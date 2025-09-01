@@ -111,8 +111,8 @@ export class Game{
     calcMoney(){
         return Math.round((this.moves-this.movescounter)/1.2);
     }
-    calcRoundScore(){
-        return Math.floor(this.round*1.1*500);
+    calcRoundScore() {
+        return Math.floor(Math.pow(1.5, this.round) * 350);
     }
     createElement(icon, x, y) {
         let element = document.createElement("div");
@@ -852,7 +852,7 @@ async function playSound(url, pitch = 1) {
 }
 function restartGame() {
   game = new Game();
-  game.displayPlayerUpgrades();
+  game.GameRenderer.displayPlayerUpgrades();
   startRound();
   document.getElementById("game-over").style.display = "none";
 }
