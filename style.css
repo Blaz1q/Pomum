@@ -290,6 +290,38 @@ body, html {
   background: #e74c3c;
 }
 
+.chance {
+  white-space: nowrap;
+  background-color: #86b587;
+  border-radius: 0.2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+
+.score {
+  white-space: nowrap;
+  background-color: #72abe0;
+  border-radius: 0.2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+
+.moves {
+  white-space: nowrap;
+  background-color: #e4d147;
+  border-radius: 0.2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+
+.mult {
+  white-space: nowrap;
+  background-color: #e07272;
+  border-radius: 0.2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+
 @keyframes skewCard {
   0% {
     transform: skew(-1deg, -0.5deg);

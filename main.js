@@ -1,49 +1,14 @@
 import { upgradesList,Upgrade } from "./upgrade.js";
+import { Tile } from "./Tile.js";
 import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES } from "./dictionary.js";
+import { consumableList } from "./consumable.js";
+import { RenderUI } from "./RenderUI.js";
 const CELL_PX = 50;
 const FADE_MS = 300;
 const FALL_MS = 350;
 console.log(upgradesList);
 
-export class Tile {
-    constructor(icon, type = TYPES.Fruit, props = {}) {
-        this.icon = icon;
-        this.type = type; // "fruit", "dynamite", "bomb"
-        this.props = {
-            detonations: props.detonations ?? 0, // default 0 unless provided
-            percent: props.percent ?? 1,
-            modifier: props.modifier ?? MODIFIERS.None,
-            ...props
-        };
-    }
-    get percent(){
-        return this.props.percent;
-    }
-    get detonations(){
-        if(this.type==TYPES.Bomb||this.type==TYPES.Dynamite){
-            return this.props.detonations;
-        }
-        return 0;
-    }
-    set percent(percent){
-        if(this.type==TYPES.Fruit||this.type==TYPES.Dynamite){
-            this.props.percent = percent;
-        }
-    }
-    set detonations(detonations){
-        if(this.type==TYPES.Dynamite||this.type==TYPES.Bomb){
-            this.props.detonations = detonations;
-        }
-    }
-}
-export class Fruit {
-    constructor(icon, percent=1, type="fruit",props = {}) {
-        this.icon = icon;
-        this.percent = percent;
-        this.type;
-        this.props;
-    }
-}
+
 export class Game{
     constructor(){
         //gold
@@ -66,6 +31,8 @@ export class Game{
         this.silverChance = 0;
         this.tempscore = 0;
         this.score = 0;
+        this.maxUpgrades = 4;
+        this.GameRenderer = new RenderUI(this);
         this.scoreBox = document.getElementById("score");
         this.tempscoreBox = document.getElementById("tempscore");
         this.multBox = document.getElementById("mult");
@@ -106,105 +73,25 @@ export class Game{
     displayMoves(){
         this.moveBox.innerHTML = this.movescounter + "/" + this.moves;
     }
-displayUpgrades(upgrades, params = { canbuy: true, cansell: false }) {
-    let full = document.createDocumentFragment();
-
-    upgrades.forEach(up => {
-        // Wrapper
-        const wrapper = document.createElement("div");
-        wrapper.className = "upgrade-wrapper";
-        if (params.cansell) {
-            wrapper.classList.add("bought");
-        }
-
-        // Price above card
-        const priceEl = document.createElement("div");
-        priceEl.className = "upgrade-price";
-        priceEl.textContent = `${params.cansell ? Math.floor(up.price / 2) : up.price}$`;
-
-        // Card inner
-        const cardInner = document.createElement("div");
-        cardInner.className = "upgrade-inner";
-        cardInner.style.backgroundImage = `url('${up.image}')`;
-        
-
-        // Card
-        const card = document.createElement("div");
-        card.className = "upgrade-card";
-        card.style.animationDelay = `-${Math.random() * 3}s`;
-        card.appendChild(cardInner);
-        
-        // Description
-        const desc = document.createElement("div");
-        desc.className = "upgrade-desc";
-        desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this)}</p>`;
-
-        // Aktualizacja opisu przy hover
-        wrapper.addEventListener("mouseenter", () => {
-            // jeśli opis się zmienia dynamicznie w zależności od stanu gry
-            desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this)}</p>`;
-        });
-
-        // Click handlers
-        if (params.canbuy) {
-            card.addEventListener("click", () => {
-                if (this.upgrades.length < 4 && this.money >= up.price) {
-                    this.buy(up);
-                    wrapper.remove();
-                }
-            });
-        }
-
-        if (params.cansell) {
-            card.addEventListener("click", () => {
-                if(this.sell(up)) wrapper.remove();
-            });
-        }
-
-        // Append
-        wrapper.appendChild(priceEl);
-        wrapper.appendChild(card);
-        wrapper.appendChild(desc);
-        full.appendChild(wrapper);
-    });
-
-    return full;
-}
-    displayPlayerUpgrades(){
-        const playerUpgrades = document.getElementById("player-upgrades-container");
-        playerUpgrades.innerHTML = "";
-        playerUpgrades.appendChild(this.displayUpgrades(this.upgrades,{canbuy:false,cansell:true}));
-    }
-    displayUpgradesInShop() {
-        const shopEl = document.getElementById("upgrades-container");
-        shopEl.innerHTML = ""; 
-        shopEl.appendChild(this.displayUpgrades(this.rollUpgrades(),{canbuy:true,cansell:false}));
-    }
     rerollUpgrades(){
         if(this.money<4) return;
         this.money-=4;
-        this.displayUpgradesInShop();
-        this.displayMoney();
-    }
-    displayMoney(){
-        this.moneyBox.innerHTML = this.money;
-    }
-    displayRound(){
-        this.roundBox.innerHTML = this.round;
+        this.GameRenderer.displayUpgradesInShop();
+        this.GameRenderer.displayMoney();
     }
     gameover(){
         document.getElementById("game-over").style.display = "flex";
     }
     endround(){
         this.movescounter=0;
-        this.displayMoves();
+        this.GameRenderer.displayMoves();
         this.stage = STAGES.Shop;
         this.emit(GAME_TRIGGERS.onRoundEnd);
         this.locked = true;
         this.money+=this.calcMoney();
         this.money+=2;
-        this.displayMoney();
-        this.displayUpgradesInShop();
+        this.GameRenderer.displayMoney();
+        this.GameRenderer.displayUpgradesInShop();
         this.gameContainer.style.display = "none";
         this.shopContainer.style.display = "block";
     }
@@ -214,22 +101,15 @@ displayUpgrades(upgrades, params = { canbuy: true, cansell: false }) {
         this.round++;
         this.score=0;
         this.locked = false;
-        this.displayRound();
-        this.displayMoney();
-        this.displayMoves();
+        this.GameRenderer.displayRound();
+        this.GameRenderer.displayMoney();
+        this.GameRenderer.displayMoves();
         this.fill();
         this.gameContainer.style.display = "grid";
         this.shopContainer.style.display = "none";
     }
-    displayScore(){
-        this.scoreBox.innerHTML=`${this.score}/${this.calcRoundScore()}`;
-    }
-    displayTempScore(){
-        this.tempscoreBox.innerHTML = this.tempscore;
-        this.multBox.innerHTML = this.mult;
-    }
     calcMoney(){
-        return (this.moves-this.movescounter);
+        return Math.round((this.moves-this.movescounter)/1.2);
     }
     calcRoundScore(){
         return Math.floor(this.round*1.1*500);
@@ -310,7 +190,7 @@ trySwap(x1, y1, x2, y2) {
 
     this.movescounter++;
     this.emit(GAME_TRIGGERS.onMove);
-    this.displayMoves();
+    this.GameRenderer.displayMoves();
 
     // animate swap first
     this.animateSwap(x1, y1, x2, y2, true, () => {
@@ -352,7 +232,7 @@ trySwap(x1, y1, x2, y2) {
         upgrade.apply(this);
         this.money -= upgrade.price;
         this.moneyBox.innerHTML = this.money;
-        this.displayPlayerUpgrades();
+        this.GameRenderer.displayPlayerUpgrades();
     }
     sell(upgrade){
         if(this.stage!==STAGES.Shop) return false; // not in shop -> can't sell
@@ -377,28 +257,42 @@ trySwap(x1, y1, x2, y2) {
     let modifier = MODIFIERS.None;
     let isGold = Math.random()*100 < this.goldChance;
     let isSilver = Math.random()*100 < this.silverChance;
-    if(isSilver){
-        modifier = MODIFIERS.Silver;
-    }
-    if(isGold){
-        modifier = MODIFIERS.Gold;
-    }
-    const props = {modifier: modifier};
+
+    if (isSilver) modifier = MODIFIERS.Silver;
+    if (isGold) modifier = MODIFIERS.Gold;
+
     const weights = this.fruits.map(f => Math.max(0, f.percent));
     let total = weights.reduce((a,b)=>a+b, 0);
-    
+
+    // fallback – jeśli wszystkie wagi są 0
     if (total <= 0) {
         total = this.fruits.length;
         const r = Math.floor(Math.random() * total);
-        return new Tile(this.fruits[r].icon, TYPES.Fruit, props);
+        const base = this.fruits[r];
+        return new Tile(base.icon, TYPES.Fruit, {
+            modifier,
+            upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
+        });
     }
 
     let r = Math.random() * total;
-    for (let i=0;i<this.fruits.length;i++){
+    for (let i = 0; i < this.fruits.length; i++) {
         r -= weights[i];
-        if (r < 0) return new Tile(this.fruits[i].icon, TYPES.Fruit, props);
+        if (r < 0) {
+            const base = this.fruits[i];
+            return new Tile(base.icon, TYPES.Fruit, {
+                modifier,
+                upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
+            });
+        }
     }
-    return new Tile(this.fruits[0].icon, TYPES.Fruit, props); 
+
+    // default – pierwszy owoc
+    const base = this.fruits[0];
+    return new Tile(base.icon, TYPES.Fruit, {
+        modifier,
+        upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
+    });
 }
     updateCell(x, y){
     const idx = y * this.matrixsize + x;
@@ -523,7 +417,7 @@ triggerSpecial(x, y, tile, options = {}, collected = new Set()) {
                 this.gameContainer.appendChild(el);
             }
         }
-        this.displayScore();
+        this.GameRenderer.displayScore();
     }
 
 
@@ -842,12 +736,12 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
     processMatches(matches){
         if(matches.length === 0){
             this.locked = false; // koniec kaskady
-            this.score += this.tempscore * this.mult;
+            this.score += Math.round(this.tempscore * this.mult);
             this.tempscore = 0;
             this.mult = 1;
             this.pitch=1;
-            this.displayScore();
-            this.displayTempScore();
+            this.GameRenderer.displayScore();
+            this.GameRenderer.displayTempScore();
             if(this.score>=this.calcRoundScore()){
                 this.endround();
                 return;
@@ -860,19 +754,19 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
             return;
         }
         this.locked = true;
-        if (this.isFiveLine(matches) || this.isLShape(matches)) {
-            // pick center tile by bounding box for stability
-            let xs = matches.map(m=>m.x);
-            let ys = matches.map(m=>m.y);
-            let minX = Math.min(...xs), maxX = Math.max(...xs);
-            let minY = Math.min(...ys), maxY = Math.max(...ys);
-            let cx = Math.round((minX + maxX)/2);
-            let cy = Math.round((minY + maxY)/2);
-            // ensure valid coordinates
-            cx = Math.max(0, Math.min(this.matrixsize-1, cx));
-            cy = Math.max(0, Math.min(this.matrixsize-1, cy));
-            //this.board[cy][cx] = this.makeBomb();
-        }
+        // if (this.isFiveLine(matches) || this.isLShape(matches)) {
+        //     // pick center tile by bounding box for stability
+        //     let xs = matches.map(m=>m.x);
+        //     let ys = matches.map(m=>m.y);
+        //     let minX = Math.min(...xs), maxX = Math.max(...xs);
+        //     let minY = Math.min(...ys), maxY = Math.max(...ys);
+        //     let cx = Math.round((minX + maxX)/2);
+        //     let cy = Math.round((minY + maxY)/2);
+        //     // ensure valid coordinates
+        //     cx = Math.max(0, Math.min(this.matrixsize-1, cx));
+        //     cy = Math.max(0, Math.min(this.matrixsize-1, cy));
+        //     //this.board[cy][cx] = this.makeBomb();
+        // }
         this.emit("match", matches);
         // pozwól przeglądarce „zobaczyć” stan po swapie zanim nałożymy .fade
         requestAnimationFrame(() => {
@@ -881,25 +775,41 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
                 const cell = this.gameContainer.children[idx];
                 if(cell) cell.classList.add("fade");
             }
-
             setTimeout(()=>{
                 // fizycznie usuń z board
+                let groups = {};
                 for(const m of matches){
+                    let tile = this.board[m.y][m.x];
                     let gold = this.board[m.y][m.x].props.modifier==MODIFIERS.Gold;
                     let silver = this.board[m.y][m.x].props.modifier==MODIFIERS.Silver;
+                    let type = tile.icon;
                     if(gold){
                         this.money++;
-                        this.displayMoney();
+                        this.GameRenderer.displayMoney();
                     }
                     if(silver){
                         this.mult = this.mult * 1.5;
                     }
+                    if (!groups[type]) {
+                        groups[type] = {
+                            mult: 0,
+                            multAdded: false
+                        };
+                    }
+                    if(!groups[type].multAdded){
+                        groups[type].mult = tile.props.upgrade.mult;
+                        groups[type].multAdded = true;
+                    }
+                    this.tempscore += Math.round(tile.props.upgrade.score);
                     this.board[m.y][m.x] = null;
                 }
-                this.tempscore += matches.length * 10;
+                for (let type in groups) {
+                    let group = groups[type];
+                    this.mult += group.mult;
+                }
                 playSound('score_sound.mp3',this.pitch);
                 this.pitch+=0.2;
-                this.displayTempScore();
+                this.GameRenderer.displayTempScore();
                 // animacja spadania istniejących owoców
                 this.animateCollapse();
             }, FADE_MS);
@@ -908,7 +818,7 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
 }
 
 let game = new Game();
-
+//consumableList[0].consume(game);
 game.startround();
 function startRound(){
     game.startround();
@@ -949,8 +859,9 @@ function restartGame() {
 function reroll(){
     game.rerollUpgrades();
 }
-//window.game = game;
+window.game = game;
 window.startRound = startRound; 
 window.upgradesList = upgradesList;
+window.consumableList = consumableList;
 window.reroll = reroll;
 window.restartGame = restartGame

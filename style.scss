@@ -3,7 +3,10 @@ $cellpx: 50px;
 $game-bg: #f0f3f7;
 $tile-bg: #ffffff;
 $tile-hover: #ffe6a7;
-
+$chance: #86b587;
+$mult: #e07272;
+$score: #72abe0;
+$moves: #e4d147;
 body, html {
   margin: 0;
   font-family: "Segoe UI", Roboto, sans-serif;
@@ -311,6 +314,34 @@ body, html {
       }
     }
   }
+}
+.chance{
+  white-space: nowrap;
+  background-color: $chance;
+  border-radius: .2em;
+  padding-left: .2em;
+  padding-right: .2em;
+}
+.score{
+  white-space: nowrap;
+  background-color: $score;
+  border-radius: .2em;
+  padding-left: .2em;
+  padding-right: .2em;
+}
+.moves{
+  white-space: nowrap;
+  background-color: $moves;
+  border-radius: .2em;
+  padding-left: .2em;
+  padding-right: .2em;
+}
+.mult{
+  white-space: nowrap;
+  background-color: $mult;
+  border-radius: .2em;
+  padding-left: .2em;
+  padding-right: .2em;
 }
 @keyframes skewCard {
   0%   { transform: skew(-1deg, -0.5deg); }

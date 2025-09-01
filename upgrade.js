@@ -1,10 +1,14 @@
-import { Game,Tile } from "./main.js";
+import { Game } from "./main.js";
+import { Tile } from "./Tile.js";
 import { GAME_TRIGGERS,MODIFIERS } from "./dictionary.js";
+import { Style } from "./RenderUI.js";
+import { RenderUI } from "./RenderUI.js";
 export const upgradesList = [];
 function removeTrigger(game,triggeredFunction,trigger){
     const index = game.triggers[trigger].indexOf(triggeredFunction);
     if (index > -1) game.triggers[trigger].splice(index, 1);
 }
+
 const defaultimage = {image: 'default'};
 export class Upgrade {
   constructor(name,descriptionfn, effect, remove, price = 2,props = {}) {
@@ -37,7 +41,7 @@ export class Upgrade {
     game.money += Math.floor(this.price/2);
   }
 }
-const applehater = new Upgrade('AppleHater',function(game){return `-4% ${game.fruits[0].icon}, +1% reszta`}, function(game){
+const applehater = new Upgrade('AppleHater',function(game){return `${Style.Chance('-4%')} ${game.fruits[0].icon}, ${Style.Chance('+1%')} reszta`}, function(game){
   const apple = game.fruits[0]; 
     apple.percent -= 1;
   if(apple.percent<0) apple.percent = 0;
@@ -50,8 +54,8 @@ const applehater = new Upgrade('AppleHater',function(game){return `-4% ${game.fr
 const stockmarket = new Upgrade('StockMarket',
   function(game) {
     // nazwa upgrade – generowana dynamicznie, ale dopiero po wylosowaniu w apply()
-    if (!this.props.randomfruit) return "-100% dla losowego owoca, reszta dostanie równo podzielone procenty. zmienia się co rundę.";
-    return `-100% ${this.props.randomfruit.icon}, +${game.calcEqualize(this.props.previousPercent)}% reszta`;
+    if (!this.props.randomfruit) return `${Style.Chance('-100%')} dla losowego owoca, reszta dostanie równo podzielone procenty. zmienia się co rundę.`;
+    return `${Style.Chance('-100%')} ${this.props.randomfruit.icon}, +${Style.Chance(game.calcEqualize(this.props.previousPercent).toString()+"%")} reszta`;
   },
   function(game) {
     this.setProps({
@@ -85,7 +89,7 @@ const stockmarket = new Upgrade('StockMarket',
   },
   8
 );
-const boom = new Upgrade('Boom',`Dynamit pojawia się +2% częściej`,
+const boom = new Upgrade('Boom',`Dynamit pojawia się ${Style.Chance('+2%')} częściej`,
   function(game){
     game.special[0].percent+=2;
   },
@@ -94,7 +98,7 @@ const boom = new Upgrade('Boom',`Dynamit pojawia się +2% częściej`,
   },2
 );
 const boomber = new Upgrade('Boomber',
-  `+50 pkt za ruch, -2 ruchy`,
+  `${Style.Score('+50 punktów')} za ruch, ${Style.Moves('-2 ruchy')}`,
   function(game) {
     // odejmujemy ruchy od gracza
     game.moves -= 2;
@@ -104,7 +108,7 @@ const boomber = new Upgrade('Boomber',
     this.setProps({
       handler: (payload) => {
         game.tempscore += 50;
-        game.displayScore();
+        game.GameRenderer.displayScore();
       }
     });
 
@@ -120,16 +124,16 @@ const boomber = new Upgrade('Boomber',
     removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMove);
   },4,{image: 'boom'}
 );
-const tetris = new Upgrade('tetris',`+4 ruchy`,function(game){
+const tetris = new Upgrade('tetris',`${Style.Moves('+4 ruchy')}`,function(game){
     game.moves+=4;
 },function(game){
     game.moves-=4;
 },4);
-const mult = new Upgrade('Mult',`+1 mult`,function(game){
+const mult = new Upgrade('Mult',`${Style.Mult('+1 mult')}`,function(game){
     this.setProps({
       handler: (payload) => {
         game.mult+=1;
-        game.displayTempScore();
+        game.GameRenderer.displayTempScore();
       }
     });
     // rejestrujemy handler
@@ -140,7 +144,7 @@ const mult = new Upgrade('Mult',`+1 mult`,function(game){
     removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMove);
   },4,defaultimage);
 const applelover = new Upgrade('applelover',
-  `+20 pkt za każde 🍎 (raz na kaskadę)`,
+  `${Style.Score('+20 pkt')} za każde 🍎 (raz na kaskadę)`,
   function(game) {
     this.setProps({
       handler: (matches) => {
@@ -150,8 +154,7 @@ const applelover = new Upgrade('applelover',
         if (uniqueFruits.has("🍎")) {
           game.tempscore += 20; // tylko raz, niezależnie od ilości jabłek
         }
-        game.displayTempScore();
-        game.displayScore();
+        game.GameRenderer.displayTempScore();
       }
     });
     game.on(GAME_TRIGGERS.onMatch, this.props.handler);
@@ -161,7 +164,8 @@ const applelover = new Upgrade('applelover',
   },
   5
 );
-const coconutBank = new Upgrade('Coconut Bank',function(game){return `50% ${game.fruits[4].icon} jest złotch, -10% ${game.fruits[4].icon}, +2.5% dla reszty`},
+const coconutBank = new Upgrade('Coconut Bank',function(game){
+  return `${Style.Chance('50%')}  ${game.fruits[4].icon} jest złotch, ${Style.Chance('-10%')} ${game.fruits[4].icon}, ${Style.Chance('+2.5%')} dla reszty`},
   function(game){
     this.setProps({
       handler: (payload) => {
@@ -181,7 +185,7 @@ const coconutBank = new Upgrade('Coconut Bank',function(game){return `50% ${game
     removeTrigger(game,this.props.handler,GAME_TRIGGERS.onSpawn);
   },10,{image: 'coconutbank'}
 );
-const goldenFruits = new Upgrade('Golden Fruits',`+1% szansa na gold`,
+const goldenFruits = new Upgrade('Golden Fruits',`${Style.Chance('+1%')}  szansa na gold`,
   function (game){
   game.goldChance += 1;
   },
@@ -189,7 +193,7 @@ const goldenFruits = new Upgrade('Golden Fruits',`+1% szansa na gold`,
     game.goldChance -= 1;
   },10,defaultimage
 );
-const silverFruits = new Upgrade('Silver Fruits',`+1% szansa na silver`,
+const silverFruits = new Upgrade('Silver Fruits',`${Style.Chance('+1%')} szansa na silver`,
   function (game){
   game.silverChance += 1;
   },
@@ -207,8 +211,7 @@ const cherryBoost = new Upgrade('CherryBoost',
             game.tempscore += 15;
           }
         });
-        game.displayTempScore();
-        game.displayScore();
+        game.GameRenderer.displayTempScore();
       }
     });
     game.on(GAME_TRIGGERS.onMatch, this.props.handler);
@@ -219,7 +222,7 @@ const cherryBoost = new Upgrade('CherryBoost',
   5
 );
 const luckySpin = new Upgrade('LuckySpin',
-  `Na początku każdej rundy losowy owoc dostaje +5% szansy (reszta równoważona, suma 100%)`,
+  `Na początku każdej rundy losowy owoc dostaje ${Style.Chance('+5%')} szansy (reszta równoważona, suma ${Style.Chance('100%')})`,
   function(game) {
     this.setProps({
       fruitsAfter: new Array(game.fruits.length).fill(0),
@@ -274,21 +277,45 @@ const luckySpin = new Upgrade('LuckySpin',
   7,defaultimage
 );
 const chainReaction = new Upgrade('ChainReaction',
-  `Każda kaskada daje dodatkowe +30 pkt`,
+  `Każda kaskada daje dodatkowe ${Style.Score('+30 punktów')}`,
   function(game) {
     this.setProps({
       handler: () => {
         game.tempscore += 30;
-        game.displayTempScore();
-        game.displayScore();
+        game.GameRenderer.displayTempScore();
       }
     });
     game.on(GAME_TRIGGERS.onMatch,this.props.handler);
   },
   function(game) {
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onCascade);
+    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch);
   },
   4,defaultimage
+);
+const battlepass = new Upgrade(
+  'Battlepass',
+  function(game){
+    if(!this.props.isactive) return `${Style.Mult('+1 mult')}. na końcu rundy dostaje ${Style.Mult('+1 mult')}`;
+    return `${Style.Mult('+1 mult')}. na końcu rundy dostaje ${Style.Mult('+1 mult')}. obecnie ${Style.Mult('+'+this.props.mult)}`;
+},
+function(game){
+  this.setProps({
+    mult: 1,
+    isactive: true,
+    onScore: () =>{
+      game.mult+=this.props.mult;
+      game.GameRenderer.displayTempScore();
+    },
+    onRoundEnd: () =>{
+      this.props.mult+=1;
+    }
+  });
+  game.on(GAME_TRIGGERS.onMove,this.props.onScore);
+  game.on(GAME_TRIGGERS.onRoundEnd,this.props.onRoundEnd);
+},function(game){
+  removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore);
+  removeTrigger(game,this.props.onRoundEnd,GAME_TRIGGERS.onRoundEnd);
+},8
 );
 upgradesList.push(applehater);
 upgradesList.push(stockmarket);
@@ -302,3 +329,4 @@ upgradesList.push(silverFruits);
 upgradesList.push(goldenFruits);
 upgradesList.push(chainReaction);
 upgradesList.push(luckySpin);
+upgradesList.push(battlepass);
