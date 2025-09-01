@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" defer src="main.js"></script>
+</head>
+<body>
+  <div class="game">
+    <!-- Left panel: stats -->
+    <div class="left-panel">
+      <h2>Round: <b id="round"></b></h2>
+      <h2>Money: <b id="money"></b></h2>
+      <h2>Get atleast: <b id="score">0</b></h2>
+      <h2>Moves: <b id="moves"></b></h2>
+      <h1>Score:</h1>
+      <div class="calcscore">
+        <div id="tempscore">0</div> x <div id="mult">1</div>
+      </div>
+      
+    </div>
+
+    <!-- Right panel: upgrades, game, shop -->
+    <div class="right-panel">
+      
+      <!-- Player upgrades -->
+      <div id="player-upgrades">
+        <h3>Upgrades</h3>
+        <div id="player-upgrades-container"></div>
+      </div>
+
+      <!-- Game grid -->
+      <div id="body"></div>
+
+      <!-- Shop -->
+      <div id="shop">
+        <button onclick="reroll()">Reroll</button>
+        <div id="upgrades-container"></div>
+        <button onclick="startRound()">Continue</button>
+      </div>
+    </div>
+  </div>
+  <div id="game-over">
+    <div class="game-over-content">
+      <h1>Game Over</h1>
+      <p>Your score: <span id="final-score">0</span></p>
+      <button onclick="restartGame()">Restart</button>
+      <button onclick="goToMenu()">Menu</button>
+    </div>
+  </div>
+</body>
+</html>

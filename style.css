@@ -1,0 +1,312 @@
+@charset "UTF-8";
+body, html {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #dbe6f6 0%, #c5796d 100%);
+  color: #333;
+}
+
+.game {
+  display: flex;
+  height: 100vh;
+  padding: 0.3rem;
+  gap: 0.5rem;
+}
+.game .left-panel {
+  flex: 0 0 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.game .left-panel h2 {
+  margin: 0;
+  font-weight: 500;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
+}
+.game .right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.game .right-panel #player-upgrades {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.game .right-panel #player-upgrades h3 {
+  margin: 0.2rem 0;
+}
+.game .right-panel #player-upgrades #player-upgrades-container {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.game .right-panel #body {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  margin-left: auto;
+  margin-right: auto;
+  grid-template-rows: repeat(9, 50px);
+  grid-template-columns: repeat(9, 50px);
+  background-color: #f0f3f7;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+.game .right-panel #body div {
+  font-size: 25px;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  cursor: grab;
+  border-radius: 10px;
+  transition: transform 200ms ease, opacity 300ms ease, background 200ms ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.game .right-panel #body div.gold {
+  background-color: gold;
+}
+.game .right-panel #body div.silver {
+  background-color: silver;
+}
+.game .right-panel #body div.fade {
+  opacity: 0;
+}
+.game .right-panel #body div.selected {
+  background: #ff7675;
+  color: white;
+  font-weight: bold;
+}
+.game .right-panel #body div:hover {
+  transform: scale(1.15);
+  background: #ffe6a7;
+}
+.game .right-panel #shop {
+  display: none;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+.game .right-panel #shop h1 {
+  margin-bottom: 1rem;
+}
+.game .right-panel #shop button {
+  margin: 0.3rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.game .right-panel #shop #upgrades-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.calcscore {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.calcscore div {
+  font-weight: bold;
+  display: block;
+  padding: 0.5em;
+  padding-left: 2em;
+  padding-right: 2em;
+  border-radius: 1em;
+}
+.calcscore #tempscore {
+  background-color: rgb(172, 172, 197);
+}
+.calcscore #mult {
+  background-color: rgb(231, 130, 130);
+}
+
+#upgrades-container {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.upgrade-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Price above the card */
+.upgrade-price {
+  margin-bottom: 0.3rem;
+  font-weight: bold;
+  background: gold;
+  color: #000;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* Card */
+.upgrade-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.upgrade-wrapper .upgrade-card {
+  width: 120px;
+  height: 180px;
+  position: relative;
+  overflow: visible; /* allow image to scale outside */
+  cursor: pointer;
+  animation: skewCard 3s infinite ease-out;
+  transition: box-shadow 0.2s ease;
+}
+.upgrade-wrapper .upgrade-card .upgrade-inner {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  transition: transform 0.2s ease;
+  transform-origin: center center; /* scale from center */
+}
+.upgrade-wrapper .upgrade-card:hover {
+  animation-play-state: paused;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+}
+.upgrade-wrapper .upgrade-card:hover .upgrade-inner {
+  transform: translateY(-5px) scale(1.05) skew(0);
+}
+.upgrade-wrapper .upgrade-desc {
+  position: absolute;
+  left: -180px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 160px;
+  background: rgba(0, 0, 0, 0.911);
+  border: 0.3em solid gray;
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+.upgrade-wrapper .upgrade-desc p {
+  font-size: 0.9rem;
+}
+.upgrade-wrapper:hover .upgrade-desc {
+  opacity: 1;
+}
+.upgrade-wrapper .upgrade-price {
+  position: absolute;
+  top: -1.5rem; /* nad kartą */
+  background: gold;
+  color: #000;
+  padding: 0.2rem 0.5rem;
+  padding-left: 1em;
+  padding-right: 1em;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  opacity: 1; /* ukryta domyślnie */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none; /* żeby nie blokowało hovera */
+  transform: translateY(-10px); /* lekko niżej na start */
+  z-index: 15;
+}
+.upgrade-wrapper:hover .upgrade-price {
+  opacity: 1;
+  transform: translateY(-15px); /* płynnie do góry */
+}
+.upgrade-wrapper.bought .upgrade-price {
+  opacity: 0;
+}
+.upgrade-wrapper.bought:hover .upgrade-price {
+  opacity: 1;
+  transform: translateY(-15px); /* płynnie do góry */
+}
+
+#game-over {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+#game-over .game-over-content {
+  background: #fff;
+  padding: 2rem 3rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+#game-over .game-over-content h1 {
+  margin: 0 0 1rem;
+  font-size: 2.5rem;
+  color: #c0392b;
+}
+#game-over .game-over-content p {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+#game-over .game-over-content button {
+  margin: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  background: #c0392b;
+  color: #fff;
+  transition: background 0.2s;
+}
+#game-over .game-over-content button:hover {
+  background: #e74c3c;
+}
+
+@keyframes skewCard {
+  0% {
+    transform: skew(-1deg, -0.5deg);
+  }
+  20% {
+    transform: skew(0.5deg, 1deg);
+  }
+  40% {
+    transform: skew(1deg, 0deg);
+  }
+  60% {
+    transform: skew(0deg, -1deg);
+  }
+  80% {
+    transform: skew(-0.5deg, 0.5deg);
+  }
+  100% {
+    transform: skew(-1deg, -0.5deg);
+  }
+}/*# sourceMappingURL=style.css.map */
