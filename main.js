@@ -1,4 +1,5 @@
 import { upgradesList,Upgrade } from "./upgrade.js";
+import { Audio } from "./sound.js";
 import { Tile } from "./Tile.js";
 import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES } from "./dictionary.js";
 import { consumableList } from "./consumable.js";
@@ -6,8 +7,6 @@ import { RenderUI } from "./RenderUI.js";
 const CELL_PX = 50;
 const FADE_MS = 300;
 const FALL_MS = 350;
-console.log(upgradesList);
-
 
 export class Game{
     constructor(){
@@ -36,7 +35,6 @@ export class Game{
         this.scoreBox = document.getElementById("score");
         this.tempscoreBox = document.getElementById("tempscore");
         this.multBox = document.getElementById("mult");
-        
         this.fruits = [
             new Tile("🍎", TYPES.Fruit),
             new Tile("🍐", TYPES.Fruit),
@@ -55,7 +53,8 @@ export class Game{
             [GAME_TRIGGERS.onRoundStart]: [],
             [GAME_TRIGGERS.onRoundEnd]: [],     // na koniec rundy
             [GAME_TRIGGERS.onMove]: [],          //ruch    
-            [GAME_TRIGGERS.onSpawn]: []
+            [GAME_TRIGGERS.onSpawn]: [],
+            [GAME_TRIGGERS.onUpgradeTriggered]: []
         };
         this.board = [];
         this.selected = null; // zapamiętany pierwszy klik
@@ -63,8 +62,24 @@ export class Game{
         //upgrades
         this.upgrades = [];
     }
-    on(event, handler) { this.triggers[event].push(handler); }
-    emit(event, payload) { this.triggers[event].forEach(h => h(payload)); }
+    on(event, handler, upgrade) {
+    this.triggers[event].push({ handler, upgrade });
+    }
+    emit(event, payload) {
+    let delay = 0;
+    console.log(`${event}:`+this.triggers[event].length);
+    this.triggers[event].forEach(({ handler, upgrade }) => {
+        handler(payload);
+        // now you also know which upgrade fired
+        if (upgrade) {
+            game.GameRenderer.upgradeTrigger(upgrade,delay);
+            setTimeout(()=>{
+                Audio.playSound('tick.mp3');
+            },delay);
+        }
+        delay+=300;
+    });
+    }
     rollUpgrades(count = 3){
         const available = upgradesList.filter(up => !this.upgrades.includes(up));
         const shuffled = available.sort(() => Math.random() - 0.5);
@@ -238,6 +253,7 @@ trySwap(x1, y1, x2, y2) {
         if(this.stage!==STAGES.Shop) return false; // not in shop -> can't sell
         const index = this.upgrades.indexOf(upgrade) ?? -1;
         if(index==-1) return;
+        console.log("SELLINNN");
         this.upgrades[index].sell(this);
         this.upgrades.splice(index,1);
         return true;
@@ -654,6 +670,8 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
         });
     }
    collapseBoard(spawnCounts){
+    console.log("collapseBoard");
+    let elements = [];
         const size = this.board.length;
         for(let x=0;x<size;x++){
             let writeY = size - 1;
@@ -666,13 +684,12 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
                 }
             }
             // uzupełnij górę nowymi (dokładnie spawnCounts[x] sztuk)
-            let spawnArray = [];
             for(let y=writeY; y>=0; y--){
                 this.board[y][x] = this.randomTile();
-                spawnArray.push(this.board[y][x]);
-            }
-            if(spawnArray.length>0) this.emit(GAME_TRIGGERS.onSpawn,spawnArray);
+                elements.push(this.board[y][x])
+            }       
         }
+        this.emit(GAME_TRIGGERS.onSpawn,elements);
     }
     animateCollapse() {
     const size = this.board.length;
@@ -807,7 +824,7 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
                     let group = groups[type];
                     this.mult += group.mult;
                 }
-                playSound('score_sound.mp3',this.pitch);
+                Audio.playSound('score_sound.mp3',this.pitch);
                 this.pitch+=0.2;
                 this.GameRenderer.displayTempScore();
                 // animacja spadania istniejących owoców
@@ -822,33 +839,6 @@ let game = new Game();
 game.startround();
 function startRound(){
     game.startround();
-}
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const soundBufferCache = {};
-
-async function loadSound(url) {
-  if (soundBufferCache[url]) return soundBufferCache[url];
-
-  const response = await fetch(url);
-  const arrayBuffer = await response.arrayBuffer();
-  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-  soundBufferCache[url] = audioBuffer;
-  return audioBuffer;
-}
-
-/**
- * Play a sound with adjustable pitch
- * @param {string} url - Path to audio file
- * @param {number} pitch - Playback rate (1 = normal, 2 = one octave up, 0.5 = one octave down)
- */
-async function playSound(url, pitch = 1) {
-  const buffer = await loadSound(url);
-
-  const source = audioContext.createBufferSource();
-  source.buffer = buffer;
-  source.playbackRate.value = pitch; // changes pitch
-  source.connect(audioContext.destination);
-  source.start();
 }
 function restartGame() {
   game = new Game();

@@ -30,6 +30,22 @@ export class RenderUI {
         playerUpgrades.appendChild(this.displayUpgrades(this.game.upgrades,{canbuy:false,cansell:true}));
         this.displayUpgradesCounter();
     }
+    getPlayerUpgrades(upgradeid) {
+        return document.querySelectorAll('#player-upgrades-container .upgrade-wrapper.bought')[upgradeid];
+    }
+    upgradeTrigger(upgrade,delay){
+        console.log(`upgrade trigger: ${upgrade.name}`);
+        const gameupgrades = this.game.upgrades;
+        const index = gameupgrades.indexOf(upgrade);
+        if(index<0) return;
+        let upgradecard = this.getPlayerUpgrades(index);
+        setTimeout(()=>{
+                upgradecard.classList.add("triggered");
+            setTimeout(()=>{
+                upgradecard.classList.remove("triggered");
+            },500);
+        },delay)
+    }
     displayUpgradesInShop() {
         const shopEl = document.getElementById("upgrades-container");
         shopEl.innerHTML = ""; 

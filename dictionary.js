@@ -3,7 +3,8 @@ export const GAME_TRIGGERS = {
     onMatch: "match",
     onRoundEnd: "roundEnd",
     onRoundStart: "roundStart",
-    onMove: "move"
+    onMove: "move",
+    onUpgradeTriggered: "upgradeTrigger"
 };
 export const TYPES = {
     Fruit: "fruit",

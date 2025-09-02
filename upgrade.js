@@ -4,9 +4,10 @@ import { GAME_TRIGGERS,MODIFIERS } from "./dictionary.js";
 import { Style } from "./RenderUI.js";
 import { RenderUI } from "./RenderUI.js";
 export const upgradesList = [];
-function removeTrigger(game,triggeredFunction,trigger){
-    const index = game.triggers[trigger].indexOf(triggeredFunction);
-    if (index > -1) game.triggers[trigger].splice(index, 1);
+function removeTrigger(game, triggeredFunction, trigger, upgrade) {
+  game.triggers[trigger] = game.triggers[trigger].filter(
+    h => !(h.handler === triggeredFunction && h.upgrade === upgrade)
+  );
 }
 
 const defaultimage = {image: 'default'};
@@ -72,10 +73,11 @@ const stockmarket = new Upgrade('StockMarket',
 
         this.props.randomfruit.percent += this.props.previousPercent;
         game.addChancesExcept(this.props.randomfruit, -chance);
+        this.props.randomfruit= null;
       }
     });
-    game.on(GAME_TRIGGERS.onRoundStart,this.props.onStart);
-    game.on(GAME_TRIGGERS.onRoundEnd,this.props.onEnd);
+    game.on(GAME_TRIGGERS.onRoundStart,this.props.onStart,this);
+    game.on(GAME_TRIGGERS.onRoundEnd,this.props.onEnd,this);
   },
   function(game) {
     // cofamy upgrade
@@ -84,8 +86,8 @@ const stockmarket = new Upgrade('StockMarket',
 
     rf.percent += this.props.previousPercent;
     game.addChancesExcept(rf, -chance);
-    removeTrigger(game,this.props.onStart,GAME_TRIGGERS.onRoundStart);
-    removeTrigger(game,this.props.onEnd,GAME_TRIGGERS.onRoundEnd);
+    removeTrigger(game,this.props.onStart,GAME_TRIGGERS.onRoundStart,this);
+    removeTrigger(game,this.props.onEnd,GAME_TRIGGERS.onRoundEnd,this);
   },
   8
 );
@@ -113,7 +115,7 @@ const boomber = new Upgrade('Boomber',
     });
 
     // rejestrujemy handler
-    game.on(GAME_TRIGGERS.onMove, this.props.handler);
+    game.on(GAME_TRIGGERS.onMove, this.props.handler,this);
   },
   function(game) {
     // cofamy ruchy
@@ -121,7 +123,7 @@ const boomber = new Upgrade('Boomber',
     game.moveBox.innerHTML = game.movescounter + "/" + game.moves;
 
     // usuwamy handler z triggerów
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMove);
+    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMove,this);
   },4,{image: 'boom'}
 );
 const tetris = new Upgrade('tetris',`${Style.Moves('+4 ruchy')}`,function(game){
@@ -137,14 +139,14 @@ const mult = new Upgrade('Mult',`${Style.Mult('+1 mult')}`,function(game){
       }
     });
     // rejestrujemy handler
-    game.on(GAME_TRIGGERS.onMove, this.props.handler);
+    game.on(GAME_TRIGGERS.onMove, this.props.handler,this);
 },
   function(game) {
     // usuwamy handler z triggerów
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMove);
+    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMove,this);
   },4,defaultimage);
 const applelover = new Upgrade('applelover',
-  `${Style.Score('+20 pkt')} za każde 🍎 (raz na kaskadę)`,
+  `${Style.Mult('+1 mult')} za każde 🍎 (raz na kaskadę)`,
   function(game) {
     this.setProps({
       handler: (matches) => {
@@ -152,15 +154,15 @@ const applelover = new Upgrade('applelover',
         const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
 
         if (uniqueFruits.has("🍎")) {
-          game.tempscore += 20; // tylko raz, niezależnie od ilości jabłek
+          game.mult += 1; // tylko raz, niezależnie od ilości jabłek
         }
         game.GameRenderer.displayTempScore();
       }
     });
-    game.on(GAME_TRIGGERS.onMatch, this.props.handler);
+    game.on(GAME_TRIGGERS.onMatch, this.props.handler,this);
   },
   function(game) {
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch);
+    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch,this);
   },
   5
 );
@@ -178,11 +180,11 @@ const coconutBank = new Upgrade('Coconut Bank',function(game){
     });
     game.fruits[4].percent -= 10;
     game.addChancesExcept(game.fruits[4],2.5);
-    game.on(GAME_TRIGGERS.onSpawn,this.props.handler);
+    game.on(GAME_TRIGGERS.onSpawn,this.props.handler,this);
   },function(game){
     game.fruits[4].percent += 10;
     game.addChancesExcept(game.fruits[4],-2.5);
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onSpawn);
+    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onSpawn,this);
   },10,{image: 'coconutbank'}
 );
 const goldenFruits = new Upgrade('Golden Fruits',`${Style.Chance('+1%')}  szansa na gold`,
@@ -214,10 +216,10 @@ const cherryBoost = new Upgrade('CherryBoost',
         game.GameRenderer.displayTempScore();
       }
     });
-    game.on(GAME_TRIGGERS.onMatch, this.props.handler);
+    game.on(GAME_TRIGGERS.onMatch, this.props.handler,this);
   },
   function(game) {
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch);
+    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch,thid);
   },
   5
 );
@@ -263,7 +265,7 @@ const luckySpin = new Upgrade('LuckySpin',
       }
     });
 
-    game.on(GAME_TRIGGERS.onRoundStart, this.props.handler);
+    game.on(GAME_TRIGGERS.onRoundStart, this.props.handler,this);
   },
   function(game) {
     if (this.props.current) {
@@ -272,7 +274,7 @@ const luckySpin = new Upgrade('LuckySpin',
         game.fruits[i].percent -= this.props.fruitsAfter[i];
       }
     }
-    removeTrigger(game,this.props.handler, GAME_TRIGGERS.onRoundStart);
+    removeTrigger(game,this.props.handler, GAME_TRIGGERS.onRoundStart,this);
   },
   7,defaultimage
 );
@@ -285,10 +287,10 @@ const chainReaction = new Upgrade('ChainReaction',
         game.GameRenderer.displayTempScore();
       }
     });
-    game.on(GAME_TRIGGERS.onMatch,this.props.handler);
+    game.on(GAME_TRIGGERS.onMatch,this.props.handler,this);
   },
   function(game) {
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch);
+    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch,this);
   },
   4,defaultimage
 );
@@ -296,7 +298,7 @@ const battlepass = new Upgrade(
   'Battlepass',
   function(game){
     if(!this.props.isactive) return `${Style.Mult('+1 mult')}. na końcu rundy dostaje ${Style.Mult('+1 mult')}`;
-    return `${Style.Mult('+1 mult')}. na końcu rundy dostaje ${Style.Mult('+1 mult')}. obecnie ${Style.Mult('+'+this.props.mult)}`;
+    return `${Style.Mult('+1 mult')}. na końcu rundy dostaje ${Style.Mult('+1 mult')}. obecnie ${Style.Mult('+'+this.props.mult)+' mult'}`;
 },
 function(game){
   this.setProps({
@@ -310,11 +312,11 @@ function(game){
       this.props.mult+=1;
     }
   });
-  game.on(GAME_TRIGGERS.onMove,this.props.onScore);
-  game.on(GAME_TRIGGERS.onRoundEnd,this.props.onRoundEnd);
+  game.on(GAME_TRIGGERS.onMove,this.props.onScore,this);
+  game.on(GAME_TRIGGERS.onRoundEnd,this.props.onRoundEnd,this);
 },function(game){
-  removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore);
-  removeTrigger(game,this.props.onRoundEnd,GAME_TRIGGERS.onRoundEnd);
+  removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
+  removeTrigger(game,this.props.onRoundEnd,GAME_TRIGGERS.onRoundEnd,this);
 },8
 );
 upgradesList.push(applehater);
