@@ -50,12 +50,6 @@ const stockmarket = new Upgrade('StockMarket',
     game.on(GAME_TRIGGERS.onRoundEnd,this.props.onEnd,this);
   },
   function(game) {
-    // cofamy upgrade
-    const rf = this.props.randomfruit;
-    const chance = game.calcEqualize(this.props.previousPercent);
-
-    rf.percent += this.props.previousPercent;
-    game.addChancesExcept(rf, -chance);
     removeTrigger(game,this.props.onStart,GAME_TRIGGERS.onRoundStart,this);
     removeTrigger(game,this.props.onEnd,GAME_TRIGGERS.onRoundEnd,this);
   },

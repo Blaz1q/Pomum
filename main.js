@@ -96,6 +96,12 @@ export class Game{
         this.GameRenderer.displayUpgradesInShop();
         this.GameRenderer.displayMoney();
     }
+    rerollBoosters(){
+        if(this.money<2) return;
+        this.money-=2;
+        this.GameRenderer.displayBoosterPacks();
+        this.GameRenderer.displayMoney();
+    }
     gameover(){
         document.getElementById("game-over").style.display = "flex";
     }
@@ -861,9 +867,13 @@ function restartGame() {
 function reroll(){
     game.rerollUpgrades();
 }
+function rerollBoosters(){
+    game.rerollBoosters();
+}
 window.game = game;
 window.startRound = startRound; 
 window.upgradesList = upgradesList;
 window.consumableList = consumableList;
 window.reroll = reroll;
-window.restartGame = restartGame
+window.rerollBoosters = rerollBoosters;
+window.restartGame = restartGame;
