@@ -103,12 +103,12 @@ export function rollConsumablePacks(count = 2) {
   const weights = consumablePacks.map(pack => 1 / pack.price);
 
   const result = [];
-  while (result.length < count && consumablePacks.length > 0) {
-    // sum all weights
+  for (let n = 0; n < count; n++) {
+    // sum of weights
     const totalWeight = weights.reduce((a, b) => a + b, 0);
     let r = Math.random() * totalWeight;
 
-    // pick one based on weight
+    // pick based on weight
     let pickedIndex = 0;
     for (let i = 0; i < weights.length; i++) {
       r -= weights[i];
@@ -118,12 +118,7 @@ export function rollConsumablePacks(count = 2) {
       }
     }
 
-    // add to result
     result.push(consumablePacks[pickedIndex]);
-
-    // remove it to avoid duplicates
-    consumablePacks.splice(pickedIndex, 1);
-    weights.splice(pickedIndex, 1);
   }
 
   return result;
