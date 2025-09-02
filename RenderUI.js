@@ -1,3 +1,5 @@
+import { Consumable,ConsumablePack,consumableList,rollConsumablePacks } from "./consumable.js";
+import { Upgrade } from "./upgradeBase.js";
 export class RenderUI {
     constructor(game) {
         this.game = game;
@@ -23,6 +25,16 @@ export class RenderUI {
     }
     displayUpgradesCounter(){
         document.getElementById("upgrades-counter").innerHTML = `(${this.game.upgrades.length}/${this.game.maxUpgrades})`;
+    }
+    displayBoosterPacks(){
+        const boosterPack = document.getElementById("boosterpack-container");
+        boosterPack.innerHTML = "";
+        boosterPack.appendChild(this.displayUpgrades(rollConsumablePacks(2),{canbuy: true,cansell: false}));
+    }
+    OpenBoosterPack(boosterPack){
+        const consumableContainer = document.getElementById("consumables-container");
+        consumableContainer.innerHTML = "";
+        consumableContainer.appendChild(this.displayUpgrades(boosterPack.roll(),{canbuy:true,cansell:false,free:true,origin: boosterPack}));
     }
     displayPlayerUpgrades(){
         const playerUpgrades = document.getElementById("player-upgrades-container");
@@ -51,9 +63,12 @@ export class RenderUI {
         shopEl.innerHTML = ""; 
         shopEl.appendChild(this.displayUpgrades(this.game.rollUpgrades(),{canbuy:true,cansell:false}));
     }
-    displayUpgrades(upgrades, params = { canbuy: true, cansell: false }) {
+    displayUpgrades(upgrades, params = { canbuy: true, cansell: false, origin: null }) {
+        console.log(params.origin);
         let full = document.createDocumentFragment();
-    
+        if(params.origin&&params.origin.type=="ConsumablePack"){
+            this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
+        }
         upgrades.forEach(up => {
             // Wrapper
             const wrapper = document.createElement("div");
@@ -61,12 +76,14 @@ export class RenderUI {
             if (params.cansell) {
                 wrapper.classList.add("bought");
             }
-    
+            if(params.free){
+                up.price = 0;
+            }
             // Price above card
             const priceEl = document.createElement("div");
             priceEl.className = "upgrade-price";
             priceEl.textContent = `$${params.cansell ? Math.floor(up.price / 2) : up.price}`;
-    
+            
             // Card inner
             const cardInner = document.createElement("div");
             cardInner.className = "upgrade-inner";
@@ -91,25 +108,32 @@ export class RenderUI {
             });
     
             // Click handlers
-            if (params.canbuy) {
-                card.addEventListener("click", () => {
-                    if (this.game.upgrades.length < this.game.maxUpgrades && this.game.money >= up.price) {
-                        this.game.buy(up);
-                        wrapper.remove();
-                    }
-                });
+                if (params.canbuy) {
+                    card.addEventListener("click", () => {
+                        if ((this.game.upgrades.length < this.game.maxUpgrades && this.game.money >= up.price&&up.type=="Upgrade") || (this.game.money >= up.price&&up.type=="ConsumablePack")) {
+                            this.game.buy(up);
+                            wrapper.remove();
+                        }
+                        else if(params.origin&&params.origin.type=="ConsumablePack"){
+                            this.game.buy(up);
+                            this.game.BuysFromBoosterLeft--;
+                            if(this.game.BuysFromBoosterLeft<=0){
+                                const container = document.getElementById("consumables-container");
+                                container.innerHTML = "";
+                            }
+                            wrapper.remove();
+                        }
+                    });
             }
-    
-            if (params.cansell) {
-                card.addEventListener("click", () => {
-                    if(this.game.sell(up)){
-                        wrapper.remove();
-                        this.displayMoney();
-                        this.displayUpgradesCounter();
-                    } 
-                });
-            }
-    
+            if (params.cansell&&(up.type=="Consumable"||up.type=="Upgrade")) {
+                    card.addEventListener("click", () => {
+                        if(this.game.sell(up)){
+                            wrapper.remove();
+                            this.displayMoney();
+                            this.displayUpgradesCounter();
+                        } 
+                    });
+                }    
             // Append
             wrapper.appendChild(priceEl);
             wrapper.appendChild(card);

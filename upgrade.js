@@ -1,8 +1,7 @@
-import { Game } from "./main.js";
-import { Tile } from "./Tile.js";
 import { GAME_TRIGGERS,MODIFIERS } from "./dictionary.js";
 import { Style } from "./RenderUI.js";
 import { RenderUI } from "./RenderUI.js";
+import { Upgrade } from "./upgradeBase.js";
 export const upgradesList = [];
 function removeTrigger(game, triggeredFunction, trigger, upgrade) {
   game.triggers[trigger] = game.triggers[trigger].filter(
@@ -11,37 +10,6 @@ function removeTrigger(game, triggeredFunction, trigger, upgrade) {
 }
 
 const defaultimage = {image: 'default'};
-export class Upgrade {
-  constructor(name,descriptionfn, effect, remove, price = 2,props = {}) {
-    this.name = name;
-    this.descriptionfn = descriptionfn;
-    this.effect = effect; // funkcja, która modyfikuje grę
-    this.remove = remove; // funkcja cofająca efekt
-    this.price = price;
-    this.image = `./images/cards/${props.image ? props.image.toLowerCase() : name.toLowerCase()}.png`
-    this.props = {
-      ...props
-    };
-  }
-  description(game){
-    if (typeof this.descriptionfn === "function") {
-      return this.descriptionfn.call(this,game);
-    }
-    return this.descriptionfn;
-  }
-  setProps(props) {
-    this.props = props;
-  }
-
-  apply(game) {
-    this.effect.call(this, game); // this wewnątrz effect wskazuje na instancję
-  }
-
-  sell(game) {
-    this.remove.call(this, game); // this wewnątrz remove wskazuje na instancję
-    game.money += Math.floor(this.price/2);
-  }
-}
 const applehater = new Upgrade('AppleHater',function(game){return `${Style.Chance('-4%')} ${game.fruits[0].icon}, ${Style.Chance('+1%')} reszta`}, function(game){
   const apple = game.fruits[0]; 
     apple.percent -= 1;
@@ -67,6 +35,7 @@ const stockmarket = new Upgrade('StockMarket',
         this.props.previousPercent = this.props.randomfruit.percent;
         game.equalizeChancesExcept(this.props.randomfruit);
         this.props.randomfruit.percent = 0;
+        return true;
       },
       onEnd: (payload) => {
         const chance = game.calcEqualize(this.props.previousPercent);
@@ -74,6 +43,7 @@ const stockmarket = new Upgrade('StockMarket',
         this.props.randomfruit.percent += this.props.previousPercent;
         game.addChancesExcept(this.props.randomfruit, -chance);
         this.props.randomfruit= null;
+        return true;
       }
     });
     game.on(GAME_TRIGGERS.onRoundStart,this.props.onStart,this);
@@ -208,7 +178,7 @@ const silverFruits = new Upgrade('Silver Fruits',`${Style.Chance('+1%')} szansa 
   },
   function(game){
     game.silverChance -= 1;
-  },10,defaultimage
+  },10,{image: 'metalplate'}
 );
 const cherryBoost = new Upgrade('CherryBoost',
   () => `+15 pkt za każdą ${game.fruit[1].icon} (za każde dopasowanie)`,

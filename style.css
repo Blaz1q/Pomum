@@ -17,11 +17,51 @@ body, html {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
-.game .left-panel h2 {
+.game .left-panel h2, .game .left-panel h1 {
   margin: 0;
-  font-weight: 500;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.game .left-panel h2 b, .game .left-panel h1 b {
+  font-weight: 700;
+  color: #222;
+  padding: 0.2em 0.5em;
+  border-radius: 0.4em;
+  background: rgba(0, 0, 0, 0.05);
+}
+.game .left-panel h1 {
+  font-size: 1.4rem;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 0.2rem;
+  margin-bottom: 0.3rem;
+}
+.game .left-panel .calcscore {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.game .left-panel .calcscore div {
+  display: block;
+  padding: 0.5em 1.2em;
+  border-radius: 1em;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.game .left-panel .calcscore #tempscore {
+  background-color: #72abe0;
+}
+.game .left-panel .calcscore #mult {
+  background-color: #e07272;
 }
 .game .right-panel {
   flex: 1;
@@ -128,13 +168,13 @@ body, html {
   border-radius: 1em;
 }
 .calcscore #tempscore {
-  background-color: rgb(172, 172, 197);
+  background-color: #72abe0;
 }
 .calcscore #mult {
-  background-color: rgb(231, 130, 130);
+  background-color: #e07272;
 }
 
-#upgrades-container {
+#upgrades-container, #consumables-container, #boosterpack-container {
   display: flex;
   justify-content: center;
   gap: 1.5rem;

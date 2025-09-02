@@ -1,8 +1,9 @@
-import { upgradesList,Upgrade } from "./upgrade.js";
+import { consumableList,Consumable,ConsumablePack } from "./consumable.js";
+import { Upgrade } from "./upgradeBase.js";
+import { upgradesList } from "./upgrade.js";
 import { Audio } from "./sound.js";
 import { Tile } from "./Tile.js";
 import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES } from "./dictionary.js";
-import { consumableList } from "./consumable.js";
 import { RenderUI } from "./RenderUI.js";
 const CELL_PX = 50;
 const FADE_MS = 300;
@@ -61,6 +62,7 @@ export class Game{
         this.locked = false;
         //upgrades
         this.upgrades = [];
+        this.BuysFromBoosterLeft = 0;
     }
     on(event, handler, upgrade) {
     this.triggers[event].push({ handler, upgrade });
@@ -107,6 +109,7 @@ export class Game{
         this.money+=2;
         this.GameRenderer.displayMoney();
         this.GameRenderer.displayUpgradesInShop();
+        this.GameRenderer.displayBoosterPacks();
         this.gameContainer.style.display = "none";
         this.shopContainer.style.display = "block";
     }
@@ -124,7 +127,7 @@ export class Game{
         this.shopContainer.style.display = "none";
     }
     calcMoney(){
-        return Math.round((this.moves-this.movescounter)/1.2);
+        return Math.round((this.moves-this.movescounter)/2);
     }
     calcRoundScore() {
         return Math.floor(Math.pow(1.5, this.round) * 350);
@@ -243,11 +246,19 @@ trySwap(x1, y1, x2, y2) {
     buy(upgrade){
         if(this.stage!==STAGES.Shop) return; // not in shop -> can't buy
         if(this.money<upgrade.price) return; // not enough money
-        this.upgrades.push(upgrade);
-        upgrade.apply(this);
+        if(upgrade.type=="Upgrade"){
+            this.upgrades.push(upgrade);
+            upgrade.apply(this);
+            this.GameRenderer.displayPlayerUpgrades();
+        }else if(upgrade.type=="Consumable"){
+            upgrade.apply(this);
+        }
+        else if(upgrade.type=="ConsumablePack"){
+            this.GameRenderer.OpenBoosterPack(upgrade);
+            Audio.playSound('pop.mp3');
+        }
         this.money -= upgrade.price;
         this.moneyBox.innerHTML = this.money;
-        this.GameRenderer.displayPlayerUpgrades();
     }
     sell(upgrade){
         if(this.stage!==STAGES.Shop) return false; // not in shop -> can't sell
@@ -823,6 +834,7 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
                 for (let type in groups) {
                     let group = groups[type];
                     this.mult += group.mult;
+                    this.mult = Math.round(this.mult * 100) / 100;
                 }
                 Audio.playSound('score_sound.mp3',this.pitch);
                 this.pitch+=0.2;

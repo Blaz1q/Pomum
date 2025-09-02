@@ -10,7 +10,9 @@ export class Tile {
             upgrade: {
                 level: 1,
                 mult: 0,
-                score: 10
+                score: 10,
+                goldchance: 0,
+                silverchance: 0
             },
             ...props
         };
