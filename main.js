@@ -69,7 +69,7 @@ export class Game{
     let delay = 0;
     console.log(`${event}:`+this.triggers[event].length);
     this.triggers[event].forEach(({ handler, upgrade }) => {
-        handler(payload);
+        if(!handler(payload)) return;
         // now you also know which upgrade fired
         if (upgrade) {
             game.GameRenderer.upgradeTrigger(upgrade,delay);
@@ -784,7 +784,7 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
         //     cy = Math.max(0, Math.min(this.matrixsize-1, cy));
         //     //this.board[cy][cx] = this.makeBomb();
         // }
-        this.emit("match", matches);
+        this.emit(GAME_TRIGGERS.onMatch, matches);
         // pozwól przeglądarce „zobaczyć” stan po swapie zanim nałożymy .fade
         requestAnimationFrame(() => {
             for(const m of matches){

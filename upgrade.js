@@ -94,6 +94,7 @@ const stockmarket = new Upgrade('StockMarket',
 const boom = new Upgrade('Boom',`Dynamit pojawia się ${Style.Chance('+2%')} częściej`,
   function(game){
     game.special[0].percent+=2;
+    return true;
   },
   function(game){
     game.special[0].percent+=-2;
@@ -111,6 +112,7 @@ const boomber = new Upgrade('Boomber',
       handler: (payload) => {
         game.tempscore += 50;
         game.GameRenderer.displayScore();
+        return true;
       }
     });
 
@@ -136,6 +138,7 @@ const mult = new Upgrade('Mult',`${Style.Mult('+1 mult')}`,function(game){
       handler: (payload) => {
         game.mult+=1;
         game.GameRenderer.displayTempScore();
+        return true;
       }
     });
     // rejestrujemy handler
@@ -157,6 +160,7 @@ const applelover = new Upgrade('applelover',
           game.mult += 1; // tylko raz, niezależnie od ilości jabłek
         }
         game.GameRenderer.displayTempScore();
+        return uniqueFruits.has("🍎");
       }
     });
     game.on(GAME_TRIGGERS.onMatch, this.props.handler,this);
@@ -176,6 +180,7 @@ const coconutBank = new Upgrade('Coconut Bank',function(game){
             if(Math.random() < 0.50) fruit.props.modifier = MODIFIERS.Gold;
           }
           });
+          return true;
       }
     });
     game.fruits[4].percent -= 10;
@@ -190,6 +195,7 @@ const coconutBank = new Upgrade('Coconut Bank',function(game){
 const goldenFruits = new Upgrade('Golden Fruits',`${Style.Chance('+1%')}  szansa na gold`,
   function (game){
   game.goldChance += 1;
+  return true;
   },
   function(game){
     game.goldChance -= 1;
@@ -198,6 +204,7 @@ const goldenFruits = new Upgrade('Golden Fruits',`${Style.Chance('+1%')}  szansa
 const silverFruits = new Upgrade('Silver Fruits',`${Style.Chance('+1%')} szansa na silver`,
   function (game){
   game.silverChance += 1;
+  return true;
   },
   function(game){
     game.silverChance -= 1;
@@ -214,6 +221,7 @@ const cherryBoost = new Upgrade('CherryBoost',
           }
         });
         game.GameRenderer.displayTempScore();
+        return true;
       }
     });
     game.on(GAME_TRIGGERS.onMatch, this.props.handler,this);
@@ -262,6 +270,7 @@ const luckySpin = new Upgrade('LuckySpin',
         }
 
         this.props.current = fruit;
+        return true;
       }
     });
 
@@ -285,6 +294,7 @@ const chainReaction = new Upgrade('ChainReaction',
       handler: () => {
         game.tempscore += 30;
         game.GameRenderer.displayTempScore();
+        return true;
       }
     });
     game.on(GAME_TRIGGERS.onMatch,this.props.handler,this);
@@ -298,7 +308,7 @@ const battlepass = new Upgrade(
   'Battlepass',
   function(game){
     if(!this.props.isactive) return `${Style.Mult('+1 mult')}. na końcu rundy dostaje ${Style.Mult('+1 mult')}`;
-    return `${Style.Mult('+1 mult')}. na końcu rundy dostaje ${Style.Mult('+1 mult')}. obecnie ${Style.Mult('+'+this.props.mult)+' mult'}`;
+    return `${Style.Mult('+1 mult')}. na końcu rundy dostaje ${Style.Mult('+1 mult')}. obecnie ${Style.Mult('+'+this.props.mult+' mult')}`;
 },
 function(game){
   this.setProps({
@@ -307,9 +317,11 @@ function(game){
     onScore: () =>{
       game.mult+=this.props.mult;
       game.GameRenderer.displayTempScore();
+      return true;
     },
     onRoundEnd: () =>{
       this.props.mult+=1;
+      return true;
     }
   });
   game.on(GAME_TRIGGERS.onMove,this.props.onScore,this);
