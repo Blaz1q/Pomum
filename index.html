@@ -26,8 +26,14 @@
       
       <!-- Player upgrades -->
       <div id="player-upgrades">
-        <h3>Upgrades <b id="upgrades-counter">(0/4)</b></h3>
-        <div id="player-upgrades-container"></div>
+        <div class="upgrade-group upgrades">
+          <div id="player-upgrades-container"></div>
+          <label><b id="upgrades-counter">(0/4)</b></label>
+        </div>
+        <div class="upgrade-group consumables">
+          <div id="player-consumables-container"></div>
+          <label><b id="consumables-counter">(0/2)</b></label>
+        </div>
       </div>
 
       <!-- Game grid -->
@@ -37,7 +43,6 @@
       <div id="shop">
         <button onclick="reroll()">Reroll Shop ($4)</button>
         <div id="upgrades-container"></div>
-        <button onclick="rerollBoosters()">Reroll Boosters ($2)</button>
         <div id="boosterpack-container"></div>
         <div id="consumables-container"></div>
         <button onclick="startRound()">Continue</button>

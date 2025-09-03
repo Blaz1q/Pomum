@@ -4,6 +4,7 @@ import { RenderUI } from "./RenderUI.js";
 import { Upgrade } from "./upgradeBase.js";
 export const upgradesList = [];
 function removeTrigger(game, triggeredFunction, trigger, upgrade) {
+  console.log(trigger);
   game.triggers[trigger] = game.triggers[trigger].filter(
     h => !(h.handler === triggeredFunction && h.upgrade === upgrade)
   );
@@ -135,25 +136,15 @@ const applelover = new Upgrade('applelover',
   5
 );
 const coconutBank = new Upgrade('Coconut Bank',function(game){
-  return `${Style.Chance('50%')}  ${game.fruits[4].icon} jest złotch, ${Style.Chance('-10%')} ${game.fruits[4].icon}, ${Style.Chance('+2.5%')} dla reszty`},
+  return `${Style.Chance('+50%')} aby ${game.fruits[4].icon} był złoty, ${Style.Chance('-10%')} ${game.fruits[4].icon}, ${Style.Chance('+2.5%')} dla reszty`},
   function(game){
-    this.setProps({
-      handler: (payload) => {
-        payload.forEach(fruit => {
-          if(fruit.icon==game.fruits[4].icon){
-            if(Math.random() < 0.50) fruit.props.modifier = MODIFIERS.Gold;
-          }
-          });
-          return true;
-      }
-    });
+    game.fruits[4].props.upgrade.goldchance += 50;
     game.fruits[4].percent -= 10;
     game.addChancesExcept(game.fruits[4],2.5);
-    game.on(GAME_TRIGGERS.onSpawn,this.props.handler,this);
   },function(game){
     game.fruits[4].percent += 10;
+    game.fruits[4].props.upgrade.goldchance -= 50;
     game.addChancesExcept(game.fruits[4],-2.5);
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onSpawn,this);
   },10,{image: 'coconutbank'}
 );
 const goldenFruits = new Upgrade('Golden Fruits',`${Style.Chance('+1%')}  szansa na gold`,
@@ -291,7 +282,7 @@ function(game){
   game.on(GAME_TRIGGERS.onMove,this.props.onScore,this);
   game.on(GAME_TRIGGERS.onRoundEnd,this.props.onRoundEnd,this);
 },function(game){
-  removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
+  removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onMove,this);
   removeTrigger(game,this.props.onRoundEnd,GAME_TRIGGERS.onRoundEnd,this);
 },8
 );

@@ -29,17 +29,17 @@ export class RenderUI {
     displayBoosterPacks(){
         const boosterPack = document.getElementById("boosterpack-container");
         boosterPack.innerHTML = "";
-        boosterPack.appendChild(this.displayUpgrades(rollConsumablePacks(2),{canbuy: true,cansell: false}));
+        boosterPack.appendChild(this.displayUpgrades(rollConsumablePacks(2),{bought: false}));
     }
     OpenBoosterPack(boosterPack){
         const consumableContainer = document.getElementById("consumables-container");
         consumableContainer.innerHTML = "";
-        consumableContainer.appendChild(this.displayUpgrades(boosterPack.roll(),{canbuy:true,cansell:false,free:true,origin: boosterPack}));
+        consumableContainer.appendChild(this.displayUpgrades(boosterPack.roll(),{bought:false,free:true,origin: boosterPack}));
     }
     displayPlayerUpgrades(){
         const playerUpgrades = document.getElementById("player-upgrades-container");
         playerUpgrades.innerHTML = "";
-        playerUpgrades.appendChild(this.displayUpgrades(this.game.upgrades,{canbuy:false,cansell:true}));
+        playerUpgrades.appendChild(this.displayUpgrades(this.game.upgrades,{bought:true}));
         this.displayUpgradesCounter();
     }
     getPlayerUpgrades(upgradeid) {
@@ -61,9 +61,9 @@ export class RenderUI {
     displayUpgradesInShop() {
         const shopEl = document.getElementById("upgrades-container");
         shopEl.innerHTML = ""; 
-        shopEl.appendChild(this.displayUpgrades(this.game.rollUpgrades(),{canbuy:true,cansell:false}));
+        shopEl.appendChild(this.displayUpgrades(this.game.rollUpgrades(),{bought:false}));
     }
-    displayUpgrades(upgrades, params = { canbuy: true, cansell: false, origin: null }) {
+    displayUpgrades(upgrades, params = {bought:false, origin: null }) {
         console.log(params.origin);
         let full = document.createDocumentFragment();
         if(params.origin&&params.origin.type=="ConsumablePack"){
@@ -73,7 +73,7 @@ export class RenderUI {
             // Wrapper
             const wrapper = document.createElement("div");
             wrapper.className = "upgrade-wrapper";
-            if (params.cansell) {
+            if (params.bought) {
                 wrapper.classList.add("bought");
             }
             if(params.free){
@@ -82,14 +82,13 @@ export class RenderUI {
             // Price above card
             const priceEl = document.createElement("div");
             priceEl.className = "upgrade-price";
-            priceEl.textContent = `$${params.cansell ? Math.floor(up.price / 2) : up.price}`;
+            priceEl.textContent = `$${params.bought ? Math.floor(up.price / 2) : up.price}`;
             
             // Card inner
             const cardInner = document.createElement("div");
             cardInner.className = "upgrade-inner";
             cardInner.style.backgroundImage = `url('${up.image}')`;
             
-    
             // Card
             const card = document.createElement("div");
             card.className = "upgrade-card";
@@ -108,39 +107,38 @@ export class RenderUI {
             });
     
             // Click handlers
-                if (params.canbuy) {
-                    card.addEventListener("click", () => {
-                        if ((this.game.upgrades.length < this.game.maxUpgrades && this.game.money >= up.price&&up.type=="Upgrade") || (this.game.money >= up.price&&up.type=="ConsumablePack")) {
-                            this.game.buy(up);
-                            wrapper.remove();
+            if (!params.bought) {
+                card.addEventListener("click", () => {
+                    if ((this.game.upgrades.length < this.game.maxUpgrades && this.game.money >= up.price&&up.type=="Upgrade") || (this.game.money >= up.price&&up.type=="ConsumablePack")) {
+                        this.game.buy(up);
+                        wrapper.remove();
+                    }
+                    else if(params.origin&&params.origin.type=="ConsumablePack"){
+                        this.game.buy(up);
+                        this.game.BuysFromBoosterLeft--;
+                        if(this.game.BuysFromBoosterLeft<=0){
+                            const container = document.getElementById("consumables-container");
+                            container.innerHTML = "";
                         }
-                        else if(params.origin&&params.origin.type=="ConsumablePack"){
-                            this.game.buy(up);
-                            this.game.BuysFromBoosterLeft--;
-                            if(this.game.BuysFromBoosterLeft<=0){
-                                const container = document.getElementById("consumables-container");
-                                container.innerHTML = "";
-                            }
-                            wrapper.remove();
-                        }
-                    });
+                        wrapper.remove();    
+                    }
+                });
             }
-            if (params.cansell&&(up.type=="Consumable"||up.type=="Upgrade")) {
-                    card.addEventListener("click", () => {
-                        if(this.game.sell(up)){
-                            wrapper.remove();
-                            this.displayMoney();
-                            this.displayUpgradesCounter();
-                        } 
-                    });
-                }    
+            if (params.bought&&(up.type=="Consumable"||up.type=="Upgrade")) {
+                card.addEventListener("click", () => {
+                    if(this.game.sell(up)){
+                        wrapper.remove();
+                        this.displayMoney();
+                        this.displayUpgradesCounter();
+                    } 
+                });
+            }
             // Append
             wrapper.appendChild(priceEl);
             wrapper.appendChild(card);
             wrapper.appendChild(desc);
             full.appendChild(wrapper);
         });
-    
         return full;
     }
     // przeniesione displayUpgrades, displayPlayerUpgrades itd...

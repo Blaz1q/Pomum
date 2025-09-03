@@ -28,13 +28,13 @@ export class Consumable extends Upgrade{
     }
 }
 function desc(fruit){
-    return `daje ${Style.Score('+1 punkt')}, ${Style.Mult('+0.2 mult')} do ${fruit.icon}, obecnie ${ Style.Score('+'+fruit.props.upgrade.score+' punktów') }, ${Style.Mult('+'+fruit.props.upgrade.mult+' mult')}`;
+    return `daje ${Style.Score('+2 punkty')}, ${Style.Mult('+0.4 mult')} do ${fruit.icon}, obecnie ${ Style.Score('+'+fruit.props.upgrade.score+' punktów') }, ${Style.Mult('+'+fruit.props.upgrade.mult+' mult')}`;
 }
 function add(fruit){
     fruit.score+=1;
-    fruit.mult+=0.2;
+    fruit.mult+=0.4;
     fruit.mult=Math.round(fruit.mult * 100) / 100;
-    fruit.level+=1;
+    fruit.level+=2;
 }
 const apple = new Consumable(
     "Jabłko",
@@ -95,6 +95,13 @@ const coconut = new Consumable(
         add(fruit);
     },
     5,{image: "lvlup_coconut"}
+);
+const voucher = new Consumable(
+    "Voucher",`Zwiększa upgrade slot o 1`,function (game){
+        game.maxUpgrades+=1;
+        game.GameRenderer.displayUpgradesCounter();
+    },
+    10,{image:'metalplate'}
 );
 export function rollConsumablePacks(count = 2) {
   if (!consumablePacks.length) return [];

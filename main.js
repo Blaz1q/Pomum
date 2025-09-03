@@ -106,18 +106,19 @@ export class Game{
         document.getElementById("game-over").style.display = "flex";
     }
     endround(){
-        this.movescounter=0;
+        
         this.GameRenderer.displayMoves();
         this.stage = STAGES.Shop;
         this.emit(GAME_TRIGGERS.onRoundEnd);
         this.locked = true;
         this.money+=this.calcMoney();
-        this.money+=2;
+        this.movescounter=0;
+        this.money+=3;
         this.GameRenderer.displayMoney();
         this.GameRenderer.displayUpgradesInShop();
         this.GameRenderer.displayBoosterPacks();
         this.gameContainer.style.display = "none";
-        this.shopContainer.style.display = "block";
+        this.shopContainer.style.display = "grid";
     }
     startround(){
         this.stage = STAGES.Game;
@@ -133,7 +134,7 @@ export class Game{
         this.shopContainer.style.display = "none";
     }
     calcMoney(){
-        return Math.round((this.moves-this.movescounter)/2);
+        return Math.round((this.moves-this.movescounter)/1.2);
     }
     calcRoundScore() {
         return Math.floor(Math.pow(1.5, this.round) * 350);
@@ -287,13 +288,6 @@ trySwap(x1, y1, x2, y2) {
     return new Tile("💣", TYPES.Bomb, { detonations: 1 });
     }
     randomFruit() {
-    let modifier = MODIFIERS.None;
-    let isGold = Math.random()*100 < this.goldChance;
-    let isSilver = Math.random()*100 < this.silverChance;
-
-    if (isSilver) modifier = MODIFIERS.Silver;
-    if (isGold) modifier = MODIFIERS.Gold;
-
     const weights = this.fruits.map(f => Math.max(0, f.percent));
     let total = weights.reduce((a,b)=>a+b, 0);
 
@@ -303,7 +297,7 @@ trySwap(x1, y1, x2, y2) {
         const r = Math.floor(Math.random() * total);
         const base = this.fruits[r];
         return new Tile(base.icon, TYPES.Fruit, {
-            modifier,
+            modifier: this.rollModifier(base),
             upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
         });
     }
@@ -314,7 +308,7 @@ trySwap(x1, y1, x2, y2) {
         if (r < 0) {
             const base = this.fruits[i];
             return new Tile(base.icon, TYPES.Fruit, {
-                modifier,
+                modifier: this.rollModifier(base),
                 upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
             });
         }
@@ -323,10 +317,22 @@ trySwap(x1, y1, x2, y2) {
     // default – pierwszy owoc
     const base = this.fruits[0];
     return new Tile(base.icon, TYPES.Fruit, {
-        modifier,
+        modifier: this.rollModifier(base),
         upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
     });
 }
+    rollModifier(tile) {
+        let modifier = MODIFIERS.None;
+        const goldChance = tile.props.upgrade.goldchance ?? 0;
+        const silverChance = tile.props.upgrade.silverchance ?? 0;
+
+        const isSilver = Math.random() * 100 < silverChance;
+        const isGold = Math.random() * 100 < goldChance;
+
+        if (isSilver) modifier = MODIFIERS.Silver;
+        if (isGold) modifier = MODIFIERS.Gold; // gold nadpisuje silver jeśli oba trafione
+        return modifier;
+    }
     updateCell(x, y){
     const idx = y * this.matrixsize + x;
     const cell = this.gameContainer.children[idx];
@@ -875,5 +881,5 @@ window.startRound = startRound;
 window.upgradesList = upgradesList;
 window.consumableList = consumableList;
 window.reroll = reroll;
-window.rerollBoosters = rerollBoosters;
+// window.rerollBoosters = rerollBoosters;
 window.restartGame = restartGame;
