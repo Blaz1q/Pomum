@@ -165,82 +165,38 @@ const silverFruits = new Upgrade('Silver Fruits',`${Style.Chance('+1%')} szansa 
     game.silverChance -= 1;
   },10,{image: 'metalplate'}
 );
-const cherryBoost = new Upgrade('CherryBoost',
-  () => `+15 pkt za każdą ${game.fruit[1].icon} (za każde dopasowanie)`,
-  function(game) {
+const grapeInterest = new Upgrade('GrapeInterest',
+  function(game){
+    if(!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score('+5 pkt')}, na końcu rundy zyskuje kolejne +5`;
+    return `Każda ${game.fruits[3].icon} daje ${Style.Score('+'+this.props.value+' pkt')}`;
+  },
+  function(game){
     this.setProps({
+      value: 5,
+      isactive: true,
       handler: (matches) => {
+        let found = false;
         matches.forEach(m => {
-          if (m.fruit.icon === game.fruit[1].icon) {
-            game.tempscore += 15;
+          if(m.fruit.icon === game.fruits[3].icon) {
+            game.tempscore += this.props.value;
+            found = true;
           }
         });
         game.GameRenderer.displayTempScore();
+        return found;
+      },
+      onRoundEnd: () => {
+        this.props.value += 5;
         return true;
       }
     });
-    game.on(GAME_TRIGGERS.onMatch, this.props.handler,this);
+    game.on(GAME_TRIGGERS.onMatch,this.props.handler,this);
+    game.on(GAME_TRIGGERS.onRoundEnd,this.props.onRoundEnd,this);
   },
-  function(game) {
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch,thid);
-  },
-  5
-);
-const luckySpin = new Upgrade('LuckySpin',
-  `Na początku każdej rundy losowy owoc dostaje ${Style.Chance('+5%')} szansy (reszta równoważona, suma ${Style.Chance('100%')})`,
-  function(game) {
-    this.setProps({
-      fruitsAfter: new Array(game.fruits.length).fill(0),
-      handler: () => {
-        const index = Math.floor(Math.random() * game.fruits.length);
-        const fruit = game.fruits[index];
-
-        // ile można dodać do wybranego owocu
-        const maxAdd = Math.min(5, 100 - fruit.percent);
-        fruit.percent += maxAdd;
-        this.props.fruitsAfter[index] += maxAdd;
-
-        // reszta procentów do odejmowania
-        let remainingSubtract = maxAdd;
-
-        // zbieramy indeksy owoców, które mogą być zmniejszone
-        let others = [];
-        for (let i = 0; i < game.fruits.length; i++) {
-          if (i !== index && game.fruits[i].percent > 0) others.push(i);
-        }
-
-        while (remainingSubtract > 0 && others.length > 0) {
-          const decrement = remainingSubtract / others.length;
-          let newOthers = [];
-          for (let i of others) {
-            const actualSubtract = Math.min(decrement, game.fruits[i].percent);
-            game.fruits[i].percent -= actualSubtract;
-            this.props.fruitsAfter[i] -= actualSubtract;
-            remainingSubtract -= actualSubtract;
-
-            // jeśli owoc dalej może być zmniejszony, zostaje w puli
-            if (game.fruits[i].percent > 0) newOthers.push(i);
-          }
-          others = newOthers;
-        }
-
-        this.props.current = fruit;
-        return true;
-      }
-    });
-
-    game.on(GAME_TRIGGERS.onRoundStart, this.props.handler,this);
-  },
-  function(game) {
-    if (this.props.current) {
-      // cofamy dokładnie zmiany zapisane w fruitsAfter
-      for (let i = 0; i < game.fruits.length; i++) {
-        game.fruits[i].percent -= this.props.fruitsAfter[i];
-      }
-    }
-    removeTrigger(game,this.props.handler, GAME_TRIGGERS.onRoundStart,this);
-  },
-  7,defaultimage
+  function(game){
+    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch,this);
+    removeTrigger(game,this.props.onRoundEnd,GAME_TRIGGERS.onRoundEnd,this);
+  },6,defaultimage
 );
 const chainReaction = new Upgrade('ChainReaction',
   `Każda kaskada daje dodatkowe ${Style.Score('+30 punktów')}`,
@@ -297,5 +253,5 @@ upgradesList.push(coconutBank);
 upgradesList.push(silverFruits);
 upgradesList.push(goldenFruits);
 upgradesList.push(chainReaction);
-upgradesList.push(luckySpin);
+upgradesList.push(grapeInterest);
 upgradesList.push(battlepass);

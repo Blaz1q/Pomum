@@ -63,6 +63,7 @@ export class Game{
         //upgrades
         this.upgrades = [];
         this.BuysFromBoosterLeft = 0;
+        this.overstock = false;
     }
     on(event, handler, upgrade) {
     this.triggers[event].push({ handler, upgrade });
@@ -84,8 +85,11 @@ export class Game{
     }
     rollUpgrades(count = 3){
         const available = upgradesList.filter(up => !this.upgrades.includes(up));
-        const shuffled = available.sort(() => Math.random() - 0.5);
-        return shuffled.slice(0, count);
+        const shuffled = available.sort(() => Math.random() - 0.5).slice(0, count);
+        if(this.overstock){
+            shuffled.push(consumableList[Math.floor(Math.random(consumableList.length))]);
+        }
+        return shuffled;
     }
     displayMoves(){
         this.moveBox.innerHTML = this.movescounter + "/" + this.moves;
@@ -253,6 +257,7 @@ trySwap(x1, y1, x2, y2) {
     buy(upgrade){
         if(this.stage!==STAGES.Shop) return; // not in shop -> can't buy
         if(this.money<upgrade.price) return; // not enough money
+        Audio.playSound('buy.mp3');
         if(upgrade.type=="Upgrade"){
             this.upgrades.push(upgrade);
             upgrade.apply(this);
@@ -398,7 +403,16 @@ triggerSpecial(x, y, tile, options = {}, collected = new Set()) {
         // build final deduped array
         const allSeen = new Set();
         const all = [];
-
+        let matches = this.findMatches(this.board);
+        if(matches.length>0){
+            for (const m of matches) {
+                const uniqueKey = `${m.x},${m.y}`;
+                if (!allSeen.has(uniqueKey)) {
+                    allSeen.add(uniqueKey);
+                    all.push(m);
+                }
+            }
+        }
         for (const k of collected) {
             const [cx, cy] = k.split(",").map(Number);
             const fruit = this.board[cy][cx];
@@ -410,6 +424,8 @@ triggerSpecial(x, y, tile, options = {}, collected = new Set()) {
                 all.push({ x: cx, y: cy, fruit });
             }
         }
+        
+        console.log(all);
         this.processMatches(all);
     }
 }
@@ -794,7 +810,8 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
             return;
         }
         this.locked = true;
-        // if (this.isFiveLine(matches) || this.isLShape(matches)) {
+        if (this.isFiveLine(matches) || this.isLShape(matches)) {
+            this.mult+=1;
         //     // pick center tile by bounding box for stability
         //     let xs = matches.map(m=>m.x);
         //     let ys = matches.map(m=>m.y);
@@ -806,7 +823,7 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
         //     cx = Math.max(0, Math.min(this.matrixsize-1, cx));
         //     cy = Math.max(0, Math.min(this.matrixsize-1, cy));
         //     //this.board[cy][cx] = this.makeBomb();
-        // }
+        }
         this.emit(GAME_TRIGGERS.onMatch, matches);
         // pozwól przeglądarce „zobaczyć” stan po swapie zanim nałożymy .fade
         requestAnimationFrame(() => {

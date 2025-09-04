@@ -2,6 +2,14 @@ import { Upgrade } from "./upgradeBase.js";
 import { Style } from "./RenderUI.js";
 export const consumableList = [];
 export const consumablePacks = [];
+export const vouchers = [];
+const pomumpackItems = [];
+export class Voucher extends Upgrade{
+    constructor(name,descriptionfn,effect,price,props = {}){
+        super(name,descriptionfn,effect,price,props);
+        this.type = "Voucher";
+    }
+}
 export class ConsumablePack extends Upgrade{
     constructor(name,descriptionfn,consumables,price,props = {}){
         super(name, descriptionfn, null, null, price, props);
@@ -96,12 +104,84 @@ const coconut = new Consumable(
     },
     5,{image: "lvlup_coconut"}
 );
-const voucher = new Consumable(
-    "Voucher",`Zwiększa upgrade slot o 1`,function (game){
+function evildesc(fruit){
+    if(fruit.props.percent-5<=0){
+        return `${Style.Chance('-'+fruit.props.percent+'%')} ${Style.Chance(`+${game.calcEqualize(fruit.props.percent)}%`) } reszta`;
+    }
+    return `${Style.Chance('-5%')} dla ${fruit.icon} ${Style.Chance('+1.25%')} reszta`;
+}
+function evilfunc(fruit){
+    if(fruit.props.percent-5<=0){
+            game.equalizeChancesExcept(fruit.props.percent);
+            fruit.props.percent-=fruit.props.percent;
+        }
+        else{
+            fruit.props.percent -= 5;
+            game.addChancesExcept(fruit,1.25);
+        }
+}
+const badapple = new Consumable(
+    "Bad Apple",
+    function(game){
+        return evildesc(game.fruits[0]);
+    },
+    function(game){
+        evilfunc(game.fruits[0]);
+    },5,{image: "default"}
+);
+const pbear = new Consumable(
+    "p-bear?",
+    function(game){
+        return evildesc(game.fruits[1]);
+    },
+    function(game){
+        evilfunc(game.fruits[1]);
+    },5,{image: "default"}
+);
+const winogronevil = new Consumable(
+    "EVIL Winogron",
+    function(game){
+        return evildesc(game.fruits[3]);
+    },
+    function(game){
+        evilfunc(game.fruits[3]);
+    },5,{image: "default"}
+);
+const toxicpineapple = new Consumable(
+    "Toxic pineapple",
+    function(game){
+        return evildesc(game.fruits[2]);
+    },
+    function(game){
+        evilfunc(game.fruits[2]);
+    },5,{image: "default"}
+);
+const coconutGranade = new Consumable(
+    "Coconut Granade",
+    function(game){
+        return evildesc(game.fruits[4]);
+    },
+    function(game){
+        evilfunc(game.fruits[4]);
+    },5,{image: "default"}
+);
+const voucher = new Voucher(
+    "Voucher",
+    `Zwiększa upgrade slot o 1`,
+    function (game){
         game.maxUpgrades+=1;
         game.GameRenderer.displayUpgradesCounter();
     },
-    10,{image:'metalplate'}
+    10,
+    {image:'metalplate'}
+);
+const overstock = new Voucher(
+    "Overstock",
+    `Ulepszenia owoców pojawiają się w sklepie!`,
+    function(game){
+        game.overstock = true;
+    },
+    10,{image: 'default'}
 );
 export function rollConsumablePacks(count = 2) {
   if (!consumablePacks.length) return [];
@@ -124,17 +204,16 @@ export function rollConsumablePacks(count = 2) {
         break;
       }
     }
-
     result.push(consumablePacks[pickedIndex]);
   }
-
   return result;
 }
-
-const pomumpackSmall = new ConsumablePack("Pomumpack",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},[apple,pear,grape,coconut,pineapple],4);
-const pomumpackBig = new ConsumablePack("Poumpack BIG",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},[apple,pear,grape,coconut,pineapple],6,{maxSelect: 1,maxRoll: 4,image: 'pomumpackbig'});
-const pomumpackMega = new ConsumablePack("Poumpack MEGA",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},[apple,pear,grape,coconut,pineapple],8,{maxSelect: 2,maxRoll: 5,image: 'pomumpackmega'});
+vouchers.push(voucher,overstock);
+pomumpackItems.push(apple,pear,grape,coconut,pineapple,badapple,pbear,winogronevil,toxicpineapple,coconutGranade);
+consumableList.push(apple,pear,grape,coconut,pineapple,badapple,pbear,winogronevil,toxicpineapple,coconutGranade);
+const pomumpackSmall = new ConsumablePack("Pomumpack",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,4);
+const pomumpackBig = new ConsumablePack("Poumpack BIG",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,6,{maxSelect: 1,maxRoll: 4,image: 'pomumpackbig'});
+const pomumpackMega = new ConsumablePack("Poumpack MEGA",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,8,{maxSelect: 2,maxRoll: 5,image: 'pomumpackmega'});
 consumablePacks.push(pomumpackSmall);
 consumablePacks.push(pomumpackBig);
 consumablePacks.push(pomumpackMega);
-consumableList.push(apple);

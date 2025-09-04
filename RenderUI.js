@@ -23,6 +23,9 @@ export class RenderUI {
         this.game.tempscoreBox.innerHTML = this.game.tempscore;
         this.game.multBox.innerHTML = this.game.mult;
     }
+    displayFruits(){
+        
+    }
     displayUpgradesCounter(){
         document.getElementById("upgrades-counter").innerHTML = `(${this.game.upgrades.length}/${this.game.maxUpgrades})`;
     }
@@ -71,6 +74,7 @@ export class RenderUI {
         }
         upgrades.forEach(up => {
             // Wrapper
+            console.log(up);
             const wrapper = document.createElement("div");
             wrapper.className = "upgrade-wrapper";
             if (params.bought) {
