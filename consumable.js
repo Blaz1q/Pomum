@@ -112,7 +112,7 @@ function evildesc(fruit){
 }
 function evilfunc(fruit){
     if(fruit.props.percent-5<=0){
-            game.equalizeChancesExcept(fruit.props.percent);
+            game.equalizeChancesExcept(fruit);
             fruit.props.percent-=fruit.props.percent;
         }
         else{
@@ -217,3 +217,4 @@ const pomumpackMega = new ConsumablePack("Poumpack MEGA",function(){return `Znaj
 consumablePacks.push(pomumpackSmall);
 consumablePacks.push(pomumpackBig);
 consumablePacks.push(pomumpackMega);
+
