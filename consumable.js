@@ -110,7 +110,7 @@ function evildesc(fruit){
     }
     return `${Style.Chance('-5%')} dla ${fruit.icon} ${Style.Chance('+1.25%')} reszta`;
 }
-function evilfunc(fruit){
+function evilfunc(game,fruit){
     if(fruit.props.percent-5<=0){
             game.equalizeChancesExcept(fruit);
             fruit.props.percent-=fruit.props.percent;
@@ -126,7 +126,7 @@ const badapple = new Consumable(
         return evildesc(game.fruits[0]);
     },
     function(game){
-        evilfunc(game.fruits[0]);
+        evilfunc(game,game.fruits[0]);
     },5,{image: "default"}
 );
 const pbear = new Consumable(
@@ -135,7 +135,7 @@ const pbear = new Consumable(
         return evildesc(game.fruits[1]);
     },
     function(game){
-        evilfunc(game.fruits[1]);
+        evilfunc(game,game.fruits[1]);
     },5,{image: "default"}
 );
 const winogronevil = new Consumable(
@@ -144,7 +144,7 @@ const winogronevil = new Consumable(
         return evildesc(game.fruits[3]);
     },
     function(game){
-        evilfunc(game.fruits[3]);
+        evilfunc(game,game.fruits[3]);
     },5,{image: "default"}
 );
 const toxicpineapple = new Consumable(
@@ -153,7 +153,7 @@ const toxicpineapple = new Consumable(
         return evildesc(game.fruits[2]);
     },
     function(game){
-        evilfunc(game.fruits[2]);
+        evilfunc(game,game.fruits[2]);
     },5,{image: "default"}
 );
 const coconutGranade = new Consumable(
@@ -162,7 +162,7 @@ const coconutGranade = new Consumable(
         return evildesc(game.fruits[4]);
     },
     function(game){
-        evilfunc(game.fruits[4]);
+        evilfunc(game,game.fruits[4]);
     },5,{image: "default"}
 );
 const voucher = new Voucher(
@@ -217,4 +217,3 @@ const pomumpackMega = new ConsumablePack("Poumpack MEGA",function(){return `Znaj
 consumablePacks.push(pomumpackSmall);
 consumablePacks.push(pomumpackBig);
 consumablePacks.push(pomumpackMega);
-

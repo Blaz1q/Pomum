@@ -28,6 +28,7 @@ export class Tile {
     }
     set percent(percent){
         if(this.type==TYPES.Fruit||this.type==TYPES.Dynamite){
+            console.log("set:"+percent);
             this.props.percent = percent;
         }
     }

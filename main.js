@@ -236,7 +236,9 @@ trySwap(x1, y1, x2, y2) {
 
     equalizeChances(){
         const eq = parseFloat(100 / this.fruits.length);
-        for (const f of this.fruits) f.percent = eq;
+        this.fruits.forEach(fruit => {
+            fruit.percent = eq;
+        });
     }
     calcEqualize(percent){
         return (parseFloat)(percent/(this.fruits.length-1));
@@ -876,6 +878,7 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
 }
 
 let game = new Game();
+console.log(game.fruits);
 //consumableList[0].consume(game);
 game.startround();
 function startRound(){
@@ -884,6 +887,7 @@ function startRound(){
 function restartGame() {
   game = new Game();
   game.GameRenderer.displayPlayerUpgrades();
+  console.log(game.fruits);
   startRound();
   document.getElementById("game-over").style.display = "none";
 }
@@ -893,7 +897,6 @@ function reroll(){
 function rerollBoosters(){
     game.rerollBoosters();
 }
-window.game = game;
 window.startRound = startRound; 
 window.upgradesList = upgradesList;
 window.consumableList = consumableList;
