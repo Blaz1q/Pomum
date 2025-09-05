@@ -69,47 +69,43 @@ export class Game{
     on(event, handler, upgrade) {
     this.triggers[event].push({ handler, upgrade });
     }
-    async emit(event, payload) {
-    // Sort handlers by upgrade purchase order
+async emit(event, payload) {
     const sorted = [...this.triggers[event]].sort((a, b) => {
-        if (!a.upgrade || !b.upgrade) return 0;
-        return this.upgrades.indexOf(a.upgrade) - this.upgrades.indexOf(b.upgrade);
-    });
+    const indexA = a.upgrade ? this.upgrades.indexOf(a.upgrade) : -1;
+    const indexB = b.upgrade ? this.upgrades.indexOf(b.upgrade) : -1;
 
-    return new Promise(resolve => {
-        if (sorted.length === 0) {
-            resolve();
-            return;
+    // If both upgrades exist in the list, sort by their index
+    if (indexA >= 0 && indexB >= 0) return indexA - indexB;
+
+    // If only one exists, it comes first
+    if (indexA >= 0) return -1;
+    if (indexB >= 0) return 1;
+
+    // Otherwise keep original order
+    return 0;
+});
+    if (sorted.length === 0) return;
+
+    let delay = 0;
+
+    for (const { handler, upgrade } of sorted) {
+        if (delay > 0) {
+            await new Promise(r => setTimeout(r, delay));
         }
 
-        let delay = 0;
-        let activeCount = 0; // number of handlers that actually triggered
+        const result = handler(payload);
 
-        sorted.forEach(({ handler, upgrade }, i) => {
-            const result = handler(payload);
-
-            if (result && upgrade) {
-                activeCount++;
-                setTimeout(() => {
-                    this.GameRenderer.upgradeTrigger(upgrade, 0);
-                    Audio.playSound("tick.mp3");
-
-                    // resolve only after the last *active* one
-                    if (--activeCount === 0 && i === sorted.length - 1) {
-                        resolve();
-                    }
-                }, delay);
-
-                delay += 300; // only space out active ones
-            } else {
-                // handler returned false → no delay, just continue
-                if (i === sorted.length - 1 && activeCount === 0) {
-                    resolve();
-                }
-            }
-        });
-    });
+        if (result && upgrade) {
+            this.GameRenderer.upgradeTrigger(upgrade, 0);
+            Audio.playSound("tick.mp3");
+            // only add delay for next handler if this one returned true
+            delay = 300;
+        } else {
+            delay = 0; // no delay if handler returned false
+        }
+    }
 }
+
     rollUpgrades(count = 3){
         const available = upgradesList.filter(up => !this.upgrades.includes(up));
         const shuffled = available.sort(() => Math.random() - 0.5).slice(0, count);
@@ -820,7 +816,9 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
     }
     async processMatches(matches){
         if(matches.length === 0){
+            console.log("waiting..");
             await this.emit(GAME_TRIGGERS.onScore);
+            console.log("finished");
             this.GameRenderer.displayTempScore();
             let delay = 0;
             if(this.triggers[GAME_TRIGGERS.onScore].length>0){delay = 300}

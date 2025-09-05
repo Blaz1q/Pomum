@@ -11,15 +11,35 @@ function removeTrigger(game, triggeredFunction, trigger, upgrade) {
 }
 
 const defaultimage = {image: 'default'};
-const applehater = new Upgrade('AppleHater',function(game){return `${Style.Chance('-4%')} ${game.fruits[0].icon}, ${Style.Chance('+1%')} reszta`}, function(game){
-  const apple = game.fruits[0]; 
-    apple.percent -= 1;
-  if(apple.percent<0) apple.percent = 0;
-  game.addChancesExcept(apple,0.5);
+const applehater = new Upgrade('AppleHater',`Jeżeli jabłko nie zostanie zniszczone, ${Style.Score("+100 punktów")}`, 
+function(game){
+  this.setProps({
+    found: false,
+    onMatch: (payload)=>{
+      if(this.props.found) return false;
+      payload.forEach(m => {
+          if(m.fruit.icon === game.fruits[0].icon) {
+            this.props.found = true; 
+            return true;
+          }
+        });
+        return false;
+      },
+      onScore: ()=>{
+        if(!this.props.found){
+          game.tempscore+=100;
+          game.GameRenderer.displayTempScore();
+          return true;
+        }
+        this.props.found = false;
+        return false;
+      }
+  });
+  game.on(GAME_TRIGGERS.onMatch,this.props.onMatch,this);
+  game.on(GAME_TRIGGERS.onScore,this.props.onScore,this);
 },function(game){
-    const apple = game.fruits[0]; 
-    apple.percent += 1;
-  game.addChancesExcept(apple,-0.5);
+    removeTrigger(game,this.props.onMatch,GAME_TRIGGERS.onMatch,this);
+    removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
 },4,defaultimage);
 const stockmarket = new Upgrade('StockMarket',
   function(game) {
@@ -65,8 +85,8 @@ const boom = new Upgrade('Boom',`Dynamit pojawia się ${Style.Chance('+2%')} cz�
     game.special[0].percent+=-2;
   },2
 );
-const boomber = new Upgrade('Boomber',
-  `${Style.Score('+50 punktów')} za ruch, ${Style.Moves('-2 ruchy')}`,
+const boomber = new Upgrade('Bomber',
+  `${Style.Score('+250 punktów')} za ruch, ${Style.Moves('-2 ruchy')}`,
   function(game) {
     // odejmujemy ruchy od gracza
     game.moves -= 2;
@@ -75,7 +95,7 @@ const boomber = new Upgrade('Boomber',
     // zapisujemy handler w props, żeby później można go było usunąć
     this.setProps({
       handler: (payload) => {
-        game.tempscore += 50;
+        game.tempscore += 250;
         game.GameRenderer.displayScore();
         return true;
       }
@@ -167,7 +187,7 @@ const silverFruits = new Upgrade('Silver Fruits',`${Style.Chance('+1%')} szansa 
 );
 const grapeInterest = new Upgrade('GrapeInterest',
   function(game){
-    if(!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score('+5 pkt')}, na końcu rundy zyskuje kolejne +5`;
+    if(!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score('+5 pkt')}, na końcu rundy zyskuje kolejne ${Style.Score('+5 pkt')}`;
     return `Każda ${game.fruits[3].icon} daje ${Style.Score('+'+this.props.value+' pkt')}`;
   },
   function(game){
@@ -270,6 +290,23 @@ const highfive = new Upgrade(
     removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
   },6,defaultimage
 );
+const broke = new Upgrade(
+  'broke',
+  `Jeżeli ma się mniej niż $6, +${Style.Score('+250 punktów')}`,
+  function(game){
+    this.setProps({
+      onScore: ()=>{
+        if(game.money<6){
+          game.tempscore+=250;
+        }
+        return game.money<6;
+      }
+    });
+    game.on(GAME_TRIGGERS.onScore,this.props.onScore,this);
+  },function(game){
+    removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
+  },6,defaultimage
+)
 upgradesList.push(applehater);
 upgradesList.push(stockmarket);
 upgradesList.push(boom);

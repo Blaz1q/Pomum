@@ -39,12 +39,65 @@ export class RenderUI {
         consumableContainer.innerHTML = "";
         consumableContainer.appendChild(this.displayUpgrades(boosterPack.roll(),{bought:false,free:true,origin: boosterPack}));
     }
-    displayPlayerUpgrades(){
-        const playerUpgrades = document.getElementById("player-upgrades-container");
-        playerUpgrades.innerHTML = "";
-        playerUpgrades.appendChild(this.displayUpgrades(this.game.upgrades,{bought:true}));
-        this.displayUpgradesCounter();
-    }
+displayPlayerUpgrades() {
+    const playerUpgrades = document.getElementById("player-upgrades-container");
+    playerUpgrades.innerHTML = "";
+    const upgradesFragment = this.displayUpgrades(this.game.upgrades, { bought: true });
+
+    upgradesFragment.querySelectorAll(".upgrade-wrapper").forEach((wrapper) => {
+        wrapper.draggable = true;
+
+        wrapper.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", [...wrapper.parentElement.children].indexOf(wrapper));
+            wrapper.classList.add("dragging");
+        });
+
+        wrapper.addEventListener("dragend", () => {
+            wrapper.classList.remove("dragging");
+            // reset transform after drop
+            wrapper.style.transform = "";
+        });
+
+        wrapper.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            wrapper.classList.add("drag-over");
+        });
+
+        wrapper.addEventListener("dragleave", () => {
+            wrapper.classList.remove("drag-over");
+        });
+
+        wrapper.addEventListener("drop", (e) => {
+            e.preventDefault();
+            wrapper.classList.remove("drag-over");
+
+            const container = wrapper.parentElement;
+            const draggedIndex = parseInt(e.dataTransfer.getData("text/plain"));
+            const targetIndex = [...container.children].indexOf(wrapper);
+
+            if (draggedIndex === targetIndex) return;
+
+            const draggedElement = container.children[draggedIndex];
+
+            draggedElement.style.transition = "";
+                draggedElement.style.transform = "";
+
+                if (draggedIndex < targetIndex) {
+                    container.insertBefore(draggedElement, container.children[targetIndex + 1] || null);
+                } else {
+                    container.insertBefore(draggedElement, container.children[targetIndex]);
+                }
+
+                // Update array
+                const movedUpgrade = this.game.upgrades.splice(draggedIndex, 1)[0];
+                this.game.upgrades.splice(targetIndex, 0, movedUpgrade);
+
+                this.displayUpgradesCounter();
+        });
+    });
+
+    playerUpgrades.appendChild(upgradesFragment);
+}
     getPlayerUpgrades(upgradeid) {
         return document.querySelectorAll('#player-upgrades-container .upgrade-wrapper.bought')[upgradeid];
     }
