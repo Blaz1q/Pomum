@@ -4,7 +4,8 @@ export const GAME_TRIGGERS = {
     onRoundEnd: "roundEnd",
     onRoundStart: "roundStart",
     onMove: "move",
-    onUpgradeTriggered: "upgradeTrigger"
+    onUpgradeTriggered: "upgradeTrigger",
+    onScore: "score"
 };
 export const TYPES = {
     Fruit: "fruit",

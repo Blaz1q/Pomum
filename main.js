@@ -55,7 +55,8 @@ export class Game{
             [GAME_TRIGGERS.onRoundEnd]: [],     // na koniec rundy
             [GAME_TRIGGERS.onMove]: [],          //ruch    
             [GAME_TRIGGERS.onSpawn]: [],
-            [GAME_TRIGGERS.onUpgradeTriggered]: []
+            [GAME_TRIGGERS.onUpgradeTriggered]: [],
+            [GAME_TRIGGERS.onScore]: [],
         };
         this.board = [];
         this.selected = null; // zapamiętany pierwszy klik
@@ -68,21 +69,47 @@ export class Game{
     on(event, handler, upgrade) {
     this.triggers[event].push({ handler, upgrade });
     }
-    emit(event, payload) {
-    let delay = 0;
-    console.log(`${event}:`+this.triggers[event].length);
-    this.triggers[event].forEach(({ handler, upgrade }) => {
-        if(!handler(payload)) return;
-        // now you also know which upgrade fired
-        if (upgrade) {
-            game.GameRenderer.upgradeTrigger(upgrade,delay);
-            setTimeout(()=>{
-                Audio.playSound('tick.mp3');
-            },delay);
-        }
-        delay+=300;
+    async emit(event, payload) {
+    // Sort handlers by upgrade purchase order
+    const sorted = [...this.triggers[event]].sort((a, b) => {
+        if (!a.upgrade || !b.upgrade) return 0;
+        return this.upgrades.indexOf(a.upgrade) - this.upgrades.indexOf(b.upgrade);
     });
-    }
+
+    return new Promise(resolve => {
+        if (sorted.length === 0) {
+            resolve();
+            return;
+        }
+
+        let delay = 0;
+        let activeCount = 0; // number of handlers that actually triggered
+
+        sorted.forEach(({ handler, upgrade }, i) => {
+            const result = handler(payload);
+
+            if (result && upgrade) {
+                activeCount++;
+                setTimeout(() => {
+                    this.GameRenderer.upgradeTrigger(upgrade, 0);
+                    Audio.playSound("tick.mp3");
+
+                    // resolve only after the last *active* one
+                    if (--activeCount === 0 && i === sorted.length - 1) {
+                        resolve();
+                    }
+                }, delay);
+
+                delay += 300; // only space out active ones
+            } else {
+                // handler returned false → no delay, just continue
+                if (i === sorted.length - 1 && activeCount === 0) {
+                    resolve();
+                }
+            }
+        });
+    });
+}
     rollUpgrades(count = 3){
         const available = upgradesList.filter(up => !this.upgrades.includes(up));
         const shuffled = available.sort(() => Math.random() - 0.5).slice(0, count);
@@ -97,6 +124,7 @@ export class Game{
     rerollUpgrades(){
         if(this.money<4) return;
         this.money-=4;
+        Audio.playSound('buy.mp3');
         this.GameRenderer.displayUpgradesInShop();
         this.GameRenderer.displayMoney();
     }
@@ -218,7 +246,6 @@ trySwap(x1, y1, x2, y2) {
     }
 
     this.movescounter++;
-    this.emit(GAME_TRIGGERS.onMove);
     this.GameRenderer.displayMoves();
 
     // animate swap first
@@ -227,6 +254,7 @@ trySwap(x1, y1, x2, y2) {
         if (special) {
             this.triggerSpecial(special.x, special.y, special.tile, { includeSwapped: true, swappedX: special.swappedX, swappedY: special.swappedY });
         } else if (matches.length > 0) {
+            this.emit(GAME_TRIGGERS.onMove,matches);
             this.processMatches(matches);
         }
     }, { start1, start2, preIcon1, preIcon2 });
@@ -426,8 +454,7 @@ triggerSpecial(x, y, tile, options = {}, collected = new Set()) {
                 all.push({ x: cx, y: cy, fruit });
             }
         }
-        
-        console.log(all);
+        this.emit(GAME_TRIGGERS.onMove,all);
         this.processMatches(all);
     }
 }
@@ -791,24 +818,30 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
         g.style.zIndex = "100";
         return g;
     }
-    processMatches(matches){
+    async processMatches(matches){
         if(matches.length === 0){
-            this.locked = false; // koniec kaskady
-            this.score += Math.round(this.tempscore * this.mult);
-            this.tempscore = 0;
-            this.mult = 1;
-            this.pitch=1;
-            this.GameRenderer.displayScore();
+            await this.emit(GAME_TRIGGERS.onScore);
             this.GameRenderer.displayTempScore();
-            if(this.score>=this.calcRoundScore()){
-                this.endround();
-                return;
-            }
-            else if(this.movescounter>=this.moves&&this.score<this.calcRoundScore()){
-                this.locked = true;
-                this.gameover();
-                return;
-            }
+            let delay = 0;
+            if(this.triggers[GAME_TRIGGERS.onScore].length>0){delay = 300}
+            setTimeout(()=>{
+                this.locked = false; // koniec kaskady
+                this.score += Math.round(this.tempscore * this.mult);
+                this.tempscore = 0;
+                this.mult = 1;
+                this.pitch=1;
+                this.GameRenderer.displayScore();
+                this.GameRenderer.displayTempScore();
+                if(this.score>=this.calcRoundScore()){
+                    this.endround();
+                    return;
+                }
+                else if(this.movescounter>=this.moves&&this.score<this.calcRoundScore()){
+                    this.locked = true;
+                    this.gameover();
+                    return;
+                }
+            },delay);
             return;
         }
         this.locked = true;
@@ -897,6 +930,7 @@ function reroll(){
 function rerollBoosters(){
     game.rerollBoosters();
 }
+window.game = game;
 window.startRound = startRound; 
 window.upgradesList = upgradesList;
 window.consumableList = consumableList;

@@ -107,11 +107,11 @@ const mult = new Upgrade('Mult',`${Style.Mult('+1 mult')}`,function(game){
       }
     });
     // rejestrujemy handler
-    game.on(GAME_TRIGGERS.onMove, this.props.handler,this);
+    game.on(GAME_TRIGGERS.onScore, this.props.handler,this);
 },
   function(game) {
     // usuwamy handler z triggerów
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMove,this);
+    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onScore,this);
   },4,defaultimage);
 const applelover = new Upgrade('applelover',
   `${Style.Mult('+1 mult')} za każde 🍎 (raz na kaskadę)`,
@@ -235,12 +235,40 @@ function(game){
       return true;
     }
   });
-  game.on(GAME_TRIGGERS.onMove,this.props.onScore,this);
+  game.on(GAME_TRIGGERS.onScore,this.props.onScore,this);
   game.on(GAME_TRIGGERS.onRoundEnd,this.props.onRoundEnd,this);
 },function(game){
-  removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onMove,this);
+  removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
   removeTrigger(game,this.props.onRoundEnd,GAME_TRIGGERS.onRoundEnd,this);
 },8
+);
+const highfive = new Upgrade(
+  'High Five',
+  `Gdy podczas gry zrobi się piątke, ${Style.Mult('X2 mult')}`,
+  function(game){
+    this.setProps({
+      triggered: false,
+      onMatch: (payload) =>{
+        if(this.props.triggered) return false;
+        this.props.triggered = payload&&game.isFiveLine(payload);
+        return payload&&game.isFiveLine(payload);
+      },
+      onScore: () => {
+        if(this.props.triggered){
+          game.mult *= 2;
+          game.GameRenderer.displayTempScore();
+          this.props.triggered = false;
+          return true;
+        }
+        return false;
+      }
+    })
+    game.on(GAME_TRIGGERS.onMatch,this.props.onMatch,this);
+    game.on(GAME_TRIGGERS.onScore,this.props.onScore,this);
+  },function(game){
+    removeTrigger(game,this.props.onMatch,GAME_TRIGGERS.onMatch,this);
+    removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
+  },6,defaultimage
 );
 upgradesList.push(applehater);
 upgradesList.push(stockmarket);
@@ -255,3 +283,4 @@ upgradesList.push(goldenFruits);
 upgradesList.push(chainReaction);
 upgradesList.push(grapeInterest);
 upgradesList.push(battlepass);
+upgradesList.push(highfive);
