@@ -917,6 +917,7 @@ function startRound(){
 }
 function restartGame() {
   game = new Game();
+  window.game = game;
   game.GameRenderer.displayPlayerUpgrades();
   console.log(game.fruits);
   startRound();
