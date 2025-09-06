@@ -923,12 +923,16 @@ function restartGame() {
   startRound();
   document.getElementById("game-over").style.display = "none";
 }
+function skip(){
+    game.GameRenderer.hideTileOverlay();
+}
 function reroll(){
     game.rerollUpgrades();
 }
 function rerollBoosters(){
     game.rerollBoosters();
 }
+window.skip = skip;
 window.game = game;
 window.startRound = startRound; 
 window.upgradesList = upgradesList;

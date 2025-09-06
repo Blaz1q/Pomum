@@ -40,7 +40,7 @@ function(game){
 },function(game){
     removeTrigger(game,this.props.onMatch,GAME_TRIGGERS.onMatch,this);
     removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
-},4,defaultimage);
+},4);
 const stockmarket = new Upgrade('StockMarket',
   function(game) {
     // nazwa upgrade – generowana dynamicznie, ale dopiero po wylosowaniu w apply()
@@ -307,6 +307,44 @@ const broke = new Upgrade(
     removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
   },6,defaultimage
 )
+const robber = new Upgrade(
+  'Robber',
+  function(game){
+    if(this.props.sellPriceMult&&this.props.sellPriceMult!=0){
+      return `Daje + Mult ceny sprzedarzy wszystkich kupionych ulepszeń. (Obecnie ${Style.Mult(`+${this.props.sellPriceMult} mult`)})`;
+      } 
+      return `Daje + Mult ceny sprzedarzy wszystkich kupionych ulepszeń.`;
+    },function(game){
+      this.setProps({
+        sellPriceMult: 0,
+        onRoundStart: ()=> {
+          let x = 0;
+          game.upgrades.forEach(upgrade => {
+              x += upgrade.sellPrice;
+          });
+          this.props.sellPriceMult = x;
+          console.log(x);
+          return true;
+        },
+        onRoundEnd: () =>{
+          this.sellPriceMult = 0;
+          return true;
+        },
+        onScore: ()=>{
+          game.mult+=this.props.sellPriceMult;
+          game.GameRenderer.displayTempScore();
+          return true;
+        }
+      });
+      game.on(GAME_TRIGGERS.onRoundStart,this.props.onRoundStart,this);
+      game.on(GAME_TRIGGERS.onRoundEnd,this.props.onRoundEnd,this);
+      game.on(GAME_TRIGGERS.onScore,this.props.onScore,this);
+    },function(game){
+      removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
+      removeTrigger(game,this.props.onRoundStart,GAME_TRIGGERS.onRoundStart,this);
+      removeTrigger(game,this.props.onRoundEnd,GAME_TRIGGERS.onRoundEnd,this);
+    },4,defaultimage
+);
 upgradesList.push(applehater);
 upgradesList.push(stockmarket);
 upgradesList.push(boom);
@@ -321,3 +359,4 @@ upgradesList.push(chainReaction);
 upgradesList.push(grapeInterest);
 upgradesList.push(battlepass);
 upgradesList.push(highfive);
+upgradesList.push(robber);

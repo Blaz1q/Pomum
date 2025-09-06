@@ -38,7 +38,53 @@ export class RenderUI {
         const consumableContainer = document.getElementById("consumables-container");
         consumableContainer.innerHTML = "";
         consumableContainer.appendChild(this.displayUpgrades(boosterPack.roll(),{bought:false,free:true,origin: boosterPack}));
+        this.displayTiles();
+        this.dispalyTileOverlay();
     }
+    dispalyTileOverlay(){
+        let container = document.getElementById("upgrade-tiles");
+        container.style.display = "flex";
+    }
+    hideTileOverlay(){
+        let container = document.getElementById("upgrade-tiles");
+        container.style.display = "none";
+    }
+    displayTiles() {
+    const tiles = this.game.fruits;
+    const tileContainer = document.getElementById("tiles");
+    tileContainer.innerHTML = "";
+
+    tiles.forEach(tile => {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("tile");
+        wrapper.textContent = tile.icon;
+        wrapper.style.position = "relative"; // needed for tooltip positioning
+
+        // Tooltip element (like upgrade-desc)
+        const desc = document.createElement("div");
+        desc.className = "upgrade-desc";
+        desc.innerHTML = `<h1>${tile.name}</h1><p>${tile.description ?? ""}</p>`; // placeholder
+        wrapper.appendChild(desc);
+
+        // Show tooltip on hover
+        wrapper.addEventListener("mouseenter", () => {
+            desc.innerHTML = `
+                <p><b>Level:</b> ${tile.props?.upgrade?.level ?? "-"}</p>
+                <p><span class="chance">Szansa:</span> ${tile.percent ?? 0}</p>
+                <p><span class="mult">Mult:</span> ${tile.props?.upgrade?.mult ?? 0}</p>
+                <p><span class="score">Punkty:</span> ${tile.props?.upgrade?.score ?? 0}</p>
+                <p><span class="chance">Gold Chance:</span> ${tile.props?.upgrade?.goldchance ?? 0}%</p>
+                <p><span class="chance">Silver Chance:</span> ${tile.props?.upgrade?.silverchance ?? 0}%</p>
+            `;
+            desc.style.opacity = "1";
+        });
+        wrapper.addEventListener("mouseleave", () => {
+            desc.style.opacity = "0";
+        });
+
+        tileContainer.appendChild(wrapper);
+    });
+}
 displayPlayerUpgrades() {
     const playerUpgrades = document.getElementById("player-upgrades-container");
     playerUpgrades.innerHTML = "";
@@ -176,6 +222,7 @@ displayPlayerUpgrades() {
                         if(this.game.BuysFromBoosterLeft<=0){
                             const container = document.getElementById("consumables-container");
                             container.innerHTML = "";
+                            //hideTileOverlay();
                         }
                         wrapper.remove();    
                     }

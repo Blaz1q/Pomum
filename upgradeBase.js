@@ -5,6 +5,8 @@ export class Upgrade {
     this.effect = effect; // funkcja, która modyfikuje grę
     this.remove = remove; // funkcja cofająca efekt
     this.price = price;
+    this.sellPrice = props.sellPrice ?? Math.round(price/2);
+    this.active = true;
     this.type = "Upgrade";
     this.image = `./images/cards/${props.image ? props.image.toLowerCase() : name.toLowerCase()}.png`
     this.props = {

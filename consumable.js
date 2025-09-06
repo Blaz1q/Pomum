@@ -42,7 +42,7 @@ function add(fruit){
     fruit.score+=1;
     fruit.mult+=0.4;
     fruit.mult=Math.round(fruit.mult * 100) / 100;
-    fruit.level+=2;
+    fruit.level+=1;
 }
 const apple = new Consumable(
     "Jabłko",
@@ -127,7 +127,7 @@ const badapple = new Consumable(
     },
     function(game){
         evilfunc(game,game.fruits[0]);
-    },5,{image: "default"}
+    },5,{image: "devil_apple"}
 );
 const pbear = new Consumable(
     "p-bear?",
@@ -136,7 +136,7 @@ const pbear = new Consumable(
     },
     function(game){
         evilfunc(game,game.fruits[1]);
-    },5,{image: "default"}
+    },5,{image: "devil_pear"}
 );
 const winogronevil = new Consumable(
     "EVIL Winogron",
@@ -145,7 +145,7 @@ const winogronevil = new Consumable(
     },
     function(game){
         evilfunc(game,game.fruits[3]);
-    },5,{image: "default"}
+    },5,{image: "devil_grape"}
 );
 const toxicpineapple = new Consumable(
     "Toxic pineapple",
@@ -154,7 +154,7 @@ const toxicpineapple = new Consumable(
     },
     function(game){
         evilfunc(game,game.fruits[2]);
-    },5,{image: "default"}
+    },5,{image: "devil_pineapple"}
 );
 const coconutGranade = new Consumable(
     "Coconut Granade",
@@ -163,7 +163,7 @@ const coconutGranade = new Consumable(
     },
     function(game){
         evilfunc(game,game.fruits[4]);
-    },5,{image: "default"}
+    },5,{image: "devil_coconut"}
 );
 const voucher = new Voucher(
     "Voucher",
