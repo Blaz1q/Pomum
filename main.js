@@ -65,13 +65,14 @@ export class Game{
         this.upgrades = [];
         this.BuysFromBoosterLeft = 0;
         this.overstock = false;
+        this.upgradeDedupe = true;
     }
     on(event, handler, upgrade) {
     this.triggers[event].push({ handler, upgrade });
     }
 async emit(event, payload) {
     const sorted = [...this.triggers[event]].sort((a, b) => {
-    const indexA = a.upgrade ? this.upgrades.indexOf(a.upgrade) : -1;
+    const indexA = a.upgrade ? this.upgrades.indexOf(a.upgrade) : -1; 
     const indexB = b.upgrade ? this.upgrades.indexOf(b.upgrade) : -1;
 
     // If both upgrades exist in the list, sort by their index
@@ -106,13 +107,33 @@ async emit(event, payload) {
     }
 }
 
-    rollUpgrades(count = 3){
-        const available = upgradesList.filter(up => !this.upgrades.includes(up));
-        const shuffled = available.sort(() => Math.random() - 0.5).slice(0, count);
-        if(this.overstock){
-            shuffled.push(consumableList[Math.floor(Math.random(consumableList.length))]);
+    rollUpgrades(count = 3) {
+        let available = upgradesList;
+
+        if (this.upgradeDedupe) {
+            available = upgradesList.filter(up => 
+                !this.upgrades.some(u => u.name === up.name) // check by name, since upgradesList are blueprints
+            );
         }
-        return shuffled;
+
+        const pool = [...available];
+
+        // Fisher–Yates shuffle
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+
+        // Create *new instances* from blueprints
+        const picked = pool.slice(0, count).map(
+            up => new Upgrade(up.name, up.descriptionfn, up.effect, up.remove, up.price, up.props)
+        );
+
+        if (this.overstock) {
+            picked.push(consumableList[Math.floor(Math.random() * consumableList.length)]);
+        }
+
+        return picked;
     }
     displayMoves(){
         this.moveBox.innerHTML = this.movescounter + "/" + this.moves;

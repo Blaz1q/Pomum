@@ -1,362 +1,408 @@
-import { GAME_TRIGGERS,MODIFIERS } from "./dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS } from "./dictionary.js";
 import { Style } from "./RenderUI.js";
-import { RenderUI } from "./RenderUI.js";
 import { Upgrade } from "./upgradeBase.js";
+
 export const upgradesList = [];
+
 function removeTrigger(game, triggeredFunction, trigger, upgrade) {
-  console.log(trigger);
   game.triggers[trigger] = game.triggers[trigger].filter(
     h => !(h.handler === triggeredFunction && h.upgrade === upgrade)
   );
 }
 
-const defaultimage = {image: 'default'};
-const applehater = new Upgrade('AppleHater',`Jeżeli jabłko nie zostanie zniszczone, ${Style.Score("+100 punktów")}`, 
-function(game){
-  this.setProps({
-    found: false,
-    onMatch: (payload)=>{
-      if(this.props.found) return false;
-      payload.forEach(m => {
-          if(m.fruit.icon === game.fruits[0].icon) {
-            this.props.found = true; 
+const defaultimage = { image: "default" };
+
+export const upgradeBlueprints = [
+  {
+    name: "AppleHater",
+    descriptionfn: `Jeżeli jabłko nie zostanie zniszczone, ${Style.Score("+100 punktów")}`,
+    effect(game) {
+      this.setProps({
+        found: false,
+        onMatch: (payload) => {
+          if (this.props.found) return false;
+          payload.forEach(m => {
+            if (m.fruit.icon === game.fruits[0].icon) {
+              this.props.found = true;
+              return true;
+            }
+          });
+          return false;
+        },
+        onScore: () => {
+          if (!this.props.found) {
+            game.tempscore += 100;
+            game.GameRenderer.displayTempScore();
             return true;
           }
-        });
-        return false;
-      },
-      onScore: ()=>{
-        if(!this.props.found){
-          game.tempscore+=100;
-          game.GameRenderer.displayTempScore();
-          return true;
+          this.props.found = false;
+          return false;
         }
-        this.props.found = false;
-        return false;
-      }
-  });
-  game.on(GAME_TRIGGERS.onMatch,this.props.onMatch,this);
-  game.on(GAME_TRIGGERS.onScore,this.props.onScore,this);
-},function(game){
-    removeTrigger(game,this.props.onMatch,GAME_TRIGGERS.onMatch,this);
-    removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
-},4);
-const stockmarket = new Upgrade('StockMarket',
-  function(game) {
-    // nazwa upgrade – generowana dynamicznie, ale dopiero po wylosowaniu w apply()
-    if (!this.props.randomfruit) return `${Style.Chance('-100%')} dla losowego owoca, reszta dostanie równo podzielone procenty. zmienia się co rundę.`;
-    return `${Style.Chance('-100%')} ${this.props.randomfruit.icon}, +${Style.Chance(game.calcEqualize(this.props.previousPercent).toString()+"%")} reszta`;
-  },
-  function(game) {
-    this.setProps({
-      randomfruit: null,
-      previousPercent: null,
-      onStart: (payload) => {
-        this.props.randomfruit = game.fruits[Math.floor(Math.random() * game.fruits.length)]; 
-        this.props.previousPercent = this.props.randomfruit.percent;
-        game.equalizeChancesExcept(this.props.randomfruit);
-        this.props.randomfruit.percent = 0;
-        return true;
-      },
-      onEnd: (payload) => {
-        const chance = game.calcEqualize(this.props.previousPercent);
-
-        this.props.randomfruit.percent += this.props.previousPercent;
-        game.addChancesExcept(this.props.randomfruit, -chance);
-        this.props.randomfruit= null;
-        return true;
-      }
-    });
-    game.on(GAME_TRIGGERS.onRoundStart,this.props.onStart,this);
-    game.on(GAME_TRIGGERS.onRoundEnd,this.props.onEnd,this);
-  },
-  function(game) {
-    removeTrigger(game,this.props.onStart,GAME_TRIGGERS.onRoundStart,this);
-    removeTrigger(game,this.props.onEnd,GAME_TRIGGERS.onRoundEnd,this);
-  },
-  8
-);
-const boom = new Upgrade('Boom',`Dynamit pojawia się ${Style.Chance('+2%')} częściej`,
-  function(game){
-    game.special[0].percent+=2;
-    return true;
-  },
-  function(game){
-    game.special[0].percent+=-2;
-  },2
-);
-const boomber = new Upgrade('Bomber',
-  `${Style.Score('+250 punktów')} za ruch, ${Style.Moves('-2 ruchy')}`,
-  function(game) {
-    // odejmujemy ruchy od gracza
-    game.moves -= 2;
-    game.moveBox.innerHTML = game.movescounter + "/" + game.moves;
-
-    // zapisujemy handler w props, żeby później można go było usunąć
-    this.setProps({
-      handler: (payload) => {
-        game.tempscore += 250;
-        game.GameRenderer.displayScore();
-        return true;
-      }
-    });
-
-    // rejestrujemy handler
-    game.on(GAME_TRIGGERS.onMove, this.props.handler,this);
-  },
-  function(game) {
-    // cofamy ruchy
-    game.moves += 2;
-    game.moveBox.innerHTML = game.movescounter + "/" + game.moves;
-
-    // usuwamy handler z triggerów
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMove,this);
-  },4,{image: 'boom'}
-);
-const tetris = new Upgrade('tetris',`${Style.Moves('+4 ruchy')}`,function(game){
-    game.moves+=4;
-},function(game){
-    game.moves-=4;
-},4);
-const mult = new Upgrade('Mult',`${Style.Mult('+1 mult')}`,function(game){
-    this.setProps({
-      handler: (payload) => {
-        game.mult+=1;
-        game.GameRenderer.displayTempScore();
-        return true;
-      }
-    });
-    // rejestrujemy handler
-    game.on(GAME_TRIGGERS.onScore, this.props.handler,this);
-},
-  function(game) {
-    // usuwamy handler z triggerów
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onScore,this);
-  },4,defaultimage);
-const applelover = new Upgrade('applelover',
-  `${Style.Mult('+1 mult')} za każde 🍎 (raz na kaskadę)`,
-  function(game) {
-    this.setProps({
-      handler: (matches) => {
-        // wyciągamy unikalne owoce z dopasowań
-        const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
-
-        if (uniqueFruits.has("🍎")) {
-          game.mult += 1; // tylko raz, niezależnie od ilości jabłek
-        }
-        game.GameRenderer.displayTempScore();
-        return uniqueFruits.has("🍎");
-      }
-    });
-    game.on(GAME_TRIGGERS.onMatch, this.props.handler,this);
-  },
-  function(game) {
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch,this);
-  },
-  5
-);
-const coconutBank = new Upgrade('Coconut Bank',function(game){
-  return `${Style.Chance('+50%')} aby ${game.fruits[4].icon} był złoty, ${Style.Chance('-10%')} ${game.fruits[4].icon}, ${Style.Chance('+2.5%')} dla reszty`},
-  function(game){
-    game.fruits[4].props.upgrade.goldchance += 50;
-    game.fruits[4].percent -= 10;
-    game.addChancesExcept(game.fruits[4],2.5);
-  },function(game){
-    game.fruits[4].percent += 10;
-    game.fruits[4].props.upgrade.goldchance -= 50;
-    game.addChancesExcept(game.fruits[4],-2.5);
-  },10,{image: 'coconutbank'}
-);
-const goldenFruits = new Upgrade('Golden Fruits',`${Style.Chance('+1%')}  szansa na gold`,
-  function (game){
-  game.goldChance += 1;
-  return true;
-  },
-  function(game){
-    game.goldChance -= 1;
-  },10,defaultimage
-);
-const silverFruits = new Upgrade('Silver Fruits',`${Style.Chance('+1%')} szansa na silver`,
-  function (game){
-  game.silverChance += 1;
-  return true;
-  },
-  function(game){
-    game.silverChance -= 1;
-  },10,{image: 'metalplate'}
-);
-const grapeInterest = new Upgrade('GrapeInterest',
-  function(game){
-    if(!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score('+5 pkt')}, na końcu rundy zyskuje kolejne ${Style.Score('+5 pkt')}`;
-    return `Każda ${game.fruits[3].icon} daje ${Style.Score('+'+this.props.value+' pkt')}`;
-  },
-  function(game){
-    this.setProps({
-      value: 5,
-      isactive: true,
-      handler: (matches) => {
-        let found = false;
-        matches.forEach(m => {
-          if(m.fruit.icon === game.fruits[3].icon) {
-            game.tempscore += this.props.value;
-            found = true;
-          }
-        });
-        game.GameRenderer.displayTempScore();
-        return found;
-      },
-      onRoundEnd: () => {
-        this.props.value += 5;
-        return true;
-      }
-    });
-    game.on(GAME_TRIGGERS.onMatch,this.props.handler,this);
-    game.on(GAME_TRIGGERS.onRoundEnd,this.props.onRoundEnd,this);
-  },
-  function(game){
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch,this);
-    removeTrigger(game,this.props.onRoundEnd,GAME_TRIGGERS.onRoundEnd,this);
-  },6,defaultimage
-);
-const chainReaction = new Upgrade('ChainReaction',
-  `Każda kaskada daje dodatkowe ${Style.Score('+30 punktów')}`,
-  function(game) {
-    this.setProps({
-      handler: () => {
-        game.tempscore += 30;
-        game.GameRenderer.displayTempScore();
-        return true;
-      }
-    });
-    game.on(GAME_TRIGGERS.onMatch,this.props.handler,this);
-  },
-  function(game) {
-    removeTrigger(game,this.props.handler,GAME_TRIGGERS.onMatch,this);
-  },
-  4,defaultimage
-);
-const battlepass = new Upgrade(
-  'Battlepass',
-  function(game){
-    if(!this.props.isactive) return `${Style.Mult('+1 mult')}. na końcu rundy dostaje ${Style.Mult('+1 mult')}`;
-    return `${Style.Mult('+1 mult')}. na końcu rundy dostaje ${Style.Mult('+1 mult')}. obecnie ${Style.Mult('+'+this.props.mult+' mult')}`;
-},
-function(game){
-  this.setProps({
-    mult: 1,
-    isactive: true,
-    onScore: () =>{
-      game.mult+=this.props.mult;
-      game.GameRenderer.displayTempScore();
-      return true;
+      });
+      game.on(GAME_TRIGGERS.onMatch, this.props.onMatch, this);
+      game.on(GAME_TRIGGERS.onScore, this.props.onScore, this);
     },
-    onRoundEnd: () =>{
-      this.props.mult+=1;
-      return true;
-    }
-  });
-  game.on(GAME_TRIGGERS.onScore,this.props.onScore,this);
-  game.on(GAME_TRIGGERS.onRoundEnd,this.props.onRoundEnd,this);
-},function(game){
-  removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
-  removeTrigger(game,this.props.onRoundEnd,GAME_TRIGGERS.onRoundEnd,this);
-},8
-);
-const highfive = new Upgrade(
-  'High Five',
-  `Gdy podczas gry zrobi się piątke, ${Style.Mult('X2 mult')}`,
-  function(game){
-    this.setProps({
-      triggered: false,
-      onMatch: (payload) =>{
-        if(this.props.triggered) return false;
-        this.props.triggered = payload&&game.isFiveLine(payload);
-        return payload&&game.isFiveLine(payload);
-      },
-      onScore: () => {
-        if(this.props.triggered){
-          game.mult *= 2;
-          game.GameRenderer.displayTempScore();
-          this.props.triggered = false;
-          return true;
-        }
-        return false;
-      }
-    })
-    game.on(GAME_TRIGGERS.onMatch,this.props.onMatch,this);
-    game.on(GAME_TRIGGERS.onScore,this.props.onScore,this);
-  },function(game){
-    removeTrigger(game,this.props.onMatch,GAME_TRIGGERS.onMatch,this);
-    removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
-  },6,defaultimage
-);
-const broke = new Upgrade(
-  'broke',
-  `Jeżeli ma się mniej niż $6, +${Style.Score('+250 punktów')}`,
-  function(game){
-    this.setProps({
-      onScore: ()=>{
-        if(game.money<6){
-          game.tempscore+=250;
-        }
-        return game.money<6;
-      }
-    });
-    game.on(GAME_TRIGGERS.onScore,this.props.onScore,this);
-  },function(game){
-    removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
-  },6,defaultimage
-)
-const robber = new Upgrade(
-  'Robber',
-  function(game){
-    if(this.props.sellPriceMult&&this.props.sellPriceMult!=0){
-      return `Daje + Mult ceny sprzedarzy wszystkich kupionych ulepszeń. (Obecnie ${Style.Mult(`+${this.props.sellPriceMult} mult`)})`;
-      } 
-      return `Daje + Mult ceny sprzedarzy wszystkich kupionych ulepszeń.`;
-    },function(game){
+    remove(game) {
+      removeTrigger(game, this.props.onMatch, GAME_TRIGGERS.onMatch, this);
+      removeTrigger(game, this.props.onScore, GAME_TRIGGERS.onScore, this);
+    },
+    price: 4
+  },
+  {
+    name: "StockMarket",
+    descriptionfn(game) {
+      if (!this.props.randomfruit)
+        return `${Style.Chance("-100%")} dla losowego owoca, reszta dostanie równo podzielone procenty. zmienia się co rundę.`;
+      return `${Style.Chance("-100%")} ${this.props.randomfruit.icon}, +${Style.Chance(game.calcEqualize(this.props.previousPercent).toString()+"%")} reszta`;
+    },
+    effect(game) {
       this.setProps({
-        sellPriceMult: 0,
-        onRoundStart: ()=> {
-          let x = 0;
-          game.upgrades.forEach(upgrade => {
-              x += upgrade.sellPrice;
-          });
-          this.props.sellPriceMult = x;
-          console.log(x);
+        randomfruit: null,
+        previousPercent: null,
+        onStart: () => {
+          this.props.randomfruit = game.fruits[Math.floor(Math.random() * game.fruits.length)];
+          this.props.previousPercent = this.props.randomfruit.percent;
+          game.equalizeChancesExcept(this.props.randomfruit);
+          this.props.randomfruit.percent = 0;
           return true;
         },
-        onRoundEnd: () =>{
-          this.sellPriceMult = 0;
+        onEnd: () => {
+          const chance = game.calcEqualize(this.props.previousPercent);
+          this.props.randomfruit.percent += this.props.previousPercent;
+          game.addChancesExcept(this.props.randomfruit, -chance);
+          this.props.randomfruit = null;
           return true;
-        },
-        onScore: ()=>{
-          game.mult+=this.props.sellPriceMult;
+        }
+      });
+      game.on(GAME_TRIGGERS.onRoundStart, this.props.onStart, this);
+      game.on(GAME_TRIGGERS.onRoundEnd, this.props.onEnd, this);
+    },
+    remove(game) {
+      removeTrigger(game, this.props.onStart, GAME_TRIGGERS.onRoundStart, this);
+      removeTrigger(game, this.props.onEnd, GAME_TRIGGERS.onRoundEnd, this);
+    },
+    price: 8
+  },
+  {
+    name: "Boom",
+    descriptionfn: `Dynamit pojawia się ${Style.Chance("+2%")} częściej`,
+    effect(game) {
+      game.special[0].percent += 2;
+    },
+    remove(game) {
+      game.special[0].percent -= 2;
+    },
+    price: 2
+  },
+  {
+    name: "Bomber",
+    descriptionfn: `${Style.Score("+250 punktów")} za ruch, ${Style.Moves("-2 ruchy")}`,
+    effect(game) {
+      game.moves -= 2;
+      game.moveBox.innerHTML = game.movescounter + "/" + game.moves;
+      this.setProps({
+        handler: () => {
+          game.tempscore += 250;
+          game.GameRenderer.displayScore();
+          return true;
+        }
+      });
+      game.on(GAME_TRIGGERS.onMove, this.props.handler, this);
+    },
+    remove(game) {
+      game.moves += 2;
+      game.moveBox.innerHTML = game.movescounter + "/" + game.moves;
+      removeTrigger(game, this.props.handler, GAME_TRIGGERS.onMove, this);
+    },
+    price: 4,
+    props: { image: "boom" }
+  },
+  {
+    name: "tetris",
+    descriptionfn: `${Style.Moves("+4 ruchy")}`,
+    effect(game) {
+      game.moves += 4;
+    },
+    remove(game) {
+      game.moves -= 4;
+    },
+    price: 4
+  },
+  {
+    name: "Mult",
+    descriptionfn: `${Style.Mult("+1 mult")}`,
+    effect(game) {
+      this.setProps({
+        handler: () => {
+          game.mult += 1;
           game.GameRenderer.displayTempScore();
           return true;
         }
       });
-      game.on(GAME_TRIGGERS.onRoundStart,this.props.onRoundStart,this);
-      game.on(GAME_TRIGGERS.onRoundEnd,this.props.onRoundEnd,this);
-      game.on(GAME_TRIGGERS.onScore,this.props.onScore,this);
-    },function(game){
-      removeTrigger(game,this.props.onScore,GAME_TRIGGERS.onScore,this);
-      removeTrigger(game,this.props.onRoundStart,GAME_TRIGGERS.onRoundStart,this);
-      removeTrigger(game,this.props.onRoundEnd,GAME_TRIGGERS.onRoundEnd,this);
-    },4,defaultimage
-);
-upgradesList.push(applehater);
-upgradesList.push(stockmarket);
-upgradesList.push(boom);
-upgradesList.push(boomber);
-upgradesList.push(tetris);
-upgradesList.push(mult);
-upgradesList.push(applelover);
-upgradesList.push(coconutBank);
-upgradesList.push(silverFruits);
-upgradesList.push(goldenFruits);
-upgradesList.push(chainReaction);
-upgradesList.push(grapeInterest);
-upgradesList.push(battlepass);
-upgradesList.push(highfive);
-upgradesList.push(robber);
+      game.on(GAME_TRIGGERS.onScore, this.props.handler, this);
+    },
+    remove(game) {
+      removeTrigger(game, this.props.handler, GAME_TRIGGERS.onScore, this);
+    },
+    price: 4,
+    props: defaultimage
+  },
+  {
+    name: "applelover",
+    descriptionfn: `${Style.Mult("+1 mult")} za każde 🍎 (raz na kaskadę)`,
+    effect(game) {
+      this.setProps({
+        handler: (matches) => {
+          const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+          if (uniqueFruits.has("🍎")) {
+            game.mult += 1;
+          }
+          game.GameRenderer.displayTempScore();
+          return uniqueFruits.has("🍎");
+        }
+      });
+      game.on(GAME_TRIGGERS.onMatch, this.props.handler, this);
+    },
+    remove(game) {
+      removeTrigger(game, this.props.handler, GAME_TRIGGERS.onMatch, this);
+    },
+    price: 5
+  },
+  {
+    name: "Coconut Bank",
+    descriptionfn(game) {
+      return `${Style.Chance("+50%")} aby ${game.fruits[4].icon} był złoty, ${Style.Chance("-10%")} ${game.fruits[4].icon}, ${Style.Chance("+2.5%")} dla reszty`;
+    },
+    effect(game) {
+      game.fruits[4].props.upgrade.goldchance += 50;
+      game.fruits[4].percent -= 10;
+      game.addChancesExcept(game.fruits[4], 2.5);
+    },
+    remove(game) {
+      game.fruits[4].percent += 10;
+      game.fruits[4].props.upgrade.goldchance -= 50;
+      game.addChancesExcept(game.fruits[4], -2.5);
+    },
+    price: 10,
+    props: { image: "coconutbank" }
+  },
+  {
+    name: "Golden Fruits",
+    descriptionfn: `${Style.Chance("+1%")}  szansa na gold`,
+    effect(game) {
+      game.goldChance += 1;
+    },
+    remove(game) {
+      game.goldChance -= 1;
+    },
+    price: 10,
+    props: defaultimage
+  },
+  {
+    name: "Silver Fruits",
+    descriptionfn: `${Style.Chance("+1%")} szansa na silver`,
+    effect(game) {
+      game.silverChance += 1;
+    },
+    remove(game) {
+      game.silverChance -= 1;
+    },
+    price: 10,
+    props: { image: "metalplate" }
+  },
+  {
+    name: "GrapeInterest",
+    descriptionfn(game) {
+      if (!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+5 pkt")}`;
+      return `Każda ${game.fruits[3].icon} daje ${Style.Score("+"+this.props.value+" pkt")}`;
+    },
+    effect(game) {
+      this.setProps({
+        value: 5,
+        isactive: true,
+        handler: (matches) => {
+          let found = false;
+          matches.forEach(m => {
+            if (m.fruit.icon === game.fruits[3].icon) {
+              game.tempscore += this.props.value;
+              found = true;
+            }
+          });
+          game.GameRenderer.displayTempScore();
+          return found;
+        },
+        onRoundEnd: () => {
+          this.props.value += 5;
+          return true;
+        }
+      });
+      game.on(GAME_TRIGGERS.onMatch, this.props.handler, this);
+      game.on(GAME_TRIGGERS.onRoundEnd, this.props.onRoundEnd, this);
+    },
+    remove(game) {
+      removeTrigger(game, this.props.handler, GAME_TRIGGERS.onMatch, this);
+      removeTrigger(game, this.props.onRoundEnd, GAME_TRIGGERS.onRoundEnd, this);
+    },
+    price: 6,
+    props: defaultimage
+  },
+  {
+    name: "ChainReaction",
+    descriptionfn: `Każda kaskada daje dodatkowe ${Style.Score("+30 punktów")}`,
+    effect(game) {
+      this.setProps({
+        handler: () => {
+          game.tempscore += 30;
+          game.GameRenderer.displayTempScore();
+          return true;
+        }
+      });
+      game.on(GAME_TRIGGERS.onMatch, this.props.handler, this);
+    },
+    remove(game) {
+      removeTrigger(game, this.props.handler, GAME_TRIGGERS.onMatch, this);
+    },
+    price: 4,
+    props: defaultimage
+  },
+  {
+    name: "Battlepass",
+    descriptionfn(game) {
+      if (!this.props.isactive) return `${Style.Mult("+1 mult")}. na końcu rundy dostaje ${Style.Mult("+1 mult")}`;
+      return `${Style.Mult("+1 mult")}. na końcu rundy dostaje ${Style.Mult("+1 mult")}. obecnie ${Style.Mult("+"+this.props.mult+" mult")}`;
+    },
+    effect(game) {
+      this.setProps({
+        mult: 1,
+        isactive: true,
+        onScore: () => {
+          game.mult += this.props.mult;
+          game.GameRenderer.displayTempScore();
+          return true;
+        },
+        onRoundEnd: () => {
+          this.props.mult += 1;
+          return true;
+        }
+      });
+      game.on(GAME_TRIGGERS.onScore, this.props.onScore, this);
+      game.on(GAME_TRIGGERS.onRoundEnd, this.props.onRoundEnd, this);
+    },
+    remove(game) {
+      removeTrigger(game, this.props.onScore, GAME_TRIGGERS.onScore, this);
+      removeTrigger(game, this.props.onRoundEnd, GAME_TRIGGERS.onRoundEnd, this);
+    },
+    price: 8
+  },
+  {
+    name: "High Five",
+    descriptionfn: `Gdy podczas gry zrobi się piątke, ${Style.Mult("X2 mult")}`,
+    effect(game) {
+      this.setProps({
+        triggered: false,
+        onMatch: (payload) => {
+          if (this.props.triggered) return false;
+          this.props.triggered = payload && game.isFiveLine(payload);
+          return payload && game.isFiveLine(payload);
+        },
+        onScore: () => {
+          if (this.props.triggered) {
+            game.mult *= 2;
+            game.GameRenderer.displayTempScore();
+            this.props.triggered = false;
+            return true;
+          }
+          return false;
+        }
+      });
+      game.on(GAME_TRIGGERS.onMatch, this.props.onMatch, this);
+      game.on(GAME_TRIGGERS.onScore, this.props.onScore, this);
+    },
+    remove(game) {
+      removeTrigger(game, this.props.onMatch, GAME_TRIGGERS.onMatch, this);
+      removeTrigger(game, this.props.onScore, GAME_TRIGGERS.onScore, this);
+    },
+    price: 6,
+    props: defaultimage
+  },
+  {
+    name: "broke",
+    descriptionfn: `Jeżeli ma się mniej niż $6, +${Style.Score("+250 punktów")}`,
+    effect(game) {
+      this.setProps({
+        onScore: () => {
+          if (game.money < 6) {
+            game.tempscore += 250;
+          }
+          return game.money < 6;
+        }
+      });
+      game.on(GAME_TRIGGERS.onScore, this.props.onScore, this);
+    },
+    remove(game) {
+      removeTrigger(game, this.props.onScore, GAME_TRIGGERS.onScore, this);
+    },
+    price: 6,
+    props: defaultimage
+  },
+  {
+    name: "Robber",
+    descriptionfn(game) {
+      if (this.props.sellPriceMult && this.props.sellPriceMult !== 0) {
+        return `Daje + Mult ceny sprzedarzy wszystkich kupionych ulepszeń. (Obecnie ${Style.Mult(`+${this.props.sellPriceMult} mult`)})`;
+      }
+      return `Daje + Mult ceny sprzedarzy wszystkich kupionych ulepszeń.`;
+    },
+    effect(game) {
+      this.setProps({
+        sellPriceMult: 0,
+        onRoundStart: () => {
+          let x = 0;
+          game.upgrades.forEach(upgrade => {
+            x += upgrade.sellPrice;
+          });
+          this.props.sellPriceMult = x;
+          return true;
+        },
+        onRoundEnd: () => {
+          this.sellPriceMult = 0;
+          return true;
+        },
+        onScore: () => {
+          game.mult += this.props.sellPriceMult;
+          game.GameRenderer.displayTempScore();
+          return true;
+        }
+      });
+      game.on(GAME_TRIGGERS.onRoundStart, this.props.onRoundStart, this);
+      game.on(GAME_TRIGGERS.onRoundEnd, this.props.onRoundEnd, this);
+      game.on(GAME_TRIGGERS.onScore, this.props.onScore, this);
+    },
+    remove(game) {
+      removeTrigger(game, this.props.onScore, GAME_TRIGGERS.onScore, this);
+      removeTrigger(game, this.props.onRoundStart, GAME_TRIGGERS.onRoundStart, this);
+      removeTrigger(game, this.props.onRoundEnd, GAME_TRIGGERS.onRoundEnd, this);
+    },
+    price: 4,
+    props: defaultimage
+  },
+  {
+    name: "circus",
+    descriptionfn: "Pozwala na pojawianie się w sklepie tych samych upgradeów.",
+    effect(game) {
+      game.upgradeDedupe = false;
+    },
+    remove(game) {
+      let counter = 0;
+      game.upgrades.forEach(up => {
+        if (up.name === this.name) counter++;
+      });
+      game.upgradeDedupe = true;
+      if (counter > 1) game.upgradeDedupe = false;
+    },
+    price: 8
+  }
+];
+
+// push all blueprints into upgradesList
+upgradeBlueprints.forEach(bp => upgradesList.push(bp));

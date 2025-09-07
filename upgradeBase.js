@@ -29,6 +29,6 @@ export class Upgrade {
 
   sell(game) {
     this.remove.call(this, game); // this wewnątrz remove wskazuje na instancję
-    game.money += Math.floor(this.price/2);
+    game.money += Math.floor(this.sellPrice);
   }
 }
