@@ -171,41 +171,68 @@ export const upgradeBlueprints = [
   {
     name: "Coconut Bank",
     descriptionfn(game) {
-      return `${Style.Chance("+50%")} aby ${game.fruits[4].icon} był złoty, ${Style.Chance("-10%")} ${game.fruits[4].icon}, ${Style.Chance("+2.5%")} dla reszty`;
+      if(this.props.previousPercent==-1) return `${Style.Chance("+50%")} aby ${game.fruits[4].icon} był złoty, ${Style.Chance("-10%")} ${game.fruits[4].icon}, ${Style.Chance("+2.5%")} dla reszty`;
+      return `${Style.Chance("+50%")} aby ${game.fruits[4].icon} był złoty, ${Style.Chance(`-${this.props.previousPercent}%`)} ${game.fruits[4].icon}, ${Style.Chance(`+${this.props.previousPercent/(game.fruits.length-1)}`)} dla reszty`;
     },
     effect(game) {
-      game.fruits[4].props.upgrade.goldchance += 50;
-      game.fruits[4].percent -= 10;
-      game.addChancesExcept(game.fruits[4], 2.5);
+      this.setProps({
+        previousPercent: -1,
+        onRoundStart: ()=>{
+          game.fruits[4].props.upgrade.goldchance += 50;
+        let percent = 10;
+        if(game.fruits[4].percent<10){
+          percent = game.fruits[4].percent;
+        }
+        this.props.previousPercent = percent;
+        game.fruits[4].percent -= this.props.previousPercent;
+        game.addChancesExcept(game.fruits[4], this.props.previousPercent/(game.fruits.length-1));
+        return true;
+        },
+        onRoundEnd: ()=>{
+          game.fruits[4].percent += this.props.previousPercent;
+          game.fruits[4].props.upgrade.goldchance -= 50;
+          game.addChancesExcept(game.fruits[4], -this.props.previousPercent/(game.fruits.length-1));
+          return true;
+        }
+      });
+      game.on(GAME_TRIGGERS.onRoundStart,this.props.onRoundStart,this);
+      game.on(GAME_TRIGGERS.onRoundEnd,this.props.onRoundEnd,this);
     },
     remove(game) {
-      game.fruits[4].percent += 10;
-      game.fruits[4].props.upgrade.goldchance -= 50;
-      game.addChancesExcept(game.fruits[4], -2.5);
+      removeTrigger(game,this.props.onRoundStart,GAME_TRIGGERS.onRoundStart,this);
+      removeTrigger(game,this.props.onRoundEnd,GAME_TRIGGERS.onRoundEnd,this);
     },
     price: 10,
     props: { image: "coconutbank" }
   },
   {
     name: "Golden Fruits",
-    descriptionfn: `${Style.Chance("+1%")}  szansa na gold`,
+    descriptionfn: `${Style.Chance("+5%")}  szansa na gold`,
     effect(game) {
-      game.goldChance += 1;
+      game.fruits.forEach(fruit => {
+        fruit.props.upgrade.goldchance += 5;
+      });
     },
     remove(game) {
-      game.goldChance -= 1;
+      game.fruits.forEach(fruit => {
+        fruit.props.upgrade.goldchance -= 5;
+      });
     },
     price: 10,
     props: defaultimage
   },
   {
     name: "Silver Fruits",
-    descriptionfn: `${Style.Chance("+1%")} szansa na silver`,
+    descriptionfn: `${Style.Chance("+2%")} szansa na silver`,
     effect(game) {
-      game.silverChance += 1;
+      game.fruits.forEach(fruit => {
+        fruit.props.upgrade.silverchance += 2;
+      });
     },
     remove(game) {
-      game.silverChance -= 1;
+      game.fruits.forEach(fruit => {
+        fruit.props.upgrade.silverchance -= 2;
+      });
     },
     price: 10,
     props: { image: "metalplate" }

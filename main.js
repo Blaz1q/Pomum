@@ -169,9 +169,11 @@ async emit(event, payload) {
         this.gameContainer.style.display = "none";
         this.shopContainer.style.display = "grid";
     }
-    startround(){
+    async startround(){
         this.stage = STAGES.Game;
-        this.emit(GAME_TRIGGERS.onRoundStart);
+        console.log("waiting..");
+        await this.emit(GAME_TRIGGERS.onRoundStart);
+        console.log("done");
         this.round++;
         this.score=0;
         this.locked = false;
@@ -878,7 +880,9 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
         //     cy = Math.max(0, Math.min(this.matrixsize-1, cy));
         //     //this.board[cy][cx] = this.makeBomb();
         }
-        this.emit(GAME_TRIGGERS.onMatch, matches);
+        console.log("waiting for matches..")
+        await this.emit(GAME_TRIGGERS.onMatch, matches);
+        console.log("ended.");
         // pozwól przeglądarce „zobaczyć” stan po swapie zanim nałożymy .fade
         requestAnimationFrame(() => {
             for(const m of matches){
