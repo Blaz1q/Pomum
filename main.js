@@ -21,6 +21,8 @@ export class Game{
         this.moveBox = document.getElementById("moves");
         //game
         this.round = 0;
+        this.level = 1;
+        
         this.roundBox = document.getElementById("round");
         this.matrixsize = 9;
         this.stage = STAGES.Game;
@@ -63,6 +65,7 @@ export class Game{
         this.locked = false;
         //upgrades
         this.upgrades = [];
+        this.coupons = [];
         this.BuysFromBoosterLeft = 0;
         this.overstock = false;
         this.upgradeDedupe = true;
@@ -155,9 +158,13 @@ async emit(event, payload) {
         document.getElementById("game-over").style.display = "flex";
     }
     endround(){
-        
+        this.GameRenderer.displayUpgradesCounter();
         this.GameRenderer.displayMoves();
         this.stage = STAGES.Shop;
+        if(this.round%4==0||this.round==1){
+            this.level++;
+            this.GameRenderer.displayCoupons();
+        }
         this.emit(GAME_TRIGGERS.onRoundEnd);
         this.locked = true;
         this.money+=this.calcMoney();
@@ -280,7 +287,22 @@ trySwap(x1, y1, x2, y2) {
 
     return true;
 }
+    getTopFruit(tiles = this.fruits) {
+        if (!tiles || tiles.length === 0) return null;
 
+        // Only consider fruits
+        const fruits = tiles.filter(t => t.type === TYPES.Fruit);
+        if (fruits.length === 0) return null;
+
+        // Find max percent
+        const maxPercent = Math.max(...fruits.map(f => f.props.percent));
+
+        // Get all fruits with that percent
+        const topFruits = fruits.filter(f => f.props.percent === maxPercent);
+
+        // Pick one randomly if multiple
+        return topFruits[Math.floor(Math.random() * topFruits.length)];
+    }
     equalizeChances(){
         const eq = parseFloat(100 / this.fruits.length);
         this.fruits.forEach(fruit => {
@@ -304,22 +326,29 @@ trySwap(x1, y1, x2, y2) {
         }
     }
     buy(upgrade){
-        if(this.stage!==STAGES.Shop) return; // not in shop -> can't buy
-        if(this.money<upgrade.price) return; // not enough money
+         console.log("buyin");
+        if(this.stage!==STAGES.Shop) return false; // not in shop -> can't buy
+        if(this.money<upgrade.price) return false; // not enough money
         Audio.playSound('buy.mp3');
+        console.log("buying true");
         if(upgrade.type=="Upgrade"){
             this.upgrades.push(upgrade);
             upgrade.apply(this);
             this.GameRenderer.displayPlayerUpgrades();
+            this.GameRenderer.displayUpgradesCounter();
         }else if(upgrade.type=="Consumable"){
             upgrade.apply(this);
         }
         else if(upgrade.type=="ConsumablePack"){
             this.GameRenderer.OpenBoosterPack(upgrade);
             Audio.playSound('pop.mp3');
+        }else if(upgrade.type=="Voucher"){
+            this.coupons.push(upgrade);
+            upgrade.apply(this);
         }
         this.money -= upgrade.price;
         this.moneyBox.innerHTML = this.money;
+        return true;
     }
     sell(upgrade){
         if(this.stage!==STAGES.Shop) return false; // not in shop -> can't sell

@@ -4,6 +4,7 @@ export class Tile {
         this.icon = icon;
         this.type = type; // "fruit", "dynamite", "bomb"
         this.props = {
+            debuffed: false,
             detonations: props.detonations ?? 0, // default 0 unless provided
             percent: props.percent ?? 1,
             modifier: props.modifier ?? MODIFIERS.None,

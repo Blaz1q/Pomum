@@ -6,7 +6,7 @@ export const vouchers = [];
 const pomumpackItems = [];
 export class Voucher extends Upgrade{
     constructor(name,descriptionfn,effect,price,props = {}){
-        super(name,descriptionfn,effect,price,props);
+        super(name,descriptionfn,effect,null,price,props);
         this.type = "Voucher";
     }
 }
@@ -173,7 +173,7 @@ const voucher = new Voucher(
         game.GameRenderer.displayUpgradesCounter();
     },
     10,
-    {image:'metalplate'}
+    {image:'coupon_plus1'}
 );
 const overstock = new Voucher(
     "Overstock",
@@ -181,7 +181,7 @@ const overstock = new Voucher(
     function(game){
         game.overstock = true;
     },
-    10,{image: 'default'}
+    10,{image: 'coupon_hand'}
 );
 export function rollConsumablePacks(count = 2) {
   if (!consumablePacks.length) return [];
@@ -207,6 +207,21 @@ export function rollConsumablePacks(count = 2) {
     result.push(consumablePacks[pickedIndex]);
   }
   return result;
+}
+export function rollVouchers(game, count = 1) {
+    if (!vouchers || vouchers.length === 0) return [];
+
+    // Get names of already owned vouchers
+    const ownedNames = new Set(game.coupons.map(v => v.name));
+
+    // Filter out owned vouchers
+    const available = vouchers.filter(v => !ownedNames.has(v.name));
+
+    if (available.length === 0) return []; // player owns all vouchers
+
+    // Shuffle and pick `count` vouchers
+    const shuffled = [...available].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
 }
 vouchers.push(voucher,overstock);
 pomumpackItems.push(apple,pear,grape,coconut,pineapple,badapple,pbear,winogronevil,toxicpineapple,coconutGranade);

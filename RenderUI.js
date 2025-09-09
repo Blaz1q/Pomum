@@ -1,4 +1,4 @@
-import { Consumable,ConsumablePack,consumableList,rollConsumablePacks } from "./consumable.js";
+import { Consumable,ConsumablePack,consumableList,rollConsumablePacks,rollVouchers } from "./consumable.js";
 import { Upgrade } from "./upgradeBase.js";
 export class RenderUI {
     constructor(game) {
@@ -33,6 +33,11 @@ export class RenderUI {
         const boosterPack = document.getElementById("boosterpack-container");
         boosterPack.innerHTML = "";
         boosterPack.appendChild(this.displayUpgrades(rollConsumablePacks(2),{bought: false}));
+    }
+    displayCoupons(){
+        const coupon = document.getElementById("voucher-container");
+        coupon.innerHTML = "";
+        coupon.appendChild(this.displayUpgrades(rollVouchers(this.game,1),{bought: false}));
     }
     OpenBoosterPack(boosterPack){
         const consumableContainer = document.getElementById("consumables-container");
@@ -212,9 +217,9 @@ displayPlayerUpgrades() {
             // Click handlers
             if (!params.bought) {
                 card.addEventListener("click", () => {
-                    if ((this.game.upgrades.length < this.game.maxUpgrades && this.game.money >= up.price&&up.type=="Upgrade") || (this.game.money >= up.price&&up.type=="ConsumablePack")) {
-                        this.game.buy(up);
-                        wrapper.remove();
+                    if ((this.game.upgrades.length < this.game.maxUpgrades && this.game.money >= up.price&&up.type=="Upgrade") || (this.game.money >= up.price&&(up.type=="ConsumablePack"||up.type=="Voucher"))) {
+                        let success = this.game.buy(up);
+                        if(success) wrapper.remove();
                     }
                     else if(params.origin&&params.origin.type=="ConsumablePack"){
                         this.game.buy(up);
