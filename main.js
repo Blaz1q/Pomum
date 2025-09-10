@@ -133,7 +133,8 @@ async emit(event, payload) {
         );
 
         if (this.overstock) {
-            picked.push(consumableList[Math.floor(Math.random() * consumableList.length)]);
+            let con = consumableList[Math.floor(Math.random() * consumableList.length)];
+            picked.push(new Consumable(con.name,con.description,con.effect,con.price,con.props));
         }
 
         return picked;

@@ -40,6 +40,7 @@ export class RenderUI {
         coupon.appendChild(this.displayUpgrades(rollVouchers(this.game,1),{bought: false}));
     }
     OpenBoosterPack(boosterPack){
+        console.log(boosterPack);
         const consumableContainer = document.getElementById("consumables-container");
         consumableContainer.innerHTML = "";
         consumableContainer.appendChild(this.displayUpgrades(boosterPack.roll(),{bought:false,free:true,origin: boosterPack}));
@@ -217,9 +218,15 @@ displayPlayerUpgrades() {
             // Click handlers
             if (!params.bought) {
                 card.addEventListener("click", () => {
-                    if ((this.game.upgrades.length < this.game.maxUpgrades && this.game.money >= up.price&&up.type=="Upgrade") || (this.game.money >= up.price&&(up.type=="ConsumablePack"||up.type=="Voucher"))) {
-                        let success = this.game.buy(up);
-                        if(success) wrapper.remove();
+                    if (
+                        (this.game.upgrades.length < this.game.maxUpgrades && this.game.money >= up.price&&up.type=="Upgrade") ||
+                        (this.game.money >= up.price&&(
+                        up.type=="ConsumablePack"||
+                        up.type=="Voucher"||
+                        (up.type=="Consumable"&&!params.origin)))
+                        ) {
+                            let success = this.game.buy(up);
+                            if(success) wrapper.remove();
                     }
                     else if(params.origin&&params.origin.type=="ConsumablePack"){
                         this.game.buy(up);

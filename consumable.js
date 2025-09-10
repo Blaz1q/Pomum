@@ -21,9 +21,14 @@ export class ConsumablePack extends Upgrade{
             ...props
         }
     }
-    roll(count = this.props.maxRoll){
-        const shuffled = this.consumables.sort(() => Math.random() - 0.5);
-        return shuffled.slice(0, count);
+    roll(count = this.props.maxRoll) {
+    // copy & shuffle
+    const shuffled = [...this.consumables].sort(() => Math.random() - 0.5);
+
+    // pick 'count' items and turn them into Consumables
+    return shuffled
+        .slice(0, count)
+        .map(bp => new Consumable(bp.name, bp.description, bp.effect, bp.price, bp.props));
     }
 }
 export class Consumable extends Upgrade{
@@ -44,65 +49,118 @@ function add(fruit){
     fruit.mult=Math.round(fruit.mult * 100) / 100;
     fruit.level+=1;
 }
-const apple = new Consumable(
-    "Jabłko",
-    function(game){
-        const fruit = game.fruits[0];
-        return desc(fruit);
+const consumableBlueprints = [];
+consumableBlueprints.push(
+    {
+        name: "Jabłko",
+        description(game) {
+            return desc(game.fruits[0]);
+        },
+        effect(game) {
+            add(game.fruits[0].props.upgrade);
+        },
+        price: 5,
+        props: { image: "lvlup_apple" }
     },
-    function(game){
-        const fruit = game.fruits[0].props.upgrade;
-        add(fruit);
+    {
+        name: "Gruszka",
+        description(game) {
+            return desc(game.fruits[1]);
+        },
+        effect(game) {
+            add(game.fruits[1].props.upgrade);
+        },
+        price: 5,
+        props: { image: "lvlup_pear" }
     },
-    5,{image: "lvlup_apple"}
-);
-const pear = new Consumable(
-    "Gruszka",
-    function(game){
-        const fruit = game.fruits[1];
-        return desc(fruit);
+    {
+        name: "Ananas",
+        description(game) {
+            return desc(game.fruits[2]);
+        },
+        effect(game) {
+            add(game.fruits[2].props.upgrade);
+        },
+        price: 5,
+        props: { image: "lvlup_pineapple" }
     },
-    function(game){
-        const fruit = game.fruits[1].props.upgrade;
-        add(fruit);
+    {
+        name: "Winogron",
+        description(game) {
+            return desc(game.fruits[3]);
+        },
+        effect(game) {
+            add(game.fruits[3].props.upgrade);
+        },
+        price: 5,
+        props: { image: "lvlup_grape" }
     },
-    5,{image: "lvlup_pear"}
-);
-const pineapple = new Consumable(
-    "Ananas",
-    function(game){
-        const fruit = game.fruits[2];
-        return desc(fruit);
+    {
+        name: "Kokos",
+        description(game) {
+            return desc(game.fruits[4]);
+        },
+        effect(game) {
+            add(game.fruits[4].props.upgrade);
+        },
+        price: 5,
+        props: { image: "lvlup_coconut" }
     },
-    function(game){
-        const fruit = game.fruits[2].props.upgrade;
-        add(fruit);
+    {
+        name: "Bad Apple",
+        description(game) {
+            return evildesc(game.fruits[0], game);
+        },
+        effect(game) {
+            evilfunc(game, game.fruits[0]);
+        },
+        price: 5,
+        props: { image: "devil_apple" }
     },
-    5,{image: "lvlup_pineapple"}
-);
-const grape = new Consumable(
-    "Winogron",
-    function(game){
-        const fruit = game.fruits[3];
-        return desc(fruit);
+    {
+        name: "p-bear?",
+        description(game) {
+            return evildesc(game.fruits[1], game);
+        },
+        effect(game) {
+            evilfunc(game, game.fruits[1]);
+        },
+        price: 5,
+        props: { image: "devil_pear" }
     },
-    function(game){
-        const fruit = game.fruits[3].props.upgrade;
-        add(fruit);
+    {
+        name: "EVIL Winogron",
+        description(game) {
+            return evildesc(game.fruits[3], game);
+        },
+        effect(game) {
+            evilfunc(game, game.fruits[3]);
+        },
+        price: 5,
+        props: { image: "devil_grape" }
     },
-    5,{image: "lvlup_grape"}
-);
-const coconut = new Consumable(
-    "Kokos",
-    function(game){
-        const fruit = game.fruits[4];
-        return desc(fruit);
+    {
+        name: "Toxic pineapple",
+        description(game) {
+            return evildesc(game.fruits[2], game);
+        },
+        effect(game) {
+            evilfunc(game, game.fruits[2]);
+        },
+        price: 5,
+        props: { image: "devil_pineapple" }
     },
-    function(game){
-        const fruit = game.fruits[4].props.upgrade;
-        add(fruit);
-    },
-    5,{image: "lvlup_coconut"}
+    {
+        name: "Coconut Granade",
+        description(game) {
+            return evildesc(game.fruits[4], game);
+        },
+        effect(game) {
+            evilfunc(game, game.fruits[4]);
+        },
+        price: 5,
+        props: { image: "devil_coconut" }
+    }
 );
 function evildesc(fruit){
     if(fruit.props.percent-5<=0){
@@ -120,51 +178,6 @@ function evilfunc(game,fruit){
             game.addChancesExcept(fruit,1.25);
         }
 }
-const badapple = new Consumable(
-    "Bad Apple",
-    function(game){
-        return evildesc(game.fruits[0]);
-    },
-    function(game){
-        evilfunc(game,game.fruits[0]);
-    },5,{image: "devil_apple"}
-);
-const pbear = new Consumable(
-    "p-bear?",
-    function(game){
-        return evildesc(game.fruits[1]);
-    },
-    function(game){
-        evilfunc(game,game.fruits[1]);
-    },5,{image: "devil_pear"}
-);
-const winogronevil = new Consumable(
-    "EVIL Winogron",
-    function(game){
-        return evildesc(game.fruits[3]);
-    },
-    function(game){
-        evilfunc(game,game.fruits[3]);
-    },5,{image: "devil_grape"}
-);
-const toxicpineapple = new Consumable(
-    "Toxic pineapple",
-    function(game){
-        return evildesc(game.fruits[2]);
-    },
-    function(game){
-        evilfunc(game,game.fruits[2]);
-    },5,{image: "devil_pineapple"}
-);
-const coconutGranade = new Consumable(
-    "Coconut Granade",
-    function(game){
-        return evildesc(game.fruits[4]);
-    },
-    function(game){
-        evilfunc(game,game.fruits[4]);
-    },5,{image: "devil_coconut"}
-);
 const voucher = new Voucher(
     "Voucher",
     `Zwiększa upgrade slot o 1`,
@@ -224,8 +237,8 @@ export function rollVouchers(game, count = 1) {
     return shuffled.slice(0, count);
 }
 vouchers.push(voucher,overstock);
-pomumpackItems.push(apple,pear,grape,coconut,pineapple,badapple,pbear,winogronevil,toxicpineapple,coconutGranade);
-consumableList.push(apple,pear,grape,coconut,pineapple,badapple,pbear,winogronevil,toxicpineapple,coconutGranade);
+pomumpackItems.push(...consumableBlueprints);
+consumableList.push(...consumableBlueprints);
 const pomumpackSmall = new ConsumablePack("Pomumpack",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,4);
 const pomumpackBig = new ConsumablePack("Poumpack BIG",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,6,{maxSelect: 1,maxRoll: 4,image: 'pomumpackbig'});
 const pomumpackMega = new ConsumablePack("Poumpack MEGA",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,8,{maxSelect: 2,maxRoll: 5,image: 'pomumpackmega'});
