@@ -158,7 +158,7 @@ body, html {
 .game .right-panel #shop h1 {
   margin-bottom: 1rem;
 }
-.game .right-panel #shop button {
+.game .right-panel #shop button.shopbutton {
   margin: 0.3rem;
   padding: 0.6rem 1.2rem;
   border-radius: 10px;
@@ -202,20 +202,6 @@ body, html {
   background-color: #e07272;
 }
 
-.upgrade-wrapper {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform 0.2s ease;
-}
-.upgrade-wrapper.dragging {
-  opacity: 0.7;
-  cursor: grabbing;
-}
-.upgrade-wrapper.drag-over {
-  outline: 2px dashed #00f;
-}
-
 /* Price above the card */
 .upgrade-price {
   margin-bottom: 0.3rem;
@@ -231,12 +217,52 @@ body, html {
 /* Card */
 .upgrade-wrapper {
   position: relative;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   align-items: center;
+  z-index: 0;
+  transition: transform 0.2s ease;
+}
+.upgrade-wrapper.dragging {
+  opacity: 0.7;
+  cursor: grabbing;
+}
+.upgrade-wrapper.drag-over {
+  outline: 2px dashed #00f;
 }
 .upgrade-wrapper.triggered {
   animation: triggeredCard 0.3s ease-in-out;
+}
+.upgrade-wrapper .consumable-buttons {
+  position: absolute;
+  right: 0; /* keep hidden off to the right */
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 4;
+}
+.upgrade-wrapper .consumable-buttons button {
+  all: unset;
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 12px;
+  background: #e74c3c;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background, padding 0.2s;
+}
+.upgrade-wrapper .consumable-buttons button:hover {
+  background: #c0392b;
+}
+.upgrade-wrapper:hover .consumable-buttons {
+  margin-left: 100px;
+  right: -70px; /* slide in */
+  opacity: 1;
 }
 .upgrade-wrapper .upgrade-card {
   width: 120px;
@@ -246,6 +272,7 @@ body, html {
   cursor: pointer;
   animation: skewCard 3s infinite ease-out;
   transition: box-shadow 0.2s ease;
+  z-index: 5;
 }
 .upgrade-wrapper .upgrade-card .upgrade-inner {
   width: 100%;
@@ -433,7 +460,7 @@ body, html {
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
-#upgrade-tiles .overlay .container button {
+#upgrade-tiles .overlay .container button.upgradetiles {
   padding: 0.8rem 1.5rem;
   border: none;
   border-radius: 12px;
@@ -443,7 +470,7 @@ body, html {
   cursor: pointer;
   transition: background 0.2s;
 }
-#upgrade-tiles .overlay .container button:hover {
+#upgrade-tiles .overlay .container button.upgradetiles:hover {
   background: #c0392b;
 }
 

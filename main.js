@@ -33,7 +33,6 @@ export class Game{
         this.silverChance = 0;
         this.tempscore = 0;
         this.score = 0;
-        this.maxUpgrades = 4;
         this.GameRenderer = new RenderUI(this);
         this.scoreBox = document.getElementById("score");
         this.tempscoreBox = document.getElementById("tempscore");
@@ -64,7 +63,10 @@ export class Game{
         this.selected = null; // zapamiętany pierwszy klik
         this.locked = false;
         //upgrades
+        this.maxUpgrades = 4;
+        this.maxConsumables = 2;
         this.upgrades = [];
+        this.consumables = [];
         this.coupons = [];
         this.BuysFromBoosterLeft = 0;
         this.overstock = false;
@@ -133,8 +135,20 @@ async emit(event, payload) {
         );
 
         if (this.overstock) {
-            let con = consumableList[Math.floor(Math.random() * consumableList.length)];
-            picked.push(new Consumable(con.name,con.description,con.effect,con.price,con.props));
+            // Start with full consumable list
+            let overstockPool = consumableList;
+
+            // Optional dedupe: exclude ones already owned or already picked this roll
+            if (this.upgradeDedupe) {
+                overstockPool = overstockPool.filter(c =>
+                    !this.consumables.some(pc => pc.name === c.name) &&
+                    !picked.some(p => p.name === c.name)
+                );
+            }
+            if (overstockPool.length > 0) {
+                const con = overstockPool[Math.floor(Math.random() * overstockPool.length)];
+                picked.push(new Consumable(con.name, con.description, con.effect, con.price, con.props));
+            }
         }
 
         return picked;
@@ -326,8 +340,28 @@ trySwap(x1, y1, x2, y2) {
             f.percent +=chance;
         }
     }
+    useConsumable(upgrade) {
+        if (upgrade.type === "Consumable") {
+            upgrade.apply(this);
+            const idx = this.consumables.indexOf(upgrade);
+            if (idx !== -1) {
+                this.consumables.splice(idx, 1); // removes the element in-place
+            }
+            Audio.playSound('pop.mp3');
+            this.GameRenderer.displayPlayerConsumables();
+        }
+    }
+    buyanduse(upgrade){
+        if(this.stage!==STAGES.Shop) return false;
+        if(this.money<upgrade.price) return false;
+        Audio.playSound('buy.mp3');
+        upgrade.apply(this);
+        this.money -= upgrade.price;
+        this.GameRenderer.displayMoney();
+        return true;
+    }
     buy(upgrade){
-         console.log("buyin");
+        console.log("buyin");
         if(this.stage!==STAGES.Shop) return false; // not in shop -> can't buy
         if(this.money<upgrade.price) return false; // not enough money
         Audio.playSound('buy.mp3');
@@ -338,7 +372,9 @@ trySwap(x1, y1, x2, y2) {
             this.GameRenderer.displayPlayerUpgrades();
             this.GameRenderer.displayUpgradesCounter();
         }else if(upgrade.type=="Consumable"){
-            upgrade.apply(this);
+            this.consumables.push(upgrade);
+            this.GameRenderer.displayPlayerConsumables();
+            this.GameRenderer.displayConsumablesCounter();   
         }
         else if(upgrade.type=="ConsumablePack"){
             this.GameRenderer.OpenBoosterPack(upgrade);
@@ -348,17 +384,31 @@ trySwap(x1, y1, x2, y2) {
             upgrade.apply(this);
         }
         this.money -= upgrade.price;
-        this.moneyBox.innerHTML = this.money;
+        this.GameRenderer.displayMoney();
         return true;
     }
     sell(upgrade){
         if(this.stage!==STAGES.Shop) return false; // not in shop -> can't sell
-        const index = this.upgrades.indexOf(upgrade) ?? -1;
-        if(index==-1) return;
-        console.log("SELLINNN");
-        this.upgrades[index].sell(this);
-        this.upgrades.splice(index,1);
-        return true;
+        if(upgrade.type=="Upgrade"){
+            const index = this.upgrades.indexOf(upgrade) ?? -1;
+            if(index==-1) return;
+            console.log("SELLINNN");
+            this.upgrades[index].sell(this);
+            this.upgrades.splice(index,1);
+            this.GameRenderer.displayUpgradesCounter();
+            this.GameRenderer.displayMoney();
+            return true;
+        }
+        else if(upgrade.type=="Consumable"){
+            const index = this.consumables.indexOf(upgrade) ?? -1;
+            if(index==-1) return;
+            console.log("SELLINNN");
+            this.money+=upgrade.sellPrice;
+            this.consumables.splice(index,1);
+            this.GameRenderer.displayMoney();
+            this.GameRenderer.displayConsumablesCounter();
+            return true;
+        }
     }
 
     randomTile() {

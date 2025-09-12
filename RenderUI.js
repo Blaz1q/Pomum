@@ -23,11 +23,11 @@ export class RenderUI {
         this.game.tempscoreBox.innerHTML = this.game.tempscore;
         this.game.multBox.innerHTML = this.game.mult;
     }
-    displayFruits(){
-        
-    }
     displayUpgradesCounter(){
         document.getElementById("upgrades-counter").innerHTML = `(${this.game.upgrades.length}/${this.game.maxUpgrades})`;
+    }
+     displayConsumablesCounter(){
+        document.getElementById("consumables-counter").innerHTML = `(${this.game.consumables.length}/${this.game.maxConsumables})`;
     }
     displayBoosterPacks(){
         const boosterPack = document.getElementById("boosterpack-container");
@@ -43,7 +43,7 @@ export class RenderUI {
         console.log(boosterPack);
         const consumableContainer = document.getElementById("consumables-container");
         consumableContainer.innerHTML = "";
-        consumableContainer.appendChild(this.displayUpgrades(boosterPack.roll(),{bought:false,free:true,origin: boosterPack}));
+        consumableContainer.appendChild(this.displayUpgrades(boosterPack.roll(this.game),{bought:false,free:true,origin: boosterPack}));
         this.displayTiles();
         this.dispalyTileOverlay();
     }
@@ -90,6 +90,12 @@ export class RenderUI {
 
         tileContainer.appendChild(wrapper);
     });
+}
+displayPlayerConsumables(){
+    const playerConsumables = document.getElementById("player-consumables-container");
+    playerConsumables.innerHTML = "";
+    const consumables = this.displayUpgrades(this.game.consumables, { bought: true });
+    playerConsumables.appendChild(consumables);
 }
 displayPlayerUpgrades() {
     const playerUpgrades = document.getElementById("player-upgrades-container");
@@ -171,93 +177,169 @@ displayPlayerUpgrades() {
         shopEl.innerHTML = ""; 
         shopEl.appendChild(this.displayUpgrades(this.game.rollUpgrades(),{bought:false}));
     }
-    displayUpgrades(upgrades, params = {bought:false, origin: null }) {
-        console.log(params.origin);
-        let full = document.createDocumentFragment();
-        if(params.origin&&params.origin.type=="ConsumablePack"){
-            this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
-        }
-        upgrades.forEach(up => {
-            // Wrapper
-            console.log(up);
-            const wrapper = document.createElement("div");
-            wrapper.className = "upgrade-wrapper";
-            if (params.bought) {
-                wrapper.classList.add("bought");
-            }
-            if(params.free){
-                up.price = 0;
-            }
-            // Price above card
-            const priceEl = document.createElement("div");
-            priceEl.className = "upgrade-price";
-            priceEl.textContent = `$${params.bought ? Math.floor(up.price / 2) : up.price}`;
-            
-            // Card inner
-            const cardInner = document.createElement("div");
-            cardInner.className = "upgrade-inner";
-            cardInner.style.backgroundImage = `url('${up.image}')`;
-            
-            // Card
-            const card = document.createElement("div");
-            card.className = "upgrade-card";
-            card.style.animationDelay = `-${Math.random() * 3}s`;
-            card.appendChild(cardInner);
-            
-            // Description
-            const desc = document.createElement("div");
-            desc.className = "upgrade-desc";
-            desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p>`;
-    
-            // Aktualizacja opisu przy hover
-            wrapper.addEventListener("mouseenter", () => {
-                // jeśli opis się zmienia dynamicznie w zależności od stanu gry
-                desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p>`;
-            });
-    
-            // Click handlers
-            if (!params.bought) {
-                card.addEventListener("click", () => {
-                    if (
-                        (this.game.upgrades.length < this.game.maxUpgrades && this.game.money >= up.price&&up.type=="Upgrade") ||
-                        (this.game.money >= up.price&&(
-                        up.type=="ConsumablePack"||
-                        up.type=="Voucher"||
-                        (up.type=="Consumable"&&!params.origin)))
-                        ) {
-                            let success = this.game.buy(up);
-                            if(success) wrapper.remove();
-                    }
-                    else if(params.origin&&params.origin.type=="ConsumablePack"){
-                        this.game.buy(up);
-                        this.game.BuysFromBoosterLeft--;
-                        if(this.game.BuysFromBoosterLeft<=0){
-                            const container = document.getElementById("consumables-container");
-                            container.innerHTML = "";
-                            //hideTileOverlay();
-                        }
-                        wrapper.remove();    
-                    }
-                });
-            }
-            if (params.bought&&(up.type=="Consumable"||up.type=="Upgrade")) {
-                card.addEventListener("click", () => {
-                    if(this.game.sell(up)){
-                        wrapper.remove();
-                        this.displayMoney();
-                        this.displayUpgradesCounter();
-                    } 
-                });
-            }
-            // Append
-            wrapper.appendChild(priceEl);
-            wrapper.appendChild(card);
-            wrapper.appendChild(desc);
-            full.appendChild(wrapper);
-        });
-        return full;
+    displayUpgrades(upgrades, params = { bought:false, origin: null }) {
+    console.log(params.origin);
+    let full = document.createDocumentFragment();
+
+    if(params.origin && params.origin.type == "ConsumablePack"){
+        this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
     }
-    // przeniesione displayUpgrades, displayPlayerUpgrades itd...
+
+    upgrades.forEach(up => {
+        const wrapper = document.createElement("div");
+        const originalZ = wrapper.style.zIndex || 0;
+        wrapper.addEventListener('mouseenter', () => wrapper.style.zIndex = 500);
+        wrapper.addEventListener('mouseleave', () => wrapper.style.zIndex = originalZ);
+        wrapper.className = "upgrade-wrapper";
+        wrapper.dataset.type = up.type;
+        if (params.bought) wrapper.classList.add("bought");
+
+        if(params.free){
+            up.price = 0;
+        }
+
+        // Price above card
+        const priceEl = document.createElement("div");
+        priceEl.className = "upgrade-price";
+        priceEl.textContent = `$${params.bought ? up.sellPrice : up.price}`;
+        
+        // Card inner
+        const cardInner = document.createElement("div");
+        cardInner.className = "upgrade-inner";
+        cardInner.style.backgroundImage = `url('${up.image}')`;
+        
+        // Card
+        const card = document.createElement("div");
+        card.className = "upgrade-card";
+        card.style.animationDelay = `-${Math.random() * 3}s`;
+        card.appendChild(cardInner);
+        
+        // Description
+        const desc = document.createElement("div");
+        desc.className = "upgrade-desc";
+        desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p>`;
+
+        wrapper.addEventListener("mouseenter", () => {
+            desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p>`;
+        });
+        wrapper.appendChild(this.createUpgradeButtons(wrapper,up,params));
+        // Click handlers
+        wrapper.appendChild(priceEl);
+        wrapper.appendChild(card);
+        wrapper.appendChild(desc);
+        full.appendChild(wrapper);
+    });
+
+    return full;
+}
+createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
+    if(params.origin && params.origin.type == "ConsumablePack"){
+        this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
+    }
+    function buy(game,upgrade,params){
+        let success = false;
+        if(game.money<upgrade.price){
+            console.log("not enough money")
+            return false;
+        }
+        if(upgrade.type==="Upgrade"&&game.upgrades.length>=game.maxUpgrades){
+            console.log("not enough upgrade space");
+            return false;
+        }
+        if(upgrade.type==="Consumable"&&game.consumables.length>=game.maxConsumables){
+            console.log("not enough consumable space space");
+            return false;
+        }
+        success = game.buy(upgrade);
+        console.log(success);
+        if (success&&params.origin&&params.origin.type=="ConsumablePack"){
+            game.BuysFromBoosterLeft--;
+        }
+        if(params.origin&&params.origin.type=="ConsumablePack"&&game.BuysFromBoosterLeft <= 0){
+            const container = document.getElementById("consumables-container");
+            container.innerHTML = "";
+        }
+        if(success){
+            wrapper.remove();
+            return true;
+        }
+        return false;
+    }
+    const btnRow = document.createElement("div");
+    btnRow.className = "consumable-buttons";
+    const btnBuy = document.createElement("button");
+    btnBuy.textContent = "Buy";
+    btnBuy.addEventListener("click", (e) => {
+        e.stopPropagation();
+        buy(this.game,upgrade,params);
+        this.refreshBuyButtons();
+    });
+    const btnUse = document.createElement("button");
+    btnUse.textContent = "Use";
+    btnUse.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.game.useConsumable(upgrade);
+    });
+    const btnBuyUse = document.createElement("button");
+    btnBuyUse.textContent = "Buy & Use";
+    btnBuyUse.addEventListener("click", (e) => {
+        e.stopPropagation();
+        let success = this.game.buyanduse(upgrade);
+        if (success&&params.origin&&params.origin.type=="ConsumablePack"){
+            this.game.BuysFromBoosterLeft--;
+        }
+        if(params.origin&&params.origin.type=="ConsumablePack"&&game.BuysFromBoosterLeft <= 0){
+            const container = document.getElementById("consumables-container");
+            container.innerHTML = "";
+        }
+        if(success){
+            wrapper.remove();
+        }
+    });
+    const btnSell = document.createElement("button");
+    btnSell.textContent = "Sell";
+    btnSell.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        if(this.game.sell(upgrade)){
+            this.refreshBuyButtons();
+            wrapper.remove();
+        }
+    })
+    if(params.bought===false){
+        btnRow.appendChild(btnBuy);
+        if(upgrade.type==="Consumable"){
+            btnRow.appendChild(btnBuyUse);
+        }
+    }
+    else{
+       if(upgrade.type==="Consumable"){
+            btnRow.appendChild(btnUse); 
+        }
+        btnRow.appendChild(btnSell);
+    }       
+    return btnRow;    
+    }
+    refreshBuyButtons() {
+    // Disable or remove buy buttons when limits are reached
+    const noUpgradeSpace = this.game.upgrades.length >= this.game.maxUpgrades;
+    const noConsumableSpace = this.game.consumables.length >= this.game.maxConsumables;
+
+    document.querySelectorAll(".consumable-buttons button").forEach(btn => {
+        if (btn.textContent === "Buy") {
+            const wrapper = btn.closest(".upgrade-wrapper");
+            if (!wrapper) return;
+
+            // Find upgrade type from dataset
+            const type = wrapper.dataset.type;
+            if(type==="Upgrade"){
+                btn.disabled = noUpgradeSpace;
+            }
+            if(type==="Consumable"){
+                btn.disabled = noConsumableSpace;
+            }
+        }
+    });
+}
 }
 export class Style{
     static Mult(text){

@@ -21,15 +21,33 @@ export class ConsumablePack extends Upgrade{
             ...props
         }
     }
-    roll(count = this.props.maxRoll) {
-    // copy & shuffle
-    const shuffled = [...this.consumables].sort(() => Math.random() - 0.5);
+    roll(game) {
+    // Start with all available consumables
+    let count = this.props.maxRoll
+    let available = this.consumables;
 
-    // pick 'count' items and turn them into Consumables
-    return shuffled
-        .slice(0, count)
-        .map(bp => new Consumable(bp.name, bp.description, bp.effect, bp.price, bp.props));
+    // Optional dedupe: exclude ones already owned
+    if (game.upgradeDedupe) {
+        available = available.filter(c => 
+            !game.consumables.some(pc => pc.name === c.name)
+        );
     }
+
+    // Make a copy for shuffling
+    const pool = [...available];
+
+    // Fisher–Yates shuffle
+    for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+
+    // Pick first 'count' items and create new instances
+    const picked = pool.slice(0, count).map(c =>
+        new Consumable(c.name, c.description, c.effect, c.price, c.props)
+    );
+    return picked;
+}
 }
 export class Consumable extends Upgrade{
     constructor(name,descriptionfn,effect,price,props = {}){

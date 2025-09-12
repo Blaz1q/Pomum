@@ -30,10 +30,10 @@
           <div id="player-upgrades-container"></div>
           <label><b id="upgrades-counter">(0/4)</b></label>
         </div>
-        <!--<div class="upgrade-group consumables">
+        <div class="upgrade-group consumables">
           <div id="player-consumables-container"></div>
           <label><b id="consumables-counter">(0/2)</b></label>
-        </div>-->
+        </div>
       </div>
 
       <!-- Game grid -->
@@ -41,11 +41,11 @@
 
       <!-- Shop -->
       <div id="shop">
-        <button onclick="reroll()">Reroll Shop ($4)</button>
+        <button class="shopbutton" onclick="reroll()">Reroll Shop ($4)</button>
         <div id="upgrades-container"></div>
         <div id="boosterpack-container"></div>
         <div id="voucher-container"></div>
-        <button onclick="startRound()">Continue</button>
+        <button class="shopbutton" onclick="startRound()">Continue</button>
       </div>
     </div>
   </div>
@@ -54,7 +54,7 @@
         <div class="container">
             <div id="tiles"></div>
             <div id="consumables-container"></div>
-            <button onclick="skip()">Kontynuuj</button>
+            <button class="upgradetiles" onclick="skip()">Kontynuuj</button>
         </div>
     </div>
   </div>
