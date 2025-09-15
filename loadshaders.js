@@ -22,11 +22,7 @@ async function initShaders() {
     return program;
 }
 export class Animator {
-    constructor(initialRotate = 0.5, initialColors = [
-        [1.0, 0.5, 0.5],
-        [1.0, 0.8, 0.5],
-        [1.0, 0.9, 0.7]
-    ]) {
+    constructor(initialRotate = 1, initialColors = ["#B266FF", "#C080FF", "#D299FF"]) {
         // Rotation
         this.rotate = initialRotate;
         this.targetRotate = initialRotate;
@@ -34,21 +30,31 @@ export class Animator {
         this.rotateProgress = 0;
         this.rotateDuration = 60; // frames
 
+        // Waves
+        this.waveAmp = 0;
+        this.waveFreq = 0;
+        this.waveStart = 0;
+        this.waveTarget = 0;
+        this.waveFreqStart = 0;
+        this.waveFreqTarget = 0;
+        this.waveProgress = 0;
+        this.waveDuration = 60;
+
         // Colors
-        this.currentColors = initialColors.map(c => [...c]);
-        this.targetColors = initialColors.map(c => [...c]);
-        this.colorAnimStart = initialColors.map(c => [...c]);
+        this.currentColors = initialColors.map(c =>
+            Array.isArray(c) ? [...c] : Animator.hexToVec3(c)
+        );
+        this.targetColors = this.currentColors.map(c => [...c]);
+        this.colorAnimStart = this.currentColors.map(c => [...c]);
         this.colorAnimProgress = 0;
         this.colorAnimDuration = 60;
         this.colorAnimating = false;
     }
 
-    // Easing function: fast in, slow out
     static easeInShortOutLong(t) {
         return 1 - Math.pow(1 - t, 2.5);
     }
 
-    // Start a smooth rotation to a new target
     smoothRotateTo(newRotate, duration = 60) {
         this.rotateStart = this.rotate;
         this.targetRotate = newRotate;
@@ -56,7 +62,6 @@ export class Animator {
         this.rotateDuration = duration;
     }
 
-    // Update rotation (call in render loop)
     updateRotate() {
         if (this.rotateProgress < 1) {
             this.rotateProgress += 1 / this.rotateDuration;
@@ -67,7 +72,27 @@ export class Animator {
         return this.rotate;
     }
 
-    // Convert hex to vec3 [0-1]
+    // --- New wave animation functions ---
+    smoothWaveTo(newAmp, newFreq, duration = 60) {
+        this.waveStart = this.waveAmp;
+        this.waveTarget = newAmp;
+        this.waveFreqStart = this.waveFreq;
+        this.waveFreqTarget = newFreq;
+        this.waveProgress = 0;
+        this.waveDuration = duration;
+    }
+
+    updateWave() {
+        if (this.waveProgress < 1) {
+            this.waveProgress += 1 / this.waveDuration;
+            if (this.waveProgress > 1) this.waveProgress = 1;
+            const eased = Animator.easeInShortOutLong(this.waveProgress);
+            this.waveAmp = this.waveStart + (this.waveTarget - this.waveStart) * eased;
+            this.waveFreq = this.waveFreqStart + (this.waveFreqTarget - this.waveFreqStart) * eased;
+        }
+        return { amp: this.waveAmp, freq: this.waveFreq };
+    }
+
     static hexToVec3(hex) {
         hex = hex.replace('#','');
         if(hex.length === 3) hex = hex.split('').map(c => c+c).join('');
@@ -78,20 +103,20 @@ export class Animator {
         ];
     }
 
-    // Start color animation
     animateColors(hexArray, durationFrames = 60) {
         if(hexArray.length !== 3) {
-            console.error("animateColors expects an array of 3 hex strings");
+            console.error("animateColors expects an array of 3 colors");
             return;
         }
         this.colorAnimStart = this.currentColors.map(c => [...c]);
-        this.targetColors = hexArray.map(hex => Animator.hexToVec3(hex));
+        this.targetColors = hexArray.map(c =>
+            Array.isArray(c) ? [...c] : Animator.hexToVec3(c)
+        );
         this.colorAnimProgress = 0;
         this.colorAnimDuration = durationFrames;
         this.colorAnimating = true;
     }
 
-    // Update colors (call in render loop)
     updateColors() {
         if(!this.colorAnimating) return this.currentColors;
 
@@ -163,18 +188,23 @@ initShaders().then(program => {
     ]);
     
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-
+    
     const u_timeLoc = gl.getUniformLocation(program, "u_time");
     const u_resLoc = gl.getUniformLocation(program, "u_resolution");
     const u_vortexStrengthLoc = gl.getUniformLocation(program, "u_vortexStrength");
+    const u_waveAmp = gl.getUniformLocation(program, "u_waveAmp");
+    const u_waveFreq = gl.getUniformLocation(program, "u_waveFreq");
     
     let startTime = performance.now();
 
     function render() {
         const smoothCols = animate.updateColors();
+        const waveSettings = animate.updateWave();
       const timeNow = (performance.now() - startTime) * 0.001;
       gl.useProgram(program);
       gl.uniform1f(u_vortexStrengthLoc, animate.updateRotate()); // 1.0 = normal, higher = stronger swirl 
+    gl.uniform1f(u_waveAmp,waveSettings.amp);
+    gl.uniform1f(u_waveFreq,waveSettings.freq);
       // set up position
       gl.enableVertexAttribArray(posAttribLocation);
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -198,3 +228,4 @@ gl.uniform1f(gl.getUniformLocation(program, "u_gain"), 1);
     resize();
     render();
 });
+window.animate = animate;

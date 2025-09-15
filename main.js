@@ -6,10 +6,10 @@ import { Tile } from "./Tile.js";
 import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES, COLORS } from "./dictionary.js";
 import { RenderUI } from "./RenderUI.js";
 import { Animator,animate } from "./loadshaders.js";
-const CELL_PX = 50;
+const CELL_PX = 64;
 const FADE_MS = 300;
 const FALL_MS = 350;
-
+const ANIMATION_DURATION = 8*60;
 export class Game{
     constructor(){
         //gold
@@ -171,11 +171,9 @@ async emit(event, payload) {
         this.GameRenderer.displayMoney();
     }
     gameover(){
-        document.getElementById("game-over").style.display = "flex";
+        this.GameRenderer.gameOver();
     }
     endround(){
-        animate.animateColors(COLORS.shopGreens,5*60);
-        animate.smoothRotateTo(1,5*60);
         this.GameRenderer.displayUpgradesCounter();
         this.GameRenderer.displayMoves();
         this.stage = STAGES.Shop;
@@ -191,12 +189,10 @@ async emit(event, payload) {
         this.GameRenderer.displayMoney();
         this.GameRenderer.displayUpgradesInShop();
         this.GameRenderer.displayBoosterPacks();
-        this.gameContainer.style.display = "none";
-        this.shopContainer.style.display = "grid";
+        this.GameRenderer.hideGame();
+        this.GameRenderer.showShop();
     }
     async startround(){
-        animate.animateColors(COLORS.warmOranges,5*60);
-        animate.smoothRotateTo(0.5,5*60);
         this.stage = STAGES.Game;
         console.log("waiting..");
         await this.emit(GAME_TRIGGERS.onRoundStart);
@@ -208,9 +204,8 @@ async emit(event, payload) {
         this.GameRenderer.displayMoney();
         this.GameRenderer.displayMoves();
         this.fill();
-        this.gameContainer.style.display = "grid";
-        this.shopContainer.style.display = "none";
-        
+        this.GameRenderer.hideShop();
+        this.GameRenderer.showGame();
     }
     calcMoney(){
         return Math.round((this.moves-this.movescounter)/1.2);
@@ -1022,9 +1017,24 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
 let game = new Game();
 console.log(game.fruits);
 //consumableList[0].consume(game);
-game.startround();
+//game.startround();
 function startRound(){
     game.startround();
+}
+function startGame(){
+    game = new Game();
+    game.GameRenderer.hideMenu();
+    game.GameRenderer.showGameContainer();
+    game.GameRenderer.displayPlayerUpgrades();
+    console.log(game.fruits);
+    startRound();
+    Audio.playSound('pop.mp3');
+    window.game = game;
+}
+function showMenu(){
+    document.getElementById("game-over").style.display = "none";
+    game.GameRenderer.hideGameContainer();
+    game.GameRenderer.showMenu();
 }
 function restartGame() {
   game = new Game();
@@ -1036,6 +1046,7 @@ function restartGame() {
 }
 function skip(){
     game.GameRenderer.hideTileOverlay();
+    game.GameRenderer.showShop();
 }
 function reroll(){
     game.rerollUpgrades();
@@ -1051,3 +1062,5 @@ window.consumableList = consumableList;
 window.reroll = reroll;
 // window.rerollBoosters = rerollBoosters;
 window.restartGame = restartGame;
+window.startGame = startGame;
+window.showMenu = showMenu;

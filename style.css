@@ -15,6 +15,56 @@ canvas#glcanvas {
   display: block;
 }
 
+#menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+  color: #fff;
+  text-align: center;
+}
+#menu h1 {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+#menu button {
+  margin: 0.5rem;
+  padding: 0.8rem 2rem;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #fff;
+  color: #333;
+  transition: transform 0.2s, background 0.2s;
+}
+#menu button:hover {
+  transform: scale(1.05);
+  background: #ffe6a7;
+}
+#menu #settingsPanel {
+  margin-top: 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+#menu #settingsPanel.hidden {
+  display: none;
+}
+#menu #settingsPanel h2 {
+  margin-bottom: 1rem;
+}
+#menu #settingsPanel label {
+  display: block;
+  margin: 0.5rem 0;
+}
+
 .game {
   display: flex;
   height: calc(100vh - 0.8em);
@@ -135,15 +185,16 @@ canvas#glcanvas {
   display: grid;
   margin-left: auto;
   margin-right: auto;
-  grid-template-rows: repeat(9, 50px);
-  grid-template-columns: repeat(9, 50px);
+  grid-template-rows: repeat(9, 4rem);
+  grid-template-columns: repeat(9, 4rem);
   background-color: rgba(240, 243, 247, 0.4941176471);
+  border-radius: 10px;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 .game .right-panel #body div {
   font-size: 25px;
-  height: 50px;
-  width: 50px;
+  height: 4rem;
+  width: 4rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -467,28 +518,14 @@ canvas#glcanvas {
 
 #upgrade-tiles {
   display: none;
-  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
   z-index: 900;
   justify-content: center;
-  align-items: center;
 }
-#upgrade-tiles .overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-#upgrade-tiles .overlay .container {
-  background: rgba(255, 255, 255, 0.95);
+#upgrade-tiles .container {
+  background: rgba(255, 255, 255, 0.34);
   padding: 2rem;
   border-radius: 15px;
   display: flex;
@@ -499,14 +536,14 @@ canvas#glcanvas {
   max-width: 900px;
   width: 90%;
 }
-#upgrade-tiles .overlay .container #tiles, #upgrade-tiles .overlay .container #consumables-container {
+#upgrade-tiles .container #tiles, #upgrade-tiles .container #consumables-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
-#upgrade-tiles .overlay .container button.upgradetiles {
+#upgrade-tiles .container button.upgradetiles {
   padding: 0.8rem 1.5rem;
   border: none;
   border-radius: 12px;
@@ -516,7 +553,7 @@ canvas#glcanvas {
   cursor: pointer;
   transition: background 0.2s;
 }
-#upgrade-tiles .overlay .container button.upgradetiles:hover {
+#upgrade-tiles .container button.upgradetiles:hover {
   background: #c0392b;
 }
 

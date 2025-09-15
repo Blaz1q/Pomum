@@ -1,5 +1,7 @@
 import { Consumable,ConsumablePack,consumableList,rollConsumablePacks,rollVouchers } from "./consumable.js";
 import { Upgrade } from "./upgradeBase.js";
+import { animate,Animator } from "./loadshaders.js";
+import { COLORS,GAMECOLORS, DURATIONS } from "./dictionary.js";
 export class RenderUI {
     constructor(game) {
         this.game = game;
@@ -41,11 +43,47 @@ export class RenderUI {
     }
     OpenBoosterPack(boosterPack){
         console.log(boosterPack);
+        animate.animateColors(COLORS.magicPurples,DURATIONS.ANIMATION_DURATION);
         const consumableContainer = document.getElementById("consumables-container");
         consumableContainer.innerHTML = "";
         consumableContainer.appendChild(this.displayUpgrades(boosterPack.roll(this.game),{bought:false,free:true,origin: boosterPack}));
         this.displayTiles();
         this.dispalyTileOverlay();
+        this.hideShop();
+    }
+    showMenu(){
+        document.getElementById("menu").style.display = "flex";
+        animate.animateColors(COLORS.magicPurples,DURATIONS.ANIMATION_DURATION);
+        animate.smoothRotateTo(-1,DURATIONS.SWIRL_DURATION);
+    }
+    hideMenu(){
+        document.getElementById("menu").style.display = "none";
+    }
+    hideGame(){
+        document.getElementById("body").style.display = "none";
+    }
+    showGameContainer(){
+        document.getElementsByClassName("game")[0].style.display = "flex";
+    }
+    hideGameContainer(){
+        document.getElementsByClassName("game")[0].style.display = "none";
+    }
+    showGame(){
+        document.getElementById("body").style.display = "grid";
+        const palettes = Object.values(GAMECOLORS);
+        const randomPalette = palettes[Math.floor(Math.random() * palettes.length)];
+        animate.animateColors(randomPalette,DURATIONS.ANIMATION_DURATION);
+        animate.smoothRotateTo(0.5,DURATIONS.SWIRL_DURATION);
+    }
+    hideShop(){
+        let shop = document.getElementById("shop");
+        shop.style.display="none";
+    }
+    showShop(){
+        animate.animateColors(COLORS.shopGreens,DURATIONS.ANIMATION_DURATION);
+        animate.smoothRotateTo(1,DURATIONS.SWIRL_DURATION);
+        let shop = document.getElementById("shop");
+        shop.style.display="grid";
     }
     dispalyTileOverlay(){
         let container = document.getElementById("upgrade-tiles");
@@ -231,6 +269,11 @@ displayPlayerUpgrades() {
     });
 
     return full;
+}
+gameOver(){
+    document.getElementById("game-over").style.display = "flex";
+    animate.animateColors(COLORS.gameOver,DURATIONS.ANIMATION_DURATION);
+    animate.smoothRotateTo(-1,DURATIONS.SWIRL_DURATION);
 }
 createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
     if(params.origin && params.origin.type == "ConsumablePack"){

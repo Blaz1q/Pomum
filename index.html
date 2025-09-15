@@ -9,7 +9,27 @@
   <script type="module" defer src="loadshaders.js"></script>
 </head>
 <body>
-  <div class="game">
+    <div id="menu">
+    <img src="./images/pomumlogo.png" alt="Pomum" srcset="">
+    <button id="startBtn" onclick="startGame()">Rozpocznij</button>
+
+    <div id="settingsPanel" class="hidden">
+      <h2>Settings</h2>
+      <label>
+        <input type="checkbox" id="soundToggle" checked>
+        Enable Sound
+      </label>
+      <label>
+        Difficulty:
+        <select id="difficulty">
+          <option>Easy</option>
+          <option selected>Normal</option>
+          <option>Hard</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <div class="game" style="display: none;">
     <!-- Left panel: stats -->
     <div class="left-panel">
       <h2>Round: <b id="round"></b></h2>
@@ -48,15 +68,13 @@
         <div id="voucher-container"></div>
         <button class="shopbutton" onclick="startRound()">Continue</button>
       </div>
-    </div>
-  </div>
-  <div id="upgrade-tiles">
-    <div class="overlay">
+      <div id="upgrade-tiles">
         <div class="container">
-            <div id="tiles"></div>
-            <div id="consumables-container"></div>
-            <button class="upgradetiles" onclick="skip()">Kontynuuj</button>
-        </div>
+                <div id="tiles"></div>
+                <div id="consumables-container"></div>
+                <button class="upgradetiles" onclick="skip()">Kontynuuj</button>
+            </div>
+      </div>
     </div>
   </div>
   <div id="game-over">
@@ -64,7 +82,7 @@
       <h1>Game Over</h1>
       <p>Your score: <span id="final-score">0</span></p>
       <button onclick="restartGame()">Restart</button>
-      <button onclick="goToMenu()">Menu</button>
+      <button onclick="showMenu()">Menu</button>
     </div>
   </div>
   <canvas id="glcanvas"></canvas>

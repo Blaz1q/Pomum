@@ -1,5 +1,7 @@
 $gap: 50px;
 $cellpx: 50px;
+$grid-size: 9;
+$cellsize: 4rem;
 $cardHeight: 180px;
 $cardWidth: 120px;
 $cardHeight-sm: 120px;
@@ -25,7 +27,64 @@ canvas#glcanvas {
   z-index: -1;         /* behind all other content */
   display: block;
 }
+#menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+  color: #fff;
+  text-align: center;
+
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  }
+
+  button {
+    margin: 0.5rem;
+    padding: 0.8rem 2rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: #fff;
+    color: #333;
+    transition: transform 0.2s, background 0.2s;
+
+    &:hover {
+      transform: scale(1.05);
+      background: #ffe6a7;
+    }
+  }
+
+  #settingsPanel {
+    margin-top: 1.5rem;
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    text-align: left;
+
+    &.hidden {
+      display: none;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin: 0.5rem 0;
+    }
+  }
+}
 .game {
+  
   display: flex;
   height: calc(100vh - .8em) ;
   gap: .5rem;
@@ -147,14 +206,15 @@ canvas#glcanvas {
       display: grid;
       margin-left: auto;
       margin-right: auto;
-      grid-template-rows: repeat(9, $cellpx);
-      grid-template-columns: repeat(9, $cellpx);
+      grid-template-rows: repeat($grid-size, $cellsize);
+      grid-template-columns: repeat($grid-size, $cellsize);
       background-color: $game-bg;
+      border-radius: 10px;
       box-shadow: inset 0 2px 6px rgba(0,0,0,0.15);
       div {
         font-size: calc($gap / 2);
-        height: $cellpx;
-        width: $cellpx;
+        height: $cellsize;
+        width: $cellsize;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -482,28 +542,14 @@ canvas#glcanvas {
 
 #upgrade-tiles {
   display: none; // hidden initially
-  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
   z-index: 900; // above most elements
   justify-content: center;
-  align-items: center;
 
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6); // dark translucent overlay
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    .container {
-      background: rgba(255, 255, 255, 0.95);
+  .container {
+      background: rgba(255, 255, 255, 0.34);
       padding: 2rem;
       border-radius: 15px;
       display: flex;
@@ -537,7 +583,6 @@ canvas#glcanvas {
         }
       }
     }
-  }
 }
 
 /* Tooltip for tiles */
