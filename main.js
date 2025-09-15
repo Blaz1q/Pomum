@@ -3,8 +3,9 @@ import { Upgrade } from "./upgradeBase.js";
 import { upgradesList } from "./upgrade.js";
 import { Audio } from "./sound.js";
 import { Tile } from "./Tile.js";
-import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES } from "./dictionary.js";
+import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES, COLORS } from "./dictionary.js";
 import { RenderUI } from "./RenderUI.js";
+import { Animator,animate } from "./loadshaders.js";
 const CELL_PX = 50;
 const FADE_MS = 300;
 const FALL_MS = 350;
@@ -173,6 +174,8 @@ async emit(event, payload) {
         document.getElementById("game-over").style.display = "flex";
     }
     endround(){
+        animate.animateColors(COLORS.shopGreens,5*60);
+        animate.smoothRotateTo(1,5*60);
         this.GameRenderer.displayUpgradesCounter();
         this.GameRenderer.displayMoves();
         this.stage = STAGES.Shop;
@@ -192,6 +195,8 @@ async emit(event, payload) {
         this.shopContainer.style.display = "grid";
     }
     async startround(){
+        animate.animateColors(COLORS.warmOranges,5*60);
+        animate.smoothRotateTo(0.5,5*60);
         this.stage = STAGES.Game;
         console.log("waiting..");
         await this.emit(GAME_TRIGGERS.onRoundStart);
@@ -205,6 +210,7 @@ async emit(event, payload) {
         this.fill();
         this.gameContainer.style.display = "grid";
         this.shopContainer.style.display = "none";
+        
     }
     calcMoney(){
         return Math.round((this.moves-this.movescounter)/1.2);

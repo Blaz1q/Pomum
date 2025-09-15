@@ -268,20 +268,20 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
     const btnRow = document.createElement("div");
     btnRow.className = "consumable-buttons";
     const btnBuy = document.createElement("button");
-    btnBuy.textContent = "Buy";
+    btnBuy.textContent = "Kup";
     btnBuy.addEventListener("click", (e) => {
         e.stopPropagation();
         buy(this.game,upgrade,params);
         this.refreshBuyButtons();
     });
     const btnUse = document.createElement("button");
-    btnUse.textContent = "Use";
+    btnUse.textContent = "Użyj";
     btnUse.addEventListener("click", (e) => {
         e.stopPropagation();
         this.game.useConsumable(upgrade);
     });
     const btnBuyUse = document.createElement("button");
-    btnBuyUse.textContent = "Buy & Use";
+    btnBuyUse.textContent = "Kup i Użyj";
     btnBuyUse.addEventListener("click", (e) => {
         e.stopPropagation();
         let success = this.game.buyanduse(upgrade);
@@ -297,7 +297,7 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         }
     });
     const btnSell = document.createElement("button");
-    btnSell.textContent = "Sell";
+    btnSell.textContent = "Sprzedaj";
     btnSell.addEventListener("click", (e)=>{
         e.stopPropagation();
         if(this.game.sell(upgrade)){

@@ -2,8 +2,17 @@
 body, html {
   margin: 0;
   font-family: "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(135deg, #dbe6f6 0%, #c5796d 100%);
   color: #333;
+}
+
+canvas#glcanvas {
+  position: fixed; /* stay fixed relative to viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; /* behind all other content */
+  display: block;
 }
 
 .game {
@@ -102,6 +111,24 @@ body, html {
   justify-content: center;
   min-height: 180px;
 }
+@media (max-width: 1024px) {
+  .game .right-panel #player-upgrades #player-upgrades-container,
+  .game .right-panel #player-upgrades #player-consumables-container {
+    min-height: 162px;
+  }
+}
+@media (max-width: 768px) {
+  .game .right-panel #player-upgrades #player-upgrades-container,
+  .game .right-panel #player-upgrades #player-consumables-container {
+    min-height: 120px;
+  }
+}
+@media (max-width: 480px) {
+  .game .right-panel #player-upgrades #player-upgrades-container,
+  .game .right-panel #player-upgrades #player-consumables-container {
+    min-height: 96px;
+  }
+}
 .game .right-panel #body {
   position: relative;
   overflow: hidden;
@@ -110,7 +137,7 @@ body, html {
   margin-right: auto;
   grid-template-rows: repeat(9, 50px);
   grid-template-columns: repeat(9, 50px);
-  background-color: #f0f3f7;
+  background-color: rgba(240, 243, 247, 0.4941176471);
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 .game .right-panel #body div {
@@ -249,6 +276,7 @@ body, html {
   all: unset;
   padding: 0.8rem 2rem;
   border: none;
+  text-align: right;
   border-radius: 12px;
   background: #e74c3c;
   color: #fff;
@@ -273,6 +301,24 @@ body, html {
   animation: skewCard 3s infinite ease-out;
   transition: box-shadow 0.2s ease;
   z-index: 5;
+}
+@media (max-width: 1024px) {
+  .upgrade-wrapper .upgrade-card {
+    width: 108px;
+    height: 162px;
+  }
+}
+@media (max-width: 768px) {
+  .upgrade-wrapper .upgrade-card {
+    width: 80px;
+    height: 120px;
+  }
+}
+@media (max-width: 480px) {
+  .upgrade-wrapper .upgrade-card {
+    width: 64px;
+    height: 96px;
+  }
 }
 .upgrade-wrapper .upgrade-card .upgrade-inner {
   width: 100%;

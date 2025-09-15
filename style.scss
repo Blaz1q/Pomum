@@ -2,7 +2,9 @@ $gap: 50px;
 $cellpx: 50px;
 $cardHeight: 180px;
 $cardWidth: 120px;
-$game-bg: #f0f3f7;
+$cardHeight-sm: 120px;
+$cardWidth-sm: 80px;
+$game-bg: #f0f3f77e;
 $tile-bg: #ffffff;
 $tile-hover: #ffe6a7;
 $chance: #86b587;
@@ -12,8 +14,16 @@ $moves: #e4d147;
 body, html {
   margin: 0;
   font-family: "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(135deg, #dbe6f6 0%, #c5796d 100%);
   color: #333;
+}
+canvas#glcanvas {
+  position: fixed;     /* stay fixed relative to viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;         /* behind all other content */
+  display: block;
 }
 .game {
   display: flex;
@@ -117,6 +127,17 @@ body, html {
         flex-wrap: wrap;
         justify-content: center;
         min-height: $cardHeight;
+        @media (max-width: 1024px) {
+          min-height: $cardHeight * 0.9;
+        }
+
+        @media (max-width: 768px) {
+          min-height: $cardHeight-sm;
+        }
+
+        @media (max-width: 480px) {
+          min-height: $cardHeight-sm * 0.8;
+        }
       }
     }
 
@@ -262,6 +283,7 @@ body, html {
     all: unset;
     padding: .8rem 2rem;
     border: none;
+    text-align: right;
     border-radius: 12px;
     background: #e74c3c;
     color: #fff;
@@ -282,6 +304,20 @@ body, html {
   .upgrade-card {
     width: $cardWidth;
     height: $cardHeight;
+    @media (max-width: 1024px) {
+      width: $cardWidth * 0.9;
+      height: $cardHeight * 0.9;
+    }
+
+    @media (max-width: 768px) {
+      width: $cardWidth-sm;
+      height: $cardHeight-sm;
+    }
+
+    @media (max-width: 480px) {
+      width: $cardWidth-sm * 0.8;
+      height: $cardHeight-sm * 0.8;
+    }
     position: relative;
     overflow: visible; /* allow image to scale outside */
     cursor: pointer;
