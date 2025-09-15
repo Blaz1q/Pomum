@@ -6,7 +6,7 @@ import { Tile } from "./Tile.js";
 import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES, COLORS } from "./dictionary.js";
 import { RenderUI } from "./RenderUI.js";
 import { Animator,animate } from "./loadshaders.js";
-const CELL_PX = 64;
+const CELL_PX = 50;
 const FADE_MS = 300;
 const FALL_MS = 350;
 const ANIMATION_DURATION = 8*60;
