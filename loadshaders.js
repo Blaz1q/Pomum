@@ -40,6 +40,22 @@ export class Animator {
         this.waveProgress = 0;
         this.waveDuration = 60;
 
+        // Fluids
+        this.fluidAmp = 0.6;
+        this.fluidFreq = 1.0;
+        this.fluidAmpStart = 0.6;
+        this.fluidAmpTarget = 0.6;
+        this.fluidFreqStart = 1.0;
+        this.fluidFreqTarget = 1.0;
+        this.fluidProgress = 0;
+        this.fluidDuration = 60;
+
+        // Light/dimming
+        this.light = 0.3;          // current brightness (1 = full)
+        this.targetLight = 0.3;    // target brightness
+        this.lightStart = 0.3;     // start brightness
+        this.lightProgress = 0;
+        this.lightDuration = 60;   // frames for dim/bright transition
         // Colors
         this.currentColors = initialColors.map(c =>
             Array.isArray(c) ? [...c] : Animator.hexToVec3(c)
@@ -72,7 +88,6 @@ export class Animator {
         return this.rotate;
     }
 
-    // --- New wave animation functions ---
     smoothWaveTo(newAmp, newFreq, duration = 60) {
         this.waveStart = this.waveAmp;
         this.waveTarget = newAmp;
@@ -93,6 +108,42 @@ export class Animator {
         return { amp: this.waveAmp, freq: this.waveFreq };
     }
 
+    smoothFluidTo(newAmp, newFreq, duration = 60) {
+        this.fluidAmpStart = this.fluidAmp;
+        this.fluidAmpTarget = newAmp;
+        this.fluidFreqStart = this.fluidFreq;
+        this.fluidFreqTarget = newFreq;
+        this.fluidProgress = 0;
+        this.fluidDuration = duration;
+    }
+
+    updateFluid() {
+        if (this.fluidProgress < 1) {
+            this.fluidProgress += 1 / this.fluidDuration;
+            if (this.fluidProgress > 1) this.fluidProgress = 1;
+            const eased = Animator.easeInShortOutLong(this.fluidProgress);
+            this.fluidAmp = this.fluidAmpStart + (this.fluidAmpTarget - this.fluidAmpStart) * eased;
+            this.fluidFreq = this.fluidFreqStart + (this.fluidFreqTarget - this.fluidFreqStart) * eased;
+        }
+        return { amp: this.fluidAmp, freq: this.fluidFreq };
+    }
+    smoothLightTo(newLight, duration = 60) {
+        this.lightStart = this.light;
+        this.targetLight = newLight;
+        this.lightProgress = 0;
+        this.lightDuration = duration;
+    }
+
+    // Call each frame to update
+    updateLight() {
+        if (this.lightProgress < 1) {
+            this.lightProgress += 1 / this.lightDuration;
+            if (this.lightProgress > 1) this.lightProgress = 1;
+            const eased = Animator.easeInShortOutLong(this.lightProgress);
+            this.light = this.lightStart + (this.targetLight - this.lightStart) * eased;
+        }
+        return this.light;
+    }
     static hexToVec3(hex) {
         hex = hex.replace('#','');
         if(hex.length === 3) hex = hex.split('').map(c => c+c).join('');
@@ -200,11 +251,13 @@ initShaders().then(program => {
     function render() {
         const smoothCols = animate.updateColors();
         const waveSettings = animate.updateWave();
+        const fluidSettings = animate.updateFluid();
       const timeNow = (performance.now() - startTime) * 0.001;
       gl.useProgram(program);
-      gl.uniform1f(u_vortexStrengthLoc, animate.updateRotate()); // 1.0 = normal, higher = stronger swirl 
-    gl.uniform1f(u_waveAmp,waveSettings.amp);
+      gl.uniform1f(u_waveAmp,waveSettings.amp);
     gl.uniform1f(u_waveFreq,waveSettings.freq);
+      gl.uniform1f(u_vortexStrengthLoc, animate.updateRotate()); // 1.0 = normal, higher = stronger swirl 
+        
       // set up position
       gl.enableVertexAttribArray(posAttribLocation);
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -212,10 +265,13 @@ initShaders().then(program => {
     gl.uniform3f(gl.getUniformLocation(program, "u_color1"), ...smoothCols[0]);
     gl.uniform3f(gl.getUniformLocation(program, "u_color2"), ...smoothCols[1]);
     gl.uniform3f(gl.getUniformLocation(program, "u_color3"), ...smoothCols[2]);
-        gl.uniform1f(gl.getUniformLocation(program, "u_noiseScale"), 1);
-gl.uniform1i(gl.getUniformLocation(program, "u_octaves"), 1);
-gl.uniform1f(gl.getUniformLocation(program, "u_lacunarity"), 2);
-gl.uniform1f(gl.getUniformLocation(program, "u_gain"), 1);
+        gl.uniform1f(gl.getUniformLocation(program, "u_noiseScale"), 5);
+    gl.uniform1f(gl.getUniformLocation(program, "u_fluidAmp"), fluidSettings.amp);
+    gl.uniform1f(gl.getUniformLocation(program, "u_fluidFreq"), fluidSettings.freq);
+    gl.uniform3f(gl.getUniformLocation(program, "u_particleColor"), 1.0, 1.0, 1.0); // white
+    gl.uniform1f(gl.getUniformLocation(program, "u_starSize"), 0.1);
+    gl.uniform1i(gl.getUniformLocation(program, "u_starCount"), 60);
+    gl.uniform1f(gl.getUniformLocation(program, "u_particleIntensity"), animate.updateLight());
     // uniforms
       gl.uniform1f(u_timeLoc, timeNow);
       gl.uniform2f(u_resLoc, canvas.width, canvas.height);

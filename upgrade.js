@@ -240,8 +240,8 @@ export const upgradeBlueprints = [
   {
     name: "GrapeInterest",
     descriptionfn(game) {
-      if (!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+5 pkt")}`;
-      return `Każda ${game.fruits[3].icon} daje ${Style.Score("+"+this.props.value+" pkt")}`;
+      if (!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+15 pkt")}`;
+      return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+15 pkt")} (Obecnie ${Style.Score(`+${this.props.value} pkt`)})`;
     },
     effect(game) {
       this.setProps({
@@ -259,7 +259,7 @@ export const upgradeBlueprints = [
           return found;
         },
         onRoundEnd: () => {
-          this.props.value += 5;
+          this.props.value += 15;
           return true;
         }
       });
@@ -290,7 +290,6 @@ export const upgradeBlueprints = [
       removeTrigger(game, this.props.handler, GAME_TRIGGERS.onMatch, this);
     },
     price: 4,
-    props: defaultimage
   },
   {
     name: "Battlepass",
@@ -350,7 +349,7 @@ export const upgradeBlueprints = [
       removeTrigger(game, this.props.onScore, GAME_TRIGGERS.onScore, this);
     },
     price: 6,
-    props: defaultimage
+    props: {image: "highfive"}
   },
   {
     name: "broke",
@@ -411,7 +410,6 @@ export const upgradeBlueprints = [
       removeTrigger(game, this.props.onRoundEnd, GAME_TRIGGERS.onRoundEnd, this);
     },
     price: 4,
-    props: defaultimage
   },
   {
     name: "circus",

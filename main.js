@@ -1040,6 +1040,7 @@ function restartGame() {
   game = new Game();
   window.game = game;
   game.GameRenderer.displayPlayerUpgrades();
+  game.GameRenderer.displayPlayerConsumables();
   console.log(game.fruits);
   startRound();
   document.getElementById("game-over").style.display = "none";
