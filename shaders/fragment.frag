@@ -137,9 +137,10 @@ void main() {
     col = mix(col, u_color3, smoothstep(0.5, 0.9, t));
 
     // stars
-    float stars = starField(uv);
-    col += u_particleColor * stars * u_particleIntensity;
+    // float stars = starField(uv);
+    // col += u_particleColor * stars * u_particleIntensity;
 
     gl_FragColor = vec4(col, 1.0);
 }
+
 
