@@ -25,6 +25,11 @@ export const DURATIONS = {
     ANIMATION_DURATION: 3*60,
     SWIRL_DURATION: 5*60
 }
+export const UPGRADE_STATES = {
+    Score: 1, // When Scoring
+    Failed: 0,  // Triggered with no success
+    Active: 2   // Effect active
+}
 export const COLORS = {
     gameOver: ["#b1b1b1ff","#cfcfcfff","#e6e6e6ff"],
     shopGreens: ["#3CB371", "#45D17A", "#58E78F"],

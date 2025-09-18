@@ -3,7 +3,7 @@ import { Upgrade } from "./upgradeBase.js";
 import { upgradesList } from "./upgrade.js";
 import { Audio } from "./sound.js";
 import { Tile } from "./Tile.js";
-import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES, COLORS } from "./dictionary.js";
+import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES,UPGRADE_STATES } from "./dictionary.js";
 import { RenderUI } from "./RenderUI.js";
 import { Animator,animate } from "./loadshaders.js";
 const CELL_PX = 50;
@@ -77,38 +77,55 @@ export class Game{
     this.triggers[event].push({ handler, upgrade });
     }
 async emit(event, payload) {
+    const wait = ms => new Promise(r => setTimeout(r, ms));
     const sorted = [...this.triggers[event]].sort((a, b) => {
-    const indexA = a.upgrade ? this.upgrades.indexOf(a.upgrade) : -1; 
-    const indexB = b.upgrade ? this.upgrades.indexOf(b.upgrade) : -1;
+        const indexA = a.upgrade ? this.upgrades.indexOf(a.upgrade) : -1;
+        const indexB = b.upgrade ? this.upgrades.indexOf(b.upgrade) : -1;
+        if (indexA >= 0 && indexB >= 0) return indexA - indexB;
+        if (indexA >= 0) return -1;
+        if (indexB >= 0) return 1;
+        return 0;
+    });
 
-    // If both upgrades exist in the list, sort by their index
-    if (indexA >= 0 && indexB >= 0) return indexA - indexB;
-
-    // If only one exists, it comes first
-    if (indexA >= 0) return -1;
-    if (indexB >= 0) return 1;
-
-    // Otherwise keep original order
-    return 0;
-});
     if (sorted.length === 0) return;
 
-    let delay = 0;
+    // Promise chain that guarantees visuals run one after another.
+    // We don't await this for "Active" (visual-only), but we do await it for "Score".
+    let visualChain = Promise.resolve();
 
     for (const { handler, upgrade } of sorted) {
-        if (delay > 0) {
-            await new Promise(r => setTimeout(r, delay));
-        }
-
+        // Keep handler invocation synchronous (preserves original behaviour).
         const result = handler(payload);
 
-        if (result && upgrade) {
-            this.GameRenderer.upgradeTrigger(upgrade, 0);
-            Audio.playSound("tick.mp3");
-            // only add delay for next handler if this one returned true
-            delay = 300;
-        } else {
-            delay = 0; // no delay if handler returned false
+        // Only queue visuals if an upgrade exists
+        if (!upgrade) {
+            // If you want Score to still cause a non-visual delay even without an upgrade,
+            // uncomment the next lines:
+            // if (result === UPGRADE_STATES.Score) await wait(300);
+            continue;
+        }
+
+        if (result === UPGRADE_STATES.Active) {
+            // Visual-only: queue visual but don't await it — handlers continue executing.
+            visualChain = visualChain.then(() => {
+                this.GameRenderer.upgradeTrigger(upgrade, 0);
+                Audio.playSound("tick.mp3");
+                return wait(300);
+            });
+        } else if (result === UPGRADE_STATES.Score) {
+            // Visual + actual delay: queue the visual and WAIT for it to finish before continuing.
+            visualChain = visualChain.then(() => {
+                this.GameRenderer.upgradeTrigger(upgrade, 0);
+                Audio.playSound("tick.mp3");
+                return wait(300);
+            });
+            // Wait for the queued visuals (including any previously queued Active visuals)
+            // so that Score blocks the next handler until visuals+delay finish.
+            await visualChain;
+            // Reset chain so subsequent Active visuals start fresh after this point.
+            visualChain = Promise.resolve();
+        } else if (result === UPGRADE_STATES.Failed) {
+            // skip — do nothing
         }
     }
 }
@@ -837,6 +854,9 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
             }
         });
     }
+    // zel 100 
+    // french 15
+    // po stylidstce 20
    collapseBoard(spawnCounts){
     console.log("collapseBoard");
     let elements = [];
