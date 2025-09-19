@@ -12,6 +12,7 @@ $chance: #86b587;
 $mult: #e07272;
 $score: #72abe0;
 $moves: #e4d147;
+$money: #e5db1c;
 body, html {
   margin: 0;
   font-family: "Segoe UI", Roboto, sans-serif;
@@ -538,7 +539,13 @@ canvas#glcanvas {
   padding-left: .2em;
   padding-right: .2em;
 }
-
+.money{
+  white-space: nowrap;
+  background-color: $money;
+  border-radius: .2em;
+  padding-left: .2em;
+  padding-right: .2em;
+}
 #upgrade-tiles {
   display: none; // hidden initially
   top: 0;

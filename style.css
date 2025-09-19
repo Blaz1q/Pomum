@@ -516,6 +516,14 @@ canvas#glcanvas {
   padding-right: 0.2em;
 }
 
+.money {
+  white-space: nowrap;
+  background-color: #e5db1c;
+  border-radius: 0.2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+
 #upgrade-tiles {
   display: none;
   top: 0;

@@ -621,23 +621,53 @@ triggerSpecial(x, y, tile, options = {}, collected = new Set()) {
         this.GameRenderer.displayScore();
     }
 
+    isThreeLine(matches){
+        if(matches.length != 3) return false;
+        // group by row and column
+        let byRow = {};
+        let byCol = {};
 
-    isFiveLine(matches) {
-    if (matches.length < 5) return false;
+        for (let m of matches) {
+            byRow[m.y] = (byRow[m.y] || 0) + 1;
+            byCol[m.x] = (byCol[m.x] || 0) + 1;
+        }
 
-    // group by row and column
-    let byRow = {};
-    let byCol = {};
-
-    for (let m of matches) {
-        byRow[m.y] = (byRow[m.y] || 0) + 1;
-        byCol[m.x] = (byCol[m.x] || 0) + 1;
+        // check if any row or column has >= 3
+        return Object.values(byRow).some(c => c >= 3) ||
+            Object.values(byCol).some(c => c >= 3);
     }
+    isSixLine(matches){
+        if (matches.length < 6) return false;
 
-    // check if any row or column has >= 5
-    return Object.values(byRow).some(c => c >= 5) ||
-           Object.values(byCol).some(c => c >= 5);
-}
+        // group by row and column
+        let byRow = {};
+        let byCol = {};
+
+        for (let m of matches) {
+            byRow[m.y] = (byRow[m.y] || 0) + 1;
+            byCol[m.x] = (byCol[m.x] || 0) + 1;
+        }
+
+        // check if any row or column has >= 6
+        return Object.values(byRow).some(c => c >= 6) ||
+            Object.values(byCol).some(c => c >= 6);
+    }
+    isFiveLine(matches) {
+        if (matches.length < 5) return false;
+
+        // group by row and column
+        let byRow = {};
+        let byCol = {};
+
+        for (let m of matches) {
+            byRow[m.y] = (byRow[m.y] || 0) + 1;
+            byCol[m.x] = (byCol[m.x] || 0) + 1;
+        }
+
+        // check if any row or column has >= 5
+        return Object.values(byRow).some(c => c >= 5) ||
+            Object.values(byCol).some(c => c >= 5);
+    }
 
 isLShape(matches) {
     if (matches.length < 5) return false;
@@ -982,6 +1012,8 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
         //     //this.board[cy][cx] = this.makeBomb();
         }
         console.log("waiting for matches..")
+        //console.log(matches);
+        //console.log(this.isSixLine(matches));
         await this.emit(GAME_TRIGGERS.onMatch, matches);
         console.log("ended.");
         // pozwól przeglądarce „zobaczyć” stan po swapie zanim nałożymy .fade

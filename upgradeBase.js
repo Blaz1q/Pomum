@@ -7,6 +7,7 @@ export class Upgrade {
     this.price = price;
     this.sellPrice = props.sellPrice ?? Math.round(price/2);
     this.active = true;
+    this.bought = false;
     this.type = "Upgrade";
     this.image = `./images/cards/${props.image ? props.image.toLowerCase() : name.toLowerCase()}.png`
     this.props = {
@@ -20,14 +21,16 @@ export class Upgrade {
     return this.descriptionfn;
   }
   setProps(props) {
-    this.props = props;
+    this.props = {...props};
   }
 
   apply(game) {
+    this.bought = true;
     this.effect.call(this, game); // this wewnątrz effect wskazuje na instancję
   }
 
   sell(game) {
+    this.bought = false;
     this.remove.call(this, game); // this wewnątrz remove wskazuje na instancję
     game.money += Math.floor(this.sellPrice);
   }

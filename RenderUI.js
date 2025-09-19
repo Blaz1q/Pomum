@@ -203,6 +203,9 @@ displayPlayerUpgrades() {
         const index = gameupgrades.indexOf(upgrade);
         if(index<0) return;
         let upgradecard = this.getPlayerUpgrades(index);
+
+        const descElement = upgradecard.querySelector(".upgrade-desc p");
+        descElement.innerHTML = upgrade.description(this.game);
         setTimeout(()=>{
                 upgradecard.classList.add("triggered");
             setTimeout(()=>{
@@ -396,5 +399,8 @@ export class Style{
     }
     static Moves(text){
     return `<b class='moves'>${text}</b>`;
+    }
+    static Money(text){
+        return `<b class='money'>${text}</b>`;
     }
 }
