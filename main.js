@@ -450,6 +450,7 @@ trySwap(x1, y1, x2, y2) {
         const base = this.fruits[r];
         return new Tile(base.icon, TYPES.Fruit, {
             modifier: this.rollModifier(base),
+            debuffed: base.props.debuffed,
             upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
         });
     }
@@ -461,6 +462,7 @@ trySwap(x1, y1, x2, y2) {
             const base = this.fruits[i];
             return new Tile(base.icon, TYPES.Fruit, {
                 modifier: this.rollModifier(base),
+                debuffed: base.props.debuffed,
                 upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
             });
         }
@@ -470,6 +472,7 @@ trySwap(x1, y1, x2, y2) {
     const base = this.fruits[0];
     return new Tile(base.icon, TYPES.Fruit, {
         modifier: this.rollModifier(base),
+        debuffed: base.props.debuffed,
         upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
     });
 }
@@ -605,6 +608,7 @@ triggerSpecial(x, y, tile, options = {}, collected = new Set()) {
                 const icon = tile ? tile.icon : " ";
                 const isGold = this.board[y][x].props.modifier==MODIFIERS.Gold;
                 const isSilver = this.board[y][x].props.modifier==MODIFIERS.Silver;
+                const isDebuffed = this.board[y][x].props.debuffed;
                 const el = this.createElement(icon, x, y);
                 el.style.transform = "translate(0,0)";
                 el.style.transition = "";
@@ -613,6 +617,9 @@ triggerSpecial(x, y, tile, options = {}, collected = new Set()) {
                 }
                 if(isSilver){
                     el.classList.add("silver");
+                }
+                if(isDebuffed){
+                    el.classList.add("debuffed")
                 }
                 el.classList.remove("fade");
                 this.gameContainer.appendChild(el);
@@ -1044,11 +1051,11 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
                             multAdded: false
                         };
                     }
-                    if(!groups[type].multAdded){
+                    if(!groups[type].multAdded&&!tile.props.debuffed){
                         groups[type].mult = tile.props.upgrade.mult;
                         groups[type].multAdded = true;
                     }
-                    this.tempscore += Math.round(tile.props.upgrade.score);
+                    if(!tile.props.debuffed) this.tempscore += Math.round(tile.props.upgrade.score);
                     this.board[m.y][m.x] = null;
                 }
                 for (let type in groups) {

@@ -18,7 +18,8 @@ export class RenderUI {
         this.game.roundBox.innerHTML = this.game.round;
     }
     displayScore() {
-        this.game.scoreBox.innerHTML = `${this.game.score}/${this.game.calcRoundScore()}`;
+        document.getElementById("roundscore").innerHTML = this.game.calcRoundScore();
+        document.getElementById("score").innerHTML = this.game.score;
     }
 
     displayTempScore() {

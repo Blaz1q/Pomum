@@ -150,11 +150,11 @@ export const upgradeBlueprints = [
 
   {
     name: "Mult",
-    descriptionfn: `${Style.Mult("+1 mult")}`,
+    descriptionfn: `${Style.Mult("+4 mult")}`,
     effect(game) {
       this.setProps({
         onScore: () => {
-          game.mult += 1;
+          game.mult += 4;
           game.GameRenderer.displayTempScore();
           return UPGRADE_STATES.Score;
         }
@@ -165,7 +165,6 @@ export const upgradeBlueprints = [
       removeUpgradeTriggers(game, this);
     },
     price: 4,
-    props: defaultimage
   },
 
   {
@@ -256,7 +255,7 @@ export const upgradeBlueprints = [
       });
     },
     price: 10,
-    props: defaultimage
+    props: {image: 'goldenfruits'}
   },
 
   {
@@ -526,7 +525,6 @@ export const upgradeBlueprints = [
       removeUpgradeTriggers(game, this);
     },
     price: 10,
-    props: defaultimage
   },
   {
     name: "Madness",
@@ -582,7 +580,6 @@ export const upgradeBlueprints = [
       removeUpgradeTriggers(game,this);
     },
     price: 8,
-    props: defaultimage
   },
   {
     name: "6pak",

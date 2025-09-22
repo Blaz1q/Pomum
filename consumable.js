@@ -214,6 +214,15 @@ const overstock = new Voucher(
     },
     10,{image: 'coupon_hand'}
 );
+const movevoucher = new Voucher(
+    "Moves",
+    `Zwiększa możliwe ruchy w rundzie o ${Style.Moves(`+1 ruch`)}`,
+    function(game){
+        game.moves+=1;
+        game.GameRenderer.displayMoves();
+    },
+    10,{image: 'default'}
+);
 export function rollConsumablePacks(count = 2) {
   if (!consumablePacks.length) return [];
 
@@ -254,7 +263,7 @@ export function rollVouchers(game, count = 1) {
     const shuffled = [...available].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, count);
 }
-vouchers.push(voucher,overstock);
+vouchers.push(voucher,overstock,movevoucher);
 pomumpackItems.push(...consumableBlueprints);
 consumableList.push(...consumableBlueprints);
 const pomumpackSmall = new ConsumablePack("Pomumpack",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,4);

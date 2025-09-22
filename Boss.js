@@ -4,6 +4,7 @@ export class Boss{
         this.descriptionfn = description;
         this.effect = effect;
         this.remove = remove;
+        this.moneyreward = props.moneyreward ?? 10;
         this.props = props;
     }
     description(game){
