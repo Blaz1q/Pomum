@@ -4,8 +4,9 @@ export class Boss{
         this.descriptionfn = description;
         this.effect = effect;
         this.remove = remove;
-        this.moneyreward = props.moneyreward ?? 10;
+        this.moneyreward = props.moneyreward ?? 5;
         this.props = props;
+        this.image = `./images/bosses/${props.image ? props.image.toLowerCase() : 'default'}.png`
     }
     description(game){
         if (typeof this.descriptionfn === "function") {
@@ -23,7 +24,7 @@ export class Boss{
 const BossBlueprints = [
     {
         name: "Snake",
-        description(game){
+        descriptionfn(game){
             return `Wszystkie ${game.fruits[0].icon} są zdebuffowane`;
         },
         effect(game){
@@ -31,11 +32,12 @@ const BossBlueprints = [
         },
         revert(game){
             game.fruits[0].props.debuffed = false;
-        }
+        },
+        props: {image: 'snake'}
     },
     {
         name: "Bear",
-        description(game){
+        descriptionfn(game){
             return `Wszystkie ${game.fruits[1].icon} są zdebuffowane`;
         },
         effect(game){
@@ -47,7 +49,7 @@ const BossBlueprints = [
     },
     {
         name: "Sponge",
-        description(game){
+        descriptionfn(game){
             return `Wszystkie ${game.fruits[2].icon} są zdebuffowane`;
         },
         effect(game){
@@ -59,7 +61,7 @@ const BossBlueprints = [
     },
     {
         name: "Vine",
-        description(game){
+        descriptionfn(game){
             return `Wszystkie ${game.fruits[3].icon} są zdebuffowane`;
         },
         effect(game){
@@ -71,7 +73,7 @@ const BossBlueprints = [
     },
     {
         name: "Crab",
-        description(game){
+        descriptionfn(game){
             return `Wszystkie ${game.fruits[4].icon} są zdebuffowane`;
         },
         effect(game){
@@ -79,11 +81,12 @@ const BossBlueprints = [
         },
         revert(game){
             game.fruits[4].props.debuffed = false;
-        }
+        },
+        props: {image: 'crab'}
     },
     {
         name: "Wave",
-        description(game){
+        descriptionfn(game){
             if(this.props.chosenFruit!=null)
                 return `Najczęstrzy owoc (${this.props.chosenFruit.icon}) jest zdebuffowany.`;
             return `Najczęstrzy owoc jest zdebuffowany.`
@@ -98,3 +101,17 @@ const BossBlueprints = [
         }
     }
 ];
+export function rollBoss(game){
+    let available = BossBlueprints.filter(c => 
+            !game.bosses.some(boss => boss.name === c.name)
+    );
+    const pool = [...available];
+
+    // Fisher–Yates shuffle
+    for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const picked = new Boss(pool[0].name, pool[0].descriptionfn, pool[0].effect, pool[0].revert, pool[0].props);
+    return picked;
+}

@@ -19,7 +19,8 @@ export const MODIFIERS = {
 };
 export const STAGES = {
     Game: "game",
-    Shop: "shop"
+    Shop: "shop",
+    Boss: "boss"
 }
 export const DURATIONS = {
     ANIMATION_DURATION: 3*60,
@@ -31,6 +32,7 @@ export const UPGRADE_STATES = {
     Active: 2   // Effect active
 }
 export const COLORS = {
+    boss: ["#737373ff","#888888ff","#a3a3a3ff"],
     gameOver: ["#b1b1b1ff","#cfcfcfff","#e6e6e6ff"],
     shopGreens: ["#3CB371", "#45D17A", "#58E78F"],
     magicPurples : ["#B266FF", "#C080FF", "#D299FF"],

@@ -66,9 +66,12 @@ export class Game{
         //upgrades
         this.maxUpgrades = 4;
         this.maxConsumables = 2;
+        //storage
         this.upgrades = [];
         this.consumables = [];
         this.coupons = [];
+        this.bosses = [];
+        this.nextBoss = null;
         this.BuysFromBoosterLeft = 0;
         this.overstock = false;
         this.upgradeDedupe = true;
@@ -193,6 +196,15 @@ async emit(event, payload) {
     endround(){
         this.GameRenderer.displayUpgradesCounter();
         this.GameRenderer.displayMoves();
+        if(this.stage==STAGES.Boss){
+            this.money += this.nextBoss.moneyreward;
+            this.nextBoss.revert(this);
+            this.bosses.push(this.nextBoss);
+            this.nextBoss = null;
+            this.GameRenderer.displayBossInGame();
+            this.stage=STAGES.Game;
+            this.GameRenderer.displayBossCounter();
+        }
         this.stage = STAGES.Shop;
         if(this.round%4==0||this.round==1){
             this.level++;
@@ -211,11 +223,20 @@ async emit(event, payload) {
     }
     async startround(){
         this.stage = STAGES.Game;
+        
         console.log("waiting..");
         await this.emit(GAME_TRIGGERS.onRoundStart);
         console.log("done");
         this.round++;
         this.score=0;
+        if(this.round%4==0&&this.nextBoss!=null){
+            this.stage = STAGES.Boss;
+            this.nextBoss.apply(this);
+        }
+        if((this.round%4==0||this.round==1)&&this.stage!=STAGES.Boss){
+            this.GameRenderer.displayBossInGame();
+        }
+        this.GameRenderer.displayBossCounter();
         this.locked = false;
         this.GameRenderer.displayRound();
         this.GameRenderer.displayMoney();
@@ -223,6 +244,7 @@ async emit(event, payload) {
         this.fill();
         this.GameRenderer.hideShop();
         this.GameRenderer.showGame();
+        console.log(this.stage);
     }
     calcMoney(){
         return Math.round((this.moves-this.movescounter)/1.2);

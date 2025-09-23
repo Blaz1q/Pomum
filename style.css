@@ -3,6 +3,8 @@ body, html {
   margin: 0;
   font-family: "Segoe UI", Roboto, sans-serif;
   color: #333;
+  width: 98%;
+  margin: auto;
 }
 
 canvas#glcanvas {
@@ -79,6 +81,20 @@ canvas#glcanvas {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
+.game .left-panel .location .round, .game .left-panel .location #boss-container {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  flex-direction: column;
+}
+.game .left-panel .location .round h1, .game .left-panel .location .round h2, .game .left-panel .location #boss-container h1, .game .left-panel .location #boss-container h2 {
+  margin-block-start: 0.4em;
+  margin-block-end: 0.4em;
+}
+.game .left-panel div {
+  margin-bottom: 1em;
+}
 .game .left-panel h2, .game .left-panel h1 {
   font-size: 1rem;
   display: flex;
@@ -93,7 +109,6 @@ canvas#glcanvas {
   border-radius: 0.4em;
   background: rgba(0, 0, 0, 0.05);
   font-variant-numeric: tabular-nums;
-  font-size: clamp(0.6rem, 1.2vw, 1rem);
 }
 .game .left-panel h1 {
   font-size: 1.2rem;
@@ -109,7 +124,6 @@ canvas#glcanvas {
   padding: 0.35em 0.7em;
   min-width: 45px;
   text-align: center;
-  font-size: clamp(0.7rem, 1.5vw, 1.1rem);
   font-weight: 600;
   border-radius: 0.8em;
   color: #fff;
@@ -163,16 +177,16 @@ canvas#glcanvas {
 @media (max-width: 1024px) {
   .game .right-panel #player-upgrades #player-upgrades-container,
   .game .right-panel #player-upgrades #player-consumables-container {
-    min-height: 162px;
+    min-height: 120px;
   }
 }
-@media (max-width: 768px) {
+@media (max-width: 800px) {
   .game .right-panel #player-upgrades #player-upgrades-container,
   .game .right-panel #player-upgrades #player-consumables-container {
     min-height: 120px;
   }
 }
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .game .right-panel #player-upgrades #player-upgrades-container,
   .game .right-panel #player-upgrades #player-consumables-container {
     min-height: 96px;
@@ -283,19 +297,8 @@ canvas#glcanvas {
 }
 
 /* Price above the card */
-.upgrade-price {
-  margin-bottom: 0.3rem;
-  font-weight: bold;
-  background: gold;
-  color: #000;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  text-align: center;
-}
-
 /* Card */
-.upgrade-wrapper {
+.upgrade-wrapper, .boss-wrapper {
   position: relative;
   display: inline-flex;
   flex-direction: column;
@@ -303,17 +306,17 @@ canvas#glcanvas {
   z-index: 0;
   transition: transform 0.2s ease;
 }
-.upgrade-wrapper.dragging {
+.upgrade-wrapper.dragging, .boss-wrapper.dragging {
   opacity: 0.7;
   cursor: grabbing;
 }
-.upgrade-wrapper.drag-over {
+.upgrade-wrapper.drag-over, .boss-wrapper.drag-over {
   outline: 2px dashed #00f;
 }
-.upgrade-wrapper.triggered {
+.upgrade-wrapper.triggered, .boss-wrapper.triggered {
   animation: triggeredCard 0.3s ease-in-out;
 }
-.upgrade-wrapper .consumable-buttons {
+.upgrade-wrapper .consumable-buttons, .boss-wrapper .consumable-buttons {
   position: absolute;
   right: 0; /* keep hidden off to the right */
   top: 50%;
@@ -325,7 +328,7 @@ canvas#glcanvas {
   transition: all 0.3s ease;
   z-index: 4;
 }
-.upgrade-wrapper .consumable-buttons button {
+.upgrade-wrapper .consumable-buttons button, .boss-wrapper .consumable-buttons button {
   all: unset;
   padding: 0.8rem 2rem;
   border: none;
@@ -337,15 +340,15 @@ canvas#glcanvas {
   cursor: pointer;
   transition: background, padding 0.2s;
 }
-.upgrade-wrapper .consumable-buttons button:hover {
+.upgrade-wrapper .consumable-buttons button:hover, .boss-wrapper .consumable-buttons button:hover {
   background: #c0392b;
 }
-.upgrade-wrapper:hover .consumable-buttons {
+.upgrade-wrapper:hover .consumable-buttons, .boss-wrapper:hover .consumable-buttons {
   margin-left: 100px;
   right: -70px; /* slide in */
   opacity: 1;
 }
-.upgrade-wrapper .upgrade-card {
+.upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
   width: 120px;
   height: 180px;
   position: relative;
@@ -356,24 +359,24 @@ canvas#glcanvas {
   z-index: 5;
 }
 @media (max-width: 1024px) {
-  .upgrade-wrapper .upgrade-card {
-    width: 108px;
-    height: 162px;
-  }
-}
-@media (max-width: 768px) {
-  .upgrade-wrapper .upgrade-card {
+  .upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
     width: 80px;
     height: 120px;
   }
 }
-@media (max-width: 480px) {
-  .upgrade-wrapper .upgrade-card {
+@media (max-width: 800px) {
+  .upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
+    width: 80px;
+    height: 120px;
+  }
+}
+@media (max-width: 600px) {
+  .upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
     width: 64px;
     height: 96px;
   }
 }
-.upgrade-wrapper .upgrade-card .upgrade-inner {
+.upgrade-wrapper .upgrade-card .upgrade-inner, .boss-wrapper .upgrade-card .upgrade-inner {
   width: 100%;
   height: 100%;
   background-size: cover;
@@ -383,14 +386,14 @@ canvas#glcanvas {
   transition: transform 0.2s ease;
   transform-origin: center center; /* scale from center */
 }
-.upgrade-wrapper .upgrade-card:hover {
+.upgrade-wrapper .upgrade-card:hover, .boss-wrapper .upgrade-card:hover {
   animation-play-state: paused;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
 }
-.upgrade-wrapper .upgrade-card:hover .upgrade-inner {
+.upgrade-wrapper .upgrade-card:hover .upgrade-inner, .boss-wrapper .upgrade-card:hover .upgrade-inner {
   transform: translateY(-5px) scale(1.05) skew(0);
 }
-.upgrade-wrapper .upgrade-desc {
+.upgrade-wrapper .upgrade-desc, .boss-wrapper .upgrade-desc {
   position: absolute;
   left: -180px;
   top: 50%;
@@ -407,15 +410,15 @@ canvas#glcanvas {
   transition: opacity 0.3s ease;
   z-index: 10;
 }
-.upgrade-wrapper .upgrade-desc p {
+.upgrade-wrapper .upgrade-desc p, .boss-wrapper .upgrade-desc p {
   font-size: 0.9rem;
 }
-.upgrade-wrapper:hover .upgrade-desc {
+.upgrade-wrapper:hover .upgrade-desc, .boss-wrapper:hover .upgrade-desc {
   opacity: 1;
 }
-.upgrade-wrapper .upgrade-price {
+.upgrade-wrapper .upgrade-price, .boss-wrapper .upgrade-price {
   position: absolute;
-  bottom: -3rem; /* pod kartą */
+  bottom: -2.5rem; /* pod kartą */
   background: gold;
   color: #000;
   padding: 0.2rem 0.5rem;
@@ -427,19 +430,19 @@ canvas#glcanvas {
   opacity: 1; /* ukryta domyślnie */
   transition: opacity 0.3s ease, transform 0.3s ease;
   pointer-events: none; /* żeby nie blokowało hovera */
-  transform: translateY(-10px); /* lekko niżej na start */
+  transform: translateY(-15px); /* lekko niżej na start */
   z-index: 15;
 }
-.upgrade-wrapper:hover .upgrade-price {
+.upgrade-wrapper:hover .upgrade-price, .boss-wrapper:hover .upgrade-price {
   opacity: 1;
-  transform: translateY(5px); /* płynnie do góry */
+  transform: translateY(-5px); /* płynnie do góry */
 }
-.upgrade-wrapper.bought .upgrade-price {
+.upgrade-wrapper.bought .upgrade-price, .boss-wrapper.bought .upgrade-price {
   opacity: 0;
 }
-.upgrade-wrapper.bought:hover .upgrade-price {
+.upgrade-wrapper.bought:hover .upgrade-price, .boss-wrapper.bought:hover .upgrade-price {
   opacity: 1;
-  transform: translateY(5px); /* płynnie do góry */
+  transform: translateY(-5px); /* płynnie do góry */
 }
 
 #game-over {
@@ -486,6 +489,43 @@ canvas#glcanvas {
   background: #e74c3c;
 }
 
+.boss-wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 0;
+  transition: transform 0.2s ease;
+  z-index: 500;
+}
+.boss-wrapper .upgrade-card {
+  width: 120px;
+  height: 120px;
+}
+@media (max-width: 1024px) {
+  .boss-wrapper .upgrade-card {
+    width: 80px;
+    height: 80px;
+  }
+}
+@media (max-width: 800px) {
+  .boss-wrapper .upgrade-card {
+    width: 80px;
+    height: 80px;
+  }
+}
+@media (max-width: 600px) {
+  .boss-wrapper .upgrade-card {
+    width: 64px;
+    height: 64px;
+  }
+}
+.boss-wrapper .upgrade-desc {
+  left: 120px;
+  top: 45%;
+  transform: translateY(-50%);
+}
+
 .chance {
   white-space: nowrap;
   background-color: #86b587;
@@ -520,6 +560,7 @@ canvas#glcanvas {
 
 .money {
   white-space: nowrap;
+  color: #151515;
   background-color: #e5db1c;
   border-radius: 0.2em;
   padding-left: 0.2em;

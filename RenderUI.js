@@ -1,7 +1,8 @@
 import { Consumable,ConsumablePack,consumableList,rollConsumablePacks,rollVouchers } from "./consumable.js";
 import { Upgrade } from "./upgradeBase.js";
 import { animate,Animator } from "./loadshaders.js";
-import { COLORS,GAMECOLORS, DURATIONS } from "./dictionary.js";
+import { COLORS,GAMECOLORS, DURATIONS, STAGES } from "./dictionary.js";
+import { rollBoss } from "./Boss.js";
 export class RenderUI {
     constructor(game) {
         this.game = game;
@@ -71,10 +72,16 @@ export class RenderUI {
     }
     showGame(){
         document.getElementById("body").style.display = "grid";
-        const palettes = Object.values(GAMECOLORS);
-        const randomPalette = palettes[Math.floor(Math.random() * palettes.length)];
-        animate.animateColors(randomPalette,DURATIONS.ANIMATION_DURATION);
-        animate.smoothRotateTo(0.5,DURATIONS.SWIRL_DURATION);
+        if(this.game.stage!=STAGES.Boss){
+            const palettes = Object.values(GAMECOLORS);
+            const randomPalette = palettes[Math.floor(Math.random() * palettes.length)];
+            animate.animateColors(randomPalette,DURATIONS.ANIMATION_DURATION);
+            animate.smoothRotateTo(0.5,DURATIONS.SWIRL_DURATION);
+        }
+        else{
+            animate.animateColors(COLORS.boss,DURATIONS.ANIMATION_DURATION);
+            animate.smoothRotateTo(-2,DURATIONS.SWIRL_DURATION);
+        }
     }
     hideShop(){
         let shop = document.getElementById("shop");
@@ -218,6 +225,37 @@ displayPlayerUpgrades() {
         const shopEl = document.getElementById("upgrades-container");
         shopEl.innerHTML = ""; 
         shopEl.appendChild(this.displayUpgrades(this.game.rollUpgrades(),{bought:false}));
+    }
+    displayBossInGame(){
+        const bossContainer = document.getElementById("boss-container");
+        bossContainer.innerHTML = "";
+        this.game.nextBoss = rollBoss(this.game);
+        bossContainer.appendChild(this.displayBoss(this.game.nextBoss));
+    }
+    displayBossCounter(){
+        const counter = document.getElementById("bosscounter");
+        if(this.game.stage==STAGES.Boss) counter.innerHTML = 0;
+        else counter.innerHTML = (3 - this.game.round%4 +1);
+    }
+    displayBoss(boss){
+        console.log(boss);
+        const wrapper = document.createElement("div");
+        wrapper.className = "boss-wrapper";
+        const cardInner = document.createElement("div");
+        cardInner.className = "upgrade-inner";
+        cardInner.style.backgroundImage = `url('${boss.image}')`
+
+        const card = document.createElement("div");
+        card.className = "upgrade-card";
+        card.style.animationDelay = `-${Math.random() * 3}s`;
+        card.appendChild(cardInner);
+        // Description
+        const desc = document.createElement("div");
+        desc.className = "upgrade-desc";
+        desc.innerHTML = `<h1>${boss.name}</h1><p>${boss.description(this.game)}</p>`;
+        wrapper.appendChild(card);
+        wrapper.appendChild(desc);
+        return wrapper;
     }
     displayUpgrades(upgrades, params = { bought:false, origin: null }) {
     console.log(params.origin);
