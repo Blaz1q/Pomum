@@ -101,10 +101,17 @@ const BossBlueprints = [
         }
     }
 ];
-export function rollBoss(game){
-    let available = BossBlueprints.filter(c => 
-            !game.bosses.some(boss => boss.name === c.name)
+export function rollBoss(game) {
+    // Filter out bosses already in the game
+    let available = BossBlueprints.filter(c =>
+        !game.bosses.some(boss => boss.name === c.name)
     );
+
+    // If no unused bosses left, fall back to full pool
+    if (available.length === 0) {
+        available = [...BossBlueprints];
+    }
+
     const pool = [...available];
 
     // Fisher–Yates shuffle
@@ -112,6 +119,14 @@ export function rollBoss(game){
         const j = Math.floor(Math.random() * (i + 1));
         [pool[i], pool[j]] = [pool[j], pool[i]];
     }
-    const picked = new Boss(pool[0].name, pool[0].descriptionfn, pool[0].effect, pool[0].revert, pool[0].props);
-    return picked;
+
+    // Pick first boss from shuffled pool
+    const blueprint = pool[0];
+    return new Boss(
+        blueprint.name,
+        blueprint.descriptionfn,
+        blueprint.effect,
+        blueprint.revert,
+        blueprint.props
+    );
 }
