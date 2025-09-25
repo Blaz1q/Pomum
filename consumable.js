@@ -38,7 +38,7 @@ export class ConsumablePack extends Upgrade{
 
     // Fisher–Yates shuffle
     for (let i = pool.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(game.boosterRand() * (i + 1));
         [pool[i], pool[j]] = [pool[j], pool[i]];
     }
 
@@ -223,7 +223,7 @@ const movevoucher = new Voucher(
     },
     10,{image: 'default'}
 );
-export function rollConsumablePacks(count = 2) {
+export function rollConsumablePacks(game,count = 2) {
   if (!consumablePacks.length) return [];
 
   // compute weights inversely proportional to price
@@ -233,7 +233,7 @@ export function rollConsumablePacks(count = 2) {
   for (let n = 0; n < count; n++) {
     // sum of weights
     const totalWeight = weights.reduce((a, b) => a + b, 0);
-    let r = Math.random() * totalWeight;
+    let r = game.boosterRand() * totalWeight;
 
     // pick based on weight
     let pickedIndex = 0;
@@ -260,7 +260,7 @@ export function rollVouchers(game, count = 1) {
     if (available.length === 0) return []; // player owns all vouchers
 
     // Shuffle and pick `count` vouchers
-    const shuffled = [...available].sort(() => Math.random() - 0.5);
+    const shuffled = [...available].sort(() => game.voucherRand() - 0.5);
     return shuffled.slice(0, count);
 }
 vouchers.push(voucher,overstock,movevoucher);

@@ -6,6 +6,7 @@ import { Tile } from "./Tile.js";
 import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES,UPGRADE_STATES } from "./dictionary.js";
 import { RenderUI } from "./RenderUI.js";
 import { Animator,animate } from "./loadshaders.js";
+import { cyrb128, getRandomString, sfc32 } from "./random.js";
 const CELL_PX = 50;
 const FADE_MS = 300;
 const FALL_MS = 350;
@@ -75,6 +76,13 @@ export class Game{
         this.BuysFromBoosterLeft = 0;
         this.overstock = false;
         this.upgradeDedupe = true;
+        this.seed = getRandomString(6);
+        this.hash = cyrb128(this.seed);
+        this.rand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
+        this.shopRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
+        this.bossRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
+        this.voucherRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
+        this.boosterRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
     }
     on(event, handler, upgrade) {
     this.triggers[event].push({ handler, upgrade });
@@ -132,7 +140,7 @@ async emit(event, payload) {
         }
     }
 }
-
+ 
     rollUpgrades(count = 3) {
         let available = upgradesList;
 
@@ -146,7 +154,7 @@ async emit(event, payload) {
 
         // Fisher–Yates shuffle
         for (let i = pool.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
+            const j = Math.floor(this.shopRand() * (i + 1));
             [pool[i], pool[j]] = [pool[j], pool[i]];
         }
 
@@ -167,7 +175,7 @@ async emit(event, payload) {
                 );
             }
             if (overstockPool.length > 0) {
-                const con = overstockPool[Math.floor(Math.random() * overstockPool.length)];
+                const con = overstockPool[Math.floor(this.shopRand() * overstockPool.length)];
                 picked.push(new Consumable(con.name, con.description, con.effect, con.price, con.props));
             }
         }
@@ -356,7 +364,7 @@ trySwap(x1, y1, x2, y2) {
         const topFruits = fruits.filter(f => f.props.percent === maxPercent);
 
         // Pick one randomly if multiple
-        return topFruits[Math.floor(Math.random() * topFruits.length)];
+        return topFruits[Math.floor(this.rand() * topFruits.length)];
     }
     equalizeChances(){
         const eq = parseFloat(100 / this.fruits.length);
@@ -452,7 +460,7 @@ trySwap(x1, y1, x2, y2) {
     }
 
     randomTile() {
-    if (Math.random()*100 < this.special[0].percent) {
+    if (this.rand()*100 < this.special[0].percent) {
         return new Tile("🧨", TYPES.Dynamite, { detonations: 1 });
     }
     return this.randomFruit();
@@ -468,7 +476,7 @@ trySwap(x1, y1, x2, y2) {
     // fallback – jeśli wszystkie wagi są 0
     if (total <= 0) {
         total = this.fruits.length;
-        const r = Math.floor(Math.random() * total);
+        const r = Math.floor(this.rand() * total);
         const base = this.fruits[r];
         return new Tile(base.icon, TYPES.Fruit, {
             modifier: this.rollModifier(base),
@@ -477,7 +485,7 @@ trySwap(x1, y1, x2, y2) {
         });
     }
 
-    let r = Math.random() * total;
+    let r = this.rand() * total;
     for (let i = 0; i < this.fruits.length; i++) {
         r -= weights[i];
         if (r < 0) {
@@ -503,8 +511,8 @@ trySwap(x1, y1, x2, y2) {
         const goldChance = tile.props.upgrade.goldchance ?? 0;
         const silverChance = tile.props.upgrade.silverchance ?? 0;
 
-        const isSilver = Math.random() * 100 < silverChance;
-        const isGold = Math.random() * 100 < goldChance;
+        const isSilver = this.rand() * 100 < silverChance;
+        const isGold = this.rand() * 100 < goldChance;
 
         if (isSilver) modifier = MODIFIERS.Silver;
         if (isGold) modifier = MODIFIERS.Gold; // gold nadpisuje silver jeśli oba trafione

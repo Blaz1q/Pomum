@@ -36,7 +36,7 @@ export class RenderUI {
     displayBoosterPacks(){
         const boosterPack = document.getElementById("boosterpack-container");
         boosterPack.innerHTML = "";
-        boosterPack.appendChild(this.displayUpgrades(rollConsumablePacks(2),{bought: false}));
+        boosterPack.appendChild(this.displayUpgrades(rollConsumablePacks(this.game,2),{bought: false}));
     }
     displayCoupons(){
         const coupon = document.getElementById("voucher-container");
