@@ -53,6 +53,7 @@ export class Consumable extends Upgrade{
     constructor(name,descriptionfn,effect,price,props = {}){
         super(name,descriptionfn,effect,null,price,props);
         this.type = "Consumable";
+        this.image = `./images/consumables/${props.image ? props.image.toLowerCase() : 'default'}.png`
     }
     apply(game){
         this.effect.call(this,game);
@@ -125,7 +126,7 @@ consumableBlueprints.push(
         props: { image: "lvlup_coconut" }
     },
     {
-        name: "Bad Apple",
+        name: "EVIL Jabłko",
         description(game) {
             return evildesc(game.fruits[0], game);
         },
@@ -136,7 +137,7 @@ consumableBlueprints.push(
         props: { image: "devil_apple" }
     },
     {
-        name: "p-bear?",
+        name: "EVIL Gruszka",
         description(game) {
             return evildesc(game.fruits[1], game);
         },
@@ -158,7 +159,7 @@ consumableBlueprints.push(
         props: { image: "devil_grape" }
     },
     {
-        name: "Toxic pineapple",
+        name: "EVIL Ananas",
         description(game) {
             return evildesc(game.fruits[2], game);
         },
@@ -169,7 +170,7 @@ consumableBlueprints.push(
         props: { image: "devil_pineapple" }
     },
     {
-        name: "Coconut Granade",
+        name: "EVIL Kokos",
         description(game) {
             return evildesc(game.fruits[4], game);
         },
@@ -180,6 +181,132 @@ consumableBlueprints.push(
         props: { image: "devil_coconut" }
     }
 );
+const consumableSilverBlueprints = [
+    {
+        name: "Silver Jabłko",
+        description(game){
+            return silverDesc(game.fruits[0]);
+        },
+        effect(game){
+            silverFunc(game,game.fruits[0]);
+        },
+        price: 8,
+        props: {image: 'lvlup_apple_silver'}
+    },
+    {
+        name: "Silver Gruszka",
+        description(game){
+            return silverDesc(game.fruits[1]);
+        },
+        effect(game){
+            silverFunc(game,game.fruits[1]);
+        },
+        price: 8,
+        props: {image: 'lvlup_pear_silver'}
+    },
+    {
+        name: "Silver Winogron",
+        description(game){
+            return silverDesc(game.fruits[3]);
+        },
+        effect(game){
+            silverFunc(game,game.fruits[3]);
+        },
+        price: 8,
+        props: {image: 'lvlup_grape_silver'}
+    },
+    {
+        name: "Silver Ananas",
+        description(game){
+            return silverDesc(game.fruits[2]);
+        },
+        effect(game){
+            silverFunc(game,game.fruits[2]);
+        },
+        price: 8,
+        props: {image: 'lvlup_pineapple_silver'}
+    },
+    {
+        name: "Silver Kokos",
+        description(game){
+            return silverDesc(game.fruits[4]);
+        },
+        effect(game){
+            silverFunc(game,game.fruits[4]);
+        },
+        price: 8,
+        props: {image: 'lvlup_coconut_silver'}
+    }
+];
+const consumableGoldBlueprints = [
+    {
+        name: "Gold Jabłko",
+        description(game){
+            return goldDesc(game.fruits[0]);
+        },
+        effect(game){
+            goldFunc(game,game.fruits[0]);
+        },
+        price: 8,
+        props: {image: 'lvlup_apple_gold'}
+    },
+    {
+        name: "Gold Gruszka",
+        description(game){
+            return goldDesc(game.fruits[1]);
+        },
+        effect(game){
+            goldFunc(game,game.fruits[1]);
+        },
+        price: 8,
+        props: {image: 'lvlup_pear_gold'}
+    },
+    {
+        name: "Gold Winogron",
+        description(game){
+            return goldDesc(game.fruits[3]);
+        },
+        effect(game){
+            goldFunc(game,game.fruits[3]);
+        },
+        price: 8,
+        props: {image: 'lvlup_grape_gold'}
+    },
+    {
+        name: "Gold Ananas",
+        description(game){
+            return goldDesc(game.fruits[2]);
+        },
+        effect(game){
+            goldFunc(game,game.fruits[2]);
+        },
+        price: 8,
+        props: {image: 'lvlup_pineapple_gold'}
+    },
+    {
+        name: "Silver Kokos",
+        description(game){
+            return goldDesc(game.fruits[4]);
+        },
+        effect(game){
+            goldFunc(game,game.fruits[4]);
+        },
+        price: 8,
+        props: {image: 'lvlup_coconut_gold'}
+    }
+];
+function silverDesc(fruit){
+    return `${Style.Chance(`+1.5%`)} szansa na Silver dla ${fruit.icon}`;
+}
+function silverFunc(game,fruit){
+    game.fruits[game.fruits.indexOf(fruit)].props.upgrade.silverchance+=1.5;
+}
+function goldDesc(fruit){
+    return `${Style.Chance(`+1%`)} szansa na Gold dla ${fruit.icon}`;
+}
+function goldFunc(game,fruit){
+    game.fruits[game.fruits.indexOf(fruit)].props.upgrade.goldchance+=1;
+}
 function evildesc(fruit){
     if(fruit.props.percent-5<=0){
         return `${Style.Chance('-'+fruit.props.percent+'%')} ${Style.Chance(`+${game.calcEqualize(fruit.props.percent)}%`) } reszta`;
@@ -265,10 +392,14 @@ export function rollVouchers(game, count = 1) {
 }
 vouchers.push(voucher,overstock,movevoucher);
 pomumpackItems.push(...consumableBlueprints);
-consumableList.push(...consumableBlueprints);
+consumableList.push(...consumableBlueprints,...consumableGoldBlueprints,...consumableSilverBlueprints);
 const pomumpackSmall = new ConsumablePack("Pomumpack",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,4);
 const pomumpackBig = new ConsumablePack("Poumpack BIG",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,6,{maxSelect: 1,maxRoll: 4,image: 'pomumpackbig'});
 const pomumpackMega = new ConsumablePack("Poumpack MEGA",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,8,{maxSelect: 2,maxRoll: 5,image: 'pomumpackmega'});
+
+const pomumpackGold = new ConsumablePack("Pomumpack GOLD",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},consumableGoldBlueprints,4,{maxSelect: 1,maxRoll: 3,image: 'pomumpack_gold'});
+const pomumpackSilver = new ConsumablePack("Pomumpack SILVER",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},consumableSilverBlueprints,4,{maxSelect: 1,maxRoll: 3,image: 'pomumpack_silver'});
 consumablePacks.push(pomumpackSmall);
 consumablePacks.push(pomumpackBig);
 consumablePacks.push(pomumpackMega);
+consumablePacks.push(pomumpackGold,pomumpackSilver);

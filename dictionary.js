@@ -15,7 +15,8 @@ export const TYPES = {
 export const MODIFIERS = {
     None: "none",
     Gold: "gold",
-    Silver: "silver"
+    Silver: "silver",
+    Chip: "chip"
 };
 export const STAGES = {
     Game: "game",
@@ -30,6 +31,11 @@ export const UPGRADE_STATES = {
     Score: 1, // When Scoring
     Failed: 0,  // Triggered with no success
     Active: 2   // Effect active
+}
+export const UPGRADE_RARITY = {
+    Common: 0,
+    Uncommon: 1,
+    Rare: 2
 }
 export const COLORS = {
     boss: ["#737373ff","#888888ff","#a3a3a3ff"],

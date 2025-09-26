@@ -171,16 +171,16 @@ export const upgradeBlueprints = [
     name: "applelover",
     descriptionfn(game) {
       if (this.props.mult !== 0) {
-        return `${Style.Mult("+1 mult")} za każde 🍎 na kaskadę. (Obecnie ${Style.Mult(`+${this.props.mult} mult`)})`;
+        return `${Style.Mult("+1 mult")} za każde ${game.fruits[0].icon} na kaskadę. (Obecnie ${Style.Mult(`+${this.props.mult} mult`)})`;
       }
-      return `${Style.Mult("+1 mult")} za każde 🍎 na kaskadę.`;
+      return `${Style.Mult("+1 mult")} za każde ${game.fruits[0].icon} na kaskadę.`;
     },
     effect(game) {
       this.setProps({
         mult: 0,
         onMatch: (matches) => {
           const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
-          const hasFruit = uniqueFruits.has("🍎"); 
+          const hasFruit = uniqueFruits.has(game.fruits[0].icon); 
           if (hasFruit) {
             this.props.mult += 1;
             return UPGRADE_STATES.Active;
@@ -203,7 +203,150 @@ export const upgradeBlueprints = [
     price: 5,
     props: { mult: 0 }
   },
-
+  {
+    name: "pearlover",
+    descriptionfn(game) {
+      if (this.props.mult !== 0) {
+        return `${Style.Mult("+1 mult")} za każde ${game.fruits[1].icon} na kaskadę. (Obecnie ${Style.Mult(`+${this.props.mult} mult`)})`;
+      }
+      return `${Style.Mult("+1 mult")} za każde ${game.fruits[1].icon} na kaskadę.`;
+    },
+    effect(game) {
+      this.setProps({
+        mult: 0,
+        onMatch: (matches) => {
+          const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+          const hasFruit = uniqueFruits.has(game.fruits[1].icon); 
+          if (hasFruit) {
+            this.props.mult += 1;
+            return UPGRADE_STATES.Active;
+          }
+          return UPGRADE_STATES.Failed;
+        },
+        onScore: () => {
+          if (this.props.mult == 0) return UPGRADE_STATES.Failed;
+          game.mult += this.props.mult;
+          game.GameRenderer.displayTempScore();
+          this.props.mult = 0;
+          return UPGRADE_STATES.Score;
+        }
+      });
+      addUpgradeTriggers(game, this);
+    },
+    remove(game) {
+      removeUpgradeTriggers(game, this);
+    },
+    price: 5,
+    props: { mult: 0, image: 'default' }
+  },
+  {
+    name: "pineapplelover",
+    descriptionfn(game) {
+      if (this.props.mult !== 0) {
+        return `${Style.Mult("+1 mult")} za każde ${game.fruits[2].icon} na kaskadę. (Obecnie ${Style.Mult(`+${this.props.mult} mult`)})`;
+      }
+      return `${Style.Mult("+1 mult")} za każde ${game.fruits[2].icon} na kaskadę.`;
+    },
+    effect(game) {
+      this.setProps({
+        mult: 0,
+        onMatch: (matches) => {
+          const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+          const hasFruit = uniqueFruits.has(game.fruits[2].icon); 
+          if (hasFruit) {
+            this.props.mult += 1;
+            return UPGRADE_STATES.Active;
+          }
+          return UPGRADE_STATES.Failed;
+        },
+        onScore: () => {
+          if (this.props.mult == 0) return UPGRADE_STATES.Failed;
+          game.mult += this.props.mult;
+          game.GameRenderer.displayTempScore();
+          this.props.mult = 0;
+          return UPGRADE_STATES.Score;
+        }
+      });
+      addUpgradeTriggers(game, this);
+    },
+    remove(game) {
+      removeUpgradeTriggers(game, this);
+    },
+    price: 5,
+    props: { mult: 0, image: 'default' }
+  },
+  {
+    name: "grapelover",
+    descriptionfn(game) {
+      if (this.props.mult !== 0) {
+        return `${Style.Mult("+1 mult")} za każde ${game.fruits[3].icon} na kaskadę. (Obecnie ${Style.Mult(`+${this.props.mult} mult`)})`;
+      }
+      return `${Style.Mult("+1 mult")} za każde ${game.fruits[3].icon} na kaskadę.`;
+    },
+    effect(game) {
+      this.setProps({
+        mult: 0,
+        onMatch: (matches) => {
+          const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+          const hasFruit = uniqueFruits.has(game.fruits[3].icon); 
+          if (hasFruit) {
+            this.props.mult += 1;
+            return UPGRADE_STATES.Active;
+          }
+          return UPGRADE_STATES.Failed;
+        },
+        onScore: () => {
+          if (this.props.mult == 0) return UPGRADE_STATES.Failed;
+          game.mult += this.props.mult;
+          game.GameRenderer.displayTempScore();
+          this.props.mult = 0;
+          return UPGRADE_STATES.Score;
+        }
+      });
+      addUpgradeTriggers(game, this);
+    },
+    remove(game) {
+      removeUpgradeTriggers(game, this);
+    },
+    price: 5,
+    props: { mult: 0, image: 'default'}
+  },
+  {
+    name: "coconutlover",
+    descriptionfn(game) {
+      if (this.props.mult !== 0) {
+        return `${Style.Mult("+1 mult")} za każde ${game.fruits[4].icon} na kaskadę. (Obecnie ${Style.Mult(`+${this.props.mult} mult`)})`;
+      }
+      return `${Style.Mult("+1 mult")} za każde ${game.fruits[4].icon} na kaskadę.`;
+    },
+    effect(game) {
+      this.setProps({
+        mult: 0,
+        onMatch: (matches) => {
+          const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+          const hasFruit = uniqueFruits.has(game.fruits[4].icon); 
+          if (hasFruit) {
+            this.props.mult += 1;
+            return UPGRADE_STATES.Active;
+          }
+          return UPGRADE_STATES.Failed;
+        },
+        onScore: () => {
+          if (this.props.mult == 0) return UPGRADE_STATES.Failed;
+          game.mult += this.props.mult;
+          game.GameRenderer.displayTempScore();
+          this.props.mult = 0;
+          return UPGRADE_STATES.Score;
+        }
+      });
+      addUpgradeTriggers(game, this);
+    },
+    remove(game) {
+      removeUpgradeTriggers(game, this);
+    },
+    price: 5,
+    props: { mult: 0, image: 'default' }
+  },
   {
     name: "Coconut Bank",
     descriptionfn(game) {

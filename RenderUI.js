@@ -259,6 +259,8 @@ displayPlayerUpgrades() {
     }
     displayUpgrades(upgrades, params = { bought:false, origin: null }) {
     console.log(params.origin);
+    let displayPrice = params.displayPrice ?? true;
+    let displayButtons = params.displayButtons ?? true;
     let full = document.createDocumentFragment();
 
     if(params.origin && params.origin.type == "ConsumablePack"){
@@ -302,9 +304,13 @@ displayPlayerUpgrades() {
         wrapper.addEventListener("mouseenter", () => {
             desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p>`;
         });
-        wrapper.appendChild(this.createUpgradeButtons(wrapper,up,params));
+        if(displayButtons){
+            wrapper.appendChild(this.createUpgradeButtons(wrapper,up,params));
+        }
         // Click handlers
-        wrapper.appendChild(priceEl);
+        if(displayPrice){
+            wrapper.appendChild(priceEl);
+        }
         wrapper.appendChild(card);
         wrapper.appendChild(desc);
         full.appendChild(wrapper);
@@ -316,6 +322,11 @@ gameOver(){
     document.getElementById("game-over").style.display = "flex";
     animate.animateColors(COLORS.gameOver,DURATIONS.ANIMATION_DURATION);
     animate.smoothRotateTo(-1,DURATIONS.SWIRL_DURATION);
+    let upgrades = document.getElementById("final-upgrades");
+    upgrades.innerHTML="";
+    upgrades.appendChild(this.displayUpgrades(this.game.upgrades,{displayPrice: false,displayButtons: false}));
+    document.getElementById("seed").innerHTML = this.game.seed;
+    document.getElementById("final-score").innerHTML = this.game.round; 
 }
 createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
     if(params.origin && params.origin.type == "ConsumablePack"){

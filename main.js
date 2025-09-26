@@ -140,7 +140,6 @@ async emit(event, payload) {
         }
     }
 }
- 
     rollUpgrades(count = 3) {
         let available = upgradesList;
 

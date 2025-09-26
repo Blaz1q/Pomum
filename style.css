@@ -464,12 +464,12 @@ canvas#glcanvas {
   text-align: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
-#game-over .game-over-content h1 {
+#game-over .game-over-content .game-over h1 {
   margin: 0 0 1rem;
   font-size: 2.5rem;
   color: #c0392b;
 }
-#game-over .game-over-content p {
+#game-over .game-over-content .game-over p {
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
 }

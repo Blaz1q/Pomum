@@ -1,3 +1,5 @@
+import { UPGRADE_RARITY } from "./dictionary.js";
+
 export class Upgrade {
   constructor(name,descriptionfn, effect, remove, price = 2,props = {}) {
     this.name = name;
@@ -10,6 +12,7 @@ export class Upgrade {
     this.bought = false;
     this.type = "Upgrade";
     this.image = `./images/cards/${props.image ? props.image.toLowerCase() : name.toLowerCase()}.png`
+    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.Common;
     this.props = {
       ...props
     };
