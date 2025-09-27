@@ -1,64 +1,10 @@
-import { Upgrade } from "./upgradeBase.js";
+import { Upgrade,Consumable,Voucher,ConsumablePack } from "./upgradeBase.js";
 import { Style } from "./RenderUI.js";
+import { upgradesList } from "./upgrade.js";
 export const consumableList = [];
 export const consumablePacks = [];
 export const vouchers = [];
 const pomumpackItems = [];
-export class Voucher extends Upgrade{
-    constructor(name,descriptionfn,effect,price,props = {}){
-        super(name,descriptionfn,effect,null,price,props);
-        this.type = "Voucher";
-    }
-}
-export class ConsumablePack extends Upgrade{
-    constructor(name,descriptionfn,consumables,price,props = {}){
-        super(name, descriptionfn, null, null, price, props);
-        this.consumables = consumables;
-        this.type = "ConsumablePack";
-        this.props = {
-            maxSelect: props.maxSelect ?? 1,
-            maxRoll: props.maxRoll ?? 3,
-            ...props
-        }
-    }
-    roll(game) {
-    // Start with all available consumables
-    let count = this.props.maxRoll
-    let available = this.consumables;
-
-    // Optional dedupe: exclude ones already owned
-    if (game.upgradeDedupe) {
-        available = available.filter(c => 
-            !game.consumables.some(pc => pc.name === c.name)
-        );
-    }
-
-    // Make a copy for shuffling
-    const pool = [...available];
-
-    // Fisher–Yates shuffle
-    for (let i = pool.length - 1; i > 0; i--) {
-        const j = Math.floor(game.boosterRand() * (i + 1));
-        [pool[i], pool[j]] = [pool[j], pool[i]];
-    }
-
-    // Pick first 'count' items and create new instances
-    const picked = pool.slice(0, count).map(c =>
-        new Consumable(c.name, c.description, c.effect, c.price, c.props)
-    );
-    return picked;
-}
-}
-export class Consumable extends Upgrade{
-    constructor(name,descriptionfn,effect,price,props = {}){
-        super(name,descriptionfn,effect,null,price,props);
-        this.type = "Consumable";
-        this.image = `./images/consumables/${props.image ? props.image.toLowerCase() : 'default'}.png`
-    }
-    apply(game){
-        this.effect.call(this,game);
-    }
-}
 function desc(fruit){
     return `daje ${Style.Score('+2 punkty')}, ${Style.Mult('+0.4 mult')} do ${fruit.icon}, obecnie ${ Style.Score('+'+fruit.props.upgrade.score+' punktów') }, ${Style.Mult('+'+fruit.props.upgrade.mult+' mult')}`;
 }
@@ -391,6 +337,15 @@ export function rollVouchers(game, count = 1) {
     return shuffled.slice(0, count);
 }
 vouchers.push(voucher,overstock,movevoucher);
+consumableBlueprints.forEach(consumable => {
+    consumable.type = "Consumable";
+});
+consumableGoldBlueprints.forEach(consumable => {
+    consumable.type = "Consumable";
+});
+consumableSilverBlueprints.forEach(consumable => {
+    consumable.type = "Consumable";
+});
 pomumpackItems.push(...consumableBlueprints);
 consumableList.push(...consumableBlueprints,...consumableGoldBlueprints,...consumableSilverBlueprints);
 const pomumpackSmall = new ConsumablePack("Pomumpack",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,4);
@@ -399,7 +354,8 @@ const pomumpackMega = new ConsumablePack("Poumpack MEGA",function(){return `Znaj
 
 const pomumpackGold = new ConsumablePack("Pomumpack GOLD",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},consumableGoldBlueprints,4,{maxSelect: 1,maxRoll: 3,image: 'pomumpack_gold'});
 const pomumpackSilver = new ConsumablePack("Pomumpack SILVER",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},consumableSilverBlueprints,4,{maxSelect: 1,maxRoll: 3,image: 'pomumpack_silver'});
+const pomumpackUpgrade = new ConsumablePack("Pomumpack Upgrade",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń. Możesz wybrać maksymalnie ${this.props.maxSelect}`},upgradesList,4,{maxSelect: 1,maxRoll: 3,image: 'pomumpack'});
 consumablePacks.push(pomumpackSmall);
 consumablePacks.push(pomumpackBig);
 consumablePacks.push(pomumpackMega);
-consumablePacks.push(pomumpackGold,pomumpackSilver);
+consumablePacks.push(pomumpackGold,pomumpackSilver,pomumpackUpgrade);

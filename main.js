@@ -1,5 +1,5 @@
-import { consumableList,Consumable,ConsumablePack } from "./consumable.js";
-import { Upgrade } from "./upgradeBase.js";
+import { consumableList } from "./consumable.js";
+import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { upgradesList } from "./upgrade.js";
 import { Audio } from "./sound.js";
 import { Tile } from "./Tile.js";

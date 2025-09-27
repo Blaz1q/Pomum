@@ -1,3 +1,4 @@
+console.log("Boss");
 export class Boss{
     constructor(name,description,effect,remove, props = {}){
         this.name = name;

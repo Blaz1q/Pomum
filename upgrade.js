@@ -1,7 +1,8 @@
-import { GAME_TRIGGERS, MODIFIERS } from "./dictionary.js";
-import { Style } from "./RenderUI.js";
+console.log("Upgrade");
 import { Upgrade } from "./upgradeBase.js";
-import { UPGRADE_STATES } from "./dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, UPGRADE_STATES } from "./dictionary.js";
+import { Style } from "./RenderUI.js";
+
 
 export const upgradesList = [];
 
@@ -421,8 +422,8 @@ export const upgradeBlueprints = [
   {
     name: "GrapeInterest",
     descriptionfn(game) {
-      if (!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+15 pkt")}`;
-      return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+15 pkt")} (Obecnie ${Style.Score(`+${this.props.value} pkt`)}, ${Style.Score(`+${this.props.value} pkt do wyniku`)})`;
+      if (!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+10 pkt")}`;
+      return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+10 pkt")} (Obecnie ${Style.Score(`+${this.props.value} pkt`)}, ${Style.Score(`+${this.props.value} pkt do wyniku`)})`;
     },
     effect(game) {
       this.setProps({
@@ -448,7 +449,7 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score;
         },
         onRoundEnd: () => {
-          this.props.value += 15;
+          this.props.value += 10;
           return UPGRADE_STATES.Active;
         }
       });
@@ -811,6 +812,8 @@ export const upgradeBlueprints = [
     props: defaultimage
   }
 ];
-
+upgradeBlueprints.forEach(upgrade => {
+  upgrade.type="Upgrade";
+});
 // push all blueprints into upgradesList
 upgradeBlueprints.forEach(bp => upgradesList.push(bp));

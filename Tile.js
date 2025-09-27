@@ -1,3 +1,4 @@
+console.log("Tile");
 import { GAME_TRIGGERS,MODIFIERS,TYPES } from "./dictionary.js";
 export class Tile {
     constructor(icon, type = TYPES.Fruit, props = {}) {

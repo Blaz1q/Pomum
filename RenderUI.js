@@ -1,5 +1,5 @@
-import { Consumable,ConsumablePack,consumableList,rollConsumablePacks,rollVouchers } from "./consumable.js";
-import { Upgrade } from "./upgradeBase.js";
+import { consumableList,rollConsumablePacks,rollVouchers } from "./consumable.js";
+import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { animate,Animator } from "./loadshaders.js";
 import { COLORS,GAMECOLORS, DURATIONS, STAGES } from "./dictionary.js";
 import { rollBoss } from "./Boss.js";
