@@ -828,8 +828,7 @@ swap(x1, y1, x2, y2) {
     }
 
     return { success: true, matches, special: null };
-}
-animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
+}animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
     const idx1 = y1 * this.matrixsize + x1;
     const idx2 = y2 * this.matrixsize + x2;
     const el1 = this.gameContainer.children[idx1];
@@ -849,8 +848,14 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
     preIcon1 = (preIcon1 !== undefined) ? preIcon1 : el1.textContent;
     preIcon2 = (preIcon2 !== undefined) ? preIcon2 : el2.textContent;
 
-    const g1 = this.createGhost(preIcon1, start1.x, start1.y, start1.w, start1.h);
-    const g2 = this.createGhost(preIcon2, start2.x, start2.y, start2.w, start2.h);
+    // copy relevant classes from originals so ghosts look the same (gold/silver/debuffed etc.)
+    const copyClasses = (sourceEl) => {
+        if (!sourceEl) return [];
+        return Array.from(sourceEl.classList).filter(c => c !== 'fade'); // don't copy "fade"
+    };
+
+    const g1 = this.createGhost(preIcon1, start1.x, start1.y, start1.w, start1.h, copyClasses(el1));
+    const g2 = this.createGhost(preIcon2, start2.x, start2.y, start2.w, start2.h, copyClasses(el2));
 
     el1.style.visibility = "hidden";
     el2.style.visibility = "hidden";
@@ -1127,8 +1132,7 @@ async animateCollapse() {
     const spawnCounts = Array(size).fill(0);
 
     // 1) Compute final targets (without mutating board)
-    // We'll compute targetY for each existing tile and compute spawn counts.
-    const targets = {}; // key oldKey -> { x, fromY, toY }
+    const targets = {}; // oldKey -> { x, fromY, toY }
     const writeYs = Array(size).fill(0);
     for (let x = 0; x < size; x++) {
         let writeY = size - 1;
@@ -1147,24 +1151,15 @@ async animateCollapse() {
         writeYs[x] = writeY;
     }
 
-    // If there are no drops and no spawns, simply return quickly
     const anyDrops = Object.keys(targets).length > 0;
     const anySpawns = spawnCounts.some(v => v > 0);
-    if (!anyDrops && !anySpawns) {
-        return [];
-    }
+    if (!anyDrops && !anySpawns) return [];
 
     // 2) Pre-generate the new tiles so visuals and state match
-    // For each column, fill preSpawns[x] with tiles ordered so that
-    // preSpawns[x][0] will go to final y = writeY, preSpawns[x][1] -> writeY-1, etc.
     const preSpawns = Array(size).fill(null).map(() => []);
     for (let x = 0; x < size; x++) {
         const spawn = spawnCounts[x];
         if (spawn <= 0) continue;
-        const writeY = writeYs[x];
-        // create spawn count tiles in the same order collapseBoard will place them:
-        // collapseBoard places for (y = writeY; y >= 0; y--) this.board[y][x] = nextTile
-        // So the first generated should map to finalY = writeY, next -> writeY-1, ...
         for (let i = 0; i < spawn; i++) {
             const tile = this.randomTile();
             preSpawns[x].push(tile);
@@ -1173,7 +1168,6 @@ async animateCollapse() {
 
     // 3) Create ghosts for all animated tiles (existing moving tiles + new tiles)
     const containerRect = this.gameContainer.getBoundingClientRect();
-    // find a reference cell size if possible (fallback to CELL_PX)
     let refCell = this.gameContainer.children[0];
     let cellW = CELL_PX, cellH = CELL_PX;
     if (refCell) {
@@ -1183,10 +1177,10 @@ async animateCollapse() {
     }
 
     const ghostPromises = [];
-    const ghosts = []; // keep for cleanup
+    const ghosts = [];
     const hideOriginals = [];
 
-    // existing tiles ghosts
+    // existing tiles ghosts — copy classes from the original cell so ghost matches gold/silver/debuffed
     for (const key of Object.keys(targets)) {
         const { x, fromY, toY } = targets[key];
         const idx = fromY * this.matrixsize + x;
@@ -1196,15 +1190,15 @@ async animateCollapse() {
         const relLeft = rect.left - containerRect.left;
         const relTop = rect.top - containerRect.top;
 
-        const ghost = this.createGhost(cell.textContent, relLeft, relTop, rect.width, rect.height);
-        // prepare ghost to animate transform
+        const classes = Array.from(cell.classList).filter(c => c !== 'fade');
+
+        const ghost = this.createGhost(cell.textContent, relLeft, relTop, rect.width, rect.height, classes);
         ghost.style.transition = `transform ${FALL_MS}ms ease`;
         this.gameContainer.appendChild(ghost);
-        // hide original to avoid duplicate visuals
+
         cell.style.visibility = "hidden";
         hideOriginals.push(cell);
 
-        // schedule the translate in RAF
         const dy = (toY - fromY) * CELL_PX;
         requestAnimationFrame(() => {
             ghost.style.transform = `translateY(${dy}px)`;
@@ -1214,25 +1208,28 @@ async animateCollapse() {
         ghostPromises.push(this._waitForTransition(ghost, 'transform', FALL_MS + 150));
     }
 
-    // new tile ghosts — create them positioned at their final visual x/top but offset above by spawn*CELL_PX
+    // new tile ghosts — set classes according to the tile props (gold/silver/debuffed)
     for (let x = 0; x < size; x++) {
         const spawn = preSpawns[x].length;
         if (spawn === 0) continue;
         const writeY = writeYs[x]; // final highest Y where new tiles start
-        // preSpawns[x][0] -> finalY = writeY, [1] -> writeY-1, ...
         for (let i = 0; i < spawn; i++) {
             const finalY = writeY - i;
             const tile = preSpawns[x][i];
-            const left = x * cellW + 0; // relative to container
-            const top = finalY * cellH + 0;
-            // place ghost at final's left/top
-            const ghost = this.createGhost(tile.icon, left, top, cellW, cellH);
-            // start visually above by -spawn*CELL_PX
+            const left = x * cellW;
+            const top = finalY * cellH;
+            const classes = [];
+            if (tile && tile.props) {
+                if (tile.props.modifier === MODIFIERS.Gold) classes.push('gold');
+                else if (tile.props.modifier === MODIFIERS.Silver) classes.push('silver');
+                if (tile.props.debuffed) classes.push('debuffed');
+                // if you have other semantic classes for bombs/dynamite, add here:
+                if (tile.type === TYPES.Bomb || tile.type === TYPES.Dynamite) classes.push('special');
+            }
+            const ghost = this.createGhost(tile.icon, left, top, cellW, cellH, classes);
             ghost.style.transition = `transform ${FALL_MS}ms ease`;
-            // initial transform so it sits above
-            ghost.style.transform = `translateY(-${spawn * CELL_PX}px)`;
+            ghost.style.transform = `translateY(-${spawn * CELL_PX}px)`; // start above
             this.gameContainer.appendChild(ghost);
-            // animate to final (translateY 0)
             requestAnimationFrame(() => {
                 ghost.style.transform = `translateY(0)`;
             });
@@ -1244,65 +1241,61 @@ async animateCollapse() {
     // 4) Wait for all ghost transitions to finish
     await Promise.all(ghostPromises);
 
-    // 5) cleanup ghosts and originals (unhide originals only if we will keep them — but we will render anew)
-    for (const g of ghosts) {
-        g.remove();
-    }
-    for (const o of hideOriginals) {
-        // the render() will eventually clear them; but restore visibility in case of early errors
-        o.style.visibility = "";
-    }
+    // 5) cleanup ghosts and originals
+    for (const g of ghosts) g.remove();
+    for (const o of hideOriginals) o.style.visibility = "";
 
-    // 6) Now update the board for real using the exact preSpawns we drew (so visuals match state)
-    // We must pass a copy of preSpawns because collapseBoard will shift items off of each preSpawns[x].
+    // 6) Now update the board for real using preSpawns (pass a copy because collapseBoard may mutate)
     const preSpawnsForCollapse = preSpawns.map(arr => arr.slice());
     const updatedSpawns = this.collapseBoard(spawnCounts, preSpawnsForCollapse);
 
     // 7) Re-render the grid to reflect new board state
     this.render();
 
-    // 8) After render, continue cascade: check explosions & matches
+    // 8) Continue cascade as before (compute specials / matches)
     let triggerMatches = [];
     if (this.activeExplosions.length > 0) {
-        const explosionsCopy = [...this.activeExplosions];
-        for (const exp of explosionsCopy) {
+        for (const exp of [...this.activeExplosions]) {
             const tile = this.board[exp.y][exp.x];
-            if (tile) {
-                triggerMatches.push(...this.triggerSpecial(exp.x, exp.y, tile));
-            }
+            if (tile) triggerMatches.push(...this.triggerSpecial(exp.x, exp.y, tile));
         }
     }
 
     let matches = this.findMatches(this.board);
     matches.push(...triggerMatches);
     const map = {};
-    for (const m of matches) {
-        const key = `${m.x},${m.y}`;
-        if (!map[key]) map[key] = m;
-    }
+    for (const m of matches) map[`${m.x},${m.y}`] = m;
     matches = Object.values(map);
 
-    // tiny pause to let UI settle
     await new Promise(r => setTimeout(r, 10));
     this.processMatches(matches);
 }
-    createGhost(icon, xPx, yPx, w, h) {
-        const g = document.createElement("div");
-        g.textContent = icon;
-        g.style.position = "absolute";
-        g.style.left = xPx + "px";
-        g.style.top = yPx + "px";
-        g.style.width = w + "px";
-        g.style.height = h + "px";
-        g.style.display = "flex";
-        g.style.alignItems = "center";
-        g.style.justifyContent = "center";
-        g.style.userSelect = "none";
-        g.style.pointerEvents = "none";
-        g.style.transition = "transform 150ms ease";
-        g.style.zIndex = "100";
-        return g;
+
+
+createGhost(icon, xPx, yPx, w, h, classList = []) {
+    const g = document.createElement("div");
+    g.textContent = icon;
+    g.style.position = "absolute";
+    g.style.left = xPx + "px";
+    g.style.top = yPx + "px";
+    g.style.width = w + "px";
+    g.style.height = h + "px";
+    g.style.display = "flex";
+    g.style.alignItems = "center";
+    g.style.justifyContent = "center";
+    g.style.userSelect = "none";
+    g.style.pointerEvents = "none";
+    g.style.transition = "transform 150ms ease";
+    g.style.zIndex = "100";
+
+    // apply classes that make ghosts visually identical to tiles (gold/silver/debuffed/etc.)
+    if (Array.isArray(classList)) {
+        for (const c of classList) {
+            if (c && typeof c === 'string') g.classList.add(c);
+        }
     }
+    return g;
+}
     async processMatches(matches){
         console.log("processMatches");
         if(matches.length === 0){
