@@ -836,7 +836,7 @@ export const upgradeBlueprints = [
           var found = false
           matches.forEach(m => {
             if (m.fruit.icon === this.props.chosenFruit.icon) {
-              this.props.score += this.props.value;
+              this.props.score += 20;
               found = true;
             }
           });
