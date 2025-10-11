@@ -214,6 +214,9 @@ displayPlayerUpgrades() {
 
         const descElement = upgradecard.querySelector(".upgrade-desc p");
         descElement.innerHTML = upgrade.description(this.game);
+
+        const upgradePrice = upgradecard.querySelector(".upgrade-price");
+        upgradePrice.innerHTML = "$"+upgrade.sellPrice;
         setTimeout(()=>{
                 upgradecard.classList.add("triggered");
             setTimeout(()=>{

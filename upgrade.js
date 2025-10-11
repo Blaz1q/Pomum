@@ -1,6 +1,6 @@
 console.log("Upgrade");
 import { Upgrade } from "./upgradeBase.js";
-import { GAME_TRIGGERS, MODIFIERS, UPGRADE_STATES } from "./dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, STAGES, TYPES, UPGRADE_STATES } from "./dictionary.js";
 import { Style } from "./RenderUI.js";
 
 
@@ -72,7 +72,7 @@ export const upgradeBlueprints = [
     descriptionfn(game) {
       if (!this.props.randomfruit)
         return `${Style.Chance("-100%")} dla losowego owoca, reszta dostanie równo podzielone procenty. zmienia się co rundę.`;
-      return `${Style.Chance("-100%")} ${this.props.randomfruit.icon}, +${Style.Chance(game.calcEqualize(this.props.previousPercent).toString()+"%")} reszta`;
+      return `${Style.Chance("-100%")} ${this.props.randomfruit.icon}, ${Style.Chance('+'+game.calcEqualize(this.props.previousPercent).toString()+"%")} reszta`;
     },
     effect(game) {
       this.setProps({
@@ -810,8 +810,190 @@ export const upgradeBlueprints = [
     },
     price: 6,
     props: defaultimage
-  }
-];
+  },
+  {
+    name: "Tutti Frutti",
+    descriptionfn(game){
+      const fruit = this.props?.chosenFruit;
+      if(this.bought && fruit)
+        return `Za ${fruit.icon}, ${Style.Score(`+20 pkt`)}, obecnie ${Style.Score(`${this.props.score ?? 0} pkt`)}`;
+      return `Za zniszczony pierwszy owoc w rundzie dostaje ${Style.Score(`+20 pkt`)}. Owoc resetuje się na koniec rundy.`;
+    },
+    effect(game){
+      this.setProps({
+        chosenFruit: null,
+        score: 0,
+        onMove: (matches) => {
+          if(this.props.chosenFruit==null){
+            const firstFruit = matches[0]?.fruit ?? null;
+            this.props.chosenFruit = firstFruit;
+            return UPGRADE_STATES.Active;
+          }
+          return  UPGRADE_STATES.Failed;
+        },
+        onMatch: (matches) => {
+          if(this.props.chosenFruit==null) return UPGRADE_STATES.Failed;
+          var found = false
+          matches.forEach(m => {
+            if (m.fruit.icon === this.props.chosenFruit.icon) {
+              this.props.score += this.props.value;
+              found = true;
+            }
+          });
+          if(found) return UPGRADE_STATES.Active;
+          return UPGRADE_STATES.Failed;
+        },
+        onRoundEnd: () => {
+          this.props.chosenFruit = null;
+          return UPGRADE_STATES.Active;
+        },
+        onScore: () => {
+          if(this.props.score<=0) return UPGRADE_STATES.Failed;
+          game.tempscore+=this.props.score;
+          game.GameRenderer.displayTempScore();
+          this.props.score = 0;
+          return UPGRADE_STATES.Score;
+        }
+      });
+      addUpgradeTriggers(game,this);
+    },
+    remove(game){
+      removeUpgradeTriggers(game,this);
+    },
+    price: 6,
+    props: defaultimage
+    },
+    {
+      name: "Fruit Tycoon",
+      descriptionfn: `Na koniec rundy, ${Style.Money("+$1")} za każdy ulepszony owoc w grze.`,
+      effect(game) {
+        this.setProps({
+          onRoundEnd: () => {
+            let upgradedfruits=0;
+            game.board.forEach(boardx => {
+                boardx.forEach(fruit => {
+                  if(fruit.props.modifier != MODIFIERS.None){
+                    upgradedfruits++;
+                  }
+                });
+            });
+            if(upgradedfruits==0) return UPGRADE_STATES.Failed;
+            game.money += upgradedfruits;
+            game.GameRenderer.displayMoney();
+            return UPGRADE_STATES.Active;
+          }
+        });
+        addUpgradeTriggers(game, this);
+      },
+      remove(game) { removeUpgradeTriggers(game, this); },
+      price: 8,
+      props: defaultimage
+    },
+    {
+  name: "Jackpot",
+  descriptionfn: `Szansa ${Style.Chance("1 na 100")} że po rundzie dostaniesz ${Style.Money("$100")}`,
+  effect(game) {
+    this.setProps({
+      onRoundEnd: () => {
+        if (Math.random() < 0.01) {
+          game.money += 100;
+          game.GameRenderer.displayMoney();
+          return UPGRADE_STATES.Active;
+        }
+        return UPGRADE_STATES.Failed;
+      }
+    });
+    addUpgradeTriggers(game, this);
+  },
+  remove(game) { removeUpgradeTriggers(game, this); },
+  price: 10,
+  props: defaultimage
+},
+{
+  name: "Collector",
+  descriptionfn(game){
+    const collected = this.props?.collected;
+    const score = this.props?.score;
+    const collectedIcons = collected && collected.size > 0 
+      ? [...collected].join(" ")
+      : "0";
+    if(score&&score>0&&this.bought){
+      return `Jeżeli zniszczysz każdy rodzaj owocu w rundzie, ${Style.Score("+200 pkt")} za kaskade. (Zniszczono: ${collectedIcons}/${game.fruits.length}),(Obecnie ${Style.Score(`+${score} pkt`)})`;
+    }
+    if(collected&&game.stage!=STAGES.Shop&&this.bought){
+      return `Jeżeli zniszczysz każdy rodzaj owocu w rundzie, ${Style.Score("+200 pkt")} za kaskade. (Zniszczono: ${collectedIcons}/${game.fruits.length})`;
+    }
+    return `Jeżeli zniszczysz każdy rodzaj owocu w rundzie, ${Style.Score("+200 pkt")} za kaskade.`;
+  },
+  effect(game) {
+    this.setProps({
+      score: 0,
+      collected: new Set(),
+
+      onMatch: (matches) => {
+        let size=this.props.collected.size;
+        matches.forEach(m => {
+            if(m.fruit.type==TYPES.Fruit) this.props.collected.add(m.fruit.icon)
+          });
+        
+        if (this.props.collected.size === game.fruits.length){
+          this.props.score += 200;
+          return UPGRADE_STATES.Active;
+        }
+        if(size<this.props.collected.size) return UPGRADE_STATES.Active;
+        return UPGRADE_STATES.Failed;
+      },
+      onScore: ()=>{
+          if(this.props.score<=0) return UPGRADE_STATES.Failed;
+          game.tempscore += this.props.score;
+          game.GameRenderer.displayTempScore();
+          this.props.score = 0;
+          return UPGRADE_STATES.Score;
+      },
+      onRoundEnd: () => {
+        this.props.collected.clear();
+        return UPGRADE_STATES.Active;
+      }
+    });
+    addUpgradeTriggers(game, this);
+  },
+  remove(game) { removeUpgradeTriggers(game, this); },
+  price: 9,
+  props: defaultimage
+},
+{
+  name: "BOOM!!",
+  descriptionfn(game){
+    return `${Style.Chance(`+1%`)} dla ${game.special[1].icon}`;
+  },
+  effect(game){
+    game.special[1].props.percent += 1;
+    return UPGRADE_STATES.Active;
+  },
+  remove(game){
+    game.special[1].props.percent -= 1;
+    return UPGRADE_STATES.Active;
+  },
+  price: 4,
+  props: {image: 'boom'}
+},
+{
+  name: "",
+  descriptionfn(game){
+    return `${game.special[0].icon} i ${game.special[1].icon} detonują się 1 raz więcej.`;
+  },
+  effect(game){
+    game.special[0].props.detonations += 1;
+    game.special[1].props.detonations += 1;
+  },
+  remove(game){
+    game.special[0].props.detonations -= 1;
+    game.special[1].props.detonations -= 1;
+  },
+  price: 4,
+  props: {image: 'boom'}
+}
+  ];
 upgradeBlueprints.forEach(upgrade => {
   upgrade.type="Upgrade";
 });

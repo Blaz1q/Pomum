@@ -166,6 +166,7 @@ canvas#glcanvas {
     gap: .5rem;
 
     #player-upgrades {
+      margin-top: .5em;
       display: flex;
       flex-direction: row;
       align-items: flex-start; // groups align nicely at the top

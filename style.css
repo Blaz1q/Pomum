@@ -142,6 +142,7 @@ canvas#glcanvas {
   gap: 0.5rem;
 }
 .game .right-panel #player-upgrades {
+  margin-top: 0.5em;
   display: flex;
   flex-direction: row;
   align-items: flex-start;

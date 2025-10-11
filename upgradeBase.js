@@ -59,6 +59,9 @@ export class ConsumablePack extends Upgrade{
         available = available.filter(c => 
             !game.consumables.some(pc => pc.name === c.name)
         );
+        available = available.filter(c => 
+          !game.upgrades.some(pu => pu.name === c.name)
+        );
     }
 
     // Make a copy for shuffling

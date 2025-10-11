@@ -48,9 +48,9 @@ export class Game{
         ];
         this.special = [
             new Tile("🧨", TYPES.Dynamite, { detonations: 1, percent: 1 }),
-            new Tile("💣", TYPES.Bomb, { detonations: 1 }),
-            
+            new Tile("💣", TYPES.Bomb, { detonations: 1,percent: 0 }),
         ];
+        this.activeExplosions = [];
         this.equalizeChances();
         this.triggers = {
             [GAME_TRIGGERS.onMatch]: [],        // kiedy znajdzie się match
@@ -340,8 +340,12 @@ trySwap(x1, y1, x2, y2) {
     this.animateSwap(x1, y1, x2, y2, true, () => {
         // trigger special if exists
         if (special) {
-            this.triggerSpecial(special.x, special.y, special.tile, { includeSwapped: true, swappedX: special.swappedX, swappedY: special.swappedY });
-        } else if (matches.length > 0) {
+            let triggerMatches = this.triggerSpecial(special.x, special.y, special.tile, { includeSwapped: true, swappedX: special.swappedX, swappedY: special.swappedY });
+            this.emit(GAME_TRIGGERS.onMove,matches);
+            this.processMatches(triggerMatches);
+            //matches.push(...triggerMatches);
+        }
+        else if (matches.length > 0) {
             this.emit(GAME_TRIGGERS.onMove,matches);
             this.processMatches(matches);
         }
@@ -459,14 +463,13 @@ trySwap(x1, y1, x2, y2) {
     }
 
     randomTile() {
+    if (this.rand()*100 < this.special[1].percent) {
+        return new Tile(this.special[1].icon, this.special[1].type, {detonations: this.special[1].detonations}); 
+    }
     if (this.rand()*100 < this.special[0].percent) {
-        return new Tile("🧨", TYPES.Dynamite, { detonations: 1 });
+        return new Tile(this.special[0].icon, this.special[0].type, {detonations: this.special[0].detonations}); 
     }
     return this.randomFruit();
-    }
-    // FIXED: return correct Tile object
-    makeBomb() {
-    return new Tile("💣", TYPES.Bomb, { detonations: 1 });
     }
     randomFruit() {
     const weights = this.fruits.map(f => Math.max(0, f.percent));
@@ -603,8 +606,7 @@ triggerSpecial(x, y, tile, options = {}, collected = new Set()) {
                 all.push({ x: cx, y: cy, fruit });
             }
         }
-        this.emit(GAME_TRIGGERS.onMove,all);
-        this.processMatches(all);
+        return all;
     }
 }
     fill(){
@@ -629,7 +631,7 @@ triggerSpecial(x, y, tile, options = {}, collected = new Set()) {
 
     // render(full = true) -> if full === false do an in-place update:
     render() {
-        //console.log("render");
+        console.log("render", performance.now());
         this.gameContainer.innerHTML = "";
         for (let y = 0; y < this.matrixsize; y++) {
             for (let x = 0; x < this.matrixsize; x++) {
@@ -886,71 +888,89 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
         }
     }, 160);
 }
-    animateSpawns(spawnCounts){
+_waitForTransition(el, property = 'transform', timeout = FALL_MS + 100) {
+    return new Promise(resolve => {
+        if (!el) return resolve();
+        let fired = false;
+        const onEnd = (e) => {
+            if (property && e.propertyName !== property) return;
+            if (fired) return;
+            fired = true;
+            el.removeEventListener('transitionend', onEnd);
+            clearTimeout(timer);
+            resolve();
+        };
+        el.addEventListener('transitionend', onEnd);
+        const timer = setTimeout(() => {
+            if (!fired) {
+                fired = true;
+                el.removeEventListener('transitionend', onEnd);
+                resolve();
+            }
+        }, timeout);
+    });
+}
+async animateSpawns(spawnCounts) {
     const size = this.board.length;
+    const promises = [];
 
-    // first set spawn elements above board without transition
-    for(let x=0;x<size;x++){
+    // 1) Place new top cells above board instantly (no transition)
+    for (let x = 0; x < size; x++) {
         const spawn = spawnCounts[x];
-        if(spawn === 0) continue;
-
-        for(let y=0; y<spawn; y++){
+        if (!spawn) continue;
+        for (let y = 0; y < spawn; y++) {
             const idx = y * this.matrixsize + x;
             const cell = this.gameContainer.children[idx];
-            if(!cell) continue;
-            // position the cell visually above the board
-            cell.style.transition = "";
+            if (!cell) continue;
+            cell.style.transition = "none";
+            // move visually above
             cell.style.transform = `translateY(-${spawn * CELL_PX}px)`;
         }
     }
 
-    // on next frame set transitions and drop to zero
-    requestAnimationFrame(()=>{
-            for(let x=0;x<size;x++){
-                const spawn = spawnCounts[x];
-                if(spawn === 0) continue;
+    // flush layout / wait for a RAF so the "none" transform is applied
+    await new Promise(requestAnimationFrame);
 
-                for(let y=0; y<spawn; y++){
-                    const idx = y * this.matrixsize + x;
-                    const cell = this.gameContainer.children[idx];
-                    if(!cell) continue;
-                    cell.style.transition = `transform ${FALL_MS}ms ease`;
-                    cell.style.transform = "translateY(0)";
-                }
-            }
-        });
-    }
-    // zel 100 
-    // french 15
-    // po stylidstce 20
-   collapseBoard(spawnCounts){
-    console.log("collapseBoard");
-    let elements = [];
-        const size = this.board.length;
-        for(let x=0;x<size;x++){
-            let writeY = size - 1;
-
-            // ściągnij istniejące w dół
-            for(let y=size-1;y>=0;y--){
-                if(this.board[y][x] !== null){
-                    this.board[writeY][x] = this.board[y][x];
-                    writeY--;
-                }
-            }
-            // uzupełnij górę nowymi (dokładnie spawnCounts[x] sztuk)
-            for(let y=writeY; y>=0; y--){
-                this.board[y][x] = this.randomTile();
-                elements.push(this.board[y][x])
-            }       
+    // 2) animate them into place and wait for their transitions
+    for (let x = 0; x < size; x++) {
+        const spawn = spawnCounts[x];
+        if (!spawn) continue;
+        for (let y = 0; y < spawn; y++) {
+            const idx = y * this.matrixsize + x;
+            const cell = this.gameContainer.children[idx];
+            if (!cell) continue;
+            // set transition then move to final
+            cell.style.transition = `transform ${FALL_MS}ms ease`;
+            // force a layout read to ensure transition is picked up (defensive)
+            void cell.offsetWidth;
+            cell.style.transform = "translateY(0)";
+            promises.push(this._waitForTransition(cell, 'transform', FALL_MS + 120));
         }
-        this.emit(GAME_TRIGGERS.onSpawn,elements);
     }
-    animateCollapse() {
+
+    // wait for all spawn animations to finish
+    await Promise.all(promises);
+
+    // cleanup (optional) - remove transition so future instant changes won't animate unintentionally
+    for (let x = 0; x < size; x++) {
+        const spawn = spawnCounts[x];
+        if (!spawn) continue;
+        for (let y = 0; y < spawn; y++) {
+            const idx = y * this.matrixsize + x;
+            const cell = this.gameContainer.children[idx];
+            if (!cell) continue;
+            cell.style.transition = "";
+            cell.style.transform = "translate(0,0)";
+        }
+    }
+}
+
+async animateCollapse() {
     const size = this.board.length;
     const drops = [];
     const spawnCounts = Array(size).fill(0);
 
-    // compute drops and spawns based on current nulls
+    // 1) Compute drop distances (based on current nulls)
     for (let x = 0; x < size; x++) {
         let shift = 0;
         for (let y = size - 1; y >= 0; y--) {
@@ -963,29 +983,308 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
         spawnCounts[x] = shift;
     }
 
-    // animate existing cells down
+    // 2) Animate existing cells down (collect transition promises)
+    const dropPromises = [];
     for (const d of drops) {
         const idx = d.y * this.matrixsize + d.x;
         const cell = this.gameContainer.children[idx];
-        if (cell) {
-            cell.style.transition = `transform ${FALL_MS}ms ease`;
-            cell.style.transform = `translateY(${d.shift * CELL_PX}px)`;
+        if (!cell) continue;
+        cell.style.transition = `transform ${FALL_MS}ms ease`;
+        // force layout/read to ensure transition is applied
+        void cell.offsetWidth;
+        cell.style.transform = `translateY(${d.shift * CELL_PX}px)`;
+        dropPromises.push(this._waitForTransition(cell, 'transform', FALL_MS + 120));
+    }
+
+    // wait for all drop animations to complete
+    await Promise.all(dropPromises);
+
+    // 3) Update board data & determine how many spawns were created
+    const updatedSpawns = this.collapseBoard(spawnCounts);
+
+    // 4) Re-render so new top tiles exist in the DOM before animating them
+    this.render();
+
+    // 5) Animate the newly spawned tiles from above (this function will wait)
+    await this.animateSpawns(updatedSpawns);
+
+    // 6) After everything lands, compute specials/matches and continue cascade
+    let triggerMatches = [];
+    if (this.activeExplosions.length > 0) {
+        const copy = [...this.activeExplosions];
+        for (const exp of copy) {
+            const tile = this.board[exp.y][exp.x];
+            if (tile) triggerMatches.push(...this.triggerSpecial(exp.x, exp.y, tile));
         }
     }
 
-    // after fall ends: update board, fully render, then animate spawns from above
-    setTimeout(() => {
-        
-        this.collapseBoard(spawnCounts); // rewrite board data
-        this.render(); 
-                          // full render to reset transforms
+    let matches = this.findMatches(this.board);
+    matches.push(...triggerMatches);
 
-        // animate spawns (top 'spawnCounts[x]' cells)
-        this.animateSpawns(spawnCounts);
+    // dedupe
+    const map = {};
+    for (const m of matches) map[`${m.x},${m.y}`] = m;
+    matches = Object.values(map);
 
-        // after spawns land, continue cascade
-        setTimeout(() => this.processMatches(this.findMatches(this.board)), FALL_MS);
-    }, FALL_MS);
+    // small delay to make sure UI updated; then continue cascade
+    await new Promise(r => setTimeout(r, 10));
+    this.processMatches(matches);
+}
+async animateSpawns(spawnCounts) {
+    const size = this.board.length;
+
+    // Move new tiles above the board
+    for (let x = 0; x < size; x++) {
+        const spawn = spawnCounts[x];
+        if (spawn === 0) continue;
+
+        for (let y = 0; y < spawn; y++) {
+            const idx = y * this.matrixsize + x;
+            const cell = this.gameContainer.children[idx];
+            if (!cell) continue;
+            cell.style.transition = "none";
+            cell.style.transform = `translateY(-${spawn * CELL_PX}px)`;
+        }
+    }
+
+    await new Promise(requestAnimationFrame);
+
+    // Drop them into place
+    for (let x = 0; x < size; x++) {
+        const spawn = spawnCounts[x];
+        if (spawn === 0) continue;
+
+        for (let y = 0; y < spawn; y++) {
+            const idx = y * this.matrixsize + x;
+            const cell = this.gameContainer.children[idx];
+            if (!cell) continue;
+            cell.style.transition = `transform ${FALL_MS}ms ease`;
+            cell.style.transform = "translateY(0)";
+        }
+    }
+
+    await new Promise(r => setTimeout(r, FALL_MS));
+}
+    // zel 100 
+    // french 15
+    // po stylidstce 20
+    collapseBoard(spawnCounts, preSpawns = null) {
+    // compute final placements but do NOT mutate DOM here
+    console.log("Collapse started", performance.now());
+    const size = this.board.length;
+    const moveMap = {}; // oldKey -> newKey
+
+    for (let x = 0; x < size; x++) {
+        let writeY = size - 1;
+
+        for (let y = size - 1; y >= 0; y--) {
+            const tile = this.board[y][x];
+            if (tile) {
+                if (writeY !== y) {
+                    const oldKey = `${x},${y}`;
+                    const newKey = `${x},${writeY}`;
+                    moveMap[oldKey] = newKey;
+
+                    this.board[writeY][x] = tile;
+                    this.board[y][x] = null;
+                }
+                writeY--;
+            }
+        }
+
+        // fill empty cells with new random tiles (or use preSpawns)
+        for (let y = writeY; y >= 0; y--) {
+            if (preSpawns && preSpawns[x] && preSpawns[x].length > 0) {
+                // preSpawns stored highest-first (index 0 -> finalY writeY)
+                // When we generated preSpawns we should have created them in this order.
+                const next = preSpawns[x].shift();
+                this.board[y][x] = next;
+            } else {
+                this.board[y][x] = this.randomTile();
+            }
+            spawnCounts[x]++;
+        }
+    }
+
+    // update active explosions based on moveMap
+    this.activeExplosions = this.activeExplosions.map(exp => {
+        const oldKey = `${exp.x},${exp.y}`;
+        if (moveMap[oldKey]) {
+            const [nx, ny] = moveMap[oldKey].split(",").map(Number);
+            return { ...exp, x: nx, y: ny };
+        }
+        return exp;
+    });
+
+    console.log(spawnCounts);
+    return spawnCounts;
+}
+
+// === NEW single-pass animateCollapse that animates both existing and new tiles together ===
+async animateCollapse() {
+    const size = this.board.length;
+    const drops = []; // for existing tiles that will move
+    const spawnCounts = Array(size).fill(0);
+
+    // 1) Compute final targets (without mutating board)
+    // We'll compute targetY for each existing tile and compute spawn counts.
+    const targets = {}; // key oldKey -> { x, fromY, toY }
+    const writeYs = Array(size).fill(0);
+    for (let x = 0; x < size; x++) {
+        let writeY = size - 1;
+        for (let y = size - 1; y >= 0; y--) {
+            const tile = this.board[y][x];
+            if (tile) {
+                if (writeY !== y) {
+                    const oldKey = `${x},${y}`;
+                    targets[oldKey] = { x, fromY: y, toY: writeY };
+                }
+                writeY--;
+            }
+        }
+        // number of new tiles needed is writeY + 1 (rows 0..writeY)
+        spawnCounts[x] = writeY + 1;
+        writeYs[x] = writeY;
+    }
+
+    // If there are no drops and no spawns, simply return quickly
+    const anyDrops = Object.keys(targets).length > 0;
+    const anySpawns = spawnCounts.some(v => v > 0);
+    if (!anyDrops && !anySpawns) {
+        return [];
+    }
+
+    // 2) Pre-generate the new tiles so visuals and state match
+    // For each column, fill preSpawns[x] with tiles ordered so that
+    // preSpawns[x][0] will go to final y = writeY, preSpawns[x][1] -> writeY-1, etc.
+    const preSpawns = Array(size).fill(null).map(() => []);
+    for (let x = 0; x < size; x++) {
+        const spawn = spawnCounts[x];
+        if (spawn <= 0) continue;
+        const writeY = writeYs[x];
+        // create spawn count tiles in the same order collapseBoard will place them:
+        // collapseBoard places for (y = writeY; y >= 0; y--) this.board[y][x] = nextTile
+        // So the first generated should map to finalY = writeY, next -> writeY-1, ...
+        for (let i = 0; i < spawn; i++) {
+            const tile = this.randomTile();
+            preSpawns[x].push(tile);
+        }
+    }
+
+    // 3) Create ghosts for all animated tiles (existing moving tiles + new tiles)
+    const containerRect = this.gameContainer.getBoundingClientRect();
+    // find a reference cell size if possible (fallback to CELL_PX)
+    let refCell = this.gameContainer.children[0];
+    let cellW = CELL_PX, cellH = CELL_PX;
+    if (refCell) {
+        const r = refCell.getBoundingClientRect();
+        cellW = r.width;
+        cellH = r.height;
+    }
+
+    const ghostPromises = [];
+    const ghosts = []; // keep for cleanup
+    const hideOriginals = [];
+
+    // existing tiles ghosts
+    for (const key of Object.keys(targets)) {
+        const { x, fromY, toY } = targets[key];
+        const idx = fromY * this.matrixsize + x;
+        const cell = this.gameContainer.children[idx];
+        if (!cell) continue;
+        const rect = cell.getBoundingClientRect();
+        const relLeft = rect.left - containerRect.left;
+        const relTop = rect.top - containerRect.top;
+
+        const ghost = this.createGhost(cell.textContent, relLeft, relTop, rect.width, rect.height);
+        // prepare ghost to animate transform
+        ghost.style.transition = `transform ${FALL_MS}ms ease`;
+        this.gameContainer.appendChild(ghost);
+        // hide original to avoid duplicate visuals
+        cell.style.visibility = "hidden";
+        hideOriginals.push(cell);
+
+        // schedule the translate in RAF
+        const dy = (toY - fromY) * CELL_PX;
+        requestAnimationFrame(() => {
+            ghost.style.transform = `translateY(${dy}px)`;
+        });
+
+        ghosts.push(ghost);
+        ghostPromises.push(this._waitForTransition(ghost, 'transform', FALL_MS + 150));
+    }
+
+    // new tile ghosts — create them positioned at their final visual x/top but offset above by spawn*CELL_PX
+    for (let x = 0; x < size; x++) {
+        const spawn = preSpawns[x].length;
+        if (spawn === 0) continue;
+        const writeY = writeYs[x]; // final highest Y where new tiles start
+        // preSpawns[x][0] -> finalY = writeY, [1] -> writeY-1, ...
+        for (let i = 0; i < spawn; i++) {
+            const finalY = writeY - i;
+            const tile = preSpawns[x][i];
+            const left = x * cellW + 0; // relative to container
+            const top = finalY * cellH + 0;
+            // place ghost at final's left/top
+            const ghost = this.createGhost(tile.icon, left, top, cellW, cellH);
+            // start visually above by -spawn*CELL_PX
+            ghost.style.transition = `transform ${FALL_MS}ms ease`;
+            // initial transform so it sits above
+            ghost.style.transform = `translateY(-${spawn * CELL_PX}px)`;
+            this.gameContainer.appendChild(ghost);
+            // animate to final (translateY 0)
+            requestAnimationFrame(() => {
+                ghost.style.transform = `translateY(0)`;
+            });
+            ghosts.push(ghost);
+            ghostPromises.push(this._waitForTransition(ghost, 'transform', FALL_MS + 150));
+        }
+    }
+
+    // 4) Wait for all ghost transitions to finish
+    await Promise.all(ghostPromises);
+
+    // 5) cleanup ghosts and originals (unhide originals only if we will keep them — but we will render anew)
+    for (const g of ghosts) {
+        g.remove();
+    }
+    for (const o of hideOriginals) {
+        // the render() will eventually clear them; but restore visibility in case of early errors
+        o.style.visibility = "";
+    }
+
+    // 6) Now update the board for real using the exact preSpawns we drew (so visuals match state)
+    // We must pass a copy of preSpawns because collapseBoard will shift items off of each preSpawns[x].
+    const preSpawnsForCollapse = preSpawns.map(arr => arr.slice());
+    const updatedSpawns = this.collapseBoard(spawnCounts, preSpawnsForCollapse);
+
+    // 7) Re-render the grid to reflect new board state
+    this.render();
+
+    // 8) After render, continue cascade: check explosions & matches
+    let triggerMatches = [];
+    if (this.activeExplosions.length > 0) {
+        const explosionsCopy = [...this.activeExplosions];
+        for (const exp of explosionsCopy) {
+            const tile = this.board[exp.y][exp.x];
+            if (tile) {
+                triggerMatches.push(...this.triggerSpecial(exp.x, exp.y, tile));
+            }
+        }
+    }
+
+    let matches = this.findMatches(this.board);
+    matches.push(...triggerMatches);
+    const map = {};
+    for (const m of matches) {
+        const key = `${m.x},${m.y}`;
+        if (!map[key]) map[key] = m;
+    }
+    matches = Object.values(map);
+
+    // tiny pause to let UI settle
+    await new Promise(r => setTimeout(r, 10));
+    this.processMatches(matches);
 }
     createGhost(icon, xPx, yPx, w, h) {
         const g = document.createElement("div");
@@ -1005,6 +1304,7 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
         return g;
     }
     async processMatches(matches){
+        console.log("processMatches");
         if(matches.length === 0){
             console.log("waiting..");
             await this.emit(GAME_TRIGGERS.onScore);
@@ -1057,15 +1357,33 @@ animateSwap(x1, y1, x2, y2, success, callback, opts = {}) {
             for(const m of matches){
                 const idx = m.y * this.matrixsize + m.x;
                 const cell = this.gameContainer.children[idx];
+                const tile = this.board[m.y][m.x];
+                if(tile && (tile.type === TYPES.Bomb || tile.type === TYPES.Dynamite)){
+                    // decrement detonations
+                    tile.props.detonations -= 1;
+
+                    if(tile.props.detonations > 0){
+                        // still has detonations → keep in activeExplosions
+                        this.activeExplosions.push({ x: m.x, y: m.y, type: tile.type, detonations: tile.props.detonations });
+                        continue; // skip fading / removal
+                    }
+                    // detonations now 0 → remove from activeExplosions if exists
+                    this.activeExplosions = this.activeExplosions.filter(e => !(e.x === m.x && e.y === m.y));
+                }
                 if(cell) cell.classList.add("fade");
             }
             setTimeout(()=>{
                 // fizycznie usuń z board
                 let groups = {};
                 for(const m of matches){
-                    let tile = this.board[m.y][m.x];
-                    let gold = this.board[m.y][m.x].props.modifier==MODIFIERS.Gold;
-                    let silver = this.board[m.y][m.x].props.modifier==MODIFIERS.Silver;
+                    const tile = this.board[m.y][m.x];
+                    let skip = false;
+                    this.activeExplosions.forEach(detonation => {
+                        if(m.x==detonation.x&&m.y==detonation.y) skip=true;
+                    });
+                    if(skip) continue;
+                    let gold = tile.props.modifier==MODIFIERS.Gold;
+                    let silver = tile.props.modifier==MODIFIERS.Silver;
                     let type = tile.icon;
                     if(gold){
                         this.money++;
