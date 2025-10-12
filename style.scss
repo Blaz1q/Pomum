@@ -383,7 +383,7 @@ canvas#glcanvas {
     position: relative;
     overflow: visible; /* allow image to scale outside */
     cursor: pointer;
-    animation: skewCard 3s infinite ease-out;
+    animation: skewCard 3s infinite ;
     transition: box-shadow 0.2s ease;
     z-index: 5;
     .upgrade-inner {
@@ -581,6 +581,9 @@ canvas#glcanvas {
   padding-left: .2em;
   padding-right: .2em;
 }
+.negative{
+  animation: animateNegative 3s infinite ease-in-out;
+}
 #upgrade-tiles {
   display: none; // hidden initially
   top: 0;
@@ -681,6 +684,11 @@ canvas#glcanvas {
 	60% {
     transform: scale(110%);
   }
+}
+@keyframes animateNegative {
+  0% { filter: invert(1);}
+  50% { filter: invert(0.9);}
+  100% {filter: invert(1);} 
 }
 @keyframes skewCard {
   0%   { transform: skew(-1deg, -0.5deg); }

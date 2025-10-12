@@ -1,4 +1,4 @@
-import { UPGRADE_RARITY } from "./dictionary.js";
+import { MODIFIERS, UPGRADE_RARITY } from "./dictionary.js";
 
 export class Upgrade {
   constructor(name,descriptionfn, effect, remove, price = 2,props = {}) {
@@ -13,6 +13,7 @@ export class Upgrade {
     this.type = "Upgrade";
     this.image = `./images/cards/${props.image ? props.image.toLowerCase() : name.toLowerCase()}.png`
     this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.Common;
+    this.modifier = MODIFIERS.None;
     this.props = {
       ...props
     };
@@ -29,11 +30,19 @@ export class Upgrade {
 
   apply(game) {
     this.bought = true;
+    if(this.modifier==MODIFIERS.Negative){
+      game.maxUpgrades+=1;
+      game.GameRenderer.displayUpgradesCounter();
+    }
     this.effect.call(this, game); // this wewnątrz effect wskazuje na instancję
   }
 
   sell(game) {
     this.bought = false;
+    if(this.modifier==MODIFIERS.Negative){
+      game.maxUpgrades-=1;
+      game.GameRenderer.displayUpgradesCounter();
+    }
     this.remove.call(this, game); // this wewnątrz remove wskazuje na instancję
     game.money += Math.floor(this.sellPrice);
   }

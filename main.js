@@ -161,7 +161,12 @@ async emit(event, payload) {
         const picked = pool.slice(0, count).map(
             up => new Upgrade(up.name, up.descriptionfn, up.effect, up.remove, up.price, up.props)
         );
-
+        picked.forEach(upgrade => {
+            if(this.shopRand() < 0.0075){
+                upgrade.modifier = MODIFIERS.Negative;
+            }
+        });
+        console.log(picked);
         if (this.overstock) {
             // Start with full consumable list
             let overstockPool = consumableList;
@@ -178,7 +183,6 @@ async emit(event, payload) {
                 picked.push(new Consumable(con.name, con.description, con.effect, con.price, con.props));
             }
         }
-
         return picked;
     }
     displayMoves(){

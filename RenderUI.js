@@ -1,7 +1,7 @@
 import { consumableList,rollConsumablePacks,rollVouchers } from "./consumable.js";
 import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { animate,Animator } from "./loadshaders.js";
-import { COLORS,GAMECOLORS, DURATIONS, STAGES } from "./dictionary.js";
+import { COLORS,GAMECOLORS, DURATIONS, STAGES, MODIFIERS } from "./dictionary.js";
 import { rollBoss } from "./Boss.js";
 export class RenderUI {
     constructor(game) {
@@ -291,6 +291,9 @@ displayPlayerUpgrades() {
         // Card inner
         const cardInner = document.createElement("div");
         cardInner.className = "upgrade-inner";
+        if(up.modifier==MODIFIERS.Negative){
+            cardInner.classList.add("negative");
+        }
         cardInner.style.backgroundImage = `url('${up.image}')`;
         
         // Card
@@ -303,9 +306,14 @@ displayPlayerUpgrades() {
         const desc = document.createElement("div");
         desc.className = "upgrade-desc";
         desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p>`;
-
+        if(up.modifier!=MODIFIERS.None){
+            desc.innerHTML = `<h1>${up.name}</h1><p>${Style.Chance(up.modifier)}</p><p>${up.description(this.game)}</p>`;
+        }
         wrapper.addEventListener("mouseenter", () => {
             desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p>`;
+            if(up.modifier!=MODIFIERS.None){
+                desc.innerHTML = `<h1>${up.name}</h1><p>${Style.Chance(up.modifier)}</p><p>${up.description(this.game)}</p>`;
+            }
         });
         if(displayButtons){
             wrapper.appendChild(this.createUpgradeButtons(wrapper,up,params));
@@ -341,7 +349,7 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
             console.log("not enough money")
             return false;
         }
-        if(upgrade.type==="Upgrade"&&game.upgrades.length>=game.maxUpgrades){
+        if(upgrade.type==="Upgrade"&&game.upgrades.length>=game.maxUpgrades&&upgrade.modifier!=MODIFIERS.Negative){
             console.log("not enough upgrade space");
             return false;
         }
