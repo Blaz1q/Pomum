@@ -190,25 +190,37 @@ canvas#glcanvas {
       }
 
       #player-upgrades-container,
-      #player-consumables-container {
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.378);
-        display: flex;
-        gap: 0.5rem;
-        width: 100%;
-        flex-wrap: wrap;
-        justify-content: center;
-        min-height: $cardHeight;
-        @media (max-width: 1024px) {
-          min-height: $cardHeight-sm;
-        }
-        @media (max-width: 800px) {
-          min-height: $cardHeight-sm;
-        }
-        @media (max-width: 600px) {
-          min-height: $cardHeight-sm * 0.8;
-        }
-      }
+#player-consumables-container {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;           // prevent wrapping
+  justify-content: space-evenly;
+  align-items: flex-start;
+  overflow: visible;           // show overflowing cards
+  gap: 0;                      // remove natural gap
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.378);
+  min-height: $cardHeight;
+
+  @media (max-width: 1024px) { min-height: $cardHeight-sm; }
+  @media (max-width: 800px)  { min-height: $cardHeight-sm; }
+  @media (max-width: 600px)  { min-height: $cardHeight-sm * 0.8; }
+
+  // make cards overlap when container is full
+  .upgrade-wrapper {
+    flex: 0 0 auto;                      // don't shrink
+    margin-left: -60px;                  // overlap amount
+    transition: transform 0.2s ease, z-index 0.2s ease;
+
+    &:first-child { margin-left: 0; }
+
+    // on hover, bring it to front and lift slightly
+    &:hover {
+      z-index: 10;
+      transform: translateY(-15px);
+    }
+  }
+}
     }
 
     #body {

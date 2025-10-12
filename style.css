@@ -166,13 +166,15 @@ canvas#glcanvas {
 }
 .game .right-panel #player-upgrades #player-upgrades-container,
 .game .right-panel #player-upgrades #player-consumables-container {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  overflow: visible;
+  gap: 0;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.378);
-  display: flex;
-  gap: 0.5rem;
-  width: 100%;
-  flex-wrap: wrap;
-  justify-content: center;
   min-height: 180px;
 }
 @media (max-width: 1024px) {
@@ -192,6 +194,21 @@ canvas#glcanvas {
   .game .right-panel #player-upgrades #player-consumables-container {
     min-height: 96px;
   }
+}
+.game .right-panel #player-upgrades #player-upgrades-container .upgrade-wrapper,
+.game .right-panel #player-upgrades #player-consumables-container .upgrade-wrapper {
+  flex: 0 0 auto;
+  margin-left: -60px;
+  transition: transform 0.2s ease, z-index 0.2s ease;
+}
+.game .right-panel #player-upgrades #player-upgrades-container .upgrade-wrapper:first-child,
+.game .right-panel #player-upgrades #player-consumables-container .upgrade-wrapper:first-child {
+  margin-left: 0;
+}
+.game .right-panel #player-upgrades #player-upgrades-container .upgrade-wrapper:hover,
+.game .right-panel #player-upgrades #player-consumables-container .upgrade-wrapper:hover {
+  z-index: 10;
+  transform: translateY(-15px);
 }
 .game .right-panel #body {
   position: relative;
