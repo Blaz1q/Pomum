@@ -17,7 +17,8 @@ export const MODIFIERS = {
     Gold: "gold",
     Silver: "silver",
     Chip: "chip",
-    Negative: "negative"
+    Negative: "negative",
+    Mult: "mult"
 };
 export const STAGES = {
     Game: "game",

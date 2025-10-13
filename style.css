@@ -1,4 +1,5 @@
 @charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Jersey+25&display=swap");
 body, html {
   margin: 0;
   font-family: "Segoe UI", Roboto, sans-serif;
@@ -317,6 +318,8 @@ canvas#glcanvas {
 /* Price above the card */
 /* Card */
 .upgrade-wrapper, .boss-wrapper {
+  font-family: "Jersey 25", sans-serif;
+  letter-spacing: 0.5px;
   position: relative;
   display: inline-flex;
   flex-direction: column;
@@ -422,14 +425,14 @@ canvas#glcanvas {
   color: #fff;
   padding: 0.5rem;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
   z-index: 10;
 }
 .upgrade-wrapper .upgrade-desc p, .boss-wrapper .upgrade-desc p {
-  font-size: 0.9rem;
+  font-size: 1.1rem;
 }
 .upgrade-wrapper:hover .upgrade-desc, .boss-wrapper:hover .upgrade-desc {
   opacity: 1;

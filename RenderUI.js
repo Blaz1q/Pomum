@@ -291,7 +291,7 @@ displayPlayerUpgrades() {
         // Card inner
         const cardInner = document.createElement("div");
         cardInner.className = "upgrade-inner";
-        if(up.modifier==MODIFIERS.Negative){
+        if(up.negative==true){
             cardInner.classList.add("negative");
         }
         cardInner.style.backgroundImage = `url('${up.image}')`;
@@ -307,12 +307,12 @@ displayPlayerUpgrades() {
         desc.className = "upgrade-desc";
         desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p>`;
         if(up.modifier!=MODIFIERS.None){
-            desc.innerHTML = `<h1>${up.name}</h1><p>${Style.Chance(up.modifier)}</p><p>${up.description(this.game)}</p>`;
+            desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p><p>${Style.Chance(up.modifier)}</p>`;
         }
         wrapper.addEventListener("mouseenter", () => {
             desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p>`;
             if(up.modifier!=MODIFIERS.None){
-                desc.innerHTML = `<h1>${up.name}</h1><p>${Style.Chance(up.modifier)}</p><p>${up.description(this.game)}</p>`;
+                desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p><p>${Style.Chance(up.modifier)}</p>`;
             }
         });
         if(displayButtons){

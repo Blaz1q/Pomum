@@ -16,12 +16,7 @@ function removeTrigger(game, trigger, triggeredFunction, upgrade) {
 
 // === TRIGGER HELPERS ===
 function addUpgradeTriggers(game, upgrade) {
-  if (!upgrade.props) return;
-  for (const [propName, fn] of Object.entries(upgrade.props)) {
-    if (typeof fn === "function" && GAME_TRIGGERS[propName]) {
-      game.on(GAME_TRIGGERS[propName], fn, upgrade);
-    }
-  }
+  Upgrade.addUpgradeTriggers(game,upgrade);
 }
 
 function removeUpgradeTriggers(game, upgrade) {
@@ -516,7 +511,8 @@ export const upgradeBlueprints = [
     remove(game) {
       removeUpgradeTriggers(game, this);
     },
-    price: 8
+    price: 8,
+    props: {mult:1}
   },
 
   {

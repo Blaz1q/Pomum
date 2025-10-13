@@ -1,6 +1,7 @@
 import { Upgrade,Consumable,Voucher,ConsumablePack } from "./upgradeBase.js";
 import { Style } from "./RenderUI.js";
 import { upgradesList } from "./upgrade.js";
+import { MODIFIERS } from "./dictionary.js";
 export const consumableList = [];
 export const consumablePacks = [];
 export const vouchers = [];
@@ -184,6 +185,70 @@ const consumableSilverBlueprints = [
         props: {image: 'lvlup_coconut_silver'}
     }
 ];
+const consumableUpgradeBlueprints = [
+    {
+        name: "Negative",
+        description(game){
+            return 'losowy upgrade staje się negative.';
+        },
+        effect(game){
+            if(game.upgrades.length==0) return;
+            let upgrades = game.upgrades.filter( upgrade => (upgrade.negative!=true));
+            let index = Math.floor(Math.random() * upgrades.length); 
+            upgrades[index].negative = true;
+            game.maxUpgrades+=1;
+            game.GameRenderer.displayUpgradesCounter();
+            game.GameRenderer.displayPlayerUpgrades();
+        },
+        price: 8,
+        props: {image: 'default'}
+    },
+    {
+        name: "Copy",
+        description(game){
+            return "Kopiuje losowe ulepszenie, usuwa reszte.";
+        },
+        effect(game){
+            if(game.upgrades.length==0) return;
+            let index = Math.floor(Math.random()*game.upgrades.length);
+            let copy = game.upgrades[index];
+            let copyBp = upgradesList.filter(up => 
+                up.name === copy.name
+            )[0];
+            //console.log(copyBp);
+            let copyUpgrade = new Upgrade(copyBp.name,copyBp.descriptionfn,copyBp.effect,copyBp.remove,copyBp.price,copyBp.props);
+            copyUpgrade.bought = true;
+            copyUpgrade.modifier = copy.modifier;
+            copyUpgrade.props = JSON.parse(JSON.stringify(copy.props));
+            copyUpgrade.apply(game);
+            console.log(copy);
+            console.log(copyUpgrade);
+            game.upgrades = [];
+            game.upgrades.push(copy,copyUpgrade);  
+            game.GameRenderer.displayPlayerUpgrades();
+            game.GameRenderer.displayUpgradesCounter();
+        },
+        price: 8,
+        props: {image: 'default'}
+    },
+    {
+        name: "Foiled",
+        description(game){
+            return `Losowe ulepszenie stanie się ${Style.Chance("Foiled")} lub ${Style.Chance("Holo")}`;
+        },
+        effect(game){
+            if(game.upgrades.length==0) return;
+            let index = Math.floor(Math.random()*game.upgrades.length);
+            let upgrade = game.upgrades[index];
+            if(Math.random()<0.5)
+                upgrade.modifier = MODIFIERS.Chip;
+            else
+                 upgrade.modifier = MODIFIERS.Mult;
+            upgrade.addSpecial(game);
+            game.GameRenderer.displayPlayerUpgrades();
+        }
+    }
+]
 const consumableGoldBlueprints = [
     {
         name: "Gold Jabłko",
@@ -271,7 +336,10 @@ function evilfunc(game,fruit){
 }
 const voucher = new Voucher(
     "Voucher",
-    `Zwiększa upgrade slot o 1`,
+    function(game){
+        return `Zwiększa miejsce na ulepszenia o 1. (Obecnie ${Style.Chance(game.maxUpgrades)} -> ${Style.Chance(game.maxUpgrades+1)})`
+    }
+    ,
     function (game){
         game.maxUpgrades+=1;
         game.GameRenderer.displayUpgradesCounter();
@@ -346,8 +414,11 @@ consumableGoldBlueprints.forEach(consumable => {
 consumableSilverBlueprints.forEach(consumable => {
     consumable.type = "Consumable";
 });
+consumableUpgradeBlueprints.forEach(consumable => {
+    consumable.type = "Consumable";
+});
 pomumpackItems.push(...consumableBlueprints);
-consumableList.push(...consumableBlueprints,...consumableGoldBlueprints,...consumableSilverBlueprints);
+consumableList.push(...consumableBlueprints,...consumableGoldBlueprints,...consumableSilverBlueprints,...consumableUpgradeBlueprints);
 const pomumpackSmall = new ConsumablePack("Pomumpack",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,4);
 const pomumpackBig = new ConsumablePack("Poumpack BIG",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,6,{maxSelect: 1,maxRoll: 4,image: 'pomumpackbig'});
 const pomumpackMega = new ConsumablePack("Poumpack MEGA",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},pomumpackItems,8,{maxSelect: 2,maxRoll: 5,image: 'pomumpackmega'});

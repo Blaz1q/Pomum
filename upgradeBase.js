@@ -1,4 +1,4 @@
-import { MODIFIERS, UPGRADE_RARITY } from "./dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, UPGRADE_RARITY, UPGRADE_STATES } from "./dictionary.js";
 
 export class Upgrade {
   constructor(name,descriptionfn, effect, remove, price = 2,props = {}) {
@@ -10,13 +10,107 @@ export class Upgrade {
     this.sellPrice = props.sellPrice ?? Math.round(price/2);
     this.active = true;
     this.bought = false;
+    this.negative = false;
     this.type = "Upgrade";
     this.image = `./images/cards/${props.image ? props.image.toLowerCase() : name.toLowerCase()}.png`
     this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.Common;
     this.modifier = MODIFIERS.None;
-    this.props = {
-      ...props
-    };
+    this.specialFunc;
+    this.props = {...props};
+  }
+  addChip(game){
+    game.tempscore+=50;
+    game.GameRenderer.displayTempScore();
+    return UPGRADE_STATES.Score;
+  }
+  addMult(game){
+    game.mult+=5;
+    game.GameRenderer.displayTempScore();
+    return UPGRADE_STATES.Score;
+  }
+  addSpecial(game){
+    if(this.modifier==MODIFIERS.Chip){
+      this.specialFunc = () => this.addChip(game);
+    }
+    else if(this.modifier==MODIFIERS.Mult){
+      this.specialFunc= ()=> this.addMult(game);
+    }
+    if(typeof this.specialFunc==="function")
+      game.on(GAME_TRIGGERS.onScore,this.specialFunc,this);
+  }
+  removeSpecial(game){
+    if(typeof this.specialFunc!=="function") return;
+    Upgrade.removeTrigger(game,GAME_TRIGGERS.onScore,this.specialFunc,this);
+    this.modifier = MODIFIERS.None;
+  }
+  static removeTrigger(game, trigger, triggeredFunction, upgrade) {
+    game.triggers[trigger] = game.triggers[trigger].filter(
+      h => !(h.handler === triggeredFunction && h.upgrade === upgrade)
+    );
+  }
+  static addUpgradeTriggers(game, upgrade) {
+    if (!upgrade.props) return;
+    for (const [propName, fn] of Object.entries(upgrade.props)) {
+      if (typeof fn === "function" && GAME_TRIGGERS[propName]) {
+        game.on(GAME_TRIGGERS[propName], fn, upgrade);
+      }
+    }
+  }
+  static CopyUpgrade(upgrade) {
+    // Deep clone the props to avoid reference sharing
+    const clonedProps = JSON.parse(JSON.stringify(upgrade.props));
+
+    // Determine the correct subclass type
+    let newUpgrade;
+    switch (upgrade.type) {
+      case "Consumable":
+        newUpgrade = new Consumable(
+          upgrade.name,
+          upgrade.descriptionfn,
+          upgrade.effect,
+          upgrade.price,
+          clonedProps
+        );
+        break;
+      case "Voucher":
+        newUpgrade = new Voucher(
+          upgrade.name,
+          upgrade.descriptionfn,
+          upgrade.effect,
+          upgrade.price,
+          clonedProps
+        );
+        break;
+      case "ConsumablePack":
+        newUpgrade = new ConsumablePack(
+          upgrade.name,
+          upgrade.descriptionfn,
+          upgrade.consumables ? [...upgrade.consumables] : [],
+          upgrade.price,
+          clonedProps
+        );
+        break;
+      default:
+        newUpgrade = new Upgrade(
+          upgrade.name,
+          upgrade.descriptionfn,
+          upgrade.effect,
+          upgrade.remove,
+          upgrade.price,
+          clonedProps
+        );
+        break;
+    }
+
+    // Copy over simple fields
+    newUpgrade.sellPrice = upgrade.sellPrice;
+    newUpgrade.active = upgrade.active;
+    newUpgrade.bought = upgrade.bought;
+    newUpgrade.image = upgrade.image;
+    newUpgrade.rarity = upgrade.rarity;
+    newUpgrade.modifier = upgrade.modifier;
+    newUpgrade.negative = upgrade.negative;
+    return newUpgrade;
   }
   description(game){
     if (typeof this.descriptionfn === "function") {
@@ -44,6 +138,7 @@ export class Upgrade {
       game.GameRenderer.displayUpgradesCounter();
     }
     this.remove.call(this, game); // this wewnątrz remove wskazuje na instancję
+    this.removeSpecial(game);
     game.money += Math.floor(this.sellPrice);
   }
 }
@@ -87,6 +182,17 @@ export class ConsumablePack extends Upgrade{
       if(c.type=="Consumable"){
         return new Consumable(c.name, c.description, c.effect, c.price, c.props);
       }else if(c.type=="Upgrade"){
+        let upgrade = new Upgrade(c.name,c.descriptionfn,c.effect,c.remove,c.price,c.props);
+        if(game.shopRand() < 0.0075){
+          upgrade.modifier = MODIFIERS.Negative;
+          if(game.shopRand() < 0.05){
+                if(game.shopRand()<0.5){
+                    upgrade.modifier=MODIFIERS.Chip;
+                }else{
+                    upgrade.modifier=MODIFIERS.Mult;
+                }
+            }
+        }
         return new Upgrade(c.name,c.descriptionfn,c.effect,c.remove,c.price,c.props);
       }
       return null;

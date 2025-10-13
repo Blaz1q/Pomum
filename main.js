@@ -163,7 +163,14 @@ async emit(event, payload) {
         );
         picked.forEach(upgrade => {
             if(this.shopRand() < 0.0075){
-                upgrade.modifier = MODIFIERS.Negative;
+                upgrade.negative = true;
+            }
+            if(this.shopRand() < 0.01){
+                if(this.shopRand()<0.5){
+                    upgrade.modifier=MODIFIERS.Chip;
+                }else{
+                    upgrade.modifier=MODIFIERS.Mult;
+                }
             }
         });
         console.log(picked);
@@ -444,6 +451,7 @@ trySwap(x1, y1, x2, y2) {
     }
     sell(upgrade){
         if(this.stage!==STAGES.Shop) return false; // not in shop -> can't sell
+        Audio.playSound('sell.mp3');
         if(upgrade.type=="Upgrade"){
             const index = this.upgrades.indexOf(upgrade) ?? -1;
             if(index==-1) return;
