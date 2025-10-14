@@ -124,7 +124,7 @@ export class Upgrade {
 
   apply(game) {
     this.bought = true;
-    if(this.modifier==MODIFIERS.Negative){
+    if(this.negative==true){
       game.maxUpgrades+=1;
       game.GameRenderer.displayUpgradesCounter();
     }
@@ -133,7 +133,7 @@ export class Upgrade {
 
   sell(game) {
     this.bought = false;
-    if(this.modifier==MODIFIERS.Negative){
+    if(this.modifier==true){
       game.maxUpgrades-=1;
       game.GameRenderer.displayUpgradesCounter();
     }
