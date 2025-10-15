@@ -18,6 +18,23 @@ export class Upgrade {
     this.specialFunc;
     this.props = {...props};
   }
+  changeModifier(game,modifier){
+    this.modifier = modifier;
+    if(this.modifier==MODIFIERS.Mult){
+      this.price+=2;
+    }
+    if(this.modifier==MODIFIERS.Chip){
+      this.price+=1;
+    }
+    //playsound;
+  }
+  changeNegative(game,negative){
+    this.negative = negative;
+    if(this.negative){
+      this.price+=5;
+    }
+    //playsound
+  }
   addChip(game){
     game.tempscore+=50;
     game.GameRenderer.displayTempScore();
@@ -128,6 +145,7 @@ export class Upgrade {
       game.maxUpgrades+=1;
       game.GameRenderer.displayUpgradesCounter();
     }
+    this.addSpecial(game);
     this.effect.call(this, game); // this wewnątrz effect wskazuje na instancję
   }
 
@@ -183,17 +201,17 @@ export class ConsumablePack extends Upgrade{
         return new Consumable(c.name, c.description, c.effect, c.price, c.props);
       }else if(c.type=="Upgrade"){
         let upgrade = new Upgrade(c.name,c.descriptionfn,c.effect,c.remove,c.price,c.props);
-        if(game.shopRand() < 0.0075){
-          upgrade.modifier = MODIFIERS.Negative;
-          if(game.shopRand() < 0.05){
+        if(game.shopRand() < 0.01){
+          upgrade.changeNegative(game,true);
+        }
+        if(game.shopRand() < 0.2){
                 if(game.shopRand()<0.5){
-                    upgrade.modifier=MODIFIERS.Chip;
+                    upgrade.changeModifier(game,MODIFIERS.Chip);
                 }else{
-                    upgrade.modifier=MODIFIERS.Mult;
+                    upgrade.changeModifier(game,MODIFIERS.Mult);
                 }
             }
-        }
-        return new Upgrade(c.name,c.descriptionfn,c.effect,c.remove,c.price,c.props);
+        return upgrade;
       }
       return null;
     });
@@ -214,6 +232,19 @@ export class Consumable extends Upgrade{
         this.image = `./images/consumables/${props.image ? props.image.toLowerCase() : 'default'}.png`
     }
     apply(game){
+      this.bought = true;
+      if(this.negative==true){
+        game.maxConsumables+=1;
+        game.GameRenderer.displayConsumablesCounter();
+      }
         this.effect.call(this,game);
     }
+    sell(game) {
+    this.bought = false;
+    if(this.modifier==true){
+      game.maxConsumables-=1;
+      game.GameRenderer.displayConsumablesCounter();
+    }
+    game.money += Math.floor(this.sellPrice);
+  }
 }

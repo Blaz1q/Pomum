@@ -115,10 +115,10 @@ export const upgradeBlueprints = [
       game.moves -= 2;
       game.moveBox.innerHTML = game.movescounter + "/" + game.moves;
       this.setProps({
-        onMove: () => {
+        onScore: () => {
           game.tempscore += 250;
           game.GameRenderer.displayScore();
-          return UPGRADE_STATES.Active;
+          return UPGRADE_STATES.Score;
         }
       });
       addUpgradeTriggers(game, this);

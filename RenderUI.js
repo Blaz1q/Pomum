@@ -6,15 +6,44 @@ import { rollBoss } from "./Boss.js";
 export class RenderUI {
     constructor(game) {
         this.game = game;
+        this.moneyBox = document.getElementById("money");
+        this.movesBox;
+        this.scoreBox;
     }
     displayMoves() {
         this.game.moveBox.innerHTML = this.game.movescounter + "/" + this.game.moves;
     }
 
     displayMoney() {
-        this.game.moneyBox.innerHTML = this.game.money;
+        this.moneyBox.innerHTML = '$'+this.game.money;
     }
-
+    updateMoney(ammount){
+        let moneyContainer = document.getElementsByClassName('money')[0];
+        if(ammount==0){
+            return;
+        }
+        let char = '';
+        if(ammount<0){
+            char='-';
+            moneyContainer.classList.add('lost');
+        }else{
+            char = '+';
+            moneyContainer.classList.add('earned');
+        }
+        ammount = Math.abs(ammount);
+        this.moneyBox.innerHTML = char+'$'+ammount;
+        setTimeout(()=>{
+            this.displayMoney();
+            moneyContainer.className = 'money';
+        },300);
+    }
+    notEnoughMoney(){
+        let moneyContainer = document.getElementsByClassName('money')[0];
+        moneyContainer.classList.add('notEnough');
+        setTimeout(()=>{
+            moneyContainer.classList.remove('notEnough');
+        },400);    
+    }
     displayRound() {
         this.game.roundBox.innerHTML = this.game.round;
     }
@@ -143,6 +172,9 @@ displayPlayerConsumables(){
     const consumables = this.displayUpgrades(this.game.consumables, { bought: true });
     playerConsumables.appendChild(consumables);
 }
+updatePlayerUpgrade(upgrade){
+
+}
 displayPlayerUpgrades() {
     const playerUpgrades = document.getElementById("player-upgrades-container");
     playerUpgrades.innerHTML = "";
@@ -206,14 +238,14 @@ displayPlayerUpgrades() {
         return document.querySelectorAll('#player-upgrades-container .upgrade-wrapper.bought')[upgradeid];
     }
     upgradeTrigger(upgrade,delay){
-        console.log(`upgrade trigger: ${upgrade.name}`);
+        console.log(`upgrade trigger: ${upgrade.name}`,performance.now());
         const gameupgrades = this.game.upgrades;
         const index = gameupgrades.indexOf(upgrade);
         if(index<0) return;
         let upgradecard = this.getPlayerUpgrades(index);
 
-        const descElement = upgradecard.querySelector(".upgrade-desc p");
-        descElement.innerHTML = upgrade.description(this.game);
+        const descElement = upgradecard.querySelector(".upgrade-desc");
+        descElement.innerHTML = this.createDescription(upgrade);
 
         const upgradePrice = upgradecard.querySelector(".upgrade-price");
         upgradePrice.innerHTML = "$"+upgrade.sellPrice;
@@ -221,7 +253,7 @@ displayPlayerUpgrades() {
                 upgradecard.classList.add("triggered");
             setTimeout(()=>{
                 upgradecard.classList.remove("triggered");
-            },500);
+            },300);
         },delay)
     }
     displayUpgradesInShop() {
@@ -234,6 +266,17 @@ displayPlayerUpgrades() {
         bossContainer.innerHTML = "";
         this.game.nextBoss = rollBoss(this.game);
         bossContainer.appendChild(this.displayBoss(this.game.nextBoss));
+    }
+    createDescription(upgrade){
+        let description=`<h1>${upgrade.name}</h1>`;
+        if(upgrade.negative==true){
+            description += `<p>${Style.Chance('negative')}</p>`;
+        }
+        description += `<p>${upgrade.description(this.game)}</p>`;
+        if(upgrade.modifier!=MODIFIERS.None){
+            description += `<p>${Style.Chance(upgrade.modifier)}</p>`;
+        }
+        return description;
     }
     displayBossCounter(){
         const counter = document.getElementById("bosscounter");
@@ -269,7 +312,6 @@ displayPlayerUpgrades() {
     if(params.origin && params.origin.type == "ConsumablePack"){
         this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
     }
-
     upgrades.forEach(up => {
         const wrapper = document.createElement("div");
         const originalZ = wrapper.style.zIndex || 0;
@@ -291,7 +333,7 @@ displayPlayerUpgrades() {
         // Card inner
         const cardInner = document.createElement("div");
         cardInner.className = "upgrade-inner";
-        if(up.negative==true){
+        if(up.negative){
             cardInner.classList.add("negative");
         }
         cardInner.style.backgroundImage = `url('${up.image}')`;
@@ -305,15 +347,10 @@ displayPlayerUpgrades() {
         // Description
         const desc = document.createElement("div");
         desc.className = "upgrade-desc";
-        desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p>`;
-        if(up.modifier!=MODIFIERS.None){
-            desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p><p>${Style.Chance(up.modifier)}</p>`;
-        }
+        desc.innerHTML = this.createDescription(up);
+        
         wrapper.addEventListener("mouseenter", () => {
-            desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p>`;
-            if(up.modifier!=MODIFIERS.None){
-                desc.innerHTML = `<h1>${up.name}</h1><p>${up.description(this.game)}</p><p>${Style.Chance(up.modifier)}</p>`;
-            }
+            desc.innerHTML = this.createDescription(up);
         });
         if(displayButtons){
             wrapper.appendChild(this.createUpgradeButtons(wrapper,up,params));
@@ -346,7 +383,8 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
     function buy(game,upgrade,params){
         let success = false;
         if(game.money<upgrade.price){
-            console.log("not enough money")
+            console.log("not enough money");
+            game.GameRenderer.notEnoughMoney();
             return false;
         }
         if(upgrade.type==="Upgrade"&&game.upgrades.length>=game.maxUpgrades&&upgrade.modifier!=MODIFIERS.Negative){

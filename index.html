@@ -27,24 +27,46 @@
     <div class="left-panel">
       <div class="location">
         <div class="round">
-          <h1 id="location">Runda <b id="round">1</b></h1>
           <h2 id="opis">Zdobądź punkty aby przejść dalej</h2>
           <h1>Rundy do Bossa: <b id="bosscounter">4</b></h1>
         </div>
         <div id="boss-container"></div>
       </div>
       <div class="info">
-        <h2>Pieniądze: <b id="money">2</b></h2>
-        <h2>Ruchy: <b id="moves">0/10</b></h2>
-        <h2>Zdobądź: <b id="roundscore">0</b></h2>
-        <h2>Twój wynik: <b id="score">0</b></h2>
-        <h1>Wynik:</h1>
-        <div class="calcscore">
-          <div id="tempscore">0</div> x <div id="mult">1</div>
-        </div>
-      </div>
-      <div class="settings">
+        <table class="stats-table">
+          <tr>
+            <td class="roundscore" colspan="2">
+              <span class="label">Wynik rundy</span>
+              <span id="roundscore" class="value">0</span>
+            </td>
+          </tr>
 
+          <tr>
+            <td class="moves">
+              <span class="label">Ruchy</span>
+              <span id="moves" class="value">0 / 10</span>
+            </td>
+            <td class="roundlevel">
+              <span class="label">Runda</span>
+              <span id="round" class="value">1 / 1</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="score" colspan="2">
+              <span class="label">Twój wynik</span>
+              <span id="score" class="value">0</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="money" colspan="2">
+              <span id="money" class="value">$2</span>
+            </td>
+          </tr>
+        </table>
+        <section class="calcscore">
+          <span id="tempscore">0</span> x <span id="mult">1</span>
+        </section>
       </div>
     </div>
 

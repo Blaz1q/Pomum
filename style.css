@@ -93,6 +93,63 @@ canvas#glcanvas {
   margin-block-start: 0.4em;
   margin-block-end: 0.4em;
 }
+.game .left-panel .info .stats-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0.6rem;
+  font-family: "Jersey 25", sans-serif;
+  text-align: center;
+}
+.game .left-panel .info .stats-table td {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.4rem 0.5rem;
+  color: #fff;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.game .left-panel .info .stats-table td .label {
+  display: block;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.game .left-panel .info .stats-table td .value {
+  border-radius: 12px;
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 0.2rem;
+  letter-spacing: 1px;
+}
+.game .left-panel .info .stats-table .roundscore {
+  background-color: #72abe0;
+}
+.game .left-panel .info .stats-table .moves, .game .left-panel .info .stats-table .maxmoves {
+  background-color: #e4d147;
+  color: #222;
+}
+.game .left-panel .info .stats-table .score {
+  background-color: #e07272;
+}
+.game .left-panel .info .stats-table .roundlevel {
+  background-color: #86b587;
+}
+.game .left-panel .info .stats-table .money {
+  transition: background 200ms ease-out;
+  padding: 0.8rem 0.5rem;
+  background-color: #e5db1c;
+  color: #222;
+}
+.game .left-panel .info .stats-table .money.earned {
+  background-color: #62e51c;
+  transition: background 0s;
+}
+.game .left-panel .info .stats-table .money.lost {
+  background-color: #e5521c;
+  transition: background 0s;
+}
 .game .left-panel div {
   margin-bottom: 1em;
 }
@@ -121,7 +178,7 @@ canvas#glcanvas {
   justify-content: space-evenly;
   gap: 0.4rem;
 }
-.game .left-panel .calcscore div {
+.game .left-panel .calcscore span {
   padding: 0.35em 0.7em;
   min-width: 45px;
   text-align: center;
@@ -209,7 +266,6 @@ canvas#glcanvas {
 .game .right-panel #player-upgrades #player-upgrades-container .upgrade-wrapper:hover,
 .game .right-panel #player-upgrades #player-consumables-container .upgrade-wrapper:hover {
   z-index: 10;
-  transform: translateY(-15px);
 }
 .game .right-panel #body {
   position: relative;
@@ -426,6 +482,7 @@ canvas#glcanvas {
   padding: 0.5rem;
   border-radius: 6px;
   font-size: 0.8rem;
+  text-align: center;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -674,6 +731,10 @@ canvas#glcanvas {
   font-size: 0.75rem;
 }
 
+.notEnough {
+  animation: shake 0.4s ease-in-out;
+}
+
 @keyframes triggeredCard {
   0%, 20%, 50%, 80%, 100% {
     transform: scale(100%);
@@ -695,6 +756,32 @@ canvas#glcanvas {
   }
   100% {
     filter: invert(1);
+  }
+}
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-4px);
+  }
+  30% {
+    transform: translateX(4px);
+  }
+  45% {
+    transform: translateX(-3px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+  90% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: translateX(0);
   }
 }
 @keyframes skewCard {

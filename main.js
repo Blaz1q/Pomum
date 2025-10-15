@@ -15,7 +15,6 @@ export class Game{
     constructor(){
         //gold
         this.money = 2;
-        this.moneyBox = document.getElementById("money")
         this.goldChance = 0;
         //moves
         this.moves = 10;
@@ -24,7 +23,7 @@ export class Game{
         //game
         this.round = 0;
         this.level = 1;
-        
+        this.Audio = Audio;
         this.roundBox = document.getElementById("round");
         this.matrixsize = 9;
         this.stage = STAGES.Game;
@@ -84,6 +83,15 @@ export class Game{
         this.voucherRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
         this.boosterRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
     }
+    setSeed(seed){
+        this.seed = seed;
+        this.hash = cyrb128(this.seed);
+        this.rand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
+        this.shopRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
+        this.bossRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
+        this.voucherRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
+        this.boosterRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
+    }
     on(event, handler, upgrade) {
     this.triggers[event].push({ handler, upgrade });
     }
@@ -120,15 +128,15 @@ async emit(event, payload) {
             // Visual-only: queue visual but don't await it — handlers continue executing.
             visualChain = visualChain.then(() => {
                 this.GameRenderer.upgradeTrigger(upgrade, 0);
-                Audio.playSound("tick.mp3");
-                return wait(300);
+                this.Audio.playSound("tick.mp3");
+                return wait(350);
             });
         } else if (result === UPGRADE_STATES.Score) {
             // Visual + actual delay: queue the visual and WAIT for it to finish before continuing.
             visualChain = visualChain.then(() => {
                 this.GameRenderer.upgradeTrigger(upgrade, 0);
-                Audio.playSound("tick.mp3");
-                return wait(300);
+                this.Audio.playSound("tick.mp3");
+                return wait(350);
             });
             // Wait for the queued visuals (including any previously queued Active visuals)
             // so that Score blocks the next handler until visuals+delay finish.
@@ -163,13 +171,13 @@ async emit(event, payload) {
         );
         picked.forEach(upgrade => {
             if(this.shopRand() < 0.0075){
-                upgrade.negative = true;
+                upgrade.changeNegative(game,true);
             }
-            if(this.shopRand() < 0.01){
+            if(this.shopRand() < 0.05){
                 if(this.shopRand()<0.5){
-                    upgrade.modifier=MODIFIERS.Chip;
+                    upgrade.changeModifier(game,MODIFIERS.Chip);
                 }else{
-                    upgrade.modifier=MODIFIERS.Mult;
+                    upgrade.changeModifier(game,MODIFIERS.Mult);
                 }
             }
         });
@@ -198,9 +206,9 @@ async emit(event, payload) {
     rerollUpgrades(){
         if(this.money<4) return;
         this.money-=4;
-        Audio.playSound('buy.mp3');
+        this.Audio.playSound('buy.mp3');
         this.GameRenderer.displayUpgradesInShop();
-        this.GameRenderer.displayMoney();
+        this.GameRenderer.updateMoney(-4);
     }
     rerollBoosters(){
         if(this.money<2) return;
@@ -212,10 +220,11 @@ async emit(event, payload) {
         this.GameRenderer.gameOver();
     }
     endround(){
+        let addmoney = 0;
         this.GameRenderer.displayUpgradesCounter();
         this.GameRenderer.displayMoves();
         if(this.stage==STAGES.Boss){
-            this.money += this.nextBoss.moneyreward;
+            addmoney += this.nextBoss.moneyreward;
             this.nextBoss.revert(this);
             this.bosses.push(this.nextBoss);
             this.nextBoss = null;
@@ -230,10 +239,13 @@ async emit(event, payload) {
         }
         this.emit(GAME_TRIGGERS.onRoundEnd);
         this.locked = true;
-        this.money+=this.calcMoney();
+        addmoney+=this.calcMoney();
         this.movescounter=0;
-        this.money+=3;
-        this.GameRenderer.displayMoney();
+        addmoney+=3;
+        this.money+=addmoney;
+        this.Audio.playSound('buy.mp3');
+        this.GameRenderer.updateMoney(addmoney);
+        //this.GameRenderer.displayMoney();
         this.GameRenderer.displayUpgradesInShop();
         this.GameRenderer.displayBoosterPacks();
         this.GameRenderer.hideGame();
@@ -409,24 +421,25 @@ trySwap(x1, y1, x2, y2) {
             if (idx !== -1) {
                 this.consumables.splice(idx, 1); // removes the element in-place
             }
-            Audio.playSound('pop.mp3');
+            this.Audio.playSound('pop.mp3');
             this.GameRenderer.displayPlayerConsumables();
         }
     }
     buyanduse(upgrade){
         if(this.stage!==STAGES.Shop) return false;
         if(this.money<upgrade.price) return false;
-        Audio.playSound('buy.mp3');
+        this.Audio.playSound('buy.mp3');
         upgrade.apply(this);
         this.money -= upgrade.price;
-        this.GameRenderer.displayMoney();
+        this.GameRenderer.updateMoney(-upgrade.price);
+        //this.GameRenderer.displayMoney();
         return true;
     }
     buy(upgrade){
         console.log("buyin");
         if(this.stage!==STAGES.Shop) return false; // not in shop -> can't buy
         if(this.money<upgrade.price) return false; // not enough money
-        Audio.playSound('buy.mp3');
+        this.Audio.playSound('buy.mp3');
         console.log("buying true");
         if(upgrade.type=="Upgrade"){
             this.upgrades.push(upgrade);
@@ -440,18 +453,19 @@ trySwap(x1, y1, x2, y2) {
         }
         else if(upgrade.type=="ConsumablePack"){
             this.GameRenderer.OpenBoosterPack(upgrade);
-            Audio.playSound('pop.mp3');
+            this.Audio.playSound('pop.mp3');
         }else if(upgrade.type=="Voucher"){
             this.coupons.push(upgrade);
             upgrade.apply(this);
         }
         this.money -= upgrade.price;
-        this.GameRenderer.displayMoney();
+        this.GameRenderer.updateMoney(-upgrade.price);
+        //this.GameRenderer.displayMoney();
         return true;
     }
     sell(upgrade){
         if(this.stage!==STAGES.Shop) return false; // not in shop -> can't sell
-        Audio.playSound('sell.mp3');
+        this.Audio.playSound('sell.mp3');
         if(upgrade.type=="Upgrade"){
             const index = this.upgrades.indexOf(upgrade) ?? -1;
             if(index==-1) return;
@@ -459,19 +473,18 @@ trySwap(x1, y1, x2, y2) {
             this.upgrades[index].sell(this);
             this.upgrades.splice(index,1);
             this.GameRenderer.displayUpgradesCounter();
-            this.GameRenderer.displayMoney();
-            return true;
+            
         }
         else if(upgrade.type=="Consumable"){
             const index = this.consumables.indexOf(upgrade) ?? -1;
             if(index==-1) return;
             console.log("SELLINNN");
-            this.money+=upgrade.sellPrice;
+            this.consumables[index].sell(this);
             this.consumables.splice(index,1);
-            this.GameRenderer.displayMoney();
             this.GameRenderer.displayConsumablesCounter();
-            return true;
         }
+        this.GameRenderer.updateMoney(upgrade.sellPrice);
+        return true;
     }
 
     randomTile() {
@@ -1380,6 +1393,7 @@ createGhost(icon, xPx, yPx, w, h, classList = []) {
             setTimeout(()=>{
                 // fizycznie usuń z board
                 let groups = {};
+                let addmoney = 0;
                 for(const m of matches){
                     const tile = this.board[m.y][m.x];
                     let skip = false;
@@ -1391,8 +1405,7 @@ createGhost(icon, xPx, yPx, w, h, classList = []) {
                     let silver = tile.props.modifier==MODIFIERS.Silver;
                     let type = tile.icon;
                     if(gold){
-                        this.money++;
-                        this.GameRenderer.displayMoney();
+                        addmoney++;
                     }
                     if(silver){
                         this.mult = this.mult * 1.5;
@@ -1410,12 +1423,16 @@ createGhost(icon, xPx, yPx, w, h, classList = []) {
                     if(!tile.props.debuffed) this.tempscore += Math.round(tile.props.upgrade.score);
                     this.board[m.y][m.x] = null;
                 }
+                if(addmoney>0){
+                    this.Audio.playSound('buy.mp3');
+                    this.GameRenderer.updateMoney(addmoney);
+                }
                 for (let type in groups) {
                     let group = groups[type];
                     this.mult += group.mult;
                     this.mult = Math.round(this.mult * 100) / 100;
                 }
-                Audio.playSound('score_sound.mp3',this.pitch);
+                this.Audio.playSound('score_sound.mp3',this.pitch);
                 this.pitch+=0.2;
                 this.GameRenderer.displayTempScore();
                 // animacja spadania istniejących owoców
@@ -1432,8 +1449,11 @@ console.log(game.fruits);
 function startRound(){
     game.startround();
 }
-function startGame(){
+function startGame(seed = ""){
     game = new Game();
+    if(seed!=""){
+        game.setSeed(seed);   
+    }
     game.GameRenderer.hideMenu();
     game.GameRenderer.showGameContainer();
     game.GameRenderer.displayPlayerUpgrades();
@@ -1466,6 +1486,7 @@ function reroll(){
 function rerollBoosters(){
     game.rerollBoosters();
 }
+
 window.skip = skip;
 window.game = game;
 window.startRound = startRound; 
