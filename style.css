@@ -115,6 +115,37 @@ canvas#glcanvas {
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+.game .left-panel .info .stats-table td.button {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  color: #fff;
+  padding: 0;
+}
+.game .left-panel .info .stats-table td.button .label {
+  display: block;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.game .left-panel .info .stats-table td.button button {
+  width: 100%;
+  padding: 0.8rem 0.5rem;
+  border-radius: 12px;
+  border: 0;
+  color: white;
+  background-color: #e07272;
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.25);
+}
+.game .left-panel .info .stats-table td.button button:hover {
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
+}
+.game .left-panel .info .stats-table td.button button:active {
+  background-color: rgb(219.4040697674, 93.0959302326, 93.0959302326);
+}
 .game .left-panel .info .stats-table td .value {
   border-radius: 12px;
   display: block;
@@ -135,6 +166,10 @@ canvas#glcanvas {
 }
 .game .left-panel .info .stats-table .roundlevel {
   background-color: #86b587;
+}
+.game .left-panel .info .stats-table .playerscore {
+  color: #222;
+  background-color: #ffb35d;
 }
 .game .left-panel .info .stats-table .money {
   transition: background 200ms ease-out;
@@ -177,6 +212,7 @@ canvas#glcanvas {
   display: flex;
   justify-content: space-evenly;
   gap: 0.4rem;
+  color: black;
 }
 .game .left-panel .calcscore span {
   padding: 0.35em 0.7em;

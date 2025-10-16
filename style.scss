@@ -112,7 +112,6 @@ canvas#glcanvas {
   border-spacing: 0.6rem;
   font-family: "Jersey 25", sans-serif;
   text-align: center;
-
   td {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 12px;
@@ -128,7 +127,37 @@ canvas#glcanvas {
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-
+    &.button{
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      color: #fff;
+      padding: 0;
+      .label {
+      display: block;
+      font-size: 0.85rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      }
+      button{
+        width: 100%;
+        padding: 0.8rem 0.5rem;
+        border-radius: 12px;
+        border: 0;
+        color: white;
+        background-color: $mult;
+        display: block;
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.25);
+      &:hover{
+        box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
+      }
+      &:active{
+        background-color: darken($color: $mult, $amount: 5);
+      }
+      }
+    }
     .value {
       border-radius: 12px;
       display: block;
@@ -156,7 +185,10 @@ canvas#glcanvas {
   .roundlevel {
     background-color: $chance;
   }
-
+  .playerscore {
+    color: #222;
+    background-color: #ffb35d;
+  }
   .money {
     &.earned{
       background-color: #62e51c;
@@ -210,7 +242,7 @@ canvas#glcanvas {
     display: flex;
     justify-content: space-evenly;
     gap: 0.4rem;
-
+    color: black;
     span {
       padding: 0.35em 0.7em;
       min-width: 45px;

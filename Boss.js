@@ -26,7 +26,7 @@ const BossBlueprints = [
     {
         name: "Snake",
         descriptionfn(game){
-            return `Wszystkie ${game.fruits[0].icon} są zdebuffowane`;
+            return `Wszystkie ${game.fruits[0].icon} nie dają punktów`;
         },
         effect(game){
             game.fruits[0].props.debuffed = true;
@@ -39,7 +39,7 @@ const BossBlueprints = [
     {
         name: "Bear",
         descriptionfn(game){
-            return `Wszystkie ${game.fruits[1].icon} są zdebuffowane`;
+            return `Wszystkie ${game.fruits[1].icon} nie dają punktów`;
         },
         effect(game){
             game.fruits[1].props.debuffed = true;
@@ -51,7 +51,7 @@ const BossBlueprints = [
     {
         name: "Sponge",
         descriptionfn(game){
-            return `Wszystkie ${game.fruits[2].icon} są zdebuffowane`;
+            return `Wszystkie ${game.fruits[2].icon} nie dają punktów`;
         },
         effect(game){
             game.fruits[2].props.debuffed = true;
@@ -63,7 +63,7 @@ const BossBlueprints = [
     {
         name: "Vine",
         descriptionfn(game){
-            return `Wszystkie ${game.fruits[3].icon} są zdebuffowane`;
+            return `Wszystkie ${game.fruits[3].icon} nie dają punktów`;
         },
         effect(game){
             game.fruits[3].props.debuffed = true;
@@ -75,7 +75,7 @@ const BossBlueprints = [
     {
         name: "Crab",
         descriptionfn(game){
-            return `Wszystkie ${game.fruits[4].icon} są zdebuffowane`;
+            return `Wszystkie ${game.fruits[4].icon} nie dają punktów`;
         },
         effect(game){
             game.fruits[4].props.debuffed = true;
@@ -89,8 +89,8 @@ const BossBlueprints = [
         name: "Wave",
         descriptionfn(game){
             if(this.props.chosenFruit!=null)
-                return `Najczęstrzy owoc (${this.props.chosenFruit.icon}) jest zdebuffowany.`;
-            return `Najczęstrzy owoc jest zdebuffowany.`
+                return `Najczęstrzy owoc (${this.props.chosenFruit.icon}) nie dają punktów.`;
+            return `Najczęstrzy owoc nie daje punktów.`
         },
         effect(game){
             const fruit = game.getTopFruit();

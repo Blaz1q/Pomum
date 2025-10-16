@@ -708,7 +708,7 @@ export const upgradeBlueprints = [
         onMatch: () => {
           if(Math.random() < 0.05){
             game.money+=20;
-            game.GameRenderer.displayMoney();
+            game.GameRenderer.updateMoney(20);
             return UPGRADE_STATES.Active;
           } 
           return UPGRADE_STATES.Failed;

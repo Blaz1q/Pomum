@@ -425,7 +425,7 @@ const pomumpackMega = new ConsumablePack("Poumpack MEGA",function(){return `Znaj
 
 const pomumpackGold = new ConsumablePack("Pomumpack GOLD",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},consumableGoldBlueprints,4,{maxSelect: 1,maxRoll: 3,image: 'pomumpack_gold'});
 const pomumpackSilver = new ConsumablePack("Pomumpack SILVER",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`},consumableSilverBlueprints,4,{maxSelect: 1,maxRoll: 3,image: 'pomumpack_silver'});
-const pomumpackUpgrade = new ConsumablePack("Pomumpack Upgrade",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń. Możesz wybrać maksymalnie ${this.props.maxSelect}`},upgradesList,4,{maxSelect: 1,maxRoll: 3,image: 'pomumpack'});
+const pomumpackUpgrade = new ConsumablePack("Pomumpack Upgrade",function(){return `Znajdują się ${this.props.maxRoll} karty ulepszeń. Możesz wybrać maksymalnie ${this.props.maxSelect}`},upgradesList,4,{maxSelect: 1,maxRoll: 3,image: 'pomumpackupgrade'});
 consumablePacks.push(pomumpackSmall);
 consumablePacks.push(pomumpackBig);
 consumablePacks.push(pomumpackMega);
