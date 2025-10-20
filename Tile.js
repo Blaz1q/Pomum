@@ -39,4 +39,11 @@ export class Tile {
             this.props.detonations = detonations;
         }
     }
+    levelUp(){
+        let upgrade = this.props.upgrade;
+        upgrade.level +=1;
+        upgrade.mult+=0.4;
+        upgrade.mult = Math.round(upgrade.mult * 100) / 100;
+        upgrade.score+=2;
+    }
 }

@@ -1,7 +1,8 @@
 console.log("Upgrade");
-import { Upgrade } from "./upgradeBase.js";
+import { Consumable, Upgrade } from "./upgradeBase.js";
 import { GAME_TRIGGERS, MODIFIERS, STAGES, TYPES, UPGRADE_STATES } from "./dictionary.js";
 import { Style } from "./RenderUI.js";
+import { consumableList } from "./consumable.js";
 
 
 export const upgradesList = [];
@@ -968,13 +969,12 @@ export const upgradeBlueprints = [
   },
   remove(game){
     game.special[1].props.percent -= 1;
-    return UPGRADE_STATES.Active;
   },
   price: 4,
   props: {image: 'boom'}
 },
 {
-  name: "",
+  name: "Boom?",
   descriptionfn(game){
     return `${game.special[0].icon} i ${game.special[1].icon} detonują się 1 raz więcej.`;
   },
@@ -988,6 +988,43 @@ export const upgradeBlueprints = [
   },
   price: 4,
   props: {image: 'boom'}
+},
+{
+  name: "lvlup",
+  descriptionfn(game){
+    return `Daje kartę ulepszeń dla pierwszego zniszczonego owoca (jeśli jest miejsce)`;
+  },
+  effect(game){
+    this.setProps({
+      chosenFruit: null,
+      onMove: (matches)=>{
+        if(game.consumables.length>=game.maxConsumables) return UPGRADE_STATES.Failed;
+        if(this.props.chosenFruit!=null) return UPGRADE_STATES.Failed;
+        console.log(matches);
+        let match = matches.filter(m => m.fruit.type === TYPES.Fruit);
+        const firstFruit = match[0]?.fruit ?? null; //fix this
+        this.props.chosenFruit = firstFruit;
+        const pool = consumableList.filter(cons => cons?.props?.getFruit?.(game)?.icon === this.props.chosenFruit.icon);
+        const rc = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null;
+        let consumable = new Consumable(rc.name,rc.description,rc.effect,rc.price,rc.props);
+        game.consumables.push(consumable);
+        game.Audio.playSound('pop.mp3');
+        game.GameRenderer.displayPlayerConsumables();
+        game.GameRenderer.displayConsumablesCounter();
+        return UPGRADE_STATES.Active;  
+      },
+      onRoundEnd: ()=>{
+        this.props.chosenFruit = null;
+        return UPGRADE_STATES.Active;
+      }
+    });
+    addUpgradeTriggers(game,this);
+  },
+  remove(game){
+     removeUpgradeTriggers(game, this);
+  },
+  price: 8,
+  props: defaultimage
 }
   ];
 upgradeBlueprints.forEach(upgrade => {

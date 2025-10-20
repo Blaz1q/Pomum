@@ -364,7 +364,7 @@ trySwap(x1, y1, x2, y2) {
         // trigger special if exists
         if (special) {
             let triggerMatches = this.triggerSpecial(special.x, special.y, special.tile, { includeSwapped: true, swappedX: special.swappedX, swappedY: special.swappedY });
-            this.emit(GAME_TRIGGERS.onMove,matches);
+            this.emit(GAME_TRIGGERS.onMove,triggerMatches);
             this.processMatches(triggerMatches);
             //matches.push(...triggerMatches);
         }
