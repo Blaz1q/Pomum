@@ -455,7 +455,7 @@ export const upgradeBlueprints = [
       removeUpgradeTriggers(game, this);
     },
     price: 6,
-    props: defaultimage
+    props: {image: 'grapeinterest'}
   },
 
   {
@@ -806,7 +806,6 @@ export const upgradeBlueprints = [
       removeUpgradeTriggers(game,this);
     },
     price: 6,
-    props: defaultimage
   },
   {
     name: "Tutti Frutti",
@@ -1024,7 +1023,6 @@ export const upgradeBlueprints = [
      removeUpgradeTriggers(game, this);
   },
   price: 8,
-  props: defaultimage
 }
   ];
 upgradeBlueprints.forEach(upgrade => {

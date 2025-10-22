@@ -151,7 +151,7 @@ export class Upgrade {
 
   sell(game) {
     this.bought = false;
-    if(this.modifier==true){
+    if(this.negative){
       game.maxUpgrades-=1;
       game.GameRenderer.displayUpgradesCounter();
     }

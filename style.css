@@ -265,7 +265,6 @@ canvas#glcanvas {
   flex-wrap: nowrap;
   justify-content: space-evenly;
   align-items: flex-start;
-  overflow: visible;
   gap: 0;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.378);
@@ -465,9 +464,9 @@ canvas#glcanvas {
   width: 120px;
   height: 180px;
   position: relative;
-  overflow: visible; /* allow image to scale outside */
   cursor: pointer;
-  animation: skewCard 3s infinite;
+  transform-style: preserve-3d;
+  animation: skewCard 6s infinite ease-in-out;
   transition: box-shadow 0.2s ease;
   z-index: 5;
 }
@@ -496,15 +495,15 @@ canvas#glcanvas {
   background-position: center;
   display: flex;
   align-items: flex-end;
-  transition: transform 0.2s ease;
+  transition: filter 0.3s ease, transform 0.3s ease;
   transform-origin: center center; /* scale from center */
 }
 .upgrade-wrapper .upgrade-card:hover, .boss-wrapper .upgrade-card:hover {
-  animation-play-state: paused;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+  animation: none;
+  filter: drop-shadow(0 10px 0 rgba(0, 0, 0, 0.35));
 }
 .upgrade-wrapper .upgrade-card:hover .upgrade-inner, .boss-wrapper .upgrade-card:hover .upgrade-inner {
-  transform: translateY(-5px) scale(1.05) skew(0);
+  transform: translateY(-5px) scale(1.05) rotateX(0deg) rotateY(0deg);
 }
 .upgrade-wrapper .upgrade-desc, .boss-wrapper .upgrade-desc {
   position: absolute;
@@ -822,21 +821,27 @@ canvas#glcanvas {
 }
 @keyframes skewCard {
   0% {
-    transform: skew(-1deg, -0.5deg);
+    transform: rotateX(10deg) rotateY(-15deg);
+    filter: drop-shadow(3px 8px 0px rgba(0, 0, 0, 0.35));
   }
   20% {
-    transform: skew(0.5deg, 1deg);
+    transform: rotateX(-10deg) rotateY(-15deg);
+    filter: drop-shadow(-3px 8px 0px rgba(0, 0, 0, 0.35));
   }
   40% {
-    transform: skew(1deg, 0deg);
+    transform: rotateX(-10deg) rotateY(15deg);
+    filter: drop-shadow(-3px 4px 0px rgba(0, 0, 0, 0.3));
   }
   60% {
-    transform: skew(0deg, -1deg);
+    transform: rotateX(10deg) rotateY(15deg);
+    filter: drop-shadow(3px 4px 0px rgba(0, 0, 0, 0.3));
   }
   80% {
-    transform: skew(-0.5deg, 0.5deg);
+    transform: rotateX(-10deg) rotateY(-15deg);
+    filter: drop-shadow(-3px 8px 0px rgba(0, 0, 0, 0.35));
   }
   100% {
-    transform: skew(-1deg, -0.5deg);
+    transform: rotateX(10deg) rotateY(-15deg);
+    filter: drop-shadow(3px 8px 0px rgba(0, 0, 0, 0.35));
   }
 }/*# sourceMappingURL=style.css.map */
