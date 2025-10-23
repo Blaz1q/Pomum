@@ -73,7 +73,7 @@
           </tr>
           <tr>
               <td class="button">
-                <button class="label">Info</button>
+                <button class="label" onclick="showInfo()">Info</button>
               </td>
           </tr>
         </table>
@@ -109,7 +109,7 @@
       </div>
       <div id="upgrade-tiles">
         <div class="container">
-                <div id="tiles"></div>
+                <p id="booster-amount">Wybierz karty</p>
                 <div id="consumables-container"></div>
                 <button class="upgradetiles" onclick="skip()">Kontynuuj</button>
             </div>
@@ -124,6 +124,15 @@
       <div id="final-upgrades"></div>
       <button onclick="restartGame()">Restart</button>
       <button onclick="showMenu()">Menu</button>
+    </div>
+  </div>
+  <div id="info-container">
+    <div class="game-over-content">
+      <div id="tiles"></div>
+      <button onclick="hideInfo()">Zamknij</button>
+      <!--
+        tutaj informacje o owocach
+      -->
     </div>
   </div>
   <canvas id="glcanvas"></canvas>

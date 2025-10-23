@@ -1426,6 +1426,7 @@ createGhost(icon, xPx, yPx, w, h, classList = []) {
                 if(addmoney>0){
                     this.Audio.playSound('buy.mp3');
                     this.GameRenderer.updateMoney(addmoney);
+                    this.money+=addmoney;
                 }
                 for (let type in groups) {
                     let group = groups[type];
@@ -1486,9 +1487,17 @@ function reroll(){
 function rerollBoosters(){
     game.rerollBoosters();
 }
-
+function showInfo(){
+    game.GameRenderer.displayTiles();
+    document.getElementById("info-container").style.display = "flex";
+}
+function hideInfo(){
+    document.getElementById("info-container").style.display = "none";
+}
 window.skip = skip;
 window.game = game;
+window.showInfo = showInfo;
+window.hideInfo = hideInfo;
 window.startRound = startRound; 
 window.upgradesList = upgradesList;
 window.consumableList = consumableList;

@@ -519,18 +519,18 @@ canvas#glcanvas {
       );
       background-size: 400% 400%;
       mix-blend-mode:hard-light; /* shows only on non-transparent pixels */
-      opacity: 0.3;
+      opacity: 0.5;
 
       /* make it shimmer smoothly */
       animation: holoShift 6s ease-in-out infinite alternate;
 
       /* boost vibrancy and brightness slightly */
-      filter: contrast(1.1);
+      filter: contrast(1.2);
       transition: filter 0.4s ease, opacity 0.4s ease;
     }
 
     &:hover::after {
-      opacity: 0.5;
+      opacity: 0.6;
       filter: contrast(1.2);
       animation-duration: 3s;
     }
@@ -616,7 +616,7 @@ canvas#glcanvas {
     }
   }
 }
-#game-over {
+#game-over,#info-container {
   position: fixed;
   top: 0;
   left: 0;
@@ -740,9 +740,13 @@ canvas#glcanvas {
   top: 0;
   left: 0;
   width: 100%;
+  font-family: "Jersey 25", sans-serif;
+  font-weight: bold;
+  color: black;
+  font-size: 1.5em;
   z-index: 900; // above most elements
   justify-content: center;
-
+  text-align: center;
   .container {
       background: rgba(255, 255, 255, 0.34);
       padding: 2rem;
@@ -805,9 +809,9 @@ canvas#glcanvas {
     background: rgba(0,0,0,0.91);
     border: 0.3em solid gray;
     color: #fff;
+    font-size: 0.75rem;
     padding: 0.5rem;
     border-radius: 6px;
-    font-size: 0.75rem;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;

@@ -78,9 +78,13 @@ export class RenderUI {
         const consumableContainer = document.getElementById("consumables-container");
         consumableContainer.innerHTML = "";
         consumableContainer.appendChild(this.displayUpgrades(boosterPack.roll(this.game),{bought:false,free:true,origin: boosterPack}));
+        this.displayBoosterAmmount();
         this.displayTiles();
         this.dispalyTileOverlay();
         this.hideShop();
+    }
+    displayBoosterAmmount(){
+        document.getElementById("booster-amount").innerHTML = "Wybierz swoje karty. Pozostało: "+this.game.BuysFromBoosterLeft;
     }
     showMenu(){
         document.getElementById("menu").style.display = "flex";
@@ -436,6 +440,7 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         console.log(success);
         if (success&&params.origin&&params.origin.type=="ConsumablePack"){
             game.BuysFromBoosterLeft--;
+            game.GameRenderer.displayBoosterAmmount();
         }
         if(params.origin&&params.origin.type=="ConsumablePack"&&game.BuysFromBoosterLeft <= 0){
             const container = document.getElementById("consumables-container");
@@ -469,6 +474,7 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         let success = this.game.buyanduse(upgrade);
         if (success&&params.origin&&params.origin.type=="ConsumablePack"){
             this.game.BuysFromBoosterLeft--;
+            this.displayBoosterAmmount();
         }
         if(params.origin&&params.origin.type=="ConsumablePack"&&game.BuysFromBoosterLeft <= 0){
             const container = document.getElementById("consumables-container");

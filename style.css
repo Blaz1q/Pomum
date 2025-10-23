@@ -503,15 +503,15 @@ canvas#glcanvas {
   background: linear-gradient(130deg, hsla(300, 100%, 60%, 0.801), hsla(210, 100%, 60%, 0.807), hsla(60, 100%, 60%, 0.79));
   background-size: 400% 400%;
   mix-blend-mode: hard-light; /* shows only on non-transparent pixels */
-  opacity: 0.3;
+  opacity: 0.5;
   /* make it shimmer smoothly */
   animation: holoShift 6s ease-in-out infinite alternate;
   /* boost vibrancy and brightness slightly */
-  filter: contrast(1.1);
+  filter: contrast(1.2);
   transition: filter 0.4s ease, opacity 0.4s ease;
 }
 .upgrade-wrapper .upgrade-card.holo .upgrade-inner:hover::after, .boss-wrapper .upgrade-card.holo .upgrade-inner:hover::after {
-  opacity: 0.5;
+  opacity: 0.6;
   filter: contrast(1.2);
   animation-duration: 3s;
 }
@@ -584,7 +584,7 @@ canvas#glcanvas {
   transform: translateY(-5px); /* płynnie do góry */
 }
 
-#game-over {
+#game-over, #info-container {
   position: fixed;
   top: 0;
   left: 0;
@@ -596,23 +596,23 @@ canvas#glcanvas {
   align-items: center;
   z-index: 999;
 }
-#game-over .game-over-content {
+#game-over .game-over-content, #info-container .game-over-content {
   background: #fff;
   padding: 2rem 3rem;
   border-radius: 15px;
   text-align: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
-#game-over .game-over-content .game-over h1 {
+#game-over .game-over-content .game-over h1, #info-container .game-over-content .game-over h1 {
   margin: 0 0 1rem;
   font-size: 2.5rem;
   color: #c0392b;
 }
-#game-over .game-over-content .game-over p {
+#game-over .game-over-content .game-over p, #info-container .game-over-content .game-over p {
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
 }
-#game-over .game-over-content button {
+#game-over .game-over-content button, #info-container .game-over-content button {
   margin: 0.5rem;
   padding: 0.7rem 1.5rem;
   border: none;
@@ -624,7 +624,7 @@ canvas#glcanvas {
   color: #fff;
   transition: background 0.2s;
 }
-#game-over .game-over-content button:hover {
+#game-over .game-over-content button:hover, #info-container .game-over-content button:hover {
   background: #e74c3c;
 }
 
@@ -715,8 +715,13 @@ canvas#glcanvas {
   top: 0;
   left: 0;
   width: 100%;
+  font-family: "Jersey 25", sans-serif;
+  font-weight: bold;
+  color: black;
+  font-size: 1.5em;
   z-index: 900;
   justify-content: center;
+  text-align: center;
 }
 #upgrade-tiles .container {
   background: rgba(255, 255, 255, 0.34);
@@ -775,9 +780,9 @@ canvas#glcanvas {
   background: rgba(0, 0, 0, 0.91);
   border: 0.3em solid gray;
   color: #fff;
+  font-size: 0.75rem;
   padding: 0.5rem;
   border-radius: 6px;
-  font-size: 0.75rem;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;

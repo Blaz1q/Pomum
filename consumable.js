@@ -233,7 +233,7 @@ const consumableUpgradeBlueprints = [
     {
         name: "Foiled",
         description(game){
-            return `Losowe ulepszenie stanie się ${Style.Chance("Foiled")} lub ${Style.Chance("Holo")}`;
+            return `Losowe ulepszenie dostaje bonusowe ${Style.Chance(MODIFIERS.Chip)}, lub ${Style.Chance(MODIFIERS.Mult)}`;
         },
         effect(game){
             if(game.upgrades.length==0) return;
