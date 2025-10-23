@@ -499,6 +499,43 @@ canvas#glcanvas {
     animation: skewCard 6s infinite ease-in-out;
     transition: box-shadow 0.2s ease;
     z-index: 5;
+    &.holo {
+  .upgrade-inner {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+
+      /* animated holographic gradient */
+      background: linear-gradient(
+        130deg,
+        hsla(300, 100%, 60%, 0.801), hsla(210, 100%, 60%, 0.807), hsla(60, 100%, 60%, 0.79)
+      );
+      background-size: 400% 400%;
+      mix-blend-mode:hard-light; /* shows only on non-transparent pixels */
+      opacity: 0.3;
+
+      /* make it shimmer smoothly */
+      animation: holoShift 6s ease-in-out infinite alternate;
+
+      /* boost vibrancy and brightness slightly */
+      filter: contrast(1.1);
+      transition: filter 0.4s ease, opacity 0.4s ease;
+    }
+
+    &:hover::after {
+      opacity: 0.5;
+      filter: contrast(1.2);
+      animation-duration: 3s;
+    }
+  }
+}
     .upgrade-inner {
       width: 100%;
       height: 100%;
@@ -512,7 +549,7 @@ canvas#glcanvas {
 
     &:hover {
       animation: none;
-      filter: drop-shadow(0 10px 0 rgba(0, 0, 0, 0.35));
+      //filter: drop-shadow(0 10px 0 rgba(0, 0, 0, 0.35));
 
       .upgrade-inner {
         transform: translateY(-5px) scale(1.05) rotateX(0deg) rotateY(0deg);
@@ -832,7 +869,7 @@ canvas#glcanvas {
   }
   60% {
     transform: rotateX(10deg) rotateY(15deg);
-    filter: drop-shadow(3px 4px 0px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(3px 4zpx 0px rgba(0, 0, 0, 0.3));
   }
   80% {
     transform: rotateX(-10deg) rotateY(-15deg);
@@ -842,4 +879,9 @@ canvas#glcanvas {
     transform: rotateX(10deg) rotateY(-15deg);
     filter: drop-shadow(3px 8px 0px rgba(0, 0, 0, 0.35));
   }
+}
+@keyframes holoShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }

@@ -295,6 +295,7 @@ displayPlayerUpgrades() {
         card.className = "upgrade-card";
         card.style.animationDelay = `-${Math.random() * 3}s`;
         card.appendChild(cardInner);
+        this.addParalax(card);
         // Description
         const desc = document.createElement("div");
         desc.className = "upgrade-desc";
@@ -315,6 +316,8 @@ displayPlayerUpgrades() {
     upgrades.forEach(up => {
         const wrapper = document.createElement("div");
         const originalZ = wrapper.style.zIndex || 0;
+        
+        
         wrapper.addEventListener('mouseenter', () => wrapper.style.zIndex = 500);
         wrapper.addEventListener('mouseleave', () => wrapper.style.zIndex = originalZ);
         wrapper.className = "upgrade-wrapper";
@@ -339,11 +342,15 @@ displayPlayerUpgrades() {
         cardInner.style.backgroundImage = `url('${up.image}')`;
         
         // Card
+       
         const card = document.createElement("div");
         card.className = "upgrade-card";
-        card.style.animationDelay = `-${Math.random() * 3}s`;
+        card.style.animationDelay = `-${Math.random() * 3}s`; 
+        if(up.modifier!=MODIFIERS.None){
+            card.classList.add("holo");
+        }
         card.appendChild(cardInner);
-        
+        this.addParalax(card);
         // Description
         const desc = document.createElement("div");
         desc.className = "upgrade-desc";
@@ -375,6 +382,36 @@ gameOver(){
     upgrades.appendChild(this.displayUpgrades(this.game.upgrades,{displayPrice: false,displayButtons: false}));
     document.getElementById("seed").innerHTML = this.game.seed;
     document.getElementById("final-score").innerHTML = this.game.round; 
+}
+addParalax(card){
+card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left; // x position within the card
+    const y = e.clientY - rect.top;  // y position within the card
+
+    const halfWidth = rect.width / 2;
+    const halfHeight = rect.height / 2;
+
+    // rotation
+    const rotateY = ((x - halfWidth) / halfWidth) * 10;  // max ±20°
+    const rotateX = ((halfHeight - y) / halfHeight) * 15;  // max ±15°
+    card.style.transform = `perspective(800px) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+
+    // dynamic shadow
+    const shadowX = -((x - halfWidth) / halfWidth) * 10; // horizontal shadow offset
+    const shadowY = -((y - halfHeight) / halfHeight) * 10; // vertical shadow offset
+    const blur = 0; // blur radius
+    const shadowColor = 'rgba(0,0,0,0.35)';
+    card.style.filter = `drop-shadow(${shadowX}px ${shadowY}px ${blur}px ${shadowColor})`;
+});
+
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+
+  card.addEventListener('mouseenter', () => {
+    card.style.transition = 'transform 0.2s ease, filter 0.2s ease'; // shorter transition when starting hover
+  });
 }
 createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
     if(params.origin && params.origin.type == "ConsumablePack"){

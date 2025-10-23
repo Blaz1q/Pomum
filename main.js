@@ -423,6 +423,7 @@ trySwap(x1, y1, x2, y2) {
             }
             this.Audio.playSound('pop.mp3');
             this.GameRenderer.displayPlayerConsumables();
+            this.GameRenderer.displayConsumablesCounter();
         }
     }
     buyanduse(upgrade){
@@ -473,7 +474,6 @@ trySwap(x1, y1, x2, y2) {
             this.upgrades[index].sell(this);
             this.upgrades.splice(index,1);
             this.GameRenderer.displayUpgradesCounter();
-            
         }
         else if(upgrade.type=="Consumable"){
             const index = this.consumables.indexOf(upgrade) ?? -1;

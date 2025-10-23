@@ -217,6 +217,7 @@ const consumableUpgradeBlueprints = [
             let copyUpgrade = new Upgrade(copyBp.name,copyBp.descriptionfn,copyBp.effect,copyBp.remove,copyBp.price,copyBp.props);
             copyUpgrade.bought = true;
             copyUpgrade.modifier = copy.modifier;
+            copyUpgrade.negative = copy.negative;
             copyUpgrade.props = JSON.parse(JSON.stringify(copy.props));
             copyUpgrade.apply(game);
             console.log(copy);
