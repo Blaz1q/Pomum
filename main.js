@@ -97,55 +97,48 @@ export class Game{
     }
 async emit(event, payload) {
     const wait = ms => new Promise(r => setTimeout(r, ms));
-    const sorted = [...this.triggers[event]].sort((a, b) => {
-        const indexA = a.upgrade ? this.upgrades.indexOf(a.upgrade) : -1;
-        const indexB = b.upgrade ? this.upgrades.indexOf(b.upgrade) : -1;
-        if (indexA >= 0 && indexB >= 0) return indexA - indexB;
-        if (indexA >= 0) return -1;
-        if (indexB >= 0) return 1;
-        return 0;
-    });
 
-    if (sorted.length === 0) return;
-
-    // Promise chain that guarantees visuals run one after another.
-    // We don't await this for "Active" (visual-only), but we do await it for "Score".
+    // Build a chain for queued upgrade visuals.
     let visualChain = Promise.resolve();
 
-    for (const { handler, upgrade } of sorted) {
-        // Keep handler invocation synchronous (preserves original behaviour).
-        const result = handler(payload);
+    // Iterate through all active upgrades directly.
+    for (const upgrade of this.upgrades) {
+        if (!upgrade || typeof upgrade !== "object") continue;
 
-        // Only queue visuals if an upgrade exists
-        if (!upgrade) {
-            // If you want Score to still cause a non-visual delay even without an upgrade,
-            // uncomment the next lines:
-            // if (result === UPGRADE_STATES.Score) await wait(300);
-            continue;
-        }
+        // Build handler name dynamically: "onMatch", "onScore", etc.
+        const handlerName = `on${event[0].toUpperCase()}${event.slice(1)}`;
+        const handler = typeof upgrade[handlerName] === "function"
+            ? upgrade[handlerName]
+            : upgrade.props?.[handlerName]; // fallback for older upgrades
+
+        if (!handler) continue;
+
+        // Execute the upgrade’s event handler synchronously.
+        const result = handler.call(upgrade, payload);
 
         if (result === UPGRADE_STATES.Active) {
-            // Visual-only: queue visual but don't await it — handlers continue executing.
+            // Visual-only effect — queue but don’t block next handlers.
             visualChain = visualChain.then(() => {
                 this.GameRenderer.upgradeTrigger(upgrade, 0);
                 this.Audio.playSound("tick.mp3");
                 return wait(350);
             });
-        } else if (result === UPGRADE_STATES.Score) {
-            // Visual + actual delay: queue the visual and WAIT for it to finish before continuing.
+        } 
+        else if (result === UPGRADE_STATES.Score) {
+            // Visual + delay — must finish before continuing.
             visualChain = visualChain.then(() => {
                 this.GameRenderer.upgradeTrigger(upgrade, 0);
                 this.Audio.playSound("tick.mp3");
                 return wait(350);
             });
-            // Wait for the queued visuals (including any previously queued Active visuals)
-            // so that Score blocks the next handler until visuals+delay finish.
+
+            // Wait for all visuals before continuing.
             await visualChain;
-            // Reset chain so subsequent Active visuals start fresh after this point.
+
+            // Reset chain to start fresh after a Score.
             visualChain = Promise.resolve();
-        } else if (result === UPGRADE_STATES.Failed) {
-            // skip — do nothing
-        }
+        } 
+        // UPGRADE_STATES.Failed → skip
     }
 }
     rollUpgrades(count = 3) {
@@ -204,7 +197,10 @@ async emit(event, payload) {
         this.moveBox.innerHTML = this.movescounter + "/" + this.moves;
     }
     rerollUpgrades(){
-        if(this.money<4) return;
+        if(this.money<4){
+            this.GameRenderer.notEnoughMoney();
+            return;
+        } 
         this.money-=4;
         this.Audio.playSound('buy.mp3');
         this.GameRenderer.displayUpgradesInShop();

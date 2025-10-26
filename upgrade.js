@@ -9,26 +9,6 @@ export const upgradesList = [];
 
 const defaultimage = { image: "default" };
 
-function removeTrigger(game, trigger, triggeredFunction, upgrade) {
-  game.triggers[trigger] = game.triggers[trigger].filter(
-    h => !(h.handler === triggeredFunction && h.upgrade === upgrade)
-  );
-}
-
-// === TRIGGER HELPERS ===
-function addUpgradeTriggers(game, upgrade) {
-  Upgrade.addUpgradeTriggers(game,upgrade);
-}
-
-function removeUpgradeTriggers(game, upgrade) {
-  if (!upgrade.props) return;
-  for (const [propName, fn] of Object.entries(upgrade.props)) {
-    if (typeof fn === "function" && GAME_TRIGGERS[propName]) {
-      removeTrigger(game, GAME_TRIGGERS[propName], fn, upgrade);
-    }
-  }
-}
-
 export const upgradeBlueprints = [
   {
     name: "AppleHater",
@@ -55,10 +35,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Failed;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 4
   },
@@ -89,10 +69,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Failed;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 8
   },
@@ -122,12 +102,12 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
       game.moves += 2;
       game.moveBox.innerHTML = game.movescounter + "/" + game.moves;
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 4,
     props: { image: "boom" }
@@ -156,10 +136,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 4,
   },
@@ -192,10 +172,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 5,
     props: { mult: 0 }
@@ -228,10 +208,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 5,
     props: { mult: 0, image: 'default' }
@@ -264,10 +244,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 5,
     props: { mult: 0, image: 'default' }
@@ -300,10 +280,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 5,
     props: { mult: 0, image: 'default'}
@@ -336,10 +316,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 5,
     props: { mult: 0, image: 'default' }
@@ -372,10 +352,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Failed;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 10,
     props: { image: "coconutbank" }
@@ -449,10 +429,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Active;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 6,
     props: {image: 'grapeinterest'}
@@ -461,7 +441,7 @@ export const upgradeBlueprints = [
   {
     name: "ChainReaction",
     descriptionfn(game) {
-      if (this.bought) return `Każda kaskada daje dodatkowe ${Style.Score("+30 punktów")}, (obecnie ${Style.Score(`+${this.props.score}`)})`;
+      if (this.score&&this.score>0) return `Każda kaskada daje dodatkowe ${Style.Score("+30 punktów")}, (obecnie ${Style.Score(`+${this.props.score}`)})`;
       return `Każda kaskada daje dodatkowe ${Style.Score("+30 punktów")}`;
     },
     effect(game) {
@@ -478,10 +458,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 4,
     props: { score: 0 }
@@ -507,10 +487,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Active;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 8,
     props: {mult:1}
@@ -538,10 +518,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Failed;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 6,
     props: { image: "highfive" }
@@ -549,7 +529,7 @@ export const upgradeBlueprints = [
 
   {
     name: "broke",
-    descriptionfn: `Jeżeli ma się mniej niż $6, +${Style.Score("+250 punktów")}`,
+    descriptionfn: `Jeżeli ma się mniej niż $6, ${Style.Score("+250 punktów")}`,
     effect(game) {
       this.setProps({
         onScore: () => {
@@ -561,10 +541,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Failed;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 6,
     props: defaultimage
@@ -599,10 +579,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 4,
   },
@@ -660,10 +640,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Failed;
         }
       });
-      addUpgradeTriggers(game, this);
+      
     },
     remove(game) {
-      removeUpgradeTriggers(game, this);
+      
     },
     price: 10,
   },
@@ -693,10 +673,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score
         }
       });
-      addUpgradeTriggers(game,this);
+      
     },
     remove(game){
-      removeUpgradeTriggers(game,this);
+      
     },
     price: 8,
     props: {image: 'default', mult: 1}
@@ -715,10 +695,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Failed;
         }
       });
-      addUpgradeTriggers(game,this);
+      
     },
     remove(game){
-      removeUpgradeTriggers(game,this);
+      
     },
     price: 8,
   },
@@ -752,10 +732,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Active;
         }
       });
-      addUpgradeTriggers(game,this);
+      
     },
     remove(game){
-      removeUpgradeTriggers(game,this);
+      
     },
     price: 8,
     props: {image: 'default'}
@@ -780,10 +760,10 @@ export const upgradeBlueprints = [
             return UPGRADE_STATES.Score;
         }
       });
-      addUpgradeTriggers(game,this);
+      
     },
     remove(game){
-      removeUpgradeTriggers(game,this);
+      
     },
     price: 4,
     props: {image: 'default'}
@@ -800,10 +780,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Active;
         }
       });
-      addUpgradeTriggers(game,this);
+      
     },
     remove(game){
-      removeUpgradeTriggers(game,this);
+      
     },
     price: 6,
   },
@@ -851,10 +831,10 @@ export const upgradeBlueprints = [
           return UPGRADE_STATES.Score;
         }
       });
-      addUpgradeTriggers(game,this);
+      
     },
     remove(game){
-      removeUpgradeTriggers(game,this);
+      
     },
     price: 6,
     props: defaultimage
@@ -879,9 +859,9 @@ export const upgradeBlueprints = [
             return UPGRADE_STATES.Active;
           }
         });
-        addUpgradeTriggers(game, this);
+        
       },
-      remove(game) { removeUpgradeTriggers(game, this); },
+      remove(game) {  },
       price: 8,
       props: defaultimage
     },
@@ -899,9 +879,9 @@ export const upgradeBlueprints = [
         return UPGRADE_STATES.Failed;
       }
     });
-    addUpgradeTriggers(game, this);
+    
   },
-  remove(game) { removeUpgradeTriggers(game, this); },
+  remove(game) {  },
   price: 10,
   props: defaultimage
 },
@@ -951,9 +931,9 @@ export const upgradeBlueprints = [
         return UPGRADE_STATES.Active;
       }
     });
-    addUpgradeTriggers(game, this);
+    
   },
-  remove(game) { removeUpgradeTriggers(game, this); },
+  remove(game) {  },
   price: 9,
   props: defaultimage
 },
@@ -1017,13 +997,132 @@ export const upgradeBlueprints = [
         return UPGRADE_STATES.Active;
       }
     });
-    addUpgradeTriggers(game,this);
+    
   },
   remove(game){
-     removeUpgradeTriggers(game, this);
+     
   },
   price: 8,
-}
+},
+{
+  name: "Dice",
+  descriptionfn(game){
+    if(this.props.mult&&this.props.mult!=null)  return `Co ruch dostaje się ${Style.Mult(`X1-6 Mult`)} (Obecnie ${Style.Mult('X'+this.props.mult+" Mult")})`;
+    return `Co ruch dostaje się ${Style.Mult(`X1-6 Mult`)}`;
+  },
+  effect(game){
+    this.setProps({
+      mult: null,
+      onMove: ()=>{
+        this.props.mult = Math.floor(Math.random()*6)+1;
+        return UPGRADE_STATES.Active; 
+      },
+      onRoundEnd: ()=>{
+        this.props.mult = null;
+        return UPGRADE_STATES.Active;
+      },
+      onScore: ()=>{
+        game.mult *= this.props.mult;
+        game.mult = Math.round(game.mult * 100) / 100;
+        game.GameRenderer.displayTempScore();
+        return UPGRADE_STATES.Score;
+      }
+    });
+    
+  },
+  remove(game){
+    
+  },
+  price: 7,
+  props: defaultimage
+},/*
+{
+  name: "blueprint",
+  descriptionfn(game) {
+    const target = this.props.getTargetUpgrade(this, game);
+    if (!target)
+      return `Kopiuje efekt ulepszenia po prawej stronie, ale brak ulepszenia do skopiowania.`;
+    return `Kopiuje efekt ulepszenia: ${target.name}`;
+  },
+
+  effect(game) {
+    // Initialize watcher once — keeps updating if moved mid-game
+    if (!this.props._watcher) {
+      this.props._watcher = setInterval(() => {
+        this.props.refreshClonedEffect(this, game);
+      }, 500); // every 0.5s
+    }
+
+    // Run initial effect
+    this.props.refreshClonedEffect(this, game);
+  },
+
+  remove(game) {
+    if (this.props._watcher) {
+      clearInterval(this.props._watcher);
+      this.props._watcher = null;
+    }
+    
+  },
+
+  price: 10,
+
+  props: {
+    image: "default",
+    active: false,
+    clonedFrom: null,
+    clonedProps: {},
+    _watcher: null,
+
+    // 🔹 Find the upgrade immediately to the right
+    getTargetUpgrade(self,game) {
+      const index = game.upgrades.indexOf(self);
+      if (index === -1) return null;
+      return game.upgrades[index + 1] || null;
+    },
+
+    // 🔹 Clone target behavior and props
+    refreshClonedEffect(self, game) {
+      const target = self.props.getTargetUpgrade(self,game);
+      if(target&&target!=self.props.clonedFrom){
+        self.remove(self,game);
+        //removeUpgradeTriggers(game, self);
+        self.active = false;
+      }
+      if (!target) {
+        self.props.clonedFrom = null;
+        self.props.clonedProps = {};
+        return;
+      }
+      let copyBp = upgradesList.filter(up => up.name === target.name)[0];
+      let copyUpgrade = new Upgrade(copyBp.name,copyBp.descriptionfn,copyBp.effect,copyBp.remove,copyBp.price,copyBp.props);
+      copyUpgrade.bought = true;
+      copyUpgrade.props = JSON.parse(JSON.stringify(target.props));
+      copyUpgrade.apply(game);
+      const cloned = copyUpgrade.props;
+      let clone = copyUpgrade.apply;
+      copyUpgrade.remove(game);
+      // Deep clone props to avoid mutating target
+      self.props.clonedFrom = target;
+      self.props.clonedProps = cloned;
+
+      // Execute target's effect in a safe proxy context
+      if (typeof target.effect === "function") {
+        const proxyUpgrade = {
+          setProps: (p) =>
+            self.clonedProps = { ...self.props.clonedProps, ...p }
+        };
+        target.effect.call(proxyUpgrade, game);
+      }
+
+      // Register triggers for this cloned upgrade
+      if(!self.active){
+        clone;
+        console.log("changed");
+      } 
+    }
+  }
+}*/ // <---- W.I.P. za często się wywołuje addUpgradeTriggers.
   ];
 upgradeBlueprints.forEach(upgrade => {
   upgrade.type="Upgrade";

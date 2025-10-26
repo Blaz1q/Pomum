@@ -245,7 +245,9 @@ const consumableUpgradeBlueprints = [
                  upgrade.modifier = MODIFIERS.Mult;
             upgrade.addSpecial(game);
             game.GameRenderer.displayPlayerUpgrades();
-        }
+        },
+        price: 8,
+        props: {image: 'default'}
     }
 ]
 const consumableGoldBlueprints = [

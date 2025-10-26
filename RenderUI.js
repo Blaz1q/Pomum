@@ -428,11 +428,11 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
             game.GameRenderer.notEnoughMoney();
             return false;
         }
-        if(upgrade.type==="Upgrade"&&game.upgrades.length>=game.maxUpgrades&&upgrade.modifier!=MODIFIERS.Negative){
+        if(upgrade.type==="Upgrade"&&game.upgrades.length>=game.maxUpgrades&&!upgrade.negative){
             console.log("not enough upgrade space");
             return false;
         }
-        if(upgrade.type==="Consumable"&&game.consumables.length>=game.maxConsumables){
+        if(upgrade.type==="Consumable"&&game.consumables.length>=game.maxConsumables&&!upgrade.negative){
             console.log("not enough consumable space space");
             return false;
         }

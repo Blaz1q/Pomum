@@ -60,19 +60,6 @@ export class Upgrade {
     Upgrade.removeTrigger(game,GAME_TRIGGERS.onScore,this.specialFunc,this);
     this.modifier = MODIFIERS.None;
   }
-  static removeTrigger(game, trigger, triggeredFunction, upgrade) {
-    game.triggers[trigger] = game.triggers[trigger].filter(
-      h => !(h.handler === triggeredFunction && h.upgrade === upgrade)
-    );
-  }
-  static addUpgradeTriggers(game, upgrade) {
-    if (!upgrade.props) return;
-    for (const [propName, fn] of Object.entries(upgrade.props)) {
-      if (typeof fn === "function" && GAME_TRIGGERS[propName]) {
-        game.on(GAME_TRIGGERS[propName], fn, upgrade);
-      }
-    }
-  }
   static CopyUpgrade(upgrade) {
     // Deep clone the props to avoid reference sharing
     const clonedProps = JSON.parse(JSON.stringify(upgrade.props));
