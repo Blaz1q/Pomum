@@ -399,7 +399,7 @@ export const upgradeBlueprints = [
     name: "GrapeInterest",
     descriptionfn(game) {
       if (!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+10 pkt")}`;
-      return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+10 pkt")} (Obecnie ${Style.Score(`+${this.props.value} pkt`)}, ${Style.Score(`+${this.props.value} pkt do wyniku`)})`;
+      return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+10 pkt")} (Obecnie ${Style.Score(`+${this.props.value} pkt`)}, ${Style.Score(`+${this.props.score} pkt do wyniku`)})`;
     },
     effect(game) {
       this.setProps({
@@ -634,6 +634,7 @@ export const upgradeBlueprints = [
         onScore: () => {
           if (this.props.mult !== 1) {
             game.mult *= this.props.mult;
+            game.mult = Math.round(game.mult * 100) / 100;
             this.props.mult = 1;
             return UPGRADE_STATES.Score;
           }
@@ -1037,92 +1038,119 @@ export const upgradeBlueprints = [
   props: defaultimage
 },/*
 {
-  name: "blueprint",
+  name: "Mirror",
   descriptionfn(game) {
-    const target = this.props.getTargetUpgrade(this, game);
-    if (!target)
-      return `Kopiuje efekt ulepszenia po prawej stronie, ale brak ulepszenia do skopiowania.`;
-    return `Kopiuje efekt ulepszenia: ${target.name}`;
+    if (this?.mirroredUpgradeCopy != null)
+      return this.mirroredUpgradeCopy.description(game);
+    return "Kopiuje funkcje i właściwości ulepszenia po prawej stronie. Automatycznie aktualizuje się, gdy zmienia się układ ulepszeń.";
   },
 
   effect(game) {
-    // Initialize watcher once — keeps updating if moved mid-game
-    if (!this.props._watcher) {
-      this.props._watcher = setInterval(() => {
-        this.props.refreshClonedEffect(this, game);
-      }, 500); // every 0.5s
-    }
+    this.mirroredUpgrade = null;
+    this.mirroredUpgradeCopy = null;
+    this.mirroredProps = {};
+    this.lastAppliedNeighbor = null;
 
-    // Run initial effect
-    this.props.refreshClonedEffect(this, game);
+    // --- Find ultimate non-mirror neighbor ---
+    this.getUltimateNeighbor = () => {
+      let neighbor = game.upgrades[game.upgrades.indexOf(this) + 1];
+      const visited = new Set();
+      while (neighbor && neighbor.name === "Mirror" && !visited.has(neighbor)) {
+        visited.add(neighbor);
+        neighbor = game.upgrades[game.upgrades.indexOf(neighbor) + 1];
+      }
+      return neighbor || null;
+    };
+
+    // --- Determine if this mirror is the "owner" for passive effect ---
+    this.isOwner = () => {
+      const ultimateNeighbor = this.getUltimateNeighbor();
+      const index = game.upgrades.indexOf(this);
+      for (let i = 0; i < index; i++) {
+        const u = game.upgrades[i];
+        if (u.name === "Mirror" && u.getUltimateNeighbor() === ultimateNeighbor) {
+          return false; // another mirror owns it
+        }
+      }
+      return true;
+    };
+
+    // --- Sync mirror to neighbor ---
+    this.syncMirror = () => {
+      const ultimateNeighbor = this.getUltimateNeighbor();
+      const oldNeighbor = this.lastAppliedNeighbor;
+
+      // Remove old effect if necessary (owner only)
+      if (oldNeighbor && oldNeighbor !== ultimateNeighbor && this.isOwner() && typeof oldNeighbor.remove === "function") {
+        oldNeighbor.remove(game);
+      }
+
+      this.mirroredUpgrade = ultimateNeighbor;
+
+      if (!ultimateNeighbor) {
+        this.mirroredUpgradeCopy = null;
+        this.mirroredProps = {};
+        this.props = { image: "brokenmirror" };
+        this.lastAppliedNeighbor = null;
+        return;
+      }
+
+      // Make a full independent copy of the ultimate neighbor for this mirror
+      const copiedUpgrade = Upgrade.CopyUpgrade(ultimateNeighbor);
+      this.mirroredUpgradeCopy = copiedUpgrade;
+
+      // Apply passive/hybrid effect if this mirror is owner
+      if (typeof copiedUpgrade.effect === "function" && this.isOwner()) {
+        copiedUpgrade.effect(game);
+      }
+
+      // Use the copied props
+      this.mirroredProps = copiedUpgrade.props || {};
+      this.props = { ...this.mirroredProps, image: "mirror" };
+
+      this.lastAppliedNeighbor = ultimateNeighbor;
+    };
+
+    // --- Handle upgrades changed ---
+    this.onUpgradesChanged = () => {
+      const mirrors = game.upgrades.filter(u => u.name === "Mirror");
+
+      // Phase 1: reset mirrors
+      for (const mirror of mirrors) {
+        mirror.mirroredUpgrade = null;
+        mirror.mirroredUpgradeCopy = null;
+        mirror.mirroredProps = {};
+      }
+
+      // Phase 2: resync mirrors right -> left
+      for (let i = mirrors.length - 1; i >= 0; i--) {
+        mirrors[i].syncMirror();
+      }
+
+      return UPGRADE_STATES.Active;
+    };
+
+    // Initial sync
+    this.syncMirror();
   },
 
   remove(game) {
-    if (this.props._watcher) {
-      clearInterval(this.props._watcher);
-      this.props._watcher = null;
+    // Only remove the upgrade if this mirror owns it
+    if (this.mirroredUpgradeCopy && typeof this.mirroredUpgradeCopy.remove === "function" && this.isOwner()) {
+      this.mirroredUpgradeCopy.remove(game);
     }
-    
+
+    this.mirroredUpgrade = null;
+    this.mirroredUpgradeCopy = null;
+    this.mirroredProps = {};
+    this.lastAppliedNeighbor = null;
+    this.props = { image: "brokenmirror" };
   },
 
-  price: 10,
-
-  props: {
-    image: "default",
-    active: false,
-    clonedFrom: null,
-    clonedProps: {},
-    _watcher: null,
-
-    // 🔹 Find the upgrade immediately to the right
-    getTargetUpgrade(self,game) {
-      const index = game.upgrades.indexOf(self);
-      if (index === -1) return null;
-      return game.upgrades[index + 1] || null;
-    },
-
-    // 🔹 Clone target behavior and props
-    refreshClonedEffect(self, game) {
-      const target = self.props.getTargetUpgrade(self,game);
-      if(target&&target!=self.props.clonedFrom){
-        self.remove(self,game);
-        //removeUpgradeTriggers(game, self);
-        self.active = false;
-      }
-      if (!target) {
-        self.props.clonedFrom = null;
-        self.props.clonedProps = {};
-        return;
-      }
-      let copyBp = upgradesList.filter(up => up.name === target.name)[0];
-      let copyUpgrade = new Upgrade(copyBp.name,copyBp.descriptionfn,copyBp.effect,copyBp.remove,copyBp.price,copyBp.props);
-      copyUpgrade.bought = true;
-      copyUpgrade.props = JSON.parse(JSON.stringify(target.props));
-      copyUpgrade.apply(game);
-      const cloned = copyUpgrade.props;
-      let clone = copyUpgrade.apply;
-      copyUpgrade.remove(game);
-      // Deep clone props to avoid mutating target
-      self.props.clonedFrom = target;
-      self.props.clonedProps = cloned;
-
-      // Execute target's effect in a safe proxy context
-      if (typeof target.effect === "function") {
-        const proxyUpgrade = {
-          setProps: (p) =>
-            self.clonedProps = { ...self.props.clonedProps, ...p }
-        };
-        target.effect.call(proxyUpgrade, game);
-      }
-
-      // Register triggers for this cloned upgrade
-      if(!self.active){
-        clone;
-        console.log("changed");
-      } 
-    }
-  }
-}*/ // <---- W.I.P. za często się wywołuje addUpgradeTriggers.
+  price: 8,
+  props: { image: "brokenmirror" },
+}
+*/ // <-- work in progress, bardzo skomplikowane.
   ];
 upgradeBlueprints.forEach(upgrade => {
   upgrade.type="Upgrade";

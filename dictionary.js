@@ -5,7 +5,8 @@ export const GAME_TRIGGERS = {
     onRoundStart: "roundStart",
     onMove: "move",
     onUpgradeTriggered: "upgradeTrigger",
-    onScore: "score"
+    onScore: "score",
+    onUpgradesChanged: "UpgradesChanged"
 };
 export const TYPES = {
     Fruit: "fruit",
@@ -18,7 +19,7 @@ export const MODIFIERS = {
     Silver: "silver",
     Chip: "+50 Punktów",
     Negative: "negative",
-    Mult: "+1 Mult"
+    Mult: "X1.5 Mult"
 };
 export const STAGES = {
     Game: "game",

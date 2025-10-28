@@ -97,48 +97,49 @@ export class Game{
     }
 async emit(event, payload) {
     const wait = ms => new Promise(r => setTimeout(r, ms));
-
-    // Build a chain for queued upgrade visuals.
     let visualChain = Promise.resolve();
-
-    // Iterate through all active upgrades directly.
+    console.log(event);
     for (const upgrade of this.upgrades) {
         if (!upgrade || typeof upgrade !== "object") continue;
 
-        // Build handler name dynamically: "onMatch", "onScore", etc.
         const handlerName = `on${event[0].toUpperCase()}${event.slice(1)}`;
-        const handler = typeof upgrade[handlerName] === "function"
+
+        // Main event handler (new system or legacy props)
+        const mainHandler = typeof upgrade[handlerName] === "function"
             ? upgrade[handlerName]
-            : upgrade.props?.[handlerName]; // fallback for older upgrades
+            : upgrade.props?.[handlerName];
 
-        if (!handler) continue;
+        // Secondary modifier handler (your special function)
+        const specialHandler = (event === "score" && typeof upgrade.specialFunc === "function")
+            ? upgrade.specialFunc
+            : null;
 
-        // Execute the upgrade’s event handler synchronously.
-        const result = handler.call(upgrade, payload);
+        // Collect all handlers to call in order
+        const handlers = [mainHandler, specialHandler].filter(Boolean);
 
-        if (result === UPGRADE_STATES.Active) {
-            // Visual-only effect — queue but don’t block next handlers.
-            visualChain = visualChain.then(() => {
-                this.GameRenderer.upgradeTrigger(upgrade, 0);
-                this.Audio.playSound("tick.mp3");
-                return wait(350);
-            });
-        } 
-        else if (result === UPGRADE_STATES.Score) {
-            // Visual + delay — must finish before continuing.
-            visualChain = visualChain.then(() => {
-                this.GameRenderer.upgradeTrigger(upgrade, 0);
-                this.Audio.playSound("tick.mp3");
-                return wait(350);
-            });
+        for (const handler of handlers) {
+            const result = handler.call(upgrade, payload);
 
-            // Wait for all visuals before continuing.
-            await visualChain;
-
-            // Reset chain to start fresh after a Score.
-            visualChain = Promise.resolve();
-        } 
-        // UPGRADE_STATES.Failed → skip
+            if (result === UPGRADE_STATES.Active) {
+                // Visual-only
+                visualChain = visualChain.then(() => {
+                    this.GameRenderer.upgradeTrigger(upgrade, 0);
+                    this.Audio.playSound("tick.mp3");
+                    return wait(350);
+                });
+            }
+            else if (result === UPGRADE_STATES.Score) {
+                // Visual + delay
+                visualChain = visualChain.then(() => {
+                    this.GameRenderer.upgradeTrigger(upgrade, 0);
+                    this.Audio.playSound("tick.mp3");
+                    return wait(350);
+                });
+                await visualChain;
+                visualChain = Promise.resolve();
+            }
+            // Failed → ignore
+        }
     }
 }
     rollUpgrades(count = 3) {
@@ -443,6 +444,7 @@ trySwap(x1, y1, x2, y2) {
             upgrade.apply(this);
             this.GameRenderer.displayPlayerUpgrades();
             this.GameRenderer.displayUpgradesCounter();
+            this.emit(GAME_TRIGGERS.onUpgradesChanged);
         }else if(upgrade.type=="Consumable"){
             this.consumables.push(upgrade);
             this.GameRenderer.displayPlayerConsumables();
@@ -470,6 +472,7 @@ trySwap(x1, y1, x2, y2) {
             this.upgrades[index].sell(this);
             this.upgrades.splice(index,1);
             this.GameRenderer.displayUpgradesCounter();
+            this.emit(GAME_TRIGGERS.onUpgradesChanged);
         }
         else if(upgrade.type=="Consumable"){
             const index = this.consumables.indexOf(upgrade) ?? -1;

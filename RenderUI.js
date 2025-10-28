@@ -1,7 +1,7 @@
 import { consumableList,rollConsumablePacks,rollVouchers } from "./consumable.js";
 import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { animate,Animator } from "./loadshaders.js";
-import { COLORS,GAMECOLORS, DURATIONS, STAGES, MODIFIERS } from "./dictionary.js";
+import { COLORS,GAMECOLORS, DURATIONS, STAGES, MODIFIERS, GAME_TRIGGERS } from "./dictionary.js";
 import { rollBoss } from "./Boss.js";
 export class RenderUI {
     constructor(game) {
@@ -231,7 +231,7 @@ displayPlayerUpgrades() {
                 // Update array
                 const movedUpgrade = this.game.upgrades.splice(draggedIndex, 1)[0];
                 this.game.upgrades.splice(targetIndex, 0, movedUpgrade);
-
+                this.game.emit(GAME_TRIGGERS.onUpgradesChanged);
                 this.displayUpgradesCounter();
         });
     });
