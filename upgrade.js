@@ -1035,7 +1035,6 @@ export const upgradeBlueprints = [
     
   },
   price: 7,
-  props: defaultimage
 },/*
 {
   name: "Mirror",
