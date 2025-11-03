@@ -1,4 +1,4 @@
-import { GAME_TRIGGERS, MODIFIERS, UPGRADE_RARITY, UPGRADE_STATES } from "./dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, UPGRADE_RARITY, UPGRADE_STATES } from "./dictionary.js";
 
 export class Upgrade {
   constructor(name,descriptionfn, effect, remove, price = 2,props = {}) {
@@ -38,13 +38,13 @@ export class Upgrade {
   addChip(game){
     game.tempscore+=50;
     game.GameRenderer.displayTempScore();
-    return UPGRADE_STATES.Score;
+    return {state:UPGRADE_STATES.Score,message: `+50 pkt`,style: SCORE_ACTIONS.Score};
   }
   addMult(game){
     game.mult*=1.5;
     game.mult = Math.round(game.mult * 100) / 100;
     game.GameRenderer.displayTempScore();
-    return UPGRADE_STATES.Score;
+    return {state:UPGRADE_STATES.Score,message: `X1.5 pkt`,style: SCORE_ACTIONS.Mult};
   }
   addSpecial(game){
     if(this.modifier==MODIFIERS.Chip){

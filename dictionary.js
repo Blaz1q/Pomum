@@ -26,6 +26,12 @@ export const STAGES = {
     Shop: "shop",
     Boss: "boss"
 }
+export const SCORE_ACTIONS = {
+    Mult: 'mult',
+    Score: 'score',
+    Money: 'money',
+    Info: 'upgradeinfo'
+}
 export const DURATIONS = {
     ANIMATION_DURATION: 3*60,
     SWIRL_DURATION: 5*60

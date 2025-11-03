@@ -3,7 +3,7 @@ import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { upgradesList } from "./upgrade.js";
 import { Audio } from "./sound.js";
 import { Tile } from "./Tile.js";
-import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES,UPGRADE_STATES } from "./dictionary.js";
+import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES,UPGRADE_STATES, SCORE_ACTIONS } from "./dictionary.js";
 import { RenderUI } from "./RenderUI.js";
 import { Animator,animate } from "./loadshaders.js";
 import { cyrb128, getRandomString, sfc32 } from "./random.js";
@@ -98,50 +98,73 @@ export class Game{
 async emit(event, payload) {
     const wait = ms => new Promise(r => setTimeout(r, ms));
     let visualChain = Promise.resolve();
+
     console.log(event);
+
     for (const upgrade of this.upgrades) {
         if (!upgrade || typeof upgrade !== "object") continue;
 
         const handlerName = `on${event[0].toUpperCase()}${event.slice(1)}`;
 
-        // Main event handler (new system or legacy props)
+        // Find handler (either direct function or in props)
         const mainHandler = typeof upgrade[handlerName] === "function"
             ? upgrade[handlerName]
             : upgrade.props?.[handlerName];
 
-        // Secondary modifier handler (your special function)
+        // Optional special handler for score
         const specialHandler = (event === "score" && typeof upgrade.specialFunc === "function")
             ? upgrade.specialFunc
             : null;
 
-        // Collect all handlers to call in order
+        // Run all handlers in order
         const handlers = [mainHandler, specialHandler].filter(Boolean);
 
         for (const handler of handlers) {
             const result = handler.call(upgrade, payload);
 
-            if (result === UPGRADE_STATES.Active) {
-                // Visual-only
+            // Normalize return value
+            let state = null;
+            let message = null;
+            let style = SCORE_ACTIONS.Mult;
+            if (typeof result === "object" && result !== null) {
+                state = result.state ?? result.UPGRADE_STATES ?? null;
+                message = result.message ?? null;
+                style = result.style ?? SCORE_ACTIONS.Mult;
+            } else {
+                state = result;
+            }
+
+            // --- Handle result ---
+            if (state === UPGRADE_STATES.Active) {
                 visualChain = visualChain.then(() => {
                     this.GameRenderer.upgradeTrigger(upgrade, 0);
                     this.Audio.playSound("tick.mp3");
+                    if (message) {
+                        const upgradeSlot = this.GameRenderer.getPlayerUpgrades(this.upgrades.indexOf(upgrade));
+                        this.GameRenderer.createPopup(message, upgradeSlot, style);
+                    }
                     return wait(350);
                 });
             }
-            else if (result === UPGRADE_STATES.Score) {
-                // Visual + delay
+            else if (state === UPGRADE_STATES.Score) {
                 visualChain = visualChain.then(() => {
                     this.GameRenderer.upgradeTrigger(upgrade, 0);
                     this.Audio.playSound("tick.mp3");
+
+                    // NEW: show popup if message exists
+                    if (message) {
+                        const upgradeSlot = this.GameRenderer.getPlayerUpgrades(this.upgrades.indexOf(upgrade));
+                        this.GameRenderer.createPopup(message, upgradeSlot, style);
+                    }
                     return wait(350);
                 });
                 await visualChain;
                 visualChain = Promise.resolve();
             }
-            // Failed → ignore
         }
     }
 }
+
     rollUpgrades(count = 3) {
         let available = upgradesList;
 

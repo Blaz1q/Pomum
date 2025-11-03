@@ -241,6 +241,45 @@ displayPlayerUpgrades() {
     getPlayerUpgrades(upgradeid) {
         return document.querySelectorAll('#player-upgrades-container .upgrade-wrapper.bought')[upgradeid];
     }
+    createPopup(text, targetElement, style = 'mult') {
+    if (!targetElement) return;
+
+    // Create popup container (relative to card)
+    const popup = document.createElement("div");
+    popup.className = "upgrade-popup-container";
+
+    // Create square (background)
+    const square = document.createElement("div");
+    square.className = "upgrade-popup-square";
+    square.classList.add(style);
+    console.log(style);
+    square.style.transform = `rotate(${(Math.random() * 20 - 10).toFixed(2)}deg)`; // small random tilt
+
+    // Create text
+    const label = document.createElement("div");
+    label.className = "upgrade-popup-text";
+    label.textContent = text;
+
+    // Assemble
+    popup.appendChild(square);
+    popup.appendChild(label);
+
+    // Add directly inside the upgrade card’s container
+    targetElement.appendChild(popup);
+
+    // Animate in
+    requestAnimationFrame(() => {
+        popup.style.opacity = "1";
+    });
+
+    // Fade out & remove
+    setTimeout(() => {
+        popup.style.opacity = "0";
+        setTimeout(() => popup.remove(), 400);
+    }, 500);
+}
+
+
     upgradeTrigger(upgrade,delay){
         console.log(`upgrade trigger: ${upgrade.name}`,performance.now());
         const gameupgrades = this.game.upgrades;
@@ -255,6 +294,8 @@ displayPlayerUpgrades() {
         upgradePrice.innerHTML = "$"+upgrade.sellPrice;
         setTimeout(()=>{
                 upgradecard.classList.add("triggered");
+                 //this.createPopup(`Wot?`, upgradecard);
+
             setTimeout(()=>{
                 upgradecard.classList.remove("triggered");
             },300);

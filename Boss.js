@@ -46,11 +46,10 @@ const BossBlueprints = [
         },
         revert(game){
             game.fruits[1].props.debuffed = false;
-        },
-        props: {image: 'bear'}
+        }
     },
     {
-        name: "Starfish",
+        name: "Sponge",
         descriptionfn(game){
             return `Wszystkie ${game.fruits[2].icon} nie dają punktów`;
         },
@@ -59,8 +58,7 @@ const BossBlueprints = [
         },
         revert(game){
             game.fruits[2].props.debuffed = false;
-        },
-        props: {image: 'starfish'}
+        }
     },
     {
         name: "Vine",
@@ -72,8 +70,7 @@ const BossBlueprints = [
         },
         revert(game){
             game.fruits[3].props.debuffed = false;
-        },
-        props: {image: 'vine'}
+        }
     },
     {
         name: "Crab",
@@ -92,7 +89,7 @@ const BossBlueprints = [
         name: "Wave",
         descriptionfn(game){
             if(this.props.chosenFruit!=null)
-                return `Najczęstrzy owoc (${this.props.chosenFruit.icon}) nie daje punktów.`;
+                return `Najczęstrzy owoc (${this.props.chosenFruit.icon}) nie dają punktów.`;
             return `Najczęstrzy owoc nie daje punktów.`
         },
         effect(game){
@@ -102,8 +99,7 @@ const BossBlueprints = [
         },
         revert(game){
             this.props.chosenFruit.props.debuffed = false;
-        },
-        props: {image: 'wave'}
+        }
     }
 ];
 export function rollBoss(game) {
