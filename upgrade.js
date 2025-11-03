@@ -1056,7 +1056,6 @@ export const upgradeBlueprints = [
     
   },
   price: 7,
-  props: defaultimage
 },/*
 {
   name: "Mirror",
@@ -1178,3 +1177,4 @@ upgradeBlueprints.forEach(upgrade => {
 });
 // push all blueprints into upgradesList
 upgradeBlueprints.forEach(bp => upgradesList.push(bp));
+
