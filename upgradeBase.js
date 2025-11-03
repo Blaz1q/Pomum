@@ -44,7 +44,7 @@ export class Upgrade {
     game.mult*=1.5;
     game.mult = Math.round(game.mult * 100) / 100;
     game.GameRenderer.displayTempScore();
-    return {state:UPGRADE_STATES.Score,message: `X1.5 pkt`,style: SCORE_ACTIONS.Mult};
+    return {state:UPGRADE_STATES.Score,message: `X1.5 Mult`,style: SCORE_ACTIONS.Mult};
   }
   addSpecial(game){
     if(this.modifier==MODIFIERS.Chip){
@@ -273,4 +273,5 @@ export class Consumable extends Upgrade{
     }
     game.money += Math.floor(this.sellPrice);
   }
+
 }
