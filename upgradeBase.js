@@ -273,5 +273,4 @@ export class Consumable extends Upgrade{
     }
     game.money += Math.floor(this.sellPrice);
   }
-
 }

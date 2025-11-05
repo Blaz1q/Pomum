@@ -46,10 +46,11 @@ const BossBlueprints = [
         },
         revert(game){
             game.fruits[1].props.debuffed = false;
-        }
+        },
+        props: {image: 'bear'}
     },
     {
-        name: "Sponge",
+        name: "Starfish",
         descriptionfn(game){
             return `Wszystkie ${game.fruits[2].icon} nie dają punktów`;
         },
@@ -58,7 +59,8 @@ const BossBlueprints = [
         },
         revert(game){
             game.fruits[2].props.debuffed = false;
-        }
+        },
+        props: {image: 'starfish'}
     },
     {
         name: "Vine",
@@ -70,7 +72,8 @@ const BossBlueprints = [
         },
         revert(game){
             game.fruits[3].props.debuffed = false;
-        }
+        },
+        props: {image: 'vine'}
     },
     {
         name: "Crab",
@@ -99,7 +102,8 @@ const BossBlueprints = [
         },
         revert(game){
             this.props.chosenFruit.props.debuffed = false;
-        }
+        },
+        props: {image: 'wave'}
     }
 ];
 export function rollBoss(game) {
