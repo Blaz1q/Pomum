@@ -104,6 +104,22 @@ const BossBlueprints = [
             this.props.chosenFruit.props.debuffed = false;
         },
         props: {image: 'wave'}
+    },
+    {
+        name: "Needle",
+        descriptionfn(game){
+            return "Mniej ruchów o połowe.";
+        },
+        effect(game){
+            this.props.previousMoves = game.moves;
+            game.moves = Math.round(game.moves/2);
+            game.GameRenderer.displayMoves();
+        },
+        revert(game){
+            game.moves = this.props.previousMoves;
+            game.GameRenderer.displayMoves();
+        },
+        props: {moneyreward: 8}
     }
 ];
 export function rollBoss(game) {

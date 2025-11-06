@@ -1065,8 +1065,8 @@ export const upgradeBlueprints = [
   name: "Mirror",
 
   descriptionfn(game) {
-    if (this?.mirroredUpgrade)
-      return this.mirroredUpgrade.description(game);
+    if (this?.mirroredUpgradeCopy)
+      return this.mirroredUpgradeCopy.description(game);
     return "Kopiuje ulepszenie po swojej prawej stronie.";
   },
 
@@ -1225,7 +1225,20 @@ function deepClone(obj, visited = new WeakMap()) {
 
   price: 8,
   props: { image: "brokenmirror" },
-}  
+},
+/*{
+  name: "torn",
+  descriptionfn(game){
+    return "test";
+  },
+  effect(game){
+
+  },
+  remove(game){
+
+  },
+  price: 2,
+}*/
 
 
  // <-- work in progress, bardzo skomplikowane.

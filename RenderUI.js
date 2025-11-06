@@ -51,7 +51,7 @@ export class RenderUI {
         document.getElementById("roundscore").innerHTML = this.game.calcRoundScore();
         document.getElementById("score").innerHTML = this.game.score;
     }
-
+    
     displayTempScore() {
         this.game.tempscoreBox.innerHTML = this.game.tempscore;
         this.game.multBox.innerHTML = this.game.mult;
@@ -176,8 +176,61 @@ displayPlayerConsumables(){
     const consumables = this.displayUpgrades(this.game.consumables, { bought: true });
     playerConsumables.appendChild(consumables);
 }
-updatePlayerUpgrade(upgrade){
+applyDragEvents(wrapper) {
+    wrapper.draggable = true;
 
+    wrapper.addEventListener("dragstart", (e) => {
+        const container = wrapper.parentElement;
+        if (!container) return;
+        e.dataTransfer.setData("text/plain", [...container.children].indexOf(wrapper));
+        wrapper.classList.add("dragging");
+    });
+
+    wrapper.addEventListener("dragend", () => {
+        wrapper.classList.remove("dragging");
+        wrapper.style.transform = "";
+    });
+
+    wrapper.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        wrapper.classList.add("drag-over");
+    });
+
+    wrapper.addEventListener("dragleave", () => {
+        wrapper.classList.remove("drag-over");
+    });
+
+    wrapper.addEventListener("drop", (e) => {
+        e.preventDefault();
+        wrapper.classList.remove("drag-over");
+
+        const container = wrapper.parentElement;
+        if (!container) return;
+
+        const draggedIndex = parseInt(e.dataTransfer.getData("text/plain"));
+        const targetIndex = [...container.children].indexOf(wrapper);
+
+        if (draggedIndex === targetIndex) return;
+
+        const draggedElement = container.children[draggedIndex];
+
+        draggedElement.style.transition = "";
+        draggedElement.style.transform = "";
+
+        if (draggedIndex < targetIndex) {
+            container.insertBefore(draggedElement, container.children[targetIndex + 1] || null);
+        } else {
+            container.insertBefore(draggedElement, container.children[targetIndex]);
+        }
+
+        // Update upgrade order in the game state
+        const movedUpgrade = this.game.upgrades.splice(draggedIndex, 1)[0];
+        this.game.upgrades.splice(targetIndex, 0, movedUpgrade);
+
+        // Notify listeners and update counter
+        this.game.emit(GAME_TRIGGERS.onUpgradesChanged);
+        this.displayUpgradesCounter();
+    });
 }
 displayPlayerUpgrades() {
     const playerUpgrades = document.getElementById("player-upgrades-container");
@@ -185,55 +238,7 @@ displayPlayerUpgrades() {
     const upgradesFragment = this.displayUpgrades(this.game.upgrades, { bought: true });
 
     upgradesFragment.querySelectorAll(".upgrade-wrapper").forEach((wrapper) => {
-        wrapper.draggable = true;
-
-        wrapper.addEventListener("dragstart", (e) => {
-            e.dataTransfer.setData("text/plain", [...wrapper.parentElement.children].indexOf(wrapper));
-            wrapper.classList.add("dragging");
-        });
-
-        wrapper.addEventListener("dragend", () => {
-            wrapper.classList.remove("dragging");
-            // reset transform after drop
-            wrapper.style.transform = "";
-        });
-
-        wrapper.addEventListener("dragover", (e) => {
-            e.preventDefault();
-            wrapper.classList.add("drag-over");
-        });
-
-        wrapper.addEventListener("dragleave", () => {
-            wrapper.classList.remove("drag-over");
-        });
-
-        wrapper.addEventListener("drop", (e) => {
-            e.preventDefault();
-            wrapper.classList.remove("drag-over");
-
-            const container = wrapper.parentElement;
-            const draggedIndex = parseInt(e.dataTransfer.getData("text/plain"));
-            const targetIndex = [...container.children].indexOf(wrapper);
-
-            if (draggedIndex === targetIndex) return;
-
-            const draggedElement = container.children[draggedIndex];
-
-            draggedElement.style.transition = "";
-                draggedElement.style.transform = "";
-
-                if (draggedIndex < targetIndex) {
-                    container.insertBefore(draggedElement, container.children[targetIndex + 1] || null);
-                } else {
-                    container.insertBefore(draggedElement, container.children[targetIndex]);
-                }
-
-                // Update array
-                const movedUpgrade = this.game.upgrades.splice(draggedIndex, 1)[0];
-                this.game.upgrades.splice(targetIndex, 0, movedUpgrade);
-                this.game.emit(GAME_TRIGGERS.onUpgradesChanged);
-                this.displayUpgradesCounter();
-        });
+        this.applyDragEvents(wrapper);
     });
 
     playerUpgrades.appendChild(upgradesFragment);
@@ -279,7 +284,7 @@ displayPlayerUpgrades() {
     }, 500);
 }
 
-
+    
     upgradeTrigger(upgrade,delay){
         console.log(`upgrade trigger: ${upgrade.name}`,performance.now());
         const gameupgrades = this.game.upgrades;
@@ -349,16 +354,23 @@ displayPlayerUpgrades() {
         wrapper.appendChild(desc);
         return wrapper;
     }
-    displayUpgrades(upgrades, params = { bought:false, origin: null }) {
-    console.log(params.origin);
-    let displayPrice = params.displayPrice ?? true;
-    let displayButtons = params.displayButtons ?? true;
-    let full = document.createDocumentFragment();
+    updateUpgrade(index, params = { bought: true, origin: null }) {
+        const upgrade = this.game.upgrades[index] ?? null;
+        if (!upgrade) return;
 
-    if(params.origin && params.origin.type == "ConsumablePack"){
-        this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
+        const oldWrapper = this.getPlayerUpgrades(index);
+        if (!oldWrapper) return;
+
+        const newWrapper = this.renderUpgrade(upgrade, params);
+        this.applyDragEvents(newWrapper);
+
+        oldWrapper.replaceWith(newWrapper);
+        this.upgradeTrigger(upgrade, 0);
     }
-    upgrades.forEach(up => {
+    renderUpgrade(upgrade,params){
+        let displayPrice = params.displayPrice ?? true;
+        let displayButtons = params.displayButtons ?? true;
+        
         const wrapper = document.createElement("div");
         const originalZ = wrapper.style.zIndex || 0;
         
@@ -366,46 +378,47 @@ displayPlayerUpgrades() {
         wrapper.addEventListener('mouseenter', () => wrapper.style.zIndex = 500);
         wrapper.addEventListener('mouseleave', () => wrapper.style.zIndex = originalZ);
         wrapper.className = "upgrade-wrapper";
-        wrapper.dataset.type = up.type;
+        wrapper.dataset.type = upgrade.type;
         if (params.bought) wrapper.classList.add("bought");
 
         if(params.free){
-            up.price = 0;
+            upgrade.price = 0;
         }
 
         // Price above card
         const priceEl = document.createElement("div");
         priceEl.className = "upgrade-price";
-        priceEl.textContent = `$${params.bought ? up.sellPrice : up.price}`;
+        priceEl.textContent = `$${params.bought ? upgrade.sellPrice : upgrade.price}`;
         
         // Card inner
         const cardInner = document.createElement("div");
         cardInner.className = "upgrade-inner";
-        if(up.negative){
+        if(upgrade.negative){
             cardInner.classList.add("negative");
         }
-        cardInner.style.backgroundImage = `url('${up.image}')`;
+        if(upgrade.modifier!=MODIFIERS.None){
+            cardInner.classList.add("holo");
+        }
+        cardInner.style.backgroundImage = `url('${upgrade.image}')`;
         
         // Card
        
         const card = document.createElement("div");
         card.className = "upgrade-card";
         card.style.animationDelay = `-${Math.random() * 3}s`; 
-        if(up.modifier!=MODIFIERS.None){
-            card.classList.add("holo");
-        }
+        
         card.appendChild(cardInner);
         this.addParalax(card);
         // Description
         const desc = document.createElement("div");
         desc.className = "upgrade-desc";
-        desc.innerHTML = this.createDescription(up);
+        desc.innerHTML = this.createDescription(upgrade);
         
         wrapper.addEventListener("mouseenter", () => {
-            desc.innerHTML = this.createDescription(up);
+            desc.innerHTML = this.createDescription(upgrade);
         });
         if(displayButtons){
-            wrapper.appendChild(this.createUpgradeButtons(wrapper,up,params));
+            wrapper.appendChild(this.createUpgradeButtons(wrapper,upgrade,params));
         }
         // Click handlers
         if(displayPrice){
@@ -413,6 +426,18 @@ displayPlayerUpgrades() {
         }
         wrapper.appendChild(card);
         wrapper.appendChild(desc);
+        return wrapper;
+    }
+    displayUpgrades(upgrades, params = { bought:false, origin: null }) {
+    console.log(params.origin);
+    
+    let full = document.createDocumentFragment();
+
+    if(params.origin && params.origin.type == "ConsumablePack"){
+        this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
+    }
+    upgrades.forEach(up => {
+        const wrapper = this.renderUpgrade(up,params);
         full.appendChild(wrapper);
     });
 

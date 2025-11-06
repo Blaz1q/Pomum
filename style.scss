@@ -352,15 +352,24 @@ canvas#glcanvas {
         }
         &.debuffed{
           background-color: rgba(255, 0, 0, 0.403);
+          &.gold{
+            background-color: rgba(255, 187, 0, 0.403);
+          }
+          &.silver{
+            background-color: rgba(255, 153, 153, 0.403);
+          }
         }
         &.fade {
           opacity: 0;
         }
 
         &.selected {
-          background: #ff7675;
+          background: #b1ff09;
           color: white;
           font-weight: bold;
+          &:hover{
+            background-color: #ffa749;
+          }
         }
 
         &:hover {
@@ -499,48 +508,12 @@ canvas#glcanvas {
     animation: skewCard 6s infinite ease-in-out;
     transition: box-shadow 0.2s ease;
     z-index: 5;
-    &.holo {
-  .upgrade-inner {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-
-    &::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      pointer-events: none;
-
-      /* animated holographic gradient */
-      background: linear-gradient(
-        130deg,
-        hsla(300, 100%, 60%, 0.801), hsla(210, 100%, 60%, 0.807), hsla(60, 100%, 60%, 0.79)
-      );
-      background-size: 400% 400%;
-      mix-blend-mode:hard-light; /* shows only on non-transparent pixels */
-      opacity: 0.5;
-
-      /* make it shimmer smoothly */
-      animation: holoShift 6s ease-in-out infinite alternate;
-
-      /* boost vibrancy and brightness slightly */
-      filter: contrast(1.2);
-      transition: filter 0.4s ease, opacity 0.4s ease;
-    }
-
-    &:hover::after {
-      opacity: 0.6;
-      filter: contrast(1.2);
-      animation-duration: 3s;
-    }
-  }
-}
     .upgrade-inner {
       width: 100%;
       height: 100%;
-      background-size: cover;
+      background-size: contain;
       background-position: center;
+      background-repeat: no-repeat;
       display: flex;
       align-items: flex-end;
       transition: filter 0.3s ease, transform 0.3s ease;;
@@ -740,7 +713,13 @@ canvas#glcanvas {
   padding-right: .2em;
 }
 .negative{
-  animation: animateNegative 3s infinite ease-in-out;
+  filter: invert(1)
+}
+.holo{
+  filter: url(#holo-map);
+}
+.holo.negative{
+  filter: invert(1) url(#holo-map);
 }
 #upgrade-tiles {
   display: none; // hidden initially
@@ -790,7 +769,6 @@ canvas#glcanvas {
       }
     }
 }
-
 /* Tooltip for tiles */
 .tile {
   position: relative;
@@ -864,6 +842,17 @@ canvas#glcanvas {
   75% { transform: translateX(-2px); }
   90% { transform: translateX(2px); }
   100% { transform: translateX(0); }
+}
+@keyframes huerot {
+  0% {
+    filter: brightness(0) saturate(100%) invert(13%) sepia(100%) saturate(6204%) hue-rotate(1deg) brightness(102%) contrast(110%);
+  }
+  50% {
+     filter: brightness(0) saturate(100%) invert(8%) sepia(98%) saturate(7497%) hue-rotate(261deg) brightness(101%) contrast(129%);
+  }
+  100% {
+    filter: brightness(0) saturate(100%) invert(65%) sepia(62%) saturate(1326%) hue-rotate(82deg) brightness(105%) contrast(111%);
+  }
 }
 @keyframes skewCard {
   0% {

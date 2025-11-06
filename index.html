@@ -10,6 +10,25 @@
   <script type="module" defer src="loadshaders.js"></script>
 </head>
 <body>
+<svg style="display:none">
+  <filter id="holo-map" color-interpolation-filters="sRGB">
+    <!-- Keep IDs for JS -->
+     
+    <feComponentTransfer in="SourceGraphic" result="colorMap">
+      <feFuncR id="funcR" type="table" tableValues="0 0.5 1" />
+      <feFuncG id="funcG" type="table" tableValues="0.5 1 0" />
+      <feFuncB id="funcB" type="table" tableValues="1 0 0.5" />
+    </feComponentTransfer>
+
+    <!-- Blend step -->
+    <feBlend in="SourceGraphic" in2="colorMap" mode="saturation" />
+    <feComposite in="SourceGraphic" in2="colorMap"
+  operator="arithmetic" k1="0" k2="0.6" k3="0.4" k4="0" />
+  <!-- k2 = orginał, k3 = przefiltrowany -->
+  </filter>
+</svg>
+
+
     <div id="menu">
     <img src="./images/pomumlogo.png" alt="Pomum" srcset="">
     <button id="startBtn" onclick="startGame()">Rozpocznij</button>

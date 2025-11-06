@@ -486,7 +486,7 @@ trySwap(x1, y1, x2, y2) {
         return true;
     }
     sell(upgrade){
-        if(this.stage!==STAGES.Shop) return false; // not in shop -> can't sell
+        //if(this.stage!==STAGES.Shop) return false; // not in shop -> can't sell
         this.Audio.playSound('sell.mp3');
         if(upgrade.type=="Upgrade"){
             const index = this.upgrades.indexOf(upgrade) ?? -1;
@@ -1516,6 +1516,20 @@ function showInfo(){
 function hideInfo(){
     document.getElementById("info-container").style.display = "none";
 }
+const R = document.getElementById('funcR');
+const G = document.getElementById('funcG');
+const B = document.getElementById('funcB');
+
+let t = 0;
+function animateholo() {
+  t += 0.02;
+  const hue = Math.sin(t) * 0.5 + 0.5;
+  R.setAttribute('tableValues', `0 ${hue.toFixed(2)} 1`);
+  G.setAttribute('tableValues', `0 ${(1-hue).toFixed(2)} 1`);
+  B.setAttribute('tableValues', `${hue.toFixed(2)} 0 1`);
+  requestAnimationFrame(animateholo);
+}
+animateholo();
 window.skip = skip;
 window.game = game;
 window.showInfo = showInfo;

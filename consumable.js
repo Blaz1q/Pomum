@@ -192,11 +192,12 @@ const consumableUpgradeBlueprints = [
         effect(game){
             if(game.upgrades.length==0) return;
             let upgrades = game.upgrades.filter( upgrade => (upgrade.negative!=true));
+            if(upgrades.length==0) return
             let index = Math.floor(Math.random() * upgrades.length); 
             upgrades[index].negative = true;
             game.maxUpgrades+=1;
             game.GameRenderer.displayUpgradesCounter();
-            game.GameRenderer.displayPlayerUpgrades();
+            game.GameRenderer.updateUpgrade(game.upgrades.indexOf(upgrades[index]));
         },
         price: 8,
         props: {image: 'default'}
@@ -222,6 +223,9 @@ const consumableUpgradeBlueprints = [
             copyUpgrade.apply(game);
             console.log(copy);
             console.log(copyUpgrade);
+            game.upgrades.forEach(upgrade => {
+                upgrade.remove(game);
+            });
             game.upgrades = [];
             game.upgrades.push(copy,copyUpgrade);  
             game.GameRenderer.displayPlayerUpgrades();
@@ -244,7 +248,7 @@ const consumableUpgradeBlueprints = [
             else
                  upgrade.modifier = MODIFIERS.Mult;
             upgrade.addSpecial(game);
-            game.GameRenderer.displayPlayerUpgrades();
+            game.GameRenderer.updateUpgrade(index);
         },
         price: 8,
         props: {image: 'default'}
