@@ -200,7 +200,7 @@ const consumableUpgradeBlueprints = [
             game.GameRenderer.updateUpgrade(game.upgrades.indexOf(upgrades[index]));
         },
         price: 8,
-        props: {image: 'default'}
+        props: {image: 'negative'}
     },
     {
         name: "Copy",
@@ -232,7 +232,7 @@ const consumableUpgradeBlueprints = [
             game.GameRenderer.displayUpgradesCounter();
         },
         price: 8,
-        props: {image: 'default'}
+        props: {image: 'copy'}
     },
     {
         name: "Foiled",
@@ -251,7 +251,7 @@ const consumableUpgradeBlueprints = [
             game.GameRenderer.updateUpgrade(index);
         },
         price: 8,
-        props: {image: 'default'}
+        props: {image: 'foiled'}
     }
 ]
 const consumableGoldBlueprints = [

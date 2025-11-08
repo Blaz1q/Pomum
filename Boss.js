@@ -111,12 +111,12 @@ const BossBlueprints = [
             return "Mniej ruchów o połowe.";
         },
         effect(game){
-            this.props.previousMoves = game.moves;
-            game.moves = Math.round(game.moves/2);
+            this.props.removedMoves = Math.round(game.moves/2);
+            game.moves -=this.props.removedMoves;
             game.GameRenderer.displayMoves();
         },
         revert(game){
-            game.moves = this.props.previousMoves;
+            game.moves += this.props.removedMoves;
             game.GameRenderer.displayMoves();
         },
         props: {moneyreward: 8}
