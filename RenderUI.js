@@ -19,6 +19,7 @@ export class RenderUI {
     }
     updateMoney(ammount){
         let moneyContainer = document.getElementsByClassName('money')[0];
+        moneyContainer.className = 'money';
         if(ammount==0){
             return;
         }
@@ -366,8 +367,10 @@ displayPlayerUpgrades() {
 
         oldWrapper.replaceWith(newWrapper);
         this.upgradeTrigger(upgrade, 0);
+        this.game.Audio.playSound('tick.mp3');
     }
     renderUpgrade(upgrade,params){
+        let bought = params.bought ?? false;
         let displayPrice = params.displayPrice ?? true;
         let displayButtons = params.displayButtons ?? true;
         
@@ -379,7 +382,7 @@ displayPlayerUpgrades() {
         wrapper.addEventListener('mouseleave', () => wrapper.style.zIndex = originalZ);
         wrapper.className = "upgrade-wrapper";
         wrapper.dataset.type = upgrade.type;
-        if (params.bought) wrapper.classList.add("bought");
+        if (bought) wrapper.classList.add("bought");
 
         if(params.free){
             upgrade.price = 0;
@@ -393,11 +396,32 @@ displayPlayerUpgrades() {
         // Card inner
         const cardInner = document.createElement("div");
         cardInner.className = "upgrade-inner";
+        let classes  = [];
         if(upgrade.negative){
-            cardInner.classList.add("negative");
+            classes.push("negative");
         }
         if(upgrade.modifier!=MODIFIERS.None){
-            cardInner.classList.add("holo");
+            classes.push("holo");
+        }
+        if(!bought&&classes.length>0){
+            classes.forEach(element => {
+                cardInner.classList.add(element);
+            });
+            wrapper.classList.add("triggered");
+            if(upgrade.negative){
+                this.game.Audio.playSound('foil_reverse.mp3');
+            }
+            else{
+                this.game.Audio.playSound('foil.mp3');
+            }
+            this.game.Audio.playSound('tick.mp3');
+            
+            setTimeout(() => wrapper.classList.remove("triggered"), 300+Math.floor(Math.random()*20));
+        }
+        else if(bought&&classes.length>0){
+            classes.forEach(element => {
+                cardInner.classList.add(element);
+            });
         }
         cardInner.style.backgroundImage = `url('${upgrade.image}')`;
         

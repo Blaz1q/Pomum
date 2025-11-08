@@ -13,8 +13,9 @@ function add(fruit){
     fruit.levelUp();
 }
 const consumableBlueprints = [];
-consumableBlueprints.push(
-    {
+const consumableLvlUp = [];
+const consumbaleEvil = [];
+consumableLvlUp.push(    {
         name: "Jabłko",
         description(game) {
             return desc(game.fruits[0]);
@@ -22,7 +23,7 @@ consumableBlueprints.push(
         effect(game) {
             add(game.fruits[0]);
         },
-        price: 5,
+        price: 3,
         props: { image: "lvlup_apple", getFruit(game){return game.fruits[0];}
         }
     },
@@ -34,7 +35,7 @@ consumableBlueprints.push(
         effect(game) {
             add(game.fruits[1]);
         },
-        price: 5,
+        price: 3,
         props: { image: "lvlup_pear", getFruit(game){return game.fruits[1];} }
     },
     {
@@ -45,7 +46,7 @@ consumableBlueprints.push(
         effect(game) {
             add(game.fruits[2]);
         },
-        price: 5,
+        price: 3,
         props: { image: "lvlup_pineapple", getFruit(game){return game.fruits[2];} }
     },
     {
@@ -56,7 +57,7 @@ consumableBlueprints.push(
         effect(game) {
             add(game.fruits[3]);
         },
-        price: 5,
+        price: 3,
         props: { image: "lvlup_grape", getFruit(game){return game.fruits[3];} }
     },
     {
@@ -67,9 +68,10 @@ consumableBlueprints.push(
         effect(game) {
             add(game.fruits[4]);
         },
-        price: 5,
+        price: 3,
         props: { image: "lvlup_coconut", getFruit(game){return game.fruits[4];} }
-    },
+    },)
+consumbaleEvil.push(
     {
         name: "EVIL Jabłko",
         description(game) {
@@ -78,7 +80,7 @@ consumableBlueprints.push(
         effect(game) {
             evilfunc(game, game.fruits[0]);
         },
-        price: 5,
+        price: 3,
         props: { image: "devil_apple", getFruit(game){return game.fruits[0];} }
     },
     {
@@ -89,7 +91,7 @@ consumableBlueprints.push(
         effect(game) {
             evilfunc(game, game.fruits[1]);
         },
-        price: 5,
+        price: 3,
         props: { image: "devil_pear", getFruit(game){return game.fruits[1];} }
     },
     {
@@ -100,7 +102,7 @@ consumableBlueprints.push(
         effect(game) {
             evilfunc(game, game.fruits[3]);
         },
-        price: 5,
+        price: 3,
         props: { image: "devil_grape", getFruit(game){return game.fruits[3];} }
     },
     {
@@ -111,7 +113,7 @@ consumableBlueprints.push(
         effect(game) {
             evilfunc(game, game.fruits[2]);
         },
-        price: 5,
+        price: 3,
         props: { image: "devil_pineapple", getFruit(game){return game.fruits[2];} }
     },
     {
@@ -122,7 +124,7 @@ consumableBlueprints.push(
         effect(game) {
             evilfunc(game, game.fruits[4]);
         },
-        price: 5,
+        price: 3,
         props: { image: "devil_coconut", getFruit(game){return game.fruits[4];} }
     }
 );
@@ -135,7 +137,7 @@ const consumableSilverBlueprints = [
         effect(game){
             silverFunc(game,game.fruits[0]);
         },
-        price: 8,
+        price: 3,
         props: {image: 'lvlup_apple_silver', getFruit(game){return game.fruits[0];}}
     },
     {
@@ -146,7 +148,7 @@ const consumableSilverBlueprints = [
         effect(game){
             silverFunc(game,game.fruits[1]);
         },
-        price: 8,
+        price: 3,
         props: {image: 'lvlup_pear_silver', getFruit(game){return game.fruits[1];}}
     },
     {
@@ -157,7 +159,7 @@ const consumableSilverBlueprints = [
         effect(game){
             silverFunc(game,game.fruits[3]);
         },
-        price: 8,
+        price: 3,
         props: {image: 'lvlup_grape_silver', getFruit(game){return game.fruits[3];}}
     },
     {
@@ -168,7 +170,7 @@ const consumableSilverBlueprints = [
         effect(game){
             silverFunc(game,game.fruits[2]);
         },
-        price: 8,
+        price: 3,
         props: {image: 'lvlup_pineapple_silver', getFruit(game){return game.fruits[2];}}
     },
     {
@@ -179,7 +181,7 @@ const consumableSilverBlueprints = [
         effect(game){
             silverFunc(game,game.fruits[4]);
         },
-        price: 8,
+        price: 3,
         props: {image: 'lvlup_coconut_silver', getFruit(game){return game.fruits[4];}}
     }
 ];
@@ -198,6 +200,7 @@ const consumableUpgradeBlueprints = [
             game.maxUpgrades+=1;
             game.GameRenderer.displayUpgradesCounter();
             game.GameRenderer.updateUpgrade(game.upgrades.indexOf(upgrades[index]));
+            game.Audio.playSound('foil_reverse.mp3');
         },
         price: 8,
         props: {image: 'negative'}
@@ -235,6 +238,28 @@ const consumableUpgradeBlueprints = [
         props: {image: 'copy'}
     },
     {
+        name: "Thunder",
+        description(game){
+            return `Daje 4 losowe ulepszenia owoców. (Mogą się powtarzać)`;
+        },
+        effect(game){
+            const filter = [...consumableLvlUp,...consumableGoldBlueprints,...consumableSilverBlueprints];
+            for(var i=0;i<4;i++){
+                const picked = Math.floor(Math.random()*filter.length); 
+                const con = filter[picked];
+                const consumable = new Consumable(con.name,con.description,con.effect,con.price,con.props);
+                consumable.negative = true;
+                game.consumables.push(consumable);
+            }
+            game.maxConsumables+=4;
+            game.Audio.playSound('foil_reverse.mp3');
+            game.GameRenderer.displayPlayerConsumables();
+            game.GameRenderer.displayConsumablesCounter();
+        },
+        price: 8,
+        props: {image: 'thunder'}
+    },
+    {
         name: "Foiled",
         description(game){
             return `Losowe ulepszenie dostaje bonusowe ${Style.Chance(MODIFIERS.Chip)}, lub ${Style.Chance(MODIFIERS.Mult)}`;
@@ -249,9 +274,27 @@ const consumableUpgradeBlueprints = [
                  upgrade.modifier = MODIFIERS.Mult;
             upgrade.addSpecial(game);
             game.GameRenderer.updateUpgrade(index);
+            game.Audio.playSound('foil.mp3');
         },
         price: 8,
         props: {image: 'foiled'}
+    },
+    {
+        name: "Fire",
+        description(game){
+            return `Daje cenę sprzedarzy kupionych ulepszeń. (Max ${Style.Money(`$40`)})`;
+        },
+        effect(game){
+            let money = 0;
+            game.upgrades.forEach(upgrade => {
+                money+=upgrade.sellPrice;
+            });
+            if(money>40) money = 40;
+            game.money += 40;
+            game.GameRenderer.updateMoney(money);
+        },
+        price: 8,
+        props: {image: 'fire'}
     }
 ]
 const consumableGoldBlueprints = [
@@ -263,7 +306,7 @@ const consumableGoldBlueprints = [
         effect(game){
             goldFunc(game,game.fruits[0]);
         },
-        price: 8,
+        price: 3,
         props: {image: 'lvlup_apple_gold', getFruit(game){return game.fruits[0];}}
     },
     {
@@ -274,7 +317,7 @@ const consumableGoldBlueprints = [
         effect(game){
             goldFunc(game,game.fruits[1]);
         },
-        price: 8,
+        price: 3,
         props: {image: 'lvlup_pear_gold', getFruit(game){return game.fruits[1];}}
     },
     {
@@ -285,7 +328,7 @@ const consumableGoldBlueprints = [
         effect(game){
             goldFunc(game,game.fruits[3]);
         },
-        price: 8,
+        price: 3,
         props: {image: 'lvlup_grape_gold', getFruit(game){return game.fruits[3];}}
     },
     {
@@ -296,18 +339,18 @@ const consumableGoldBlueprints = [
         effect(game){
             goldFunc(game,game.fruits[2]);
         },
-        price: 8,
+        price: 3,
         props: {image: 'lvlup_pineapple_gold', getFruit(game){return game.fruits[2];}}
     },
     {
-        name: "Silver Kokos",
+        name: "Gold Kokos",
         description(game){
             return goldDesc(game.fruits[4]);
         },
         effect(game){
             goldFunc(game,game.fruits[4]);
         },
-        price: 8,
+        price: 3,
         props: {image: 'lvlup_coconut_gold', getFruit(game){return game.fruits[4];}}
     }
 ];
@@ -410,6 +453,13 @@ export function rollVouchers(game, count = 1) {
     return shuffled.slice(0, count);
 }
 vouchers.push(voucher,overstock,movevoucher);
+consumableBlueprints.push(...consumableLvlUp,...consumbaleEvil);
+consumbaleEvil.forEach(consumable => {
+    consumable.type = "Consumable";
+});
+consumableLvlUp.forEach(consumable => {
+    consumable.type = "Consumable";
+});
 consumableBlueprints.forEach(consumable => {
     consumable.type = "Consumable";
 });

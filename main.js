@@ -450,9 +450,9 @@ trySwap(x1, y1, x2, y2) {
         if(this.stage!==STAGES.Shop) return false;
         if(this.money<upgrade.price) return false;
         this.Audio.playSound('buy.mp3');
-        upgrade.apply(this);
         this.money -= upgrade.price;
         this.GameRenderer.updateMoney(-upgrade.price);
+        upgrade.apply(this);
         //this.GameRenderer.displayMoney();
         return true;
     }
@@ -469,6 +469,7 @@ trySwap(x1, y1, x2, y2) {
             this.GameRenderer.displayUpgradesCounter();
             this.emit(GAME_TRIGGERS.onUpgradesChanged);
         }else if(upgrade.type=="Consumable"){
+            if(upgrade.negative) this.maxConsumables+=1;
             this.consumables.push(upgrade);
             this.GameRenderer.displayPlayerConsumables();
             this.GameRenderer.displayConsumablesCounter();   
