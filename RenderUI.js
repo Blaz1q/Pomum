@@ -1,7 +1,7 @@
 import { consumableList,rollConsumablePacks,rollVouchers } from "./consumable.js";
 import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { animate,Animator } from "./loadshaders.js";
-import { COLORS,GAMECOLORS, DURATIONS, STAGES, MODIFIERS, GAME_TRIGGERS } from "./dictionary.js";
+import { COLORS,GAMECOLORS, DURATIONS, STAGES, MODIFIERS, GAME_TRIGGERS, UPGRADE_STATES } from "./dictionary.js";
 import { rollBoss } from "./Boss.js";
 export class RenderUI {
     constructor(game) {
@@ -286,7 +286,7 @@ displayPlayerUpgrades() {
 }
 
     
-    upgradeTrigger(upgrade,delay){
+    upgradeTrigger(upgrade,delay,action=UPGRADE_STATES.Active){
         console.log(`upgrade trigger: ${upgrade.name}`,performance.now());
         const gameupgrades = this.game.upgrades;
         const index = gameupgrades.indexOf(upgrade);
@@ -298,14 +298,32 @@ displayPlayerUpgrades() {
 
         const upgradePrice = upgradecard.querySelector(".upgrade-price");
         upgradePrice.innerHTML = "$"+upgrade.sellPrice;
-        setTimeout(()=>{
-                upgradecard.classList.add("triggered");
-                 //this.createPopup(`Wot?`, upgradecard);
+        switch(action){
+            case UPGRADE_STATES.Active:
+            case UPGRADE_STATES.Score:{
+                setTimeout(()=>{
+                    upgradecard.classList.add("triggered");
+                    //this.createPopup(`Wot?`, upgradecard);
 
-            setTimeout(()=>{
-                upgradecard.classList.remove("triggered");
-            },300);
-        },delay)
+                setTimeout(()=>{
+                    upgradecard.classList.remove("triggered");
+                    upgradecard.classList.remove("ready"); // remove ready if ready
+                    upgrade.isReady = false;
+                },300);
+                },delay)
+            }
+            break;
+            case UPGRADE_STATES.Ready:
+            {
+                upgradecard.classList.add("ready");
+            }
+            break;
+            case UPGRADE_STATES.Tried:
+            {
+                upgradecard.classList.remove("ready");
+            }
+            break;
+        }
     }
     displayUpgradesInShop() {
         const shopEl = document.getElementById("upgrades-container");
@@ -383,7 +401,10 @@ displayPlayerUpgrades() {
         wrapper.className = "upgrade-wrapper";
         wrapper.dataset.type = upgrade.type;
         if (bought) wrapper.classList.add("bought");
-
+        console.log(upgrade.isReady);
+        if (upgrade.isReady){
+            wrapper.classList.add("ready");
+        }
         if(params.free){
             upgrade.price = 0;
         }

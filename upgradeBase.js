@@ -11,6 +11,7 @@ export class Upgrade {
     this.active = true;
     this.bought = false;
     this.negative = false;
+    this.isReady = false;
     this.type = "Upgrade";
     this.image = `./images/cards/${props.image ? props.image.toLowerCase() : name.toLowerCase()}.png`
     this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.Common;

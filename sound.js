@@ -5,7 +5,7 @@ export class Audio{
  * @param {number} pitch - Playback rate (1 = normal, 2 = one octave up, 0.5 = one octave down)
  */
 static async playSound(url, pitch = 1) {
-  const buffer = await loadSound(url);
+  const buffer = await loadSound('./sounds/'+url);
   const source = audioContext.createBufferSource();
   source.buffer = buffer;
   source.playbackRate.value = pitch; // changes pitch

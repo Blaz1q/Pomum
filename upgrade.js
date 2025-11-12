@@ -755,7 +755,7 @@ export const upgradeBlueprints = [
       
     },
     price: 8,
-    props: {image: 'default'}
+    props: {image: '6pak'}
   },
   {
     name: "Money Maker",
@@ -785,7 +785,7 @@ export const upgradeBlueprints = [
       
     },
     price: 4,
-    props: {image: 'default'}
+    props: {image: 'moneymaker'}
   },
   {
     name: "fish",
@@ -1001,6 +1001,10 @@ export const upgradeBlueprints = [
   effect(game){
     this.setProps({
       chosenFruit: null,
+      onRoundStart: ()=>{
+        this.isReady = true;
+        return UPGRADE_STATES.Ready;
+      },
       onMove: (matches)=>{
         if(game.consumables.length>=game.maxConsumables) return UPGRADE_STATES.Failed;
         if(this.props.chosenFruit!=null) return UPGRADE_STATES.Failed;
@@ -1061,9 +1065,7 @@ export const upgradeBlueprints = [
   },
   price: 7,
 },
-{
-  name: "Mirror",
-
+{ name: "Mirror",
   descriptionfn(game) {
     if (this?.mirroredUpgradeCopy)
       return this.mirroredUpgradeCopy.description(game);
@@ -1226,23 +1228,136 @@ function deepClone(obj, visited = new WeakMap()) {
   price: 8,
   props: { image: "brokenmirror" },
 },
-/*{
-  name: "torn",
+{ name: "Adrenaline",
   descriptionfn(game){
-    return "test";
+    return `Jeżeli zostało mniej niż 3 ruchy, ${Style.Mult(`+10 Mult`)}`
   },
   effect(game){
-
+    this.setProps({
+      onScore: ()=>{
+        if(game.moves-game.movescounter<3){
+        game.mult+=10;
+        return { state: UPGRADE_STATES.Score, message: `+10 Mult`, style: SCORE_ACTIONS.Mult };
+      }
+      return UPGRADE_STATES.Failed;
+    }
+    });
+  },
+  remove(game){},
+  price: 5,
+  props: defaultimage
+},
+{ name: "Critical Hit",
+  descriptionfn(game){
+    var mult = this.props.mult ?? 1;
+    return `${Style.Chance(`1 na 20`)} że co kaskade dostanie się ${Style.Mult(`X3 Mult`)}, (Obecnie ${Style.Mult('X'+mult+' Mult')})`;
+  },
+  effect(game){
+      this.setProps({
+        mult: 1,
+        onMatch: (matches)=>{
+          if(Math.random()<0.05){
+            this.props.mult *= 3;
+            this.props.mult = Math.round(this.props.mult * 100) / 100;
+            return { state: UPGRADE_STATES.Active, message: `X3 Mult`, style: SCORE_ACTIONS.Info };
+          }
+          return UPGRADE_STATES.Failed;
+        },
+        onScore: ()=>{
+          if(this.props.mult>1){
+            const gained = this.props.mult;
+            game.mult *= this.props.mult;
+            game.mult = Math.round(game.mult * 100) / 100;
+            game.GameRenderer.displayTempScore();
+            this.props.mult = 1;
+            return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };
+          }
+          return UPGRADE_STATES.Failed;
+        }
+      });
+  },
+  remove(game){},
+  price: 6,
+  props: defaultimage
+},
+{ name: "Soul Eater",
+  descriptionfn(game){
+    var mult = this.props.mult ?? 1;
+    return `Na początku rundy niszczy ulepszenie po prawej stronie i zyskuje ${Style.Mult(`+Mult ceny sprzedarzy`)} ulepszenia. (Obecnie ${Style.Mult(`+${mult} Mult`)})`;
+  },
+  effect(game){
+    this.isReady = true;
+    this.getRightNeighbor = () => {
+      const index = game.upgrades.indexOf(this);
+      if (index === -1 || index + 1 >= game.upgrades.length) return null;
+      return game.upgrades[index + 1];
+    };
+    this.setProps({
+      mult: 1,
+      onRoundStart: () => {
+        const neighbor = this.getRightNeighbor();
+        if(neighbor!=null){
+          const gained = neighbor.sellPrice
+          const index = game.upgrades.indexOf(neighbor);
+          this.props.mult += gained;
+          neighbor.remove(game);
+          game.upgrades.splice(index, 1);
+          game.GameRenderer.displayPlayerUpgrades();
+          return { state: UPGRADE_STATES.Active, message: `+${gained} Mult`, style: SCORE_ACTIONS.Info };
+        }
+        return {state: UPGRADE_STATES.Tried, message: `Failed`, style: SCORE_ACTIONS.Failed}
+      },
+      onScore: ()=>{
+          const gained = this.props.mult;
+          game.mult += this.props.mult;
+          game.GameRenderer.displayTempScore();
+          return { state: UPGRADE_STATES.Score, message: `+${gained} Mult`, style: SCORE_ACTIONS.Mult };
+        },
+        onRoundEnd : ()=>{
+          this.isReady = true;
+          return UPGRADE_STATES.Ready;
+        }
+    });
+},
+remove(game){},
+price: 7,
+props: defaultimage
+},
+{ name: "counter",
+  descriptionfn(game){
+    var mult = this.props.mult ?? 1;
+    return `Co 15 zniszczonych owoców ${Style.Mult(`+1 Mult`)}. (Obecnie ${Style.Mult(`${mult} Mult`)})`;
+  },
+  effect(game){
+    this.setProps({
+      mult: 1,
+      count: 0,
+      onMatch: (matches) => {
+        this.props.count+=matches.length;
+        var added = false;
+        if(this.props.count>=15) added = true;
+        while(this.props.count>=15){
+          this.props.count-=15;
+          this.props.mult+=1;
+        }
+        if(added) return UPGRADE_STATES.Active;
+        return UPGRADE_STATES.Failed;
+      },
+      onScore: ()=>{
+        game.mult+=this.props.mult;
+        game.GameRenderer.displayTempScore();
+        return { state: UPGRADE_STATES.Score, message: `+${this.props.mult} Mult`, style: SCORE_ACTIONS.Mult };
+      }
+    });
   },
   remove(game){
 
   },
-  price: 2,
-}*/
+  price: 6,
+  props: defaultimage
 
-
- // <-- work in progress, bardzo skomplikowane.
-  ];
+}
+];
 
   
 upgradeBlueprints.forEach(upgrade => {

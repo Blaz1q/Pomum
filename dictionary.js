@@ -28,9 +28,11 @@ export const STAGES = {
 }
 export const SCORE_ACTIONS = {
     Mult: 'mult',
+    XMult: 'xmult',
     Score: 'score',
     Money: 'money',
-    Info: 'upgradeinfo'
+    Info: 'upgradeinfo',
+    Failed: 'failed',
 }
 export const DURATIONS = {
     ANIMATION_DURATION: 3*60,
@@ -39,7 +41,9 @@ export const DURATIONS = {
 export const UPGRADE_STATES = {
     Score: 1, // When Scoring
     Failed: 0,  // Triggered with no success
-    Active: 2   // Effect active
+    Active: 2,   // Effect active
+    Ready: 3,    // Upgrade is ready to do something
+    Tried: 4     // Tried but failed.
 }
 export const UPGRADE_RARITY = {
     Common: 0,

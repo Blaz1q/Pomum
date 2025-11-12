@@ -454,6 +454,9 @@ canvas#glcanvas {
   &.triggered{
       animation: triggeredCard 0.3s ease-in-out;
   }
+  &.ready .upgrade-inner{
+    animation: readyCard 1s ease-in-out infinite;
+  }
   .consumable-buttons {
   position: absolute;
   right: 0; /* keep hidden off to the right */
@@ -815,6 +818,17 @@ canvas#glcanvas {
 }
 .notEnough{
   animation: shake 0.4s ease-in-out;
+}
+@keyframes readyCard{
+  0%,100%{
+    transform: rotate(0deg);
+  }
+  20%,40%,60%,80%{
+    transform: rotate(-1deg);
+  }
+  10%,30%,50%,90%{
+    transform: rotate(1deg);
+  }
 }
 @keyframes triggeredCard {
   	0%, 20%, 50%, 80%, 100% {

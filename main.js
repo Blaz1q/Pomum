@@ -135,9 +135,9 @@ async emit(event, payload) {
             }
 
             // --- Handle result ---
-            if (state === UPGRADE_STATES.Active) {
+            if (state === UPGRADE_STATES.Active||state === UPGRADE_STATES.Ready||state === UPGRADE_STATES.Tried) {
                 visualChain = visualChain.then(() => {
-                    this.GameRenderer.upgradeTrigger(upgrade, 0);
+                    this.GameRenderer.upgradeTrigger(upgrade, 0,state);
                     this.Audio.playSound("tick.mp3");
                     if (message) {
                         const upgradeSlot = this.GameRenderer.getPlayerUpgrades(this.upgrades.indexOf(upgrade));
