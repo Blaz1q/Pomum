@@ -1,4 +1,4 @@
-import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, UPGRADE_RARITY, UPGRADE_STATES } from "./dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, UPGRADE_RARITY, UPGRADE_RARITY_NAME, UPGRADE_STATES } from "./dictionary.js";
 
 export class Upgrade {
   constructor(name,descriptionfn, effect, remove, price = 2,props = {}) {
@@ -14,7 +14,7 @@ export class Upgrade {
     this.isReady = false;
     this.type = "Upgrade";
     this.image = `./images/cards/${props.image ? props.image.toLowerCase() : name.toLowerCase()}.png`
-    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.Common;
+    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
     this.modifier = MODIFIERS.None;
     this.specialFunc;
     this.props = {...props};

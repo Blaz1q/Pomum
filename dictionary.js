@@ -6,7 +6,8 @@ export const GAME_TRIGGERS = {
     onMove: "move",
     onUpgradeTriggered: "upgradeTrigger",
     onScore: "score",
-    onUpgradesChanged: "UpgradesChanged"
+    onUpgradesChanged: "UpgradesChanged",
+    onConsumableUse: "ConsumableUse"
 };
 export const TYPES = {
     Fruit: "fruit",
@@ -46,9 +47,19 @@ export const UPGRADE_STATES = {
     Tried: 4     // Tried but failed.
 }
 export const UPGRADE_RARITY = {
-    Common: 0,
-    Uncommon: 1,
-    Rare: 2
+    Common: 20,
+    Uncommon: 10,
+    Rare: 5,
+    ConsumableCommon: 1,
+    ConsumableRare: 0.5
+}
+export const UPGRADE_RARITY_NAME = {
+    Common: {name: `Common`,display: `Common`},
+    Uncommon: {name: `Uncommon`,display: `Uncommon`},
+    Rare: {name: `Rare`,display: `Rare`},
+    ConsumableCommon: {name: `ConsumableCommon`,display: `Common`},
+    ConsumableRare: {name: `ConsumableRare`,display: `Rare`},
+    None: {name: 'none', display: 'none'}
 }
 export const COLORS = {
     boss: ["#737373ff","#888888ff","#a3a3a3ff"],

@@ -1,7 +1,7 @@
 import { Upgrade,Consumable,Voucher,ConsumablePack } from "./upgradeBase.js";
 import { Style } from "./RenderUI.js";
 import { upgradesList } from "./upgrade.js";
-import { MODIFIERS } from "./dictionary.js";
+import { MODIFIERS, UPGRADE_RARITY, UPGRADE_RARITY_NAME } from "./dictionary.js";
 export const consumableList = [];
 export const consumablePacks = [];
 export const vouchers = [];
@@ -185,7 +185,7 @@ const consumableSilverBlueprints = [
         props: {image: 'lvlup_coconut_silver', getFruit(game){return game.fruits[4];}}
     }
 ];
-const consumableUpgradeBlueprints = [
+export const consumableUpgradeBlueprints = [
     {
         name: "Negative",
         description(game){
@@ -397,7 +397,7 @@ const voucher = new Voucher(
 );
 const overstock = new Voucher(
     "Overstock",
-    `Ulepszenia owoców pojawiają się w sklepie!`,
+    `Zwiększe miejsce na ulepszenia w sklepie o 1. (Obecnie ${Style.Chance(3)} -> ${Style.Chance(4)})`,
     function(game){
         game.overstock = true;
     },
@@ -456,21 +456,27 @@ vouchers.push(voucher,overstock,movevoucher);
 consumableBlueprints.push(...consumableLvlUp,...consumbaleEvil);
 consumbaleEvil.forEach(consumable => {
     consumable.type = "Consumable";
+    consumable.props.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
 });
 consumableLvlUp.forEach(consumable => {
     consumable.type = "Consumable";
+    consumable.props.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
 });
 consumableBlueprints.forEach(consumable => {
     consumable.type = "Consumable";
+    consumable.props.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
 });
 consumableGoldBlueprints.forEach(consumable => {
     consumable.type = "Consumable";
+    consumable.props.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
 });
 consumableSilverBlueprints.forEach(consumable => {
     consumable.type = "Consumable";
+    consumable.props.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
 });
 consumableUpgradeBlueprints.forEach(consumable => {
     consumable.type = "Consumable";
+    consumable.props.rarity = UPGRADE_RARITY_NAME.ConsumableRare;
 });
 pomumpackItems.push(...consumableBlueprints);
 consumableList.push(...consumableBlueprints,...consumableGoldBlueprints,...consumableSilverBlueprints,...consumableUpgradeBlueprints);

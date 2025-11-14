@@ -1,14 +1,16 @@
 console.log("Upgrade");
 import { Consumable, Upgrade } from "./upgradeBase.js";
-import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, STAGES, TYPES, UPGRADE_STATES } from "./dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, STAGES, TYPES, UPGRADE_RARITY, UPGRADE_RARITY_NAME, UPGRADE_STATES } from "./dictionary.js";
 import { Style } from "./RenderUI.js";
-import { consumableList } from "./consumable.js";
+import { consumableList, consumableUpgradeBlueprints } from "./consumable.js";
 
 
 export const upgradesList = [];
 
 const defaultimage = { image: "default" };
-
+const COMMON = {rarity: UPGRADE_RARITY_NAME.Common};
+const UNCOMMON = {rarity: UPGRADE_RARITY_NAME.Uncommon};
+const RARE = {rarity: UPGRADE_RARITY_NAME.Rare};
 export const upgradeBlueprints = [
   {
     name: "AppleHater",
@@ -42,7 +44,8 @@ export const upgradeBlueprints = [
     remove(game) {
       
     },
-    price: 4
+    price: 4,
+    props:COMMON
   },
 
   {
@@ -76,7 +79,8 @@ export const upgradeBlueprints = [
     remove(game) {
       
     },
-    price: 8
+    price: 8,
+    props: UNCOMMON
   },
 
   {
@@ -88,7 +92,8 @@ export const upgradeBlueprints = [
     remove(game) {
       game.special[0].percent -= 2;
     },
-    price: 2
+    price: 2,
+    props: COMMON
   },
 
   {
@@ -112,7 +117,7 @@ export const upgradeBlueprints = [
       
     },
     price: 4,
-    props: { image: "boom" }
+    props: { image: "boom",...COMMON }
   },
 
   {
@@ -126,7 +131,8 @@ export const upgradeBlueprints = [
       game.moves -= 4;
       game.GameRenderer.displayMoves();
     },
-    price: 4
+    price: 4,
+    props: COMMON
   },
 
   {
@@ -146,6 +152,7 @@ export const upgradeBlueprints = [
       
     },
     price: 4,
+    props: COMMON
   },
 
   {
@@ -183,7 +190,7 @@ export const upgradeBlueprints = [
       
     },
     price: 5,
-    props: { mult: 0 }
+    props: { mult: 0,...COMMON }
   },
   {
     name: "pearlover",
@@ -220,7 +227,7 @@ export const upgradeBlueprints = [
       
     },
     price: 5,
-    props: { mult: 0, image: 'default' }
+    props: { mult: 0, image: 'default',...COMMON }
   },
   {
     name: "pineapplelover",
@@ -257,7 +264,7 @@ export const upgradeBlueprints = [
       
     },
     price: 5,
-    props: { mult: 0, image: 'default' }
+    props: { mult: 0, image: 'default',...COMMON }
   },
   {
     name: "grapelover",
@@ -294,7 +301,7 @@ export const upgradeBlueprints = [
       
     },
     price: 5,
-    props: { mult: 0, image: 'default'}
+    props: { mult: 0, image: 'default',...COMMON}
   },
   {
     name: "coconutlover",
@@ -331,7 +338,7 @@ export const upgradeBlueprints = [
       
     },
     price: 5,
-    props: { mult: 0, image: 'default' }
+    props: { mult: 0, image: 'default',...COMMON }
   },
   {
     name: "Coconut Bank",
@@ -341,8 +348,14 @@ export const upgradeBlueprints = [
       return `${Style.Chance("+50%")} aby ${game.fruits[4].icon} był złoty, ${Style.Chance(`-${this.props.previousPercent}%`)} ${game.fruits[4].icon}, ${Style.Chance(`+${this.props.previousPercent/(game.fruits.length-1)}`)} dla reszty`;
     },
     effect(game) {
+      this.reset = (game)=>{
+        game.fruits[4].percent += this.props.previousPercent;
+        game.fruits[4].props.upgrade.goldchance -= 50;
+        game.addChancesExcept(game.fruits[4], -this.props.previousPercent / (game.fruits.length - 1)); 
+      }
       this.setProps({
         previousPercent: -1,
+        applied: false,
         onRoundStart: () => {
           game.fruits[4].props.upgrade.goldchance += 50;
           let percent = 10;
@@ -352,22 +365,23 @@ export const upgradeBlueprints = [
           this.props.previousPercent = percent;
           game.fruits[4].percent -= this.props.previousPercent;
           game.addChancesExcept(game.fruits[4], this.props.previousPercent / (game.fruits.length - 1));
+          this.props.applied = false;
           return UPGRADE_STATES.Active;
         },
         onRoundEnd: () => {
-          game.fruits[4].percent += this.props.previousPercent;
-          game.fruits[4].props.upgrade.goldchance -= 50;
-          game.addChancesExcept(game.fruits[4], -this.props.previousPercent / (game.fruits.length - 1));
+          this.reset(game);
+          this.props.applied = false;
           return UPGRADE_STATES.Failed;
         }
       });
-      
     },
     remove(game) {
-      
+      if(this.props?.applied==true){
+        this.reset(game);
+      }
     },
     price: 10,
-    props: { image: "coconutbank" }
+    props: { image: "coconutbank",...UNCOMMON }
   },
 
   {
@@ -384,7 +398,7 @@ export const upgradeBlueprints = [
       });
     },
     price: 10,
-    props: {image: 'goldenfruits'}
+    props: {image: 'goldenfruits',...COMMON}
   },
 
   {
@@ -401,7 +415,7 @@ export const upgradeBlueprints = [
       });
     },
     price: 10,
-    props: { image: "metalplate" }
+    props: { image: "metalplate",...COMMON }
   },
 
   {
@@ -445,7 +459,7 @@ export const upgradeBlueprints = [
       
     },
     price: 6,
-    props: {image: 'grapeinterest'}
+    props: {image: 'grapeinterest',...UNCOMMON}
   },
 
   {
@@ -475,7 +489,7 @@ export const upgradeBlueprints = [
       
     },
     price: 4,
-    props: { score: 0 }
+    props: { score: 0,...COMMON }
   },
 
   {
@@ -505,7 +519,7 @@ export const upgradeBlueprints = [
       
     },
     price: 8,
-    props: {mult:1}
+    props: {mult:1,...COMMON}
   },
 
   {
@@ -537,7 +551,7 @@ export const upgradeBlueprints = [
       
     },
     price: 6,
-    props: { image: "highfive" }
+    props: { image: "highfive",...UNCOMMON }
   },
 
   {
@@ -560,7 +574,7 @@ export const upgradeBlueprints = [
       
     },
     price: 6,
-    props: defaultimage
+    props: {...defaultimage,...COMMON}
   },
 
   {
@@ -598,6 +612,7 @@ export const upgradeBlueprints = [
       
     },
     price: 4,
+    props: UNCOMMON
   },
 
   {
@@ -614,7 +629,8 @@ export const upgradeBlueprints = [
       game.upgradeDedupe = true;
       if (counter > 1) game.upgradeDedupe = false;
     },
-    price: 8
+    price: 8,
+    props: RARE
   },
 
   {
@@ -661,6 +677,7 @@ export const upgradeBlueprints = [
       
     },
     price: 10,
+    props: UNCOMMON
   },
   {
     name: "Madness",
@@ -695,7 +712,7 @@ export const upgradeBlueprints = [
       
     },
     price: 8,
-    props: {image: 'default', mult: 1}
+    props: {image: 'default', mult: 1,...UNCOMMON}
   },
   {
     name: "Zdrapka",
@@ -717,6 +734,7 @@ export const upgradeBlueprints = [
       
     },
     price: 8,
+    props: UNCOMMON
   },
   {
     name: "6pak",
@@ -755,7 +773,7 @@ export const upgradeBlueprints = [
       
     },
     price: 8,
-    props: {image: '6pak'}
+    props: {image: '6pak',...RARE}
   },
   {
     name: "Money Maker",
@@ -785,7 +803,7 @@ export const upgradeBlueprints = [
       
     },
     price: 4,
-    props: {image: 'moneymaker'}
+    props: {image: 'moneymaker',...COMMON}
   },
   {
     name: "fish",
@@ -807,6 +825,7 @@ export const upgradeBlueprints = [
       
     },
     price: 6,
+    props: COMMON
   },
   {
     name: "Tutti Frutti",
@@ -860,7 +879,7 @@ export const upgradeBlueprints = [
       
     },
     price: 6,
-    props: defaultimage
+    props: {...defaultimage,...COMMON}
     },
     {
       name: "Fruit Tycoon",
@@ -886,7 +905,7 @@ export const upgradeBlueprints = [
       },
       remove(game) {  },
       price: 8,
-      props: defaultimage
+      props: {...defaultimage,...UNCOMMON}
     },
     {
   name: "Jackpot",
@@ -907,7 +926,7 @@ export const upgradeBlueprints = [
   },
   remove(game) {  },
   price: 10,
-  props: defaultimage
+  props: {...defaultimage,...COMMON}
 },
 {
   name: "Collector",
@@ -960,7 +979,7 @@ export const upgradeBlueprints = [
   },
   remove(game) {  },
   price: 9,
-  props: defaultimage
+  props: {...defaultimage,...COMMON}
 },
 {
   name: "BOOM!!",
@@ -975,7 +994,7 @@ export const upgradeBlueprints = [
     game.special[1].props.percent -= 1;
   },
   price: 4,
-  props: {image: 'boom'}
+  props: {image: 'boom',...COMMON}
 },
 {
   name: "Boom?",
@@ -991,7 +1010,7 @@ export const upgradeBlueprints = [
     game.special[1].props.detonations -= 1;
   },
   price: 4,
-  props: {image: 'boom'}
+  props: {image: 'boom',...COMMON}
 },
 {
   name: "lvlup",
@@ -1032,6 +1051,7 @@ export const upgradeBlueprints = [
      
   },
   price: 8,
+  props: COMMON
 },
 {
   name: "Dice",
@@ -1064,6 +1084,7 @@ export const upgradeBlueprints = [
     
   },
   price: 7,
+  props: UNCOMMON
 },
 { name: "Mirror",
   descriptionfn(game) {
@@ -1226,7 +1247,7 @@ function deepClone(obj, visited = new WeakMap()) {
   },
 
   price: 8,
-  props: { image: "brokenmirror" },
+  props: { image: "brokenmirror",...RARE },
 },
 { name: "Adrenaline",
   descriptionfn(game){
@@ -1245,7 +1266,7 @@ function deepClone(obj, visited = new WeakMap()) {
   },
   remove(game){},
   price: 5,
-  props: defaultimage
+  props: {...defaultimage,...COMMON}
 },
 { name: "Critical Hit",
   descriptionfn(game){
@@ -1278,7 +1299,7 @@ function deepClone(obj, visited = new WeakMap()) {
   },
   remove(game){},
   price: 6,
-  props: defaultimage
+  props: {...defaultimage,...COMMON}
 },
 { name: "Soul Eater",
   descriptionfn(game){
@@ -1321,7 +1342,7 @@ function deepClone(obj, visited = new WeakMap()) {
 },
 remove(game){},
 price: 7,
-props: defaultimage
+props: {...defaultimage,...COMMON }
 },
 { name: "counter",
   descriptionfn(game){
@@ -1354,7 +1375,32 @@ props: defaultimage
 
   },
   price: 6,
-  props: defaultimage
+  props: {...defaultimage,...UNCOMMON}
+
+},
+{ name: "20/20",
+  descriptionfn(game){
+    return `Wszystkie ulepszenia kafelków aktywują się dwukrotnie`;
+  },
+  effect(game){
+    this.setProps({
+      onConsumableUse: (consumable)=>{
+        if(!consumable){
+          return UPGRADE_STATES.Failed;
+        }
+        if(consumableUpgradeBlueprints.name===consumable.name){
+          return {state: UPGRADE_STATES.Tried, message: `Nie można skopiować tego ulepszenia.`, style: SCORE_ACTIONS.Failed}
+        }
+        consumable.apply(game);
+        return {state: UPGRADE_STATES.Active, message: `Użyto!`, style: SCORE_ACTIONS.Info}
+      }
+    });
+  },
+  remove(game){
+
+  },
+  price: 10,
+  props: {image: 'lvlup',...RARE}
 
 }
 ];

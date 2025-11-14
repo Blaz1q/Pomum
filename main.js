@@ -3,7 +3,7 @@ import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { upgradesList } from "./upgrade.js";
 import { Audio } from "./sound.js";
 import { Tile } from "./Tile.js";
-import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES,UPGRADE_STATES, SCORE_ACTIONS } from "./dictionary.js";
+import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES,UPGRADE_STATES, SCORE_ACTIONS, UPGRADE_RARITY } from "./dictionary.js";
 import { RenderUI } from "./RenderUI.js";
 import { Animator,animate } from "./loadshaders.js";
 import { cyrb128, getRandomString, sfc32 } from "./random.js";
@@ -164,59 +164,98 @@ async emit(event, payload) {
         }
     }
 }
+rollUpgrades(count = 3) {
+    if(this.overstock){
+        count+=1;
+    }
+    // weighted picker (default weight = 1)
+    const weightedPick = (list, rng) => {
+    const getWeight = item => {
+        return UPGRADE_RARITY[item.props?.rarity.name] ?? 1;
+    };
 
-    rollUpgrades(count = 3) {
-        let available = upgradesList;
+    const total = list.reduce((sum, item) => sum + getWeight(item), 0);
+    let roll = rng() * total;
 
-        if (this.upgradeDedupe) {
-            available = upgradesList.filter(up => 
-                !this.upgrades.some(u => u.name === up.name) // check by name, since upgradesList are blueprints
-            );
-        }
+    for (const item of list) {
+        roll -= getWeight(item);
+        if (roll <= 0) return item;
+    }
 
-        const pool = [...available];
+    return list[list.length - 1];
+}
 
-        // Fisher–Yates shuffle
-        for (let i = pool.length - 1; i > 0; i--) {
-            const j = Math.floor(this.shopRand() * (i + 1));
-            [pool[i], pool[j]] = [pool[j], pool[i]];
-        }
-
-        // Create *new instances* from blueprints
-        const picked = pool.slice(0, count).map(
-            up => new Upgrade(up.name, up.descriptionfn, up.effect, up.remove, up.price, up.props)
+    // build upgrade pool with optional dedupe
+    let available = upgradesList;
+    if (this.upgradeDedupe) {
+        available = upgradesList.filter(up =>
+            !this.upgrades.some(u => u.name === up.name)
         );
-        picked.forEach(upgrade => {
-            if(this.shopRand() < 0.0075){
-                upgrade.changeNegative(game,true);
+    }
+
+    // build consumable pool with optional dedupe
+    let consumablePool = consumableList;
+    if (this.upgradeDedupe) {
+        consumablePool = consumablePool.filter(c =>
+            !this.consumables.some(pc => pc.name === c.name)
+        );
+    }
+
+    // combine both into one unified rolling pool
+    const pool = [...available, ...consumablePool];
+
+    // copy so we can remove taken items (no duplicates)
+    const poolCopy = [...pool];
+    const picked = [];
+
+    for (let i = 0; i < count && poolCopy.length > 0; i++) {
+        const entry = weightedPick(poolCopy, this.shopRand.bind(this));
+
+        // remove from pool
+        const idx = poolCopy.indexOf(entry);
+        if (idx >= 0) poolCopy.splice(idx, 1);
+
+        // create Upgrade or Consumable instance
+        if ("descriptionfn" in entry) {
+            // it's an upgrade
+            const up = new Upgrade(
+                entry.name,
+                entry.descriptionfn,
+                entry.effect,
+                entry.remove,
+                entry.price,
+                entry.props
+            );
+
+            // negative / modifier rolling
+            if (this.shopRand() < 0.0075) {
+                up.changeNegative(game, true);
             }
-            if(this.shopRand() < 0.05){
-                if(this.shopRand()<0.5){
-                    upgrade.changeModifier(game,MODIFIERS.Chip);
-                }else{
-                    upgrade.changeModifier(game,MODIFIERS.Mult);
+            if (this.shopRand() < 0.05) {
+                if (this.shopRand() < 0.5) {
+                    up.changeModifier(game, MODIFIERS.Chip);
+                } else {
+                    up.changeModifier(game, MODIFIERS.Mult);
                 }
             }
-        });
-        console.log(picked);
-        if (this.overstock) {
-            // Start with full consumable list
-            let overstockPool = consumableList;
 
-            // Optional dedupe: exclude ones already owned or already picked this roll
-            if (this.upgradeDedupe) {
-                overstockPool = overstockPool.filter(c =>
-                    !this.consumables.some(pc => pc.name === c.name) &&
-                    !picked.some(p => p.name === c.name)
-                );
-            }
-            if (overstockPool.length > 0) {
-                const con = overstockPool[Math.floor(this.shopRand() * overstockPool.length)];
-                picked.push(new Consumable(con.name, con.description, con.effect, con.price, con.props));
-            }
+            picked.push(up);
+        } else {
+            // it's a consumable
+            picked.push(
+                new Consumable(
+                    entry.name,
+                    entry.description,
+                    entry.effect,
+                    entry.price,
+                    entry.props
+                )
+            );
         }
-        return picked;
     }
+
+    return picked;
+}
     displayMoves(){
         this.moveBox.innerHTML = this.movescounter + "/" + this.moves;
     }
@@ -437,6 +476,7 @@ trySwap(x1, y1, x2, y2) {
     useConsumable(upgrade) {
         if (upgrade.type === "Consumable") {
             upgrade.apply(this);
+            this.emit(GAME_TRIGGERS.onConsumableUse,upgrade);
             const idx = this.consumables.indexOf(upgrade);
             if (idx !== -1) {
                 this.consumables.splice(idx, 1); // removes the element in-place
@@ -452,6 +492,7 @@ trySwap(x1, y1, x2, y2) {
         this.Audio.playSound('buy.mp3');
         this.money -= upgrade.price;
         this.GameRenderer.updateMoney(-upgrade.price);
+        this.emit(GAME_TRIGGERS.onConsumableUse,upgrade);
         upgrade.apply(this);
         //this.GameRenderer.displayMoney();
         return true;

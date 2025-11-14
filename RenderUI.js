@@ -1,7 +1,7 @@
 import { consumableList,rollConsumablePacks,rollVouchers } from "./consumable.js";
 import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { animate,Animator } from "./loadshaders.js";
-import { COLORS,GAMECOLORS, DURATIONS, STAGES, MODIFIERS, GAME_TRIGGERS, UPGRADE_STATES } from "./dictionary.js";
+import { COLORS,GAMECOLORS, DURATIONS, STAGES, MODIFIERS, GAME_TRIGGERS, UPGRADE_STATES, UPGRADE_RARITY_NAME } from "./dictionary.js";
 import { rollBoss } from "./Boss.js";
 export class RenderUI {
     constructor(game) {
@@ -345,6 +345,10 @@ displayPlayerUpgrades() {
         if(upgrade.modifier!=MODIFIERS.None){
             description += `<p>${Style.Chance(upgrade.modifier)}</p>`;
         }
+        if(upgrade.rarity!=UPGRADE_RARITY_NAME.None){
+            description += `<p>${Style.Money(upgrade.rarity.display)}</p>`
+        }
+        
         return description;
     }
     displayBossCounter(){
