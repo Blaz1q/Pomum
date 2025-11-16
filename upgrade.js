@@ -1401,7 +1401,7 @@ props: {...defaultimage,...COMMON }
 
   },
   price: 10,
-  props: {image: 'lvlup',...COMMON}
+  props: {image: 'lvlup',...RARE}
 
 }
 ];
