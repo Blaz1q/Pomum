@@ -51,7 +51,7 @@ export const UPGRADE_RARITY = {
     Uncommon: 10,
     Rare: 5,
     ConsumableCommon: 1,
-    ConsumableRare: 10
+    ConsumableRare: 0.7
 }
 export const UPGRADE_RARITY_NAME = {
     Common: {name: `Common`,display: `Common`},
