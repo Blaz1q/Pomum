@@ -260,6 +260,7 @@ export class Consumable extends Upgrade{
     }
     apply(game){
       this.bought = true;
+      console.log(this);
       if(this.negative==true){
         game.maxConsumables-=1;
         game.GameRenderer.displayConsumablesCounter();

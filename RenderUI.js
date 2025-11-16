@@ -580,12 +580,16 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
     btnUse.textContent = "Użyj";
     btnUse.addEventListener("click", (e) => {
         e.stopPropagation();
+        console.log("using");
+        console.log(upgrade);
         this.game.useConsumable(upgrade);
     });
     const btnBuyUse = document.createElement("button");
     btnBuyUse.textContent = "Kup i Użyj";
     btnBuyUse.addEventListener("click", (e) => {
         e.stopPropagation();
+        console.log("using");
+        console.log(upgrade);
         let success = this.game.buyanduse(upgrade);
         if (success&&params.origin&&params.origin.type=="ConsumablePack"){
             this.game.BuysFromBoosterLeft--;

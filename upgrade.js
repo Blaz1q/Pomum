@@ -1388,9 +1388,10 @@ props: {...defaultimage,...COMMON }
         if(!consumable){
           return UPGRADE_STATES.Failed;
         }
-        if(consumableUpgradeBlueprints.name===consumable.name){
-          return {state: UPGRADE_STATES.Tried, message: `Nie można skopiować tego ulepszenia.`, style: SCORE_ACTIONS.Failed}
+        if(consumableUpgradeBlueprints.some(b => b.name === consumable.name)){
+          return {state: UPGRADE_STATES.Tried, message: `Nie można skopiować`, style: SCORE_ACTIONS.Failed}
         }
+        consumable.negative = false;
         consumable.apply(game);
         return {state: UPGRADE_STATES.Active, message: `Użyto!`, style: SCORE_ACTIONS.Info}
       }
@@ -1400,7 +1401,7 @@ props: {...defaultimage,...COMMON }
 
   },
   price: 10,
-  props: {image: 'lvlup',...RARE}
+  props: {image: 'lvlup',...COMMON}
 
 }
 ];

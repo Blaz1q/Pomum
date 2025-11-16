@@ -492,8 +492,8 @@ trySwap(x1, y1, x2, y2) {
         this.Audio.playSound('buy.mp3');
         this.money -= upgrade.price;
         this.GameRenderer.updateMoney(-upgrade.price);
-        this.emit(GAME_TRIGGERS.onConsumableUse,upgrade);
         upgrade.apply(this);
+        this.emit(GAME_TRIGGERS.onConsumableUse,upgrade);
         //this.GameRenderer.displayMoney();
         return true;
     }
