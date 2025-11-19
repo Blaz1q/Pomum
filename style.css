@@ -268,6 +268,7 @@ canvas#glcanvas {
   gap: 0;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.378);
+  transition: background 0.1s;
   min-height: 180px;
 }
 @media (max-width: 1024px) {
@@ -301,6 +302,11 @@ canvas#glcanvas {
 .game .right-panel #player-upgrades #player-upgrades-container .upgrade-wrapper:hover,
 .game .right-panel #player-upgrades #player-consumables-container .upgrade-wrapper:hover {
   z-index: 10;
+}
+.game .right-panel #player-upgrades #player-upgrades-container.notEnough,
+.game .right-panel #player-upgrades #player-consumables-container.notEnough {
+  background: rgba(255, 116, 116, 0.716);
+  animation: shake 0.4s ease-in-out;
 }
 .game .right-panel #body {
   position: relative;

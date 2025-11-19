@@ -45,6 +45,12 @@ export class RenderUI {
             moneyContainer.classList.remove('notEnough');
         },400);    
     }
+    notEnoughSpace(container){
+        container.classList.add('notEnough');
+        setTimeout(()=>{
+            container.classList.remove('notEnough');
+        },400);    
+    }
     displayRound() {
         this.game.roundBox.innerHTML = this.game.round;
     }
@@ -171,11 +177,91 @@ export class RenderUI {
         tileContainer.appendChild(wrapper);
     });
 }
-displayPlayerConsumables(){
-    const playerConsumables = document.getElementById("player-consumables-container");
-    playerConsumables.innerHTML = "";
-    const consumables = this.displayUpgrades(this.game.consumables, { bought: true });
-    playerConsumables.appendChild(consumables);
+displayPlayerConsumables() {
+    const container = document.getElementById("player-consumables-container");
+    if (!container) return;
+
+    const oldPositions = this.getPositions(container);
+
+    container.innerHTML = "";
+    const fragment = this.displayUpgrades(this.game.consumables, { bought: true });
+
+    fragment.querySelectorAll(".upgrade-wrapper")
+        .forEach(w => this.applyDragEvents(w));
+
+    container.appendChild(fragment);
+
+    this.animateReorder(oldPositions);
+
+    this.displayConsumablesCounter();
+}
+animateReorder(oldPositions, duration = 280) {
+    // FLIP: oldPositions is array [{ el, top, left }]
+    return new Promise((resolve) => {
+        if (!oldPositions || oldPositions.length === 0) return resolve();
+
+        const animated = [];
+        oldPositions.forEach(({ el, top, left }) => {
+            if (!el || !document.body.contains(el)) return; // removed from DOM
+            const newRect = el.getBoundingClientRect();
+            const dx = left - newRect.left;
+            const dy = top - newRect.top;
+
+            if (dx === 0 && dy === 0) return;
+
+            // prepare invert
+            el.style.transition = "none";
+            el.style.transform = `translate(${dx}px, ${dy}px)`;
+            // force layout
+            // eslint-disable-next-line no-unused-expressions
+            el.offsetHeight;
+
+            // schedule play
+            requestAnimationFrame(() => {
+                el.style.transition = `transform ${duration}ms cubic-bezier(.2,.9,.25,1)`;
+                el.style.transform = "";
+            });
+
+            animated.push(el);
+        });
+
+        if (animated.length === 0) return resolve();
+
+        // wait for all transitions to end (or timeout)
+        let remaining = animated.length;
+        const cleanup = () => {
+            animated.forEach(a => {
+                a.style.transition = "";
+                a.style.transform = "";
+            });
+            resolve();
+        };
+
+        const onEnd = (ev) => {
+            const target = ev.currentTarget;
+            target.removeEventListener("transitionend", onEnd);
+            remaining--;
+            if (remaining <= 0) cleanup();
+        };
+
+        animated.forEach(a => {
+            a.addEventListener("transitionend", onEnd);
+        });
+
+        // safety timeout
+        setTimeout(() => {
+            // remove listeners and clear transforms
+            animated.forEach(a => a.removeEventListener("transitionend", onEnd));
+            cleanup();
+        }, duration + 120);
+    });
+}
+
+getPositions(container) {
+    return [...container.children].map(el => {
+        const rect = el.getBoundingClientRect();
+        return { el, top: rect.top, left: rect.left };
+    });
 }
 applyDragEvents(wrapper) {
     wrapper.draggable = true;
@@ -202,47 +288,61 @@ applyDragEvents(wrapper) {
     });
 
     wrapper.addEventListener("drop", (e) => {
-        e.preventDefault();
-        wrapper.classList.remove("drag-over");
+    e.preventDefault();
+    wrapper.classList.remove("drag-over");
 
-        const container = wrapper.parentElement;
-        if (!container) return;
+    const container = wrapper.parentElement;
+    if (!container) return;
 
-        const draggedIndex = parseInt(e.dataTransfer.getData("text/plain"));
-        const targetIndex = [...container.children].indexOf(wrapper);
+    const draggedIndex = parseInt(e.dataTransfer.getData("text/plain"));
+    const targetIndex = [...container.children].indexOf(wrapper);
+    if (draggedIndex === targetIndex) return;
 
-        if (draggedIndex === targetIndex) return;
+    const draggedElement = container.children[draggedIndex];
 
-        const draggedElement = container.children[draggedIndex];
+    // 1️⃣ FIRST — snapshot original card positions
+    const oldPositions =this.getPositions(container);
 
-        draggedElement.style.transition = "";
-        draggedElement.style.transform = "";
+    // --- reorder in the DOM ---
+    if (draggedIndex < targetIndex) {
+        container.insertBefore(draggedElement, container.children[targetIndex + 1] || null);
+    } else {
+        container.insertBefore(draggedElement, container.children[targetIndex]);
+    }
 
-        if (draggedIndex < targetIndex) {
-            container.insertBefore(draggedElement, container.children[targetIndex + 1] || null);
-        } else {
-            container.insertBefore(draggedElement, container.children[targetIndex]);
-        }
+    // 2️⃣ LAST → INVERT → PLAY — animate to new places
+    this.animateReorder(oldPositions);
 
-        // Update upgrade order in the game state
-        const movedUpgrade = this.game.upgrades.splice(draggedIndex, 1)[0];
-        this.game.upgrades.splice(targetIndex, 0, movedUpgrade);
+    // Update upgrade list
+    const movedUpgrade = this.game.upgrades.splice(draggedIndex, 1)[0];
+    this.game.upgrades.splice(targetIndex, 0, movedUpgrade);
 
-        // Notify listeners and update counter
-        this.game.emit(GAME_TRIGGERS.onUpgradesChanged);
-        this.displayUpgradesCounter();
-    });
+    this.game.emit(GAME_TRIGGERS.onUpgradesChanged);
+    this.displayUpgradesCounter();
+});
+
 }
 displayPlayerUpgrades() {
-    const playerUpgrades = document.getElementById("player-upgrades-container");
-    playerUpgrades.innerHTML = "";
-    const upgradesFragment = this.displayUpgrades(this.game.upgrades, { bought: true });
+    const container = document.getElementById("player-upgrades-container");
+    if (!container) return;
 
-    upgradesFragment.querySelectorAll(".upgrade-wrapper").forEach((wrapper) => {
-        this.applyDragEvents(wrapper);
-    });
+    // 1) capture positions BEFORE re-render
+    const oldPositions = this.getPositions(container);
 
-    playerUpgrades.appendChild(upgradesFragment);
+    // 2) normal re-render
+    container.innerHTML = "";
+    const fragment = this.displayUpgrades(this.game.upgrades, { bought: true });
+
+    fragment.querySelectorAll(".upgrade-wrapper")
+        .forEach(w => this.applyDragEvents(w));
+
+    container.appendChild(fragment);
+
+    // 3) animate from old → new
+    this.animateReorder(oldPositions);
+
+    // update the counter
+    this.displayUpgradesCounter();
 }
     getPlayerUpgrades(upgradeid) {
         return document.querySelectorAll('#player-upgrades-container .upgrade-wrapper.bought')[upgradeid];
@@ -545,10 +645,12 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         }
         if(upgrade.type==="Upgrade"&&game.upgrades.length>=game.maxUpgrades&&!upgrade.negative){
             console.log("not enough upgrade space");
+            game.GameRenderer.notEnoughSpace(document.getElementById("player-upgrades-container"));
             return false;
         }
         if(upgrade.type==="Consumable"&&game.consumables.length>=game.maxConsumables&&!upgrade.negative){
             console.log("not enough consumable space space");
+            game.GameRenderer.notEnoughSpace(document.getElementById("player-consumables-container"));
             return false;
         }
         success = game.buy(upgrade);
