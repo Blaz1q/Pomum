@@ -322,6 +322,40 @@ applyDragEvents(wrapper) {
 });
 
 }
+displayPlayerConsumable(consumable){
+    const container = document.getElementById("player-consumables-container");
+    if (!container) return;
+
+    const oldPositions = this.getPositions(container);
+
+    const fragment = this.displayUpgrades([consumable],{bought: true});
+    fragment.querySelectorAll(".upgrade-wrapper")
+        .forEach(w => this.applyDragEvents(w));
+    const el = fragment.firstElementChild;
+    container.appendChild(el);
+    this.fadeInAndShow(el);
+    this.animateReorder(oldPositions);
+
+    // update the counter
+    this.displayConsumablesCounter();
+}
+displayPlayerUpgrade(upgrade){
+    const container = document.getElementById("player-upgrades-container");
+    if (!container) return;
+
+    const oldPositions = this.getPositions(container);
+
+    const fragment = this.displayUpgrades([upgrade],{bought: true});
+    fragment.querySelectorAll(".upgrade-wrapper")
+        .forEach(w => this.applyDragEvents(w));
+    const el = fragment.firstElementChild;
+    container.appendChild(el);
+    this.fadeInAndShow(el);
+    this.animateReorder(oldPositions);
+
+    // update the counter
+    this.displayUpgradesCounter();
+}
 displayPlayerUpgrades() {
     const container = document.getElementById("player-upgrades-container");
     if (!container) return;
@@ -632,6 +666,74 @@ card.addEventListener('mousemove', e => {
     card.style.transition = 'transform 0.2s ease, filter 0.2s ease'; // shorter transition when starting hover
   });
 }
+fadeInAndShow(wrapper, duration = 150) {
+    if (!wrapper) return;
+
+    // Ensure wrapper is not display:none
+    wrapper.style.display = wrapper.style.display || "flex";
+
+    // Measure natural width
+    wrapper.style.maxWidth = "none";
+    wrapper.style.opacity = "0";
+
+    const rect = wrapper.getBoundingClientRect();
+    const fullWidth = rect.width;
+
+    // Set collapsed start state
+    wrapper.style.maxWidth = "0";
+
+    // Apply transitions
+    wrapper.style.transition = `
+        opacity ${duration}ms cubic-bezier(.2,.9,.25,1),
+        max-width ${duration}ms cubic-bezier(.2,.9,.25,1)
+    `;
+
+    // Kick animation
+    requestAnimationFrame(() => {
+        wrapper.style.opacity = "1";
+        wrapper.style.maxWidth = fullWidth + "px";
+    });
+
+    // Clean up after animation (optional)
+    setTimeout(() => {
+        wrapper.style.overflow = "";
+        wrapper.style.maxWidth = "none";  // restore natural sizing
+    }, duration);
+}
+fadeOutAndRemove(wrapper, duration = 100) {
+    if (!wrapper) return;
+
+    // Lock computed size so the transition has a stable starting point
+    const rect = wrapper.getBoundingClientRect();
+    const computed = getComputedStyle(wrapper);
+    wrapper.style.width = rect.width + "px";
+    wrapper.style.maxWidth = rect.width + "px";
+    wrapper.style.opacity = "1";
+
+    if (!computed.marginRight || computed.marginRight === "0px") {
+        wrapper.style.marginRight = "1.5em"; // match your normal gap
+    }
+    // Apply transitions
+    wrapper.style.transition = `
+        opacity ${duration}ms cubic-bezier(.2,.9,.25,1),
+        max-width ${duration}ms cubic-bezier(.2,.9,.25,1),
+        margin-right ${duration}ms cubic-bezier(.2,.9,.25,1)
+    `;
+
+    // Start the animation in the next frame
+    requestAnimationFrame(() => {
+        wrapper.style.opacity = "0";
+        wrapper.style.maxWidth = "0";
+        wrapper.style.marginRight = "0";
+    });
+
+    // Remove after animation completes
+    setTimeout(() => {
+        if (wrapper?.parentElement) {
+            wrapper.parentElement.removeChild(wrapper);
+        }
+    }, duration);
+}
 createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
     if(params.origin && params.origin.type == "ConsumablePack"){
         this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
@@ -664,7 +766,7 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
             container.innerHTML = "";
         }
         if(success){
-            wrapper.remove();
+            game.GameRenderer.fadeOutAndRemove(wrapper);
             return true;
         }
         return false;
@@ -685,6 +787,7 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         console.log("using");
         console.log(upgrade);
         this.game.useConsumable(upgrade);
+        //this.fadeOutAndRemove(wrapper);
     });
     const btnBuyUse = document.createElement("button");
     btnBuyUse.textContent = "Kup i Użyj";
@@ -702,7 +805,8 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
             container.innerHTML = "";
         }
         if(success){
-            wrapper.remove();
+            game.GameRenderer.fadeOutAndRemove(wrapper);
+            //wrapper.remove();
         }
     });
     const btnSell = document.createElement("button");
@@ -711,6 +815,7 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         e.stopPropagation();
         if(this.game.sell(upgrade)){
             this.refreshBuyButtons();
+            //game.GameRenderer.fadeOutAndRemove(wrapper);
             wrapper.remove();
         }
     })

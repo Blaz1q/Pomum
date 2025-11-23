@@ -387,9 +387,12 @@ canvas#glcanvas {
 .game .right-panel #shop #upgrades-container, .game .right-panel #shop #voucher-container, .game .right-panel #shop #boosterpack-container {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
   margin: 1rem 0;
+  margin-left: 1.5em;
   position: relative;
+}
+.game .right-panel #shop #upgrades-container .upgrade-wrapper, .game .right-panel #shop #voucher-container .upgrade-wrapper, .game .right-panel #shop #boosterpack-container .upgrade-wrapper {
+  margin-right: 1.5em;
 }
 .game .right-panel #shop #upgrades-container {
   grid-area: 1/1/2/3;
@@ -431,6 +434,7 @@ canvas#glcanvas {
   flex-direction: column;
   align-items: center;
   z-index: 0;
+  max-width: none;
   transition: transform 0.2s ease;
 }
 .upgrade-wrapper.dragging, .boss-wrapper.dragging {

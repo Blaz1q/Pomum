@@ -506,14 +506,12 @@ trySwap(x1, y1, x2, y2) {
         if(upgrade.type=="Upgrade"){
             this.upgrades.push(upgrade);
             upgrade.apply(this);
-            this.GameRenderer.displayPlayerUpgrades();
-            this.GameRenderer.displayUpgradesCounter();
+            this.GameRenderer.displayPlayerUpgrade(upgrade);
             this.emit(GAME_TRIGGERS.onUpgradesChanged);
         }else if(upgrade.type=="Consumable"){
             if(upgrade.negative) this.maxConsumables+=1;
             this.consumables.push(upgrade);
-            this.GameRenderer.displayPlayerConsumables();
-            this.GameRenderer.displayConsumablesCounter();   
+            this.GameRenderer.displayPlayerConsumable(upgrade);  
         }
         else if(upgrade.type=="ConsumablePack"){
             this.GameRenderer.OpenBoosterPack(upgrade);
