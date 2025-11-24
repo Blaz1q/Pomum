@@ -77,7 +77,12 @@ export const upgradeBlueprints = [
       
     },
     remove(game) {
-      
+      if(this.props.randomfruit){
+        const chance = game.calcEqualize(this.props.previousPercent);
+          this.props.randomfruit.percent += this.props.previousPercent;
+          game.addChancesExcept(this.props.randomfruit, -chance);
+          this.props.randomfruit = null;
+      }
     },
     price: 8,
     props: UNCOMMON
@@ -1403,6 +1408,39 @@ props: {...defaultimage,...COMMON }
   price: 10,
   props: {image: 'lvlup',...RARE}
 
+},
+{
+  name: "Empty",
+  descriptionfn(game){
+    const mult = this.props?.mult ?? 1;
+    return `${Style.Mult(`+X1 Mult`)} za każde nieużyte miejsce ulepszeń (Obecnie ${Style.Mult(`X${mult} Mult`)})`;
+  },
+  effect(game){
+    this.setProps({
+      mult: 1,
+      onUpgradesChanged: () => {
+        const oldmult = this.props.mult;
+        this.props.mult = game.maxUpgrades - game.upgrades.length + 1;
+        if(this.props.mult!=oldmult){
+          return UPGRADE_STATES.Active;
+        }
+        return UPGRADE_STATES.Failed;
+      },
+      onScore: () => {
+        if(mult<=1)  return UPGRADE_STATES.Failed;
+          const gained = this.props.mult;
+          game.mult *= this.props.mult;
+          game.mult = Math.round(game.mult * 100) / 100;
+          game.GameRenderer.displayTempScore();
+          return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };  
+      }
+    });
+  },
+  remove(){
+
+  },
+  price: 6,
+  props: {...defaultimage,...UNCOMMON}
 }
 ];
 

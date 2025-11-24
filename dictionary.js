@@ -51,7 +51,9 @@ export const UPGRADE_RARITY = {
     Uncommon: 10,
     Rare: 5,
     ConsumableCommon: 1,
-    ConsumableRare: 0.7
+    ConsumableRare: 0.7,
+    PomumPackCommon: 1,
+    PomomPackRare: 0.2,
 }
 export const UPGRADE_RARITY_NAME = {
     Common: {name: `Common`,display: `Common`},
@@ -59,7 +61,9 @@ export const UPGRADE_RARITY_NAME = {
     Rare: {name: `Rare`,display: `Rare`},
     ConsumableCommon: {name: `ConsumableCommon`,display: `Common`},
     ConsumableRare: {name: `ConsumableRare`,display: `Rare`},
-    None: {name: 'none', display: 'none'}
+    None: {name: 'none', display: 'none'},
+    PomumPackCommon: {name: `PomumPackCommon`, display:`none`},
+    PomumPackRare: {name: `PomumPackRare`, display:`none`}
 }
 export const COLORS = {
     boss: ["#737373ff","#888888ff","#a3a3a3ff"],

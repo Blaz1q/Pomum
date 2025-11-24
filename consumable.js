@@ -386,8 +386,7 @@ const voucher = new Voucher(
     "Voucher",
     function(game){
         return `Zwiększa miejsce na ulepszenia o 1. (Obecnie ${Style.Chance(game.maxUpgrades)} -> ${Style.Chance(game.maxUpgrades+1)})`
-    }
-    ,
+    },
     function (game){
         game.maxUpgrades+=1;
         game.GameRenderer.displayUpgradesCounter();
@@ -412,47 +411,26 @@ const movevoucher = new Voucher(
     },
     10,{image: 'default'}
 );
-export function rollConsumablePacks(game,count = 2) {
-  if (!consumablePacks.length) return [];
-
-  // compute weights inversely proportional to price
-  const weights = consumablePacks.map(pack => 1 / pack.price);
-
-  const result = [];
-  for (let n = 0; n < count; n++) {
-    // sum of weights
-    const totalWeight = weights.reduce((a, b) => a + b, 0);
-    let r = game.boosterRand() * totalWeight;
-
-    // pick based on weight
-    let pickedIndex = 0;
-    for (let i = 0; i < weights.length; i++) {
-      r -= weights[i];
-      if (r <= 0) {
-        pickedIndex = i;
-        break;
-      }
-    }
-    result.push(consumablePacks[pickedIndex]);
-  }
-  return result;
-}
-export function rollVouchers(game, count = 1) {
-    if (!vouchers || vouchers.length === 0) return [];
-
-    // Get names of already owned vouchers
-    const ownedNames = new Set(game.coupons.map(v => v.name));
-
-    // Filter out owned vouchers
-    const available = vouchers.filter(v => !ownedNames.has(v.name));
-
-    if (available.length === 0) return []; // player owns all vouchers
-
-    // Shuffle and pick `count` vouchers
-    const shuffled = [...available].sort(() => game.voucherRand() - 0.5);
-    return shuffled.slice(0, count);
-}
-vouchers.push(voucher,overstock,movevoucher);
+const percentageVoucher = new Voucher(
+    "Power",
+    `Ulepszone karty pojawiają się ${Style.Chance(`X2`)} częściej`,
+    function(game){
+        game.bonusPercentage.modifier += 0.05;
+    },
+    10,{image: 'default'}
+);
+const consumableVoucher = new Voucher(
+    "Voucher?",
+    function(game){
+        return `Zwiększe miejsce na ulepszenia kafelków o 1. (Obecnie ${Style.Chance(game.maxConsumables)} -> ${Style.Chance(game.maxConsumables+1)})`
+    },
+    function(game){
+        game.maxConsumables+=1;
+        game.GameRenderer.displayConsumablesCounter();
+    },
+    10,{image: 'default'}
+);
+vouchers.push(voucher,overstock,movevoucher,percentageVoucher,consumableVoucher);
 consumableBlueprints.push(...consumableLvlUp,...consumbaleEvil);
 consumbaleEvil.forEach(consumable => {
     consumable.type = "Consumable";

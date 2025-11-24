@@ -7,6 +7,7 @@ import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES,UPGRADE_STATES, SCORE_ACTIONS, UPG
 import { RenderUI } from "./RenderUI.js";
 import { Animator,animate } from "./loadshaders.js";
 import { cyrb128, getRandomString, sfc32 } from "./random.js";
+import { Roll } from "./roll.js";
 const CELL_PX = 50;
 const FADE_MS = 300;
 const FALL_MS = 350;
@@ -75,6 +76,12 @@ export class Game{
         this.BuysFromBoosterLeft = 0;
         this.overstock = false;
         this.upgradeDedupe = true;
+        this.bonusPercentage = {
+            negative: 0,
+            modifier: 0,
+        }
+        //random
+        this.roll = new Roll(this);
         this.seed = getRandomString(6);
         this.hash = cyrb128(this.seed);
         this.rand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
@@ -168,23 +175,6 @@ rollUpgrades(count = 3) {
     if(this.overstock){
         count+=1;
     }
-    // weighted picker (default weight = 1)
-    const weightedPick = (list, rng) => {
-    const getWeight = item => {
-        return UPGRADE_RARITY[item.props?.rarity.name] ?? 1;
-    };
-
-    const total = list.reduce((sum, item) => sum + getWeight(item), 0);
-    let roll = rng() * total;
-
-    for (const item of list) {
-        roll -= getWeight(item);
-        if (roll <= 0) return item;
-    }
-
-    return list[list.length - 1];
-}
-
     // build upgrade pool with optional dedupe
     let available = upgradesList;
     if (this.upgradeDedupe) {
@@ -209,7 +199,7 @@ rollUpgrades(count = 3) {
     const picked = [];
 
     for (let i = 0; i < count && poolCopy.length > 0; i++) {
-        const entry = weightedPick(poolCopy, this.shopRand.bind(this));
+        const entry = this.roll.weightedPick(poolCopy, this.shopRand.bind(this));
 
         // remove from pool
         const idx = poolCopy.indexOf(entry);
@@ -226,19 +216,8 @@ rollUpgrades(count = 3) {
                 entry.price,
                 entry.props
             );
-
             // negative / modifier rolling
-            if (this.shopRand() < 0.0075) {
-                up.changeNegative(game, true);
-            }
-            if (this.shopRand() < 0.05) {
-                if (this.shopRand() < 0.5) {
-                    up.changeModifier(game, MODIFIERS.Chip);
-                } else {
-                    up.changeModifier(game, MODIFIERS.Mult);
-                }
-            }
-
+            this.roll.Modifier(up);
             picked.push(up);
         } else {
             // it's a consumable

@@ -1,4 +1,4 @@
-import { consumableList,rollConsumablePacks,rollVouchers } from "./consumable.js";
+import { consumableList } from "./consumable.js";
 import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { animate,Animator } from "./loadshaders.js";
 import { COLORS,GAMECOLORS, DURATIONS, STAGES, MODIFIERS, GAME_TRIGGERS, UPGRADE_STATES, UPGRADE_RARITY_NAME } from "./dictionary.js";
@@ -72,12 +72,12 @@ export class RenderUI {
     displayBoosterPacks(){
         const boosterPack = document.getElementById("boosterpack-container");
         boosterPack.innerHTML = "";
-        boosterPack.appendChild(this.displayUpgrades(rollConsumablePacks(this.game,2),{bought: false}));
+        boosterPack.appendChild(this.displayUpgrades(this.game.roll.ConsumablePacks(2),{bought: false}));
     }
     displayCoupons(){
         const coupon = document.getElementById("voucher-container");
         coupon.innerHTML = "";
-        coupon.appendChild(this.displayUpgrades(rollVouchers(this.game,1),{bought: false}));
+        coupon.appendChild(this.displayUpgrades(this.game.roll.Vouchers(1),{bought: false}));
     }
     OpenBoosterPack(boosterPack){
         console.log(boosterPack);

@@ -1,5 +1,5 @@
 import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, UPGRADE_RARITY, UPGRADE_RARITY_NAME, UPGRADE_STATES } from "./dictionary.js";
-
+import { Roll } from "./roll.js";
 export class Upgrade {
   constructor(name,descriptionfn, effect, remove, price = 2,props = {}) {
     this.name = name;
@@ -192,6 +192,7 @@ export class ConsumablePack extends Upgrade{
         super(name, descriptionfn, null, null, price, props);
         this.consumables = consumables;
         this.type = "ConsumablePack";
+        this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.Common;
         this.props = {
             maxSelect: props.maxSelect ?? 1,
             maxRoll: props.maxRoll ?? 3,
@@ -228,16 +229,7 @@ export class ConsumablePack extends Upgrade{
         return new Consumable(c.name, c.description, c.effect, c.price, c.props);
       }else if(c.type=="Upgrade"){
         let upgrade = new Upgrade(c.name,c.descriptionfn,c.effect,c.remove,c.price,c.props);
-        if(game.shopRand() < 0.01){
-          upgrade.changeNegative(game,true);
-        }
-        if(game.shopRand() < 0.2){
-                if(game.shopRand()<0.5){
-                    upgrade.changeModifier(game,MODIFIERS.Chip);
-                }else{
-                    upgrade.changeModifier(game,MODIFIERS.Mult);
-                }
-            }
+        game.roll.Modifier(upgrade,{negative: 0.0025,modifier:0.015});
         return upgrade;
       }
       return null;
