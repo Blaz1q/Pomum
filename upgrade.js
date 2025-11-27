@@ -1441,7 +1441,47 @@ props: {...defaultimage,...COMMON }
   },
   price: 6,
   props: {...defaultimage,...UNCOMMON}
-}
+},
+{
+  name: "Snowman",
+  descriptionfn(game){
+    var score = this.props?.score ?? 0;
+    var text = `Każda kaskada daje o ${Style.Score(`+10 pkt`)} więcej niż poprzednia, resetuje się po kaskadzie.`;
+    if(score>0) text += `(Obecnie ${Style.Score(`+${score} pkt`)})`; 
+    return text;
+  },
+  effect(game){
+    this.setProps({
+      score: 0,
+      add: 0,
+      onMatch: () => {
+          this.props.add += 10;
+          this.props.score+=this.props.add;
+          return { state: UPGRADE_STATES.Active, message: `+${this.props.add} pkt`, style: SCORE_ACTIONS.Score };  
+      },
+      onScore: ()=>{
+        if(this.score<=0) return UPGRADE_STATES.Failed;
+        const gained = this.props.score;
+        game.tempscore += this.props.score;
+        game.GameRenderer.displayTempScore();
+        this.props.add = 0;
+        this.props.score = 0;
+        return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };  
+      }
+    });
+  },
+  remove(game){
+
+  },
+  price: 4,
+  props: {...defaultimage,...COMMON}
+},/*
+{
+  name: "",
+  descriptionfn(game){
+    //ulepszenie które retriggeruje coś ale jeszcze nie wiem
+  }
+}*/
 ];
 
   

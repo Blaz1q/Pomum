@@ -23,7 +23,7 @@ export class Game{
         this.moveBox = document.getElementById("moves");
         //game
         this.round = 0;
-        this.level = 1;
+        this.level = 0;
         this.Audio = Audio;
         this.roundBox = document.getElementById("round");
         this.matrixsize = 9;
@@ -272,8 +272,10 @@ rollUpgrades(count = 3) {
         }
         this.stage = STAGES.Shop;
         if(this.round%4==0||this.round==1){
-            this.level++;
             this.GameRenderer.displayCoupons();
+        }
+        if(this.round%4==0){
+            this.level++;
         }
         this.emit(GAME_TRIGGERS.onRoundEnd);
         this.locked = true;
@@ -318,7 +320,14 @@ rollUpgrades(count = 3) {
         return Math.round((this.moves-this.movescounter)/1.2);
     }
     calcRoundScore() {
-        return Math.floor(Math.pow(1.5, this.round) * 350);
+        let bonus = 0;
+        if(this.level>1){
+            bonus +=  Math.floor(Math.pow(1.5,this.level));
+        }
+        if(this.level>20){
+            bonus +=  Math.floor(Math.pow(this.level*this.round,this.round));
+        }
+        return Math.floor(Math.pow(1.5, this.round) * 350) + bonus*1000;
     }
     createElement(icon, x, y) {
         let element = document.createElement("div");
