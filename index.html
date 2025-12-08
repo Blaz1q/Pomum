@@ -32,13 +32,17 @@
     <div id="menu">
     <img src="./images/pomumlogo.png" alt="Pomum" srcset="">
     <button id="startBtn" onclick="startGame()">Rozpocznij</button>
-
+    <button onclick="showCollection()">Kolekcja</button>
     <div id="settingsPanel" class="hidden">
       <h2>Settings</h2>
       <label>
         <input type="checkbox" id="soundToggle" checked>
         Enable Sound
       </label>
+    </div>
+    <div id="collection" class="hidden">
+      <button onclick="hideCollection()">Zamknij</button>
+      <div class="scroll"></div>
     </div>
   </div>
   <div class="game" style="display: none;">

@@ -83,3 +83,20 @@ sunsetCorals: ["#E25A4E", "#E67262", "#EB8B7E"],
     oceanBlues: ["#2F7CC2", "#4D91CE", "#6DA6DA"],
     emberOranges: ["#D6781A", "#E08E3B", "#E8A659"],
 }
+export class Style{
+    static Mult(text){
+        return `<b class='mult'>${text}</b>`;
+    }
+    static Score(text){
+    return `<b class='score'>${text}</b>`;
+    }
+    static Chance(text){
+    return `<b class='chance'>${text}</b>`;
+    }
+    static Moves(text){
+    return `<b class='moves'>${text}</b>`;
+    }
+    static Money(text){
+        return `<b class='money'>${text}</b>`;
+    }
+}

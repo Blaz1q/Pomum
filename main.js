@@ -1545,6 +1545,12 @@ function showInfo(){
 function hideInfo(){
     document.getElementById("info-container").style.display = "none";
 }
+function showCollection(){
+    game.GameRenderer.displayCollection();
+}
+function hideCollection(){
+    document.getElementById("collection").classList.add("hidden");
+}
 const R = document.getElementById('funcR');
 const G = document.getElementById('funcG');
 const B = document.getElementById('funcB');
@@ -1567,6 +1573,8 @@ window.startRound = startRound;
 window.upgradesList = upgradesList;
 window.consumableList = consumableList;
 window.reroll = reroll;
+window.showCollection = showCollection;
+window.hideCollection = hideCollection;
 // window.rerollBoosters = rerollBoosters;
 window.restartGame = restartGame;
 window.startGame = startGame;

@@ -1,5 +1,5 @@
 import { Upgrade,Consumable,Voucher,ConsumablePack } from "./upgradeBase.js";
-import { Style } from "./RenderUI.js";
+import { Style } from "./dictionary.js";
 import { upgradesList } from "./upgrade.js";
 import { GAME_TRIGGERS, MODIFIERS, UPGRADE_RARITY, UPGRADE_RARITY_NAME } from "./dictionary.js";
 export const consumableList = [];

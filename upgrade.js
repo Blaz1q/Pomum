@@ -1,7 +1,7 @@
 console.log("Upgrade");
 import { Consumable, Upgrade } from "./upgradeBase.js";
 import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, STAGES, TYPES, UPGRADE_RARITY, UPGRADE_RARITY_NAME, UPGRADE_STATES } from "./dictionary.js";
-import { Style } from "./RenderUI.js";
+import { Style } from "./dictionary.js";
 import { consumableList, consumableUpgradeBlueprints } from "./consumable.js";
 
 

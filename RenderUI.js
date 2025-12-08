@@ -1,8 +1,9 @@
 import { consumableList } from "./consumable.js";
 import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { animate,Animator } from "./loadshaders.js";
-import { COLORS,GAMECOLORS, DURATIONS, STAGES, MODIFIERS, GAME_TRIGGERS, UPGRADE_STATES, UPGRADE_RARITY_NAME } from "./dictionary.js";
+import { Style,COLORS,GAMECOLORS, DURATIONS, STAGES, MODIFIERS, GAME_TRIGGERS, UPGRADE_STATES, UPGRADE_RARITY_NAME } from "./dictionary.js";
 import { rollBoss } from "./Boss.js";
+import { upgradesList } from "./upgrade.js";
 export class RenderUI {
     constructor(game) {
         this.game = game;
@@ -418,6 +419,23 @@ displayPlayerUpgrades() {
         setTimeout(() => popup.remove(), 400);
     }, 500);
 }
+    displayCollection(){
+        const collection = document.getElementsByClassName("scroll")[0];
+        document.getElementById("collection").classList.remove("hidden");
+        if(collection.children.length!=0) return;
+        collection.innerHTML = "";
+        upgradesList.forEach(blueprint => {
+            const up = new Upgrade(
+                blueprint.name,
+                blueprint.descriptionfn,
+                blueprint.effect,
+                blueprint.remove,
+                blueprint.price,
+                blueprint.props  
+            );
+            collection.appendChild(this.displayUpgrades([up],{displayPrice: false,displayButtons: false}));
+        });
+        }
     triggerBoss(){
         const bossContainer = document.getElementById("boss-container");
         const upgradecard = bossContainer.children[0];
@@ -862,21 +880,4 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         }
     });
 }
-}
-export class Style{
-    static Mult(text){
-        return `<b class='mult'>${text}</b>`;
-    }
-    static Score(text){
-    return `<b class='score'>${text}</b>`;
-    }
-    static Chance(text){
-    return `<b class='chance'>${text}</b>`;
-    }
-    static Moves(text){
-    return `<b class='moves'>${text}</b>`;
-    }
-    static Money(text){
-        return `<b class='money'>${text}</b>`;
-    }
 }
