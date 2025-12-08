@@ -1,7 +1,7 @@
 import { Upgrade,Consumable,Voucher,ConsumablePack } from "./upgradeBase.js";
 import { Style } from "./RenderUI.js";
 import { upgradesList } from "./upgrade.js";
-import { MODIFIERS, UPGRADE_RARITY, UPGRADE_RARITY_NAME } from "./dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, UPGRADE_RARITY, UPGRADE_RARITY_NAME } from "./dictionary.js";
 export const consumableList = [];
 export const consumablePacks = [];
 export const vouchers = [];
@@ -390,6 +390,7 @@ const voucher = new Voucher(
     function (game){
         game.maxUpgrades+=1;
         game.GameRenderer.displayUpgradesCounter();
+        game.emit(GAME_TRIGGERS.onUpgradesChanged);
     },
     10,
     {image:'coupon_plus1'}

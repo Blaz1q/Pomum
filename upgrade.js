@@ -755,7 +755,7 @@ export const upgradeBlueprints = [
           if(game.isSixLine(payload)&&!this.props.found){
             this.props.found = true;
             this.props.mult+=2;
-            return UPGRADE_STATES.Active;
+            return {state: UPGRADE_STATES.Active,message: `Upgrade!`,style: SCORE_ACTIONS.Money};
           }
           return UPGRADE_STATES.Failed;
         },
@@ -1475,7 +1475,38 @@ props: {...defaultimage,...COMMON }
   },
   price: 4,
   props: {...COMMON}
-},/*
+},
+{
+  name: "Tripple",
+  descriptionfn(game){
+    const score = this.props.score ?? 0;
+    return `Jeżeli zrobi się tylko trójkę w kaskadzie, ${Style.Score(`+3 pkt`)} do ulepszenia. Na końcu rundy daje zebrane punkty. (Obecnie ${Style.Score(`+${score} Pkt`)})`;
+  },
+  effect(game){
+    this.setProps({
+      score: 0,
+      onMatch: (payload) => {
+          if(game.isThreeLine(payload)){
+            this.props.score+=3;
+            return UPGRADE_STATES.Active;
+          }
+          return UPGRADE_STATES.Failed;
+        },
+        onScore: () => {
+          const gained = this.props.score;
+          game.tempscore += this.props.score;
+          game.GameRenderer.displayTempScore();
+          return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
+        }
+    });
+  },
+  remove(game){
+
+  },
+  price: 4,
+  props: {...defaultimage,...COMMON}
+}
+/*
 {
   name: "",
   descriptionfn(game){

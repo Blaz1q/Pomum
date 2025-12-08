@@ -418,7 +418,15 @@ displayPlayerUpgrades() {
         setTimeout(() => popup.remove(), 400);
     }, 500);
 }
-
+    triggerBoss(){
+        const bossContainer = document.getElementById("boss-container");
+        const upgradecard = bossContainer.children[0];
+        upgradecard.classList.add("triggered");
+        this.game.Audio.playSound("tick.mp3");
+        setTimeout(()=>{
+                upgradecard.classList.remove("triggered");
+        },300);
+    }
     
     upgradeTrigger(upgrade,delay,action=UPGRADE_STATES.Active){
         console.log(`upgrade trigger: ${upgrade.name}`,performance.now());

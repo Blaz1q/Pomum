@@ -551,7 +551,8 @@ canvas#glcanvas {
     left: -180px;
     top: 50%;
     transform: translateY(-50%);
-    width: 160px;
+    max-width: 180px;
+    min-width: 160px;
     background: rgba(0, 0, 0, 0.911);
     border: .3em solid gray;
     color: #fff;

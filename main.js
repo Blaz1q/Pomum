@@ -302,6 +302,7 @@ rollUpgrades(count = 3) {
         if(this.round%4==0&&this.nextBoss!=null){
             this.stage = STAGES.Boss;
             this.nextBoss.apply(this);
+            this.GameRenderer.triggerBoss();
         }
         if((this.round%4==0||this.round==1)&&this.stage!=STAGES.Boss){
             this.GameRenderer.displayBossInGame();

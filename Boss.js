@@ -108,10 +108,10 @@ const BossBlueprints = [
     {
         name: "Needle",
         descriptionfn(game){
-            return "Mniej ruchów o połowe.";
+            return "3 ruchy mniej.";
         },
         effect(game){
-            this.props.removedMoves = Math.round(game.moves/2);
+            this.props.removedMoves = 3;
             game.moves -=this.props.removedMoves;
             game.GameRenderer.displayMoves();
         },
@@ -119,7 +119,7 @@ const BossBlueprints = [
             game.moves += this.props.removedMoves;
             game.GameRenderer.displayMoves();
         },
-        props: {moneyreward: 8}
+        props: {moneyreward: 12}
     }
 ];
 export function rollBoss(game) {
