@@ -717,7 +717,7 @@ export const upgradeBlueprints = [
       
     },
     price: 8,
-    props: {image: 'default', mult: 1,...UNCOMMON}
+    props: {image: 'clock', mult: 1,...UNCOMMON}
   },
   {
     name: "Zdrapka",
@@ -1304,7 +1304,7 @@ function deepClone(obj, visited = new WeakMap()) {
   },
   remove(game){},
   price: 6,
-  props: {...defaultimage,...COMMON}
+  props: {image: "critical_hit",...COMMON}
 },
 { name: "Soul Eater",
   descriptionfn(game){
@@ -1446,7 +1446,7 @@ props: {...defaultimage,...COMMON }
   name: "Snowman",
   descriptionfn(game){
     var score = this.props?.score ?? 0;
-    var text = `Każda kaskada daje o ${Style.Score(`+10 pkt`)} więcej niż poprzednia, resetuje się po kaskadzie.`;
+    var text = `Każda kaskada daje o ${Style.Score(`+20 pkt`)} więcej niż poprzednia, resetuje się po ruchu.`;
     if(score>0) text += `(Obecnie ${Style.Score(`+${score} pkt`)})`; 
     return text;
   },
@@ -1455,7 +1455,7 @@ props: {...defaultimage,...COMMON }
       score: 0,
       add: 0,
       onMatch: () => {
-          this.props.add += 10;
+          this.props.add += 20;
           this.props.score+=this.props.add;
           return { state: UPGRADE_STATES.Active, message: `+${this.props.add} pkt`, style: SCORE_ACTIONS.Score };  
       },
@@ -1474,7 +1474,7 @@ props: {...defaultimage,...COMMON }
 
   },
   price: 4,
-  props: {...defaultimage,...COMMON}
+  props: {...COMMON}
 },/*
 {
   name: "",
