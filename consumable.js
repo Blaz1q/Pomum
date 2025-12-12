@@ -354,6 +354,105 @@ const consumableGoldBlueprints = [
         props: {image: 'lvlup_coconut_gold', getFruit(game){return game.fruits[4];}}
     }
 ];
+const tarotCards = [
+    {
+      name: "Głupiec",
+      description(game){
+        return `Daje ostatnią użytą kartę tarota.`
+      }
+    },
+    {
+        name: "Mag",
+        description(game){
+            return `Zamienia szanse 2 losowych owoców.`;
+        }
+
+    },
+    {
+        name: "Arcykapłanka"
+    },
+    {
+        name: "Cesarzowa",
+        description(game){
+            return ``
+        }
+    },
+    {
+        name: "Cesarz",
+        description(game){
+            return `Zmienia 10 kafelków na losowe ulepszone kafelki.`;
+        }
+    },
+    {
+        name: "Arcykapłanka",
+        description(game){
+            return `Daje 2 losowe karty tarota.`
+        }
+    },
+    {
+        name: "Kochankowie"
+    },
+    {
+        name: "Powóz"
+    },
+    {
+        name: "Siła",
+        description(game){
+            return ``
+        }
+    },
+    {
+        name: "Pustelnik",
+        description(game){
+            return `Daje tyle $, ile złotych kafelków na planszy. (max. $20)`;
+        }
+    },
+    {
+        name: "Fortuna",
+        description(game){
+            return `${Style.Chance('1 na 4')} że ulepszenie dostaje bonusowe ${Style.Chance(MODIFIERS.Chip)}, lub ${Style.Chance(MODIFIERS.Mult)}`;
+        },
+        effect(game){
+
+        },
+        price: 4,
+        props: {image: 'default'}
+    },
+    {
+        name: "Sprawiedliwość"
+    },
+    {
+        name: "Szubieniczyk"
+    },
+    {
+        name: "Śmierć"
+    },
+    {
+        name: "Umiarkowanie"
+    },
+    {
+        name: "Diabeł"
+    },
+    {
+        name: "Wieża"
+    },
+    {
+        name: "Gwiazdy"
+    },
+    {
+        name: "Księżyc"
+    },
+    {
+        name: "Słońce"
+    },
+    {
+        name: "Sędzia"
+    },
+    {
+        name: "Świat"
+    }
+    
+]
 function silverDesc(fruit){
     return `${Style.Chance(`+1.5%`)} szansa na Silver dla ${fruit.icon}`;
 }
