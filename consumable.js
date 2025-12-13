@@ -358,7 +358,7 @@ const tarotCards = [
     {
       name: "Głupiec",
       description(game){
-        return `Daje ostatnią użytą kartę tarota.`
+        return `Daje ostatnią użytą kartę.`
       }
     },
     {
@@ -384,7 +384,7 @@ const tarotCards = [
         }
     },
     {
-        name: "Arcykapłanka",
+        name: "Arcykapłan",
         description(game){
             return `Daje 2 losowe karty tarota.`
         }
@@ -422,7 +422,10 @@ const tarotCards = [
         name: "Sprawiedliwość"
     },
     {
-        name: "Szubieniczyk"
+        name: "Szubieniczyk",
+        description(game){
+            return `Niszczy `
+        }
     },
     {
         name: "Śmierć"
@@ -434,7 +437,10 @@ const tarotCards = [
         name: "Diabeł"
     },
     {
-        name: "Wieża"
+        name: "Wieża",
+        description(game){
+            return `Losuje szanse wszystkich owoców`;
+        },
     },
     {
         name: "Gwiazdy"

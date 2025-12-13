@@ -991,4 +991,20 @@ canvas#glcanvas {
   text-align: center;
   white-space: nowrap;
   pointer-events: none;
+}
+
+.pop-anim {
+  animation: popBounce 0.2s ease-out;
+}
+
+@keyframes popBounce {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
 }/*# sourceMappingURL=style.css.map */

@@ -14,10 +14,43 @@ export class RenderUI {
     displayMoves() {
         this.game.moveBox.innerHTML = this.game.movescounter + "/" + this.game.moves;
     }
+displayMoney() {
+    const moneyBox = this.moneyBox;
 
-    displayMoney() {
-        this.moneyBox.innerHTML = '$'+this.game.money;
-    }
+    const start = this.prevMoney ?? 0;
+    const end = this.game.money;
+    this.prevMoney = end;
+
+    const animateNumber = (element, start, end) => {
+        if (start === end) {
+            element.innerHTML = "$" + end;
+            return;
+        }
+
+        const duration = 250;
+        const startTime = performance.now();
+
+        const animate = (now) => {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+
+            const value = Math.round(start + (end - start) * eased);
+            element.innerHTML = "$" + value;
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                element.classList.remove("money-pop");
+                void element.offsetWidth;
+                element.classList.add("money-pop");
+            }
+        };
+
+        requestAnimationFrame(animate);
+    };
+
+    animateNumber(moneyBox, start, end);
+}
     updateMoney(ammount){
         let moneyContainer = document.getElementsByClassName('money')[0];
         moneyContainer.className = 'money';
@@ -56,13 +89,76 @@ export class RenderUI {
         this.game.roundBox.innerHTML = this.game.round;
     }
     displayScore() {
-        document.getElementById("roundscore").innerHTML = this.game.calcRoundScore();
-        document.getElementById("score").innerHTML = this.game.score;
-    }
+    const roundScoreBox = document.getElementById("roundscore");
+    const totalScoreBox = document.getElementById("score");
+
+    const newRoundScore = this.game.calcRoundScore();
+    const newTotalScore  = this.game.score;
+
+    const oldRoundScore = parseInt(roundScoreBox.innerHTML) || 0;
+    const oldTotalScore = parseInt(totalScoreBox.innerHTML) || 0;
+
+    const animateNumber = (element, start, end) => {
+        if (start === end) return;
+
+        const duration = 250; // ms
+        const startTime = performance.now();
+
+        const animate = (now) => {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+
+            const value = Math.round(start + (end - start) * eased);
+            element.innerHTML = value;
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                // końcowy "pop"
+                element.classList.remove("pop-anim");
+                void element.offsetWidth;
+                element.classList.add("pop-anim");
+            }
+        };
+
+        requestAnimationFrame(animate);
+    };
+
+    animateNumber(roundScoreBox, oldRoundScore, newRoundScore);
+    animateNumber(totalScoreBox, oldTotalScore, newTotalScore);
+}
+
     
     displayTempScore() {
-        this.game.tempscoreBox.innerHTML = this.game.tempscore;
-        this.game.multBox.innerHTML = this.game.mult;
+        const scoreBox = this.game.tempscoreBox;
+        const multBox = this.game.multBox;
+
+        const newScore = this.game.tempscore;
+        const newMult = this.game.mult;
+
+        const oldScore = scoreBox.innerHTML;
+        const oldMult = multBox.innerHTML;
+
+        // Aktualizacja wartości
+        scoreBox.innerHTML = newScore;
+        multBox.innerHTML = newMult;
+
+        // Funkcja dodająca animację "podskoku"
+        const addPopAnimation = (element) => {
+            element.classList.remove("pop-anim"); 
+            void element.offsetWidth; 
+            element.classList.add("pop-anim");
+        };
+
+        // Jeśli zmienił się score — animacja
+        if (oldScore != newScore) {
+            addPopAnimation(scoreBox);
+        }
+
+        // Jeśli zmienił się mult — animacja
+        if (oldMult != newMult) {
+            addPopAnimation(multBox);
+        }
     }
     displayUpgradesCounter(){
         document.getElementById("upgrades-counter").innerHTML = `(${this.game.upgrades.length}/${this.game.maxUpgrades})`;
