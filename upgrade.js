@@ -1135,8 +1135,6 @@ export const upgradeBlueprints = [
     };
 
     // --- Build a fresh independent copy of the neighbor ---
-    this.buildCopy = (source) => Upgrade.Copy(source);
-
     // --- Synchronize the mirror ---
     this.syncMirror = () => {
       const neighbor = this.getUltimateNeighbor();
@@ -1161,8 +1159,8 @@ export const upgradeBlueprints = [
       }
 
       // Just copy the neighbor — even if it's a Mirror
-      const copyUpgrade = this.buildCopy(neighbor);
-      copyUpgrade.apply(game);
+      const copyUpgrade = Upgrade.Copy(neighbor);
+      //copyUpgrade.apply(game);
       console.log("kopia: ");
       console.log(copyUpgrade);
       this.mirroredUpgradeCopy = copyUpgrade;

@@ -74,7 +74,7 @@ export class Upgrade {
           upgrade.descriptionfn,
           upgrade.effect,
           upgrade.price,
-          propsPlaceholder
+          upgrade?.props ?? {}
         );
       case "Voucher":
         return new Voucher(
@@ -82,7 +82,7 @@ export class Upgrade {
           upgrade.descriptionfn,
           upgrade.effect,
           upgrade.price,
-          propsPlaceholder
+          upgrade?.props ?? {}
         );
       case "ConsumablePack":
         return new ConsumablePack(
@@ -90,7 +90,7 @@ export class Upgrade {
           upgrade.descriptionfn,
           upgrade.consumables ? [...upgrade.consumables] : [],
           upgrade.price,
-          propsPlaceholder
+          upgrade?.props ?? {}
         );
       default:
         const copyBp = upgradesList.find(up => up.name === source.name);
@@ -104,7 +104,10 @@ export class Upgrade {
         deepClone(copyBp.props ?? {})
       );
     }
-    
+    if (typeof copyUpgrade.effect === "function") {
+      copyUpgrade.effect(game);
+      console.log("applied");
+    }
       for (const key in source.props) {
         const val = source.props[key];
         if (typeof val !== "function") {
@@ -160,99 +163,6 @@ export class Upgrade {
     }
     return buildCopy(source);
   }
-static CopyUpgrade(upgrade) {
-  // shallow factory for a new instance of the correct subclass (props placeholder for now)
-  const makeInstance = (propsPlaceholder) => {
-    switch (upgrade.type) {
-      case "Consumable":
-        return new Consumable(
-          upgrade.name,
-          upgrade.descriptionfn,
-          upgrade.effect,
-          upgrade.price,
-          propsPlaceholder
-        );
-      case "Voucher":
-        return new Voucher(
-          upgrade.name,
-          upgrade.descriptionfn,
-          upgrade.effect,
-          upgrade.price,
-          propsPlaceholder
-        );
-      case "ConsumablePack":
-        return new ConsumablePack(
-          upgrade.name,
-          upgrade.descriptionfn,
-          upgrade.consumables ? [...upgrade.consumables] : [],
-          upgrade.price,
-          propsPlaceholder
-        );
-      default:
-        return new Upgrade(
-          upgrade.name,
-          upgrade.descriptionfn,
-          upgrade.effect,
-          upgrade.remove,
-          upgrade.price,
-          propsPlaceholder
-        );
-    }
-  };
-
-  // Helper: deep-copy data-only values (functions will be handled separately).
-  const deepCopyData = (val) => {
-    if (val === null || typeof val !== "object") return val;
-    try {
-      return JSON.parse(JSON.stringify(val));
-    } catch {
-      // fallback - shallow clone for weird objects
-      if (Array.isArray(val)) return val.slice();
-      const out = {};
-      for (const k in val) out[k] = val[k];
-      return out;
-    }
-  };
-
-  // 1) Create a placeholder props object first so the constructor receives something.
-  // We'll populate real props (with functions bound) after creating the instance.
-  const placeholderProps = {};
-  const newUpgrade = makeInstance(placeholderProps);
-
-  // 2) Copy simple fields
-  newUpgrade.sellPrice = upgrade.sellPrice;
-  newUpgrade.active = upgrade.active;
-  newUpgrade.bought = upgrade.bought;
-  newUpgrade.image = upgrade.image;
-  newUpgrade.rarity = upgrade.rarity;
-  newUpgrade.modifier = upgrade.modifier;
-  newUpgrade.negative = upgrade.negative;
-  newUpgrade.type = upgrade.type;
-
-  // 3) Build new props: copy data, preserve functions (bound to newUpgrade)
-  const origProps = upgrade.props || {};
-  const newProps = Array.isArray(origProps) ? [] : {};
-
-  for (const key of Object.keys(origProps)) {
-    const val = origProps[key];
-    if (typeof val === "function") {
-      // bind original function to the new upgrade instance
-      // If original function references closure-local variables (rare), that can't be preserved.
-      newProps[key] = val.bind(newUpgrade);
-    } else {
-      newProps[key] = deepCopyData(val);
-    }
-  }
-
-  // 4) Assign the composed props object to the new upgrade (replace placeholder)
-  newUpgrade.props = newProps;
-
-  // 5) If constructors or prototype methods expect some derived/linked fields, copy them as needed
-  // (you already copied basic meta fields above). If upgrade has arrays like consumables, copy those:
-  if (upgrade.consumables) newUpgrade.consumables = [...upgrade.consumables];
-
-  return newUpgrade;
-}
 
   description(game){
     if (typeof this.descriptionfn === "function") {
