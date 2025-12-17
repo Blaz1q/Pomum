@@ -789,7 +789,7 @@ canvas#glcanvas {
   padding-right: .2em;
 }
 .negative{
-  filter: invert(1)
+  filter: invert(1);
 }
 .holo{
   filter: url(#holo-map);

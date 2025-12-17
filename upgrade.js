@@ -1378,7 +1378,7 @@ props: {...defaultimage,...COMMON }
 
   },
   price: 6,
-  props: {...defaultimage,...UNCOMMON}
+  props: {...UNCOMMON}
 },
 {
   name: "Snowman",
@@ -1442,7 +1442,7 @@ props: {...defaultimage,...COMMON }
 
   },
   price: 4,
-  props: {...defaultimage,...COMMON}
+  props: {...COMMON}
 },
 {
   name: "fever",
@@ -1472,7 +1472,7 @@ props: {...defaultimage,...COMMON }
 
   },
   price: 6,
-  props: {...defaultimage,...UNCOMMON}
+  props: {...UNCOMMON}
 },
 {
   name: "Dollar",
