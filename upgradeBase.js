@@ -1,5 +1,6 @@
 import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, UPGRADE_RARITY, UPGRADE_RARITY_NAME, UPGRADE_STATES } from "./dictionary.js";
 import { Roll } from "./roll.js";
+import { upgradesList } from "./upgrade.js";
 export class Upgrade {
   constructor(name,descriptionfn, effect, remove, price = 2,props = {}) {
     this.name = name;
@@ -62,6 +63,103 @@ export class Upgrade {
     this.modifier = MODIFIERS.None;
   }
   // inside Upgrade class
+  static Copy(source){
+      const buildCopy = (source) => {
+      if (!source) return null;
+      let copyUpgrade;
+      switch (source.type) {
+      case "Consumable":
+        return new Consumable(
+          upgrade.name,
+          upgrade.descriptionfn,
+          upgrade.effect,
+          upgrade.price,
+          propsPlaceholder
+        );
+      case "Voucher":
+        return new Voucher(
+          upgrade.name,
+          upgrade.descriptionfn,
+          upgrade.effect,
+          upgrade.price,
+          propsPlaceholder
+        );
+      case "ConsumablePack":
+        return new ConsumablePack(
+          upgrade.name,
+          upgrade.descriptionfn,
+          upgrade.consumables ? [...upgrade.consumables] : [],
+          upgrade.price,
+          propsPlaceholder
+        );
+      default:
+        const copyBp = upgradesList.find(up => up.name === source.name);
+        if (!copyBp) return null;
+        copyUpgrade = new Upgrade(
+        copyBp.name,
+        copyBp.descriptionfn,
+        copyBp.effect,
+        copyBp.remove,
+        copyBp.price,
+        deepClone(copyBp.props ?? {})
+      );
+    }
+    
+      for (const key in source.props) {
+        const val = source.props[key];
+        if (typeof val !== "function") {
+          copyUpgrade.props[key] = deepClone(val);
+        }
+      }
+      copyUpgrade.bought = true;
+      console.log("BuildCopy:");
+      console.log(copyUpgrade);
+      copyUpgrade.negative = source.negative;
+      copyUpgrade.sellPrice = source.sellPrice;
+      copyUpgrade.active = source.active;
+      copyUpgrade.bought = source.bought;
+      copyUpgrade.image = source.image;
+      copyUpgrade.rarity = source.rarity;
+      copyUpgrade.modifier = source.modifier;
+      copyUpgrade.type = source.type;
+      return copyUpgrade;
+    };
+    
+    // --- Helper: Deep clone supporting Set, Map, Array, Object ---
+    function deepClone(obj, visited = new WeakMap()) {
+      if (obj === null || typeof obj !== "object") return obj;
+      if (visited.has(obj)) return visited.get(obj);
+    
+      if (obj instanceof Set) {
+        const newSet = new Set();
+        visited.set(obj, newSet);
+        for (const item of obj) newSet.add(deepClone(item, visited));
+        return newSet;
+      }
+    
+      if (obj instanceof Map) {
+        const newMap = new Map();
+        visited.set(obj, newMap);
+        for (const [k, v] of obj) newMap.set(deepClone(k, visited), deepClone(v, visited));
+        return newMap;
+      }
+    
+      if (Array.isArray(obj)) {
+        const arr = [];
+        visited.set(obj, arr);
+        for (const item of obj) arr.push(deepClone(item, visited));
+        return arr;
+      }
+    
+      const cloned = {};
+      visited.set(obj, cloned);
+      for (const key in obj) {
+        cloned[key] = deepClone(obj[key], visited);
+      }
+      return cloned;
+    }
+    return buildCopy(source);
+  }
 static CopyUpgrade(upgrade) {
   // shallow factory for a new instance of the correct subclass (props placeholder for now)
   const makeInstance = (propsPlaceholder) => {

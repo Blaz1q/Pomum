@@ -431,18 +431,40 @@ canvas#glcanvas {
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       text-align: center;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 0.2fr repeat(2, 1fr);
       grid-template-rows: repeat(2, 1fr);
       justify-items: center;
+      justify-content: space-around;
+      align-items: center;
       h1 {
         margin-bottom: 1rem;
       }
       button.shopbutton {
-        margin: 0.3rem;
-        padding: 0.6rem 1.2rem;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
+        width: 100%;
+        flex: 1;
+        padding: 3rem 0.5rem;
+        border-radius: 12px;
+        border: 0;
+        color: white;
+        background-color: $mult;
+        display: block;
+          font-family: "Jersey 25", sans-serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        box-shadow: inset 0 -5px 3px rgba(0, 0, 0, 0.25);
+      &:active{
+        box-shadow: inset 0 5px 3px rgba(0, 0, 0, 0.25);
+        background-color: darken($color: $mult, $amount: 5);
+      }
+    }
+      #shop-buttons-container{
+        display:flex;
+        flex-direction: column;
+        grid-area: 1 / 1 / 3 / 2;
+        height: 95%;
+        justify-content: space-around;
+        gap: .5em;
       }
       #upgrades-container,#voucher-container,#boosterpack-container {
         display: flex;
@@ -455,9 +477,9 @@ canvas#glcanvas {
           margin-right: 1.5em;
         }
       }
-      #upgrades-container{ grid-area: 1 / 1 / 2 / 3; }
-      #boosterpack-container{ grid-area: 2 / 2 / 3 / 3; }
-      #voucher-container{ grid-area: 2 / 1 / 3 / 2; }
+      #upgrades-container{ grid-area: 1 / 2 / 2 / 4; }
+      #boosterpack-container{ grid-area: 2 / 3 / 3 / 4; }
+      #voucher-container{ grid-area: 2 / 2 / 3 / 3; }
     }
   }
 }

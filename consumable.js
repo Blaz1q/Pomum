@@ -214,23 +214,14 @@ export const consumableUpgradeBlueprints = [
             if(game.upgrades.length==0) return;
             let index = Math.floor(Math.random()*game.upgrades.length);
             let copy = game.upgrades[index];
-            let copyBp = upgradesList.filter(up => 
-                up.name === copy.name
-            )[0];
-            //console.log(copyBp);
-            let copyUpgrade = new Upgrade(copyBp.name,copyBp.descriptionfn,copyBp.effect,copyBp.remove,copyBp.price,copyBp.props);
-            copyUpgrade.bought = true;
-            copyUpgrade.modifier = copy.modifier;
-            copyUpgrade.negative = copy.negative;
-            copyUpgrade.props = JSON.parse(JSON.stringify(copy.props));
-            copyUpgrade.apply(game);
-            console.log(copy);
-            console.log(copyUpgrade);
+            const newUpgrade = Upgrade.Copy(copy);
+            console.log(newUpgrade);
             game.upgrades.forEach(upgrade => {
-                upgrade.remove(game);
+                if(upgrade!=copy) upgrade.remove(game);
             });
             game.upgrades = [];
-            game.upgrades.push(copy,copyUpgrade);  
+            newUpgrade.apply(game);
+            game.upgrades.push(copy,newUpgrade);  
             game.GameRenderer.displayPlayerUpgrades();
             game.GameRenderer.displayUpgradesCounter();
         },
@@ -560,7 +551,7 @@ consumableSilverBlueprints.forEach(consumable => {
 });
 consumableUpgradeBlueprints.forEach(consumable => {
     consumable.type = "Consumable";
-    consumable.props.rarity = UPGRADE_RARITY_NAME.ConsumableRare;
+    consumable.props.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
 });
 pomumpackItems.push(...consumableBlueprints);
 consumableList.push(...consumableBlueprints,...consumableGoldBlueprints,...consumableSilverBlueprints,...consumableUpgradeBlueprints);

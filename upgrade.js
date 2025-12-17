@@ -1069,7 +1069,7 @@ export const upgradeBlueprints = [
       mult: null,
       onMove: ()=>{
         this.props.mult = Math.floor(Math.random()*6)+1;
-        return UPGRADE_STATES.Active; 
+        return UPGRADE_STATES.Failed; 
       },
       onRoundEnd: ()=>{
         this.props.mult = null;
@@ -1135,70 +1135,7 @@ export const upgradeBlueprints = [
     };
 
     // --- Build a fresh independent copy of the neighbor ---
-    this.buildCopy = (source) => {
-  if (!source) return null;
-  const copyBp = upgradesList.find(up => up.name === source.name);
-  if (!copyBp) return null;
-
-  const copyUpgrade = new Upgrade(
-    copyBp.name,
-    copyBp.descriptionfn,
-    copyBp.effect,
-    copyBp.remove,
-    copyBp.price,
-    deepClone(copyBp.props ?? {})
-  );
-
-  if (typeof copyUpgrade.effect === "function") {
-    copyUpgrade.effect(game);
-    console.log("applied");
-  }
-  
-  for (const key in source.props) {
-    const val = source.props[key];
-    if (typeof val !== "function") {
-      copyUpgrade.props[key] = deepClone(val);
-    }
-  }
-  copyUpgrade.bought = true;
-  console.log("BuildCopy:");
-  console.log(copyUpgrade);
-  return copyUpgrade;
-};
-
-// --- Helper: Deep clone supporting Set, Map, Array, Object ---
-function deepClone(obj, visited = new WeakMap()) {
-  if (obj === null || typeof obj !== "object") return obj;
-  if (visited.has(obj)) return visited.get(obj);
-
-  if (obj instanceof Set) {
-    const newSet = new Set();
-    visited.set(obj, newSet);
-    for (const item of obj) newSet.add(deepClone(item, visited));
-    return newSet;
-  }
-
-  if (obj instanceof Map) {
-    const newMap = new Map();
-    visited.set(obj, newMap);
-    for (const [k, v] of obj) newMap.set(deepClone(k, visited), deepClone(v, visited));
-    return newMap;
-  }
-
-  if (Array.isArray(obj)) {
-    const arr = [];
-    visited.set(obj, arr);
-    for (const item of obj) arr.push(deepClone(item, visited));
-    return arr;
-  }
-
-  const cloned = {};
-  visited.set(obj, cloned);
-  for (const key in obj) {
-    cloned[key] = deepClone(obj[key], visited);
-  }
-  return cloned;
-}
+    this.buildCopy = (source) => Upgrade.Copy(source);
 
     // --- Synchronize the mirror ---
     this.syncMirror = () => {
@@ -1225,6 +1162,7 @@ function deepClone(obj, visited = new WeakMap()) {
 
       // Just copy the neighbor — even if it's a Mirror
       const copyUpgrade = this.buildCopy(neighbor);
+      copyUpgrade.apply(game);
       console.log("kopia: ");
       console.log(copyUpgrade);
       this.mirroredUpgradeCopy = copyUpgrade;
@@ -1503,6 +1441,54 @@ props: {...defaultimage,...COMMON }
   remove(game){
 
   },
+  price: 4,
+  props: {...defaultimage,...COMMON}
+},
+{
+  name: "fever",
+  descriptionfn(game){
+    return `Daje ${Style.Mult('10-20 Mult')}. ${Style.Chance(`1 na 10`)}, że zniknie na końcu rundy.`;
+  },
+  effect(game){
+    this.setProps({
+        onScore: () => {
+          const gained = Math.floor(Math.random()*10)+10;
+          game.mult += gained;
+          game.GameRenderer.displayTempScore();
+          return { state: UPGRADE_STATES.Score, message: `+${gained} Mult`, style: SCORE_ACTIONS.Mult };
+        },
+        onRoundEnd: () => {
+          if(Math.floor(Math.random()*10)!=0) return;
+          const index = game.upgrades.indexOf(this) ?? -1;
+          if(index==-1) return;
+          game.upgrades.splice(index,1);
+          game.GameRenderer.displayUpgradesCounter();
+          game.GameRenderer.displayPlayerUpgrades();
+          game.emit(GAME_TRIGGERS.onUpgradesChanged);
+        }
+    });
+  },
+  remove(game){
+
+  },
+  price: 6,
+  props: {...defaultimage,...UNCOMMON}
+},
+{
+  name: "Dollar",
+  descriptionfn(game){
+    return `Na końcu rundy daje ${Style.Money('$4')}`;
+  },
+  effect(game){
+    this.setProps({
+        onRoundEnd: () => {
+          game.money+=4;
+          game.GameRenderer.updateMoney(4);
+          return {state:UPGRADE_STATES.Active,message: `+$4`, style:SCORE_ACTIONS.Money};
+        }
+    });
+  },
+  remove(game){},
   price: 4,
   props: {...defaultimage,...COMMON}
 }

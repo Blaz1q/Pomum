@@ -122,11 +122,15 @@
 
       <!-- Shop -->
       <div id="shop">
-        <button class="shopbutton" onclick="reroll()">Reroll Shop ($4)</button>
+        
+        <div id="shop-buttons-container">
+          <button class="shopbutton" onclick="reroll()">Odśwież sklep ($4)</button>
+          <button class="shopbutton" onclick="startRound()">Kontynuuj</button>
+        </div>
         <div id="upgrades-container"></div>
         <div id="boosterpack-container"></div>
         <div id="voucher-container"></div>
-        <button class="shopbutton" onclick="startRound()">Continue</button>
+        
       </div>
       <div id="upgrade-tiles">
         <div class="container">

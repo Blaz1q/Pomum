@@ -48,8 +48,8 @@ export const UPGRADE_STATES = {
 }
 export const UPGRADE_RARITY = {
     Common: 20,
-    Uncommon: 10,
-    Rare: 5,
+    Uncommon: 11,
+    Rare: 6,
     ConsumableCommon: 1,
     ConsumableRare: 0.7,
     PomumPackCommon: 1,
