@@ -586,9 +586,9 @@ export const upgradeBlueprints = [
     name: "Robber",
     descriptionfn(game) {
       if (this.props.sellPriceMult !== 0&&this.bought) {
-        return `Daje + Mult ceny sprzedarzy wszystkich kupionych ulepszeń. (Obecnie ${Style.Mult(`+${this.props.sellPriceMult} mult`)})`;
+        return `Daje + Mult ceny sprzedaży wszystkich kupionych ulepszeń. (Obecnie ${Style.Mult(`+${this.props.sellPriceMult} mult`)})`;
       }
-      return `Daje + Mult ceny sprzedarzy wszystkich kupionych ulepszeń.`;
+      return `Daje + Mult ceny sprzedaży wszystkich kupionych ulepszeń.`;
     },
     effect(game) {
       this.setProps({
@@ -813,7 +813,7 @@ export const upgradeBlueprints = [
   {
     name: "fish",
     descriptionfn(game){
-      return `co rundę cena sprzedarzy zwiększa się o ${Style.Money(`$3`)}. (Obecnie ${Style.Money('$'+this.sellPrice)})`;
+      return `co rundę cena sprzedaży zwiększa się o ${Style.Money(`$3`)}. (Obecnie ${Style.Money('$'+this.sellPrice)})`;
     },
     effect(game){
       this.setProps({
@@ -1245,7 +1245,7 @@ export const upgradeBlueprints = [
 { name: "Soul Eater",
   descriptionfn(game){
     var mult = this.props.mult ?? 1;
-    return `Na początku rundy niszczy ulepszenie po prawej stronie i zyskuje ${Style.Mult(`+Mult ceny sprzedarzy`)} ulepszenia. (Obecnie ${Style.Mult(`+${mult} Mult`)})`;
+    return `Na początku rundy niszczy ulepszenie po prawej stronie i zyskuje ${Style.Mult(`+Mult ceny sprzedaży`)} ulepszenia. (Obecnie ${Style.Mult(`+${mult} Mult`)})`;
   },
   effect(game){
     this.isReady = true;
@@ -1505,4 +1505,5 @@ upgradeBlueprints.forEach(upgrade => {
 });
 // push all blueprints into upgradesList
 upgradeBlueprints.forEach(bp => upgradesList.push(bp));
+
 
