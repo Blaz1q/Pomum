@@ -92,8 +92,8 @@ const BossBlueprints = [
         name: "Wave",
         descriptionfn(game){
             if(this.props.chosenFruit!=null)
-                return `Najczęstrzy owoc (${this.props.chosenFruit.icon}) nie dają punktów.`;
-            return `Najczęstrzy owoc nie daje punktów.`
+                return `Najczęstszy owoc (${this.props.chosenFruit.icon}) nie dają punktów.`;
+            return `Najczęstszy owoc nie daje punktów.`
         },
         effect(game){
             const fruit = game.getTopFruit();
@@ -102,6 +102,7 @@ const BossBlueprints = [
         },
         revert(game){
             this.props.chosenFruit.props.debuffed = false;
+            this.props.chosenFruit=null;
         },
         props: {image: 'wave'}
     },
@@ -150,4 +151,5 @@ export function rollBoss(game) {
         blueprint.revert,
         blueprint.props
     );
+
 }
