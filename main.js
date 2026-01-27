@@ -247,6 +247,7 @@ rollUpgrades(count = 3) {
         this.Audio.playSound('buy.mp3');
         this.GameRenderer.displayUpgradesInShop();
         this.GameRenderer.updateMoney(-4);
+        this.GameRenderer.updateRerollButton();
     }
     rerollBoosters(){
         if(this.money<2) return;
@@ -289,6 +290,7 @@ rollUpgrades(count = 3) {
         this.GameRenderer.displayUpgradesInShop();
         this.GameRenderer.displayBoosterPacks();
         this.GameRenderer.hideGame();
+        this.GameRenderer.updateRerollButton();
         this.GameRenderer.showShop();
     }
     async startround(){
@@ -484,6 +486,7 @@ trySwap(x1, y1, x2, y2) {
         upgrade.apply(this);
         this.emit(GAME_TRIGGERS.onConsumableUse,upgrade);
         //this.GameRenderer.displayMoney();
+        
         return true;
     }
     buy(upgrade){
@@ -512,6 +515,7 @@ trySwap(x1, y1, x2, y2) {
         this.money -= upgrade.price;
         this.GameRenderer.updateMoney(-upgrade.price);
         //this.GameRenderer.displayMoney();
+        this.GameRenderer.updateRerollButton();
         return true;
     }
     sell(upgrade){
@@ -535,6 +539,7 @@ trySwap(x1, y1, x2, y2) {
             this.GameRenderer.displayConsumablesCounter();
         }
         this.GameRenderer.updateMoney(upgrade.sellPrice);
+        this.GameRenderer.updateRerollButton();
         return true;
     }
 

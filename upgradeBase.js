@@ -1,6 +1,7 @@
 import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, UPGRADE_RARITY, UPGRADE_RARITY_NAME, UPGRADE_STATES } from "./dictionary.js";
 import { Roll } from "./roll.js";
 import { upgradesList } from "./upgrade.js";
+
 export class Upgrade {
   constructor(name,descriptionfn, effect, remove, price = 2,props = {}) {
     this.name = name;

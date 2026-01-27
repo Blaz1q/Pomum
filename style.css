@@ -435,6 +435,12 @@ canvas#glcanvas {
   box-shadow: inset 0 5px 3px rgba(0, 0, 0, 0.25);
   background-color: rgb(219.4040697674, 93.0959302326, 93.0959302326);
 }
+.game .right-panel #shop button.shopbutton.disabled {
+  background-color: #a98484;
+}
+.game .right-panel #shop button.shopbutton.disabled:active {
+  background-color: rgb(158.5071770335, 116.9928229665, 116.9928229665);
+}
 .game .right-panel #shop #shop-buttons-container {
   display: flex;
   flex-direction: column;
@@ -452,6 +458,7 @@ canvas#glcanvas {
 }
 .game .right-panel #shop #upgrades-container .upgrade-wrapper, .game .right-panel #shop #voucher-container .upgrade-wrapper, .game .right-panel #shop #boosterpack-container .upgrade-wrapper {
   margin-right: 1.5em;
+  transition: transform 0.2s ease-in-out;
 }
 .game .right-panel #shop #upgrades-container {
   grid-area: 1/2/2/4;
@@ -486,6 +493,7 @@ canvas#glcanvas {
 /* Price above the card */
 /* Card */
 .upgrade-wrapper, .boss-wrapper {
+  transition: transform 1s ease-in-out;
   font-family: "Jersey 25", sans-serif;
   letter-spacing: 0.5px;
   position: relative;
@@ -495,6 +503,9 @@ canvas#glcanvas {
   z-index: 0;
   max-width: none;
   transition: transform 0.2s ease;
+}
+.upgrade-wrapper.SelectedUpgrade, .boss-wrapper.SelectedUpgrade {
+  z-index: 1000 !important;
 }
 .upgrade-wrapper.dragging, .boss-wrapper.dragging {
   opacity: 0.7;
@@ -511,35 +522,37 @@ canvas#glcanvas {
 }
 .upgrade-wrapper .consumable-buttons, .boss-wrapper .consumable-buttons {
   position: absolute;
-  right: 0; /* keep hidden off to the right */
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
+  top: 105%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
   flex-direction: column;
-  gap: 0.5em;
+  gap: 0.2em;
   opacity: 0;
-  transition: all 0.3s ease;
-  z-index: 4;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 20;
 }
 .upgrade-wrapper .consumable-buttons button, .boss-wrapper .consumable-buttons button {
   all: unset;
-  padding: 0.8rem 2rem;
-  border: none;
-  text-align: right;
+  padding: 0.6rem 1.5rem;
+  white-space: nowrap;
   border-radius: 12px;
   background: #e74c3c;
   color: #fff;
   font-weight: bold;
   cursor: pointer;
-  transition: background, padding 0.2s;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.upgrade-wrapper .consumable-buttons button.disabled, .boss-wrapper .consumable-buttons button.disabled {
+  background: #212121;
+}
+.upgrade-wrapper .consumable-buttons button.disabled:hover, .boss-wrapper .consumable-buttons button.disabled:hover {
+  background: #171717;
 }
 .upgrade-wrapper .consumable-buttons button:hover, .boss-wrapper .consumable-buttons button:hover {
   background: #c0392b;
-}
-.upgrade-wrapper:hover .consumable-buttons, .boss-wrapper:hover .consumable-buttons {
-  margin-left: 100px;
-  right: -70px; /* slide in */
-  opacity: 1;
+  transform: scale(1.05);
 }
 .upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
   width: 120px;
@@ -613,7 +626,6 @@ canvas#glcanvas {
 }
 .upgrade-wrapper .upgrade-price, .boss-wrapper .upgrade-price {
   position: absolute;
-  bottom: -2.5rem; /* pod kartą */
   background: gold;
   color: #000;
   padding: 0.2rem 0.5rem;
@@ -625,19 +637,20 @@ canvas#glcanvas {
   opacity: 1; /* ukryta domyślnie */
   transition: opacity 0.3s ease, transform 0.3s ease;
   pointer-events: none; /* żeby nie blokowało hovera */
-  transform: translateY(-15px); /* lekko niżej na start */
+  transform: translateY(-20px); /* lekko niżej na start */
   z-index: 15;
 }
 .upgrade-wrapper:hover .upgrade-price, .boss-wrapper:hover .upgrade-price {
   opacity: 1;
-  transform: translateY(-5px); /* płynnie do góry */
+  transform: translateY(-30px); /* płynnie do góry */
 }
 .upgrade-wrapper.bought .upgrade-price, .boss-wrapper.bought .upgrade-price {
+  transform: translateY(-15px);
   opacity: 0;
 }
 .upgrade-wrapper.bought:hover .upgrade-price, .boss-wrapper.bought:hover .upgrade-price {
   opacity: 1;
-  transform: translateY(-5px); /* płynnie do góry */
+  transform: translateY(-15px); /* płynnie do góry */
 }
 
 #game-over, #info-container {
@@ -790,10 +803,12 @@ canvas#glcanvas {
   font-family: "Jersey 25", sans-serif;
   font-weight: bold;
   color: black;
-  font-size: 1.5em;
   z-index: 900;
   justify-content: center;
   text-align: center;
+}
+#upgrade-tiles p {
+  font-size: 1.5em;
 }
 #upgrade-tiles .container {
   background: rgba(255, 255, 255, 0.34);

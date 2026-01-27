@@ -581,6 +581,7 @@ displayPlayerUpgrades() {
             break;
         }
     }
+    
     displayUpgradesInShop() {
         const shopEl = document.getElementById("upgrades-container");
         shopEl.innerHTML = ""; 
@@ -658,6 +659,9 @@ displayPlayerUpgrades() {
         
         wrapper.addEventListener('mouseenter', () => wrapper.style.zIndex = 500);
         wrapper.addEventListener('mouseleave', () => wrapper.style.zIndex = originalZ);
+        if(displayButtons){
+            wrapper.addEventListener('click', () => this.displayUpgradeButtons(wrapper,upgrade));
+        }
         wrapper.className = "upgrade-wrapper";
         wrapper.dataset.type = upgrade.type;
         if (bought) wrapper.classList.add("bought");
@@ -722,15 +726,16 @@ displayPlayerUpgrades() {
         wrapper.addEventListener("mouseenter", () => {
             desc.innerHTML = this.createDescription(upgrade);
         });
-        if(displayButtons){
-            wrapper.appendChild(this.createUpgradeButtons(wrapper,upgrade,params));
-        }
+        
         // Click handlers
         if(displayPrice){
             wrapper.appendChild(priceEl);
         }
         wrapper.appendChild(card);
         wrapper.appendChild(desc);
+        if(displayButtons){
+            wrapper.appendChild(this.createUpgradeButtons(wrapper,upgrade,params));
+        }
         return wrapper;
     }
     displayUpgrades(upgrades, params = { bought:false, origin: null }) {
@@ -856,6 +861,71 @@ fadeOutAndRemove(wrapper, duration = 100) {
         }
     }, duration);
 }
+resetAllUpgrades() {
+    // Pobieramy wszystkie wrappery z DOM
+    const allWrappers = document.querySelectorAll('.SelectedUpgrade');
+
+    allWrappers.forEach(wrapper => {
+        // Resetujemy transformację do pozycji początkowej
+        wrapper.style.transform = "translateY(0)";
+        wrapper.classList.remove("SelectedUpgrade");
+        // Opcjonalnie: resetujemy też przyciski consumable, jeśli je wcześniej pokazałeś
+        const buttons = wrapper.querySelector('.consumable-buttons');
+        if (buttons) {
+            buttons.style.opacity = "0";
+            buttons.style.display = "none";
+        }
+    });
+}
+updateRerollButton(){
+    const rerollButton = document.querySelectorAll('.shopbutton')[0];
+    const isTooExpensive = this.game.money < 4;
+    if(isTooExpensive) rerollButton.classList.add("disabled");
+    else rerollButton.classList.remove("disabled");
+}
+displayUpgradeButtons(wrapper, upgrade) {
+    // 1. Sprawdzamy, czy ten konkretny wrapper jest już "podniesiony"
+    // Sprawdzamy styl inline lub (lepiej) konkretną wartość transformacji
+    const isAlreadyActive = wrapper.style.transform === "translateY(-20px)";
+
+    // 2. Najpierw resetujemy absolutnie wszystkie wrappery
+    this.resetAllUpgrades();
+
+    // 3. Jeśli wrapper NIE był aktywny, to go podnosimy. 
+    // Jeśli BYŁ aktywny, to po prostu zostaje zresetowany (efekt zamknięcia).
+    if (!isAlreadyActive) {
+        requestAnimationFrame(() => {
+            wrapper.style.transition = "transform 0.05s ease-out"; 
+            wrapper.style.transform = "translateY(-20px)";
+            wrapper.classList.add("SelectedUpgrade");
+            const buttons = wrapper.querySelector('.consumable-buttons');
+            if (buttons) {
+                buttons.style.display = "flex";
+                buttons.style.transition = "opacity 0.2s ease"; // dodajemy płynność dla opacity
+                buttons.style.opacity = "1";
+            }
+            const btnBuy = buttons.querySelector('button:nth-child(1)'); // Zakładamy, że Buy jest pierwszy
+            const btnBuyAndUse = buttons.querySelector('button:nth-child(2)');
+            btnBuy.classList.remove("disabled");
+            btnBuyAndUse?.classList.remove("disabled");
+            const isUpgradeSpaceFull = upgrade.type === "Upgrade" && this.game.upgrades.length >= this.game.maxUpgrades && !upgrade.negative;
+            const isConsumableSpaceFull = upgrade.type === "Consumable" && this.game.consumables.length >= this.game.maxConsumables && !upgrade.negative;
+            const isTooExpensive = this.game.money < upgrade.price;
+            if (btnBuy && btnBuy.textContent === "Kup") {
+                    // Blokujemy, jeśli brak miejsca LUB brak pieniędzy
+                const disabled = isUpgradeSpaceFull || isConsumableSpaceFull || isTooExpensive;
+                if(disabled){
+                    btnBuy.classList.add("disabled");
+                }
+            }
+            if(btnBuyAndUse&&btnBuyAndUse.textContent == "Kup i Użyj"){
+                if(isTooExpensive){
+                    btnBuyAndUse?.classList.add("disabled");
+                }
+            }
+        });
+    }
+}
 createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
     if(params.origin && params.origin.type == "ConsumablePack"){
         this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
@@ -918,6 +988,7 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         console.log("using");
         console.log(upgrade);
         let success = this.game.buyanduse(upgrade);
+        
         if (success&&params.origin&&params.origin.type=="ConsumablePack"){
             this.game.BuysFromBoosterLeft--;
             this.displayBoosterAmmount();
@@ -929,6 +1000,9 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         if(success){
             game.GameRenderer.fadeOutAndRemove(wrapper);
             //wrapper.remove();
+        }
+        else{
+            game.GameRenderer.notEnoughMoney();
         }
     });
     const btnSell = document.createElement("button");
