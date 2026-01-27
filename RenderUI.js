@@ -521,13 +521,9 @@ displayPlayerUpgrades() {
         if(collection.children.length!=0) return;
         collection.innerHTML = "";
         upgradesList.forEach(blueprint => {
+            //console.log(blueprint);
             const up = new Upgrade(
-                blueprint.name,
-                blueprint.descriptionfn,
-                blueprint.effect,
-                blueprint.remove,
-                blueprint.price,
-                blueprint.props  
+                blueprint  
             );
             collection.appendChild(this.displayUpgrades([up],{displayPrice: false,displayButtons: false}));
         });
@@ -708,7 +704,7 @@ displayPlayerUpgrades() {
                 cardInner.classList.add(element);
             });
         }
-        cardInner.style.backgroundImage = `url('${upgrade.image}')`;
+        cardInner.style.backgroundImage = `url('${upgrade.image()}')`;
         
         // Card
        

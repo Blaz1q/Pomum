@@ -526,7 +526,7 @@ canvas#glcanvas {
   max-width: none;
   transition: transform 0.2s ease; // smooth movement
   &.SelectedUpgrade {
-    z-index: 1000 !important; // !important upewni się, że przebije hover i z-index: 500 bossa
+    z-index: 9 !important; // !important upewni się, że przebije hover i z-index: 500 bossa
   }
   &.dragging {
     opacity: 0.7;

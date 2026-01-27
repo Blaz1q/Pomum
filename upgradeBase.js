@@ -2,24 +2,67 @@ import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, UPGRADE_RARITY, UPGRADE_RARITY
 import { Roll } from "./roll.js";
 import { upgradesList } from "./upgrade.js";
 
-export class Upgrade {
-  constructor(name,descriptionfn, effect, remove, price = 2,props = {}) {
-    this.name = name;
-    this.descriptionfn = descriptionfn;
-    this.effect = effect; // funkcja, która modyfikuje grę
-    this.remove = remove; // funkcja cofająca efekt
-    this.price = price;
-    this.sellPrice = props.sellPrice ?? Math.round(price/2);
+export class UpgradeBase {
+  constructor(props = {}){
+    const rawProps = typeof props.props === 'function' 
+      ? props.props() 
+      : props.props;
+
+    // 2. Gwarancja, że this.props to zawsze obiekt
+    this.props = rawProps || {};
+    if(props.effect){
+      this.props.effect = props.effect;
+    }
+
+    if(props.remove){
+      this.props.remove = props.remove;
+    }
+    
+    this.name = props.name;
+    this.descriptionfn = props.descriptionfn;
+    this.price = props.price;
+    this.sellPrice = props.sellPrice ?? Math.round(props.price/2);
+    this.modifier = MODIFIERS.None;
+    this.specialFunc;
+    this.rarity = UPGRADE_RARITY.Common;
+    this.url = "./unknown/url/";
+    this.type = "unknown";
+    this.image = ()=>{
+      return `${this.url}${props.image ? props.image.toLowerCase() : this.name?.toLowerCase()}.png`;
+    }
+  }
+  description(game){
+    if (typeof this.descriptionfn === "function") {
+      return this.descriptionfn.call(this,game);
+    }
+    return this.descriptionfn;
+  }
+  apply(game) {
+    throw new Error("Method apply must be implemented.");
+  }
+  sell(game) {
+    throw new Error("Method sell must be implemented.");
+  }
+  static Copy(source){
+    throw new Error("Copy method must be implemented.");
+  }
+  render(){
+    throw new Error("Render method must be implemented.");
+  }
+}
+
+export class Upgrade extends UpgradeBase{
+  constructor(props = {}) {
+    super(props);
     this.active = true;
     this.bought = false;
     this.negative = false;
     this.isReady = false;
     this.type = "Upgrade";
-    this.image = `./images/cards/${props.image ? props.image.toLowerCase() : name.toLowerCase()}.png`
+    this.url = "./images/cards/"
     this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
-    this.modifier = MODIFIERS.None;
     this.specialFunc;
-    this.props = {...props};
+    
   }
   changeModifier(game,modifier){
     this.modifier = modifier;
@@ -71,42 +114,25 @@ export class Upgrade {
       switch (source.type) {
       case "Consumable":
         return new Consumable(
-          upgrade.name,
-          upgrade.descriptionfn,
-          upgrade.effect,
-          upgrade.price,
-          upgrade?.props ?? {}
+          upgrade
         );
       case "Voucher":
         return new Voucher(
-          upgrade.name,
-          upgrade.descriptionfn,
-          upgrade.effect,
-          upgrade.price,
-          upgrade?.props ?? {}
+          upgrade
         );
       case "ConsumablePack":
         return new ConsumablePack(
-          upgrade.name,
-          upgrade.descriptionfn,
-          upgrade.consumables ? [...upgrade.consumables] : [],
-          upgrade.price,
-          upgrade?.props ?? {}
+          upgrade
         );
       default:
         const copyBp = upgradesList.find(up => up.name === source.name);
         if (!copyBp) return null;
         copyUpgrade = new Upgrade(
-        copyBp.name,
-        copyBp.descriptionfn,
-        copyBp.effect,
-        copyBp.remove,
-        copyBp.price,
-        deepClone(copyBp.props ?? {})
+        copyBp
       );
     }
-    if (typeof copyUpgrade.effect === "function") {
-      copyUpgrade.effect(game);
+    if (typeof copyUpgrade.props?.effect === "function") {
+      copyUpgrade.props?.effect.call(this,game);
       console.log("applied");
     }
       for (const key in source.props) {
@@ -181,8 +207,10 @@ export class Upgrade {
       game.maxUpgrades+=1;
       game.GameRenderer.displayUpgradesCounter();
     }
+
     this.addSpecial(game);
-    this.effect.call(this, game); // this wewnątrz effect wskazuje na instancję
+    this.props?.effect?.call(this,game);
+    //this.effect?.call(this, game); // this wewnątrz effect wskazuje na instancję
   }
 
   sell(game) {
@@ -191,22 +219,19 @@ export class Upgrade {
       game.maxUpgrades-=1;
       game.GameRenderer.displayUpgradesCounter();
     }
-    this.remove.call(this, game); // this wewnątrz remove wskazuje na instancję
+    this.props?.remove?.call(this,game);
+    //this.remove.call(this, game); // this wewnątrz remove wskazuje na instancję
     this.removeSpecial(game);
     game.money += Math.floor(this.sellPrice);
   }
 }
-export class ConsumablePack extends Upgrade{
-    constructor(name,descriptionfn,consumables,price,props = {}){
-        super(name, descriptionfn, null, null, price, props);
-        this.consumables = consumables;
+export class ConsumablePack extends UpgradeBase{
+    constructor(props = {}){
+        super(props);
+        this.consumables = props.consumables;
+        this.url = "./images/cards/";
         this.type = "ConsumablePack";
         this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.Common;
-        this.props = {
-            maxSelect: props.maxSelect ?? 1,
-            maxRoll: props.maxRoll ?? 3,
-            ...props
-        }
     }
     roll(game) {
     // Start with all available consumables
@@ -235,9 +260,9 @@ export class ConsumablePack extends Upgrade{
     // Pick first 'count' items and create new instances
     const picked = pool.slice(0, count).map(c => {
       if(c.type=="Consumable"){
-        return new Consumable(c.name, c.description, c.effect, c.price, c.props);
+        return new Consumable(c);
       }else if(c.type=="Upgrade"){
-        let upgrade = new Upgrade(c.name,c.descriptionfn,c.effect,c.remove,c.price,c.props);
+        let upgrade = new Upgrade(c);
         game.roll.Modifier(upgrade,{negative: 0.0025,modifier:0.015});
         return upgrade;
       }
@@ -247,17 +272,25 @@ export class ConsumablePack extends Upgrade{
     return picked;
 }
 }
-export class Voucher extends Upgrade{
-    constructor(name,descriptionfn,effect,price,props = {}){
-        super(name,descriptionfn,effect,null,price,props);
+export class Voucher extends UpgradeBase{
+    constructor(props = {}){
+        super(props);
         this.type = "Voucher";
+        this.url = "./images/cards/";
+        this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
     }
+    apply(game) {
+    this.bought = true;
+    this.props.effect.call(this,game);
+    //this.effect?.call(this, game); // this wewnątrz effect wskazuje na instancję
+  }
 }
-export class Consumable extends Upgrade{
-    constructor(name,descriptionfn,effect,price,props = {}){
-        super(name,descriptionfn,effect,null,price,props);
+export class Consumable extends UpgradeBase{
+    constructor(props = {}){
+        super(props);
         this.type = "Consumable";
-        this.image = `./images/consumables/${props.image ? props.image.toLowerCase() : 'default'}.png`
+        this.url = "./images/consumables/";
+        this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
     }
     apply(game){
       this.bought = true;
@@ -266,7 +299,7 @@ export class Consumable extends Upgrade{
         game.maxConsumables-=1;
         game.GameRenderer.displayConsumablesCounter();
       }
-        this.effect.call(this,game);
+        this.props?.effect?.call(this,game);
     }
     sell(game) {
     this.bought = false;

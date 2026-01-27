@@ -505,7 +505,7 @@ canvas#glcanvas {
   transition: transform 0.2s ease;
 }
 .upgrade-wrapper.SelectedUpgrade, .boss-wrapper.SelectedUpgrade {
-  z-index: 1000 !important;
+  z-index: 9 !important;
 }
 .upgrade-wrapper.dragging, .boss-wrapper.dragging {
   opacity: 0.7;

@@ -206,15 +206,10 @@ rollUpgrades(count = 3) {
         if (idx >= 0) poolCopy.splice(idx, 1);
 
         // create Upgrade or Consumable instance
-        if ("descriptionfn" in entry) {
+        if (entry.type=="Upgrade") {
             // it's an upgrade
             const up = new Upgrade(
-                entry.name,
-                entry.descriptionfn,
-                entry.effect,
-                entry.remove,
-                entry.price,
-                entry.props
+                entry
             );
             // negative / modifier rolling
             this.roll.Modifier(up);
@@ -223,11 +218,7 @@ rollUpgrades(count = 3) {
             // it's a consumable
             picked.push(
                 new Consumable(
-                    entry.name,
-                    entry.description,
-                    entry.effect,
-                    entry.price,
-                    entry.props
+                    entry
                 )
             );
         }
@@ -1580,6 +1571,8 @@ window.consumableList = consumableList;
 window.reroll = reroll;
 window.showCollection = showCollection;
 window.hideCollection = hideCollection;
+window.Upgrade = Upgrade;
+window.Consumable = Consumable;
 // window.rerollBoosters = rerollBoosters;
 window.restartGame = restartGame;
 window.startGame = startGame;
