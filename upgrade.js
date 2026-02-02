@@ -736,7 +736,8 @@ export const upgradeBlueprints = [
     props: ()=>({
         chosenFruit: null,
         score: 0,
-        onMove(matches) {
+        onMove(payload) {
+         const matches=  payload.matches;
           if(this.props.chosenFruit==null){
             const firstFruit = matches[0]?.fruit ?? null;
             this.props.chosenFruit = firstFruit;
@@ -903,7 +904,8 @@ export const upgradeBlueprints = [
         this.isReady = true;
         return UPGRADE_STATES.Ready;
       },
-      onMove(matches){
+      onMove(payload){
+        const matches = payload.matches;
         if(game.consumables.length>=game.maxConsumables) return UPGRADE_STATES.Failed;
         if(this.props.chosenFruit!=null) return UPGRADE_STATES.Failed;
         console.log(matches);
@@ -1308,7 +1310,7 @@ price: 7,
   ...UNCOMMON
 },
 {
-  name: "Dollar",
+  name: "Dolar",
   descriptionfn(game){
     return `Na końcu rundy daje ${Style.Money('$4')}`;
   },
@@ -1321,6 +1323,44 @@ price: 7,
       }),
         price: 4,
   ...defaultimage,...COMMON
+},
+{
+  name: "Saper",
+  descriptionfn(game){
+    return `${Style.Chance('1 na 5')} na każdą bombę lub dynamit, że zostanie wysadzony na początku ruchu`;
+  },
+  props: ()=>({
+    onMove(payload){
+      console.log(payload);
+      let game = payload.game;
+      let matches = payload.matches; 
+      const board = game.board;
+
+      // 1. Bezpieczniejsze pobieranie materiałów wybuchowych (bez indexOf)
+      const explosives = board.flatMap((row, y) => 
+        row.map((tile, x) => ({ x, y, tile }))
+          .filter(item => item.tile.type === 'bomb' || item.tile.type === 'dynamite')
+      );
+
+      let triggered = false;
+
+      // 2. Zbieramy wszystkie nowe trafienia
+      explosives.forEach(explosive => {
+        if (Math.random() < 0.2) {
+          const newMatches = game.triggerSpecial(explosive.x, explosive.y, explosive.tile);
+          if (newMatches && Array.isArray(newMatches)) {
+            matches.push(...newMatches);
+            triggered = true;
+          }
+        }
+      });
+      if(triggered)
+        return {state:UPGRADE_STATES.Active,message: `BOOM!`, style:SCORE_ACTIONS.Money};
+      return UPGRADE_STATES.Failed;
+      }
+  }),
+  price: 6,
+  ...COMMON
 }
 /*
 {

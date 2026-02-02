@@ -190,17 +190,12 @@ export class Upgrade extends UpgradeBase{
     }
     return buildCopy(source);
   }
-
   description(game){
     if (typeof this.descriptionfn === "function") {
       return this.descriptionfn.call(this,game);
     }
     return this.descriptionfn;
   }
-  setProps(props) {
-    this.props = {...props};
-  }
-
   apply(game) {
     this.bought = true;
     if(this.negative==true){
@@ -299,7 +294,7 @@ export class Consumable extends UpgradeBase{
         game.maxConsumables-=1;
         game.GameRenderer.displayConsumablesCounter();
       }
-        this.props?.effect?.call(this,game);
+      this.props?.effect?.call(this,game);
     }
     sell(game) {
     this.bought = false;

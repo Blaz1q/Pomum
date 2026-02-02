@@ -401,16 +401,16 @@ trySwap(x1, y1, x2, y2) {
     this.GameRenderer.displayMoves();
 
     // animate swap first
-    this.animateSwap(x1, y1, x2, y2, true, () => {
+    this.animateSwap(x1, y1, x2, y2, true, async () => {
         // trigger special if exists
         if (special) {
             let triggerMatches = this.triggerSpecial(special.x, special.y, special.tile, { includeSwapped: true, swappedX: special.swappedX, swappedY: special.swappedY });
-            this.emit(GAME_TRIGGERS.onMove,triggerMatches);
+            await this.emit(GAME_TRIGGERS.onMove,{matches: triggerMatches,game: this});
             this.processMatches(triggerMatches);
             //matches.push(...triggerMatches);
         }
         else if (matches.length > 0) {
-            this.emit(GAME_TRIGGERS.onMove,matches);
+            await this.emit(GAME_TRIGGERS.onMove,{matches: matches,game: this});
             this.processMatches(matches);
         }
     }, { start1, start2, preIcon1, preIcon2 });
@@ -1399,22 +1399,26 @@ createGhost(icon, xPx, yPx, w, h, classList = []) {
         }
         this.locked = true;
         if (this.isFiveLine(matches) || this.isLShape(matches)) {
-            this.mult+=1;
-        //     // pick center tile by bounding box for stability
-        //     let xs = matches.map(m=>m.x);
-        //     let ys = matches.map(m=>m.y);
-        //     let minX = Math.min(...xs), maxX = Math.max(...xs);
-        //     let minY = Math.min(...ys), maxY = Math.max(...ys);
-        //     let cx = Math.round((minX + maxX)/2);
-        //     let cy = Math.round((minY + maxY)/2);
-        //     // ensure valid coordinates
-        //     cx = Math.max(0, Math.min(this.matrixsize-1, cx));
-        //     cy = Math.max(0, Math.min(this.matrixsize-1, cy));
-        //     //this.board[cy][cx] = this.makeBomb();
+            this.mult+=1.5;
         }
         console.log("waiting for matches..")
-        //console.log(matches);
+        
         //console.log(this.isSixLine(matches));
+        
+        //dedupe matches.
+        const seen = new Set();
+        const uniqueMatches = matches.filter(tile => {
+            const coords = `${tile.x},${tile.y}`;
+            
+            if (seen.has(coords)) {
+            return false;
+            }
+            
+            seen.add(coords);
+            return true;
+        }); //przez to że deduplikacja jest tutaj, możliwe będzie kopiowanie niektórych upgrade'ów (np. SAPER).
+        matches = uniqueMatches;
+        console.log(matches);
         await this.emit(GAME_TRIGGERS.onMatch, matches);
         console.log("ended.");
         // pozwól przeglądarce „zobaczyć” stan po swapie zanim nałożymy .fade
