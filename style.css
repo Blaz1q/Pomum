@@ -492,6 +492,10 @@ canvas#glcanvas {
 
 /* Price above the card */
 /* Card */
+.logo {
+  animation: skewLogo 6s infinite ease-in-out;
+}
+
 .upgrade-wrapper, .boss-wrapper {
   transition: transform 1s ease-in-out;
   font-family: "Jersey 25", sans-serif;
@@ -505,7 +509,7 @@ canvas#glcanvas {
   transition: transform 0.2s ease;
 }
 .upgrade-wrapper.SelectedUpgrade, .boss-wrapper.SelectedUpgrade {
-  z-index: 1000 !important;
+  z-index: 9 !important;
 }
 .upgrade-wrapper.dragging, .boss-wrapper.dragging {
   opacity: 0.7;
@@ -957,6 +961,32 @@ canvas#glcanvas {
   }
   100% {
     filter: brightness(0) saturate(100%) invert(65%) sepia(62%) saturate(1326%) hue-rotate(82deg) brightness(105%) contrast(111%);
+  }
+}
+@keyframes skewLogo {
+  0% {
+    transform: rotateX(5deg) rotateY(-7deg);
+    filter: drop-shadow(3px 8px 0px rgba(0, 0, 0, 0.35));
+  }
+  20% {
+    transform: rotateX(-5deg) rotateY(-7deg);
+    filter: drop-shadow(-3px 8px 0px rgba(0, 0, 0, 0.35));
+  }
+  40% {
+    transform: rotateX(-5deg) rotateY(7deg);
+    filter: drop-shadow(-3px 4px 0px rgba(0, 0, 0, 0.3));
+  }
+  60% {
+    transform: rotateX(5deg) rotateY(7deg);
+    filter: drop-shadow(3px 4zpx 0px rgba(0, 0, 0, 0.3));
+  }
+  80% {
+    transform: rotateX(-5deg) rotateY(-7deg);
+    filter: drop-shadow(-3px 8px 0px rgba(0, 0, 0, 0.35));
+  }
+  100% {
+    transform: rotateX(5deg) rotateY(-7deg);
+    filter: drop-shadow(3px 8px 0px rgba(0, 0, 0, 0.35));
   }
 }
 @keyframes skewCard {

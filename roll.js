@@ -54,7 +54,7 @@ export class Roll{
     }
     weightedPick = (list, rng) => {
     const getWeight = item => {
-        return UPGRADE_RARITY[item.props?.rarity?.name] ?? 1;
+        return UPGRADE_RARITY[item.rarity?.name] ?? 1;
     };
 
     const total = list.reduce((sum, item) => sum + getWeight(item), 0);

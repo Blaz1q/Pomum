@@ -17,17 +17,16 @@ export const upgradeBlueprints = [
     descriptionfn(game) {
       return `Jeżeli ${game.fruits[0].icon} w kaskadzie nie zostanie zniszczone, ${Style.Score("+60 punktów")}`;
     },
-    effect(game) {
-      this.setProps({
-        score: 0,
-        onMatch: (payload) => {
+    props: ()=>({
+    score: 0,
+        onMatch(payload){
           const uniqueFruits = new Set(payload.map(m => m.fruit.icon));
           const hasFruit = uniqueFruits.has(game.fruits[0].icon); 
           if (hasFruit) return UPGRADE_STATES.Failed;
-          this.props.score += 60;
+          this.score += 60;
           return UPGRADE_STATES.Active;
         },
-        onScore: () => {
+        onScore() {
           if (this.props.score != 0) {
             game.tempscore += this.props.score;
             game.GameRenderer.displayTempScore();
@@ -37,15 +36,10 @@ export const upgradeBlueprints = [
             return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
           }
           return UPGRADE_STATES.Failed;
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+      }),
     price: 4,
-    props:COMMON
+    ...COMMON
   },
 
   {
@@ -55,27 +49,24 @@ export const upgradeBlueprints = [
         return `${Style.Chance("-100%")} dla losowego owoca, reszta dostanie równo podzielone procenty. zmienia się co rundę.`;
       return `${Style.Chance("-100%")} ${this.props.randomfruit.icon}, ${Style.Chance('+'+game.calcEqualize(this.props.previousPercent).toString()+"%")} reszta`;
     },
-    effect(game) {
-      this.setProps({
-        randomfruit: null,
+    props: ()=>({
+    randomfruit: null,
         previousPercent: null,
-        onRoundStart: () => {
+        onRoundStart(){
           this.props.randomfruit = game.fruits[Math.floor(Math.random() * game.fruits.length)];
           this.props.previousPercent = this.props.randomfruit.percent;
           game.equalizeChancesExcept(this.props.randomfruit);
           this.props.randomfruit.percent = 0;
           return {state: UPGRADE_STATES.Active, message: `-100% ${this.props.randomfruit.icon}`,style: SCORE_ACTIONS.Info};
         },
-        onRoundEnd: () => {
+        onRoundEnd(){
           const chance = game.calcEqualize(this.props.previousPercent);
           this.props.randomfruit.percent += this.props.previousPercent;
           game.addChancesExcept(this.props.randomfruit, -chance);
           this.props.randomfruit = null;
           return UPGRADE_STATES.Failed;
-        }
-      });
-      
-    },
+        },
+      }),
     remove(game) {
       if(this.props.randomfruit){
         const chance = game.calcEqualize(this.props.previousPercent);
@@ -85,7 +76,7 @@ export const upgradeBlueprints = [
       }
     },
     price: 8,
-    props: UNCOMMON
+    ...UNCOMMON
   },
 
   {
@@ -98,7 +89,7 @@ export const upgradeBlueprints = [
       game.special[0].percent -= 2;
     },
     price: 2,
-    props: COMMON
+    ...COMMON
   },
 
   {
@@ -107,57 +98,51 @@ export const upgradeBlueprints = [
     effect(game) {
       game.moves -= 2;
       game.GameRenderer.displayMoves();
-      this.setProps({
-        onScore: () => {
-          game.tempscore += 250;
-          game.GameRenderer.displayScore();
-          return { state: UPGRADE_STATES.Score, message: "+250 pkt", style: SCORE_ACTIONS.Score };
-        }
-      });
-      
     },
     remove(game) {
       game.moves += 2;
       game.GameRenderer.displayMoves();
-      
     },
+    props: ()=>({
+    onScore() {
+      game.tempscore += 250;
+      game.GameRenderer.displayScore();
+      return { state: UPGRADE_STATES.Score, message: "+250 pkt", style: SCORE_ACTIONS.Score };
+    },
+  }),
     price: 4,
-    props: { image: "boom",...COMMON }
+    image: "boom",
+    ...COMMON,
   },
 
   {
     name: "tetris",
     descriptionfn: `${Style.Moves("+4 ruchy")}`,
-    effect(game) {
+    rarity: UPGRADE_RARITY_NAME.Common,
+    effect(game){
       game.moves += 4;
       game.GameRenderer.displayMoves();
     },
-    remove(game) {
+    remove(game){
       game.moves -= 4;
       game.GameRenderer.displayMoves();
+      console.log("from props :)");
     },
     price: 4,
-    props: COMMON
   },
 
   {
     name: "Mult",
     descriptionfn: `${Style.Mult("+4 mult")}`,
-    effect(game) {
-      this.setProps({
-        onScore: () => {
-          game.mult += 4;
-          game.GameRenderer.displayTempScore();
-          return { state: UPGRADE_STATES.Score, message: "+4 Mult", style: SCORE_ACTIONS.Mult };
-        }
-      });
-      
+    props: ()=>({
+    onScore() {
+      game.mult += 4;
+      game.GameRenderer.displayTempScore();
+      return { state: UPGRADE_STATES.Score, message: "+4 Mult", style: SCORE_ACTIONS.Mult };
     },
-    remove(game) {
-      
-    },
+  }),
     price: 4,
-    props: COMMON
+    ...COMMON
   },
 
   {
@@ -168,34 +153,28 @@ export const upgradeBlueprints = [
       }
       return `${Style.Mult("+1 mult")} za każde ${game.fruits[0].icon} na kaskadę.`;
     },
-    effect(game) {
-      this.setProps({
-        mult: 0,
-        onMatch: (matches) => {
-          const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
-          const hasFruit = uniqueFruits.has(game.fruits[0].icon); 
-          if (hasFruit) {
-            this.props.mult += 1;
+    props: ()=>({
+    mult: 0,
+    onMatch(matches){
+      const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+      const hasFruit = uniqueFruits.has(game.fruits[0].icon); 
+      if (hasFruit) {
+        this.props.mult += 1;
             return UPGRADE_STATES.Active;
           }
           return UPGRADE_STATES.Failed;
         },
-        onScore: () => {
+        onScore() {
           if (this.props.mult == 0) return UPGRADE_STATES.Failed;
           const mult = this.props.mult;
           game.mult += this.props.mult;
           game.GameRenderer.displayTempScore();
           this.props.mult = 0;
           return { state: UPGRADE_STATES.Score, message: `+${mult} Mult`, style: SCORE_ACTIONS.Mult };
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+      }),
     price: 5,
-    props: { mult: 0,...COMMON }
+    ...COMMON
   },
   {
     name: "pearlover",
@@ -205,10 +184,9 @@ export const upgradeBlueprints = [
       }
       return `${Style.Mult("+1 mult")} za każde ${game.fruits[1].icon} na kaskadę.`;
     },
-    effect(game) {
-      this.setProps({
-        mult: 0,
-        onMatch: (matches) => {
+    props: ()=>({
+      mult: 0,
+      onMatch(matches) {
           const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
           const hasFruit = uniqueFruits.has(game.fruits[1].icon); 
           if (hasFruit) {
@@ -217,22 +195,17 @@ export const upgradeBlueprints = [
           }
           return UPGRADE_STATES.Failed;
         },
-        onScore: () => {
+        onScore() {
           if (this.props.mult == 0) return UPGRADE_STATES.Failed;
           const mult = this.props.mult;
           game.mult += this.props.mult;
           game.GameRenderer.displayTempScore();
           this.props.mult = 0;
           return { state: UPGRADE_STATES.Score, message: `+${mult} Mult`, style: SCORE_ACTIONS.Mult };
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+    }),
     price: 5,
-    props: { mult: 0, image: 'default',...COMMON }
+     image: 'default',...COMMON
   },
   {
     name: "pineapplelover",
@@ -242,19 +215,22 @@ export const upgradeBlueprints = [
       }
       return `${Style.Mult("+1 mult")} za każde ${game.fruits[2].icon} na kaskadę.`;
     },
-    effect(game) {
-      this.setProps({
-        mult: 0,
-        onMatch: (matches) => {
-          const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
-          const hasFruit = uniqueFruits.has(game.fruits[2].icon); 
+    price: 5,
+    
+    image: 'default',
+    ...COMMON,
+    props: ()=>({
+      mult: 0,
+      onMatch(matches) {
+      const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+      const hasFruit = uniqueFruits.has(game.fruits[2].icon); 
           if (hasFruit) {
-            this.props.mult += 1;
+          this.props.mult += 1;
             return UPGRADE_STATES.Active;
           }
           return UPGRADE_STATES.Failed;
         },
-        onScore: () => {
+        onScore() {
           if (this.props.mult == 0) return UPGRADE_STATES.Failed;
           const mult = this.props.mult;
           game.mult += this.props.mult;
@@ -262,14 +238,8 @@ export const upgradeBlueprints = [
           this.props.mult = 0;
           return { state: UPGRADE_STATES.Score, message: `+${mult} Mult`, style: SCORE_ACTIONS.Mult };
         }
-      });
-      
-    },
-    remove(game) {
-      
-    },
-    price: 5,
-    props: { mult: 0, image: 'default',...COMMON }
+    }),
+    
   },
   {
     name: "grapelover",
@@ -279,10 +249,9 @@ export const upgradeBlueprints = [
       }
       return `${Style.Mult("+1 mult")} za każde ${game.fruits[3].icon} na kaskadę.`;
     },
-    effect(game) {
-      this.setProps({
-        mult: 0,
-        onMatch: (matches) => {
+    props: ()=>({
+      mult: 0,
+        onMatch(matches) {
           const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
           const hasFruit = uniqueFruits.has(game.fruits[3].icon); 
           if (hasFruit) {
@@ -291,22 +260,18 @@ export const upgradeBlueprints = [
           }
           return UPGRADE_STATES.Failed;
         },
-        onScore: () => {
+        onScore() {
           if (this.props.mult == 0) return UPGRADE_STATES.Failed;
           const mult = this.props.mult;
           game.mult += this.props.mult;
           game.GameRenderer.displayTempScore();
           this.props.mult = 0;
           return { state: UPGRADE_STATES.Score, message: `+${mult} Mult`, style: SCORE_ACTIONS.Mult };
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+    }),
     price: 5,
-    props: { mult: 0, image: 'default',...COMMON}
+    image: 'default',
+    ...COMMON
   },
   {
     name: "coconutlover",
@@ -316,10 +281,9 @@ export const upgradeBlueprints = [
       }
       return `${Style.Mult("+1 mult")} za każde ${game.fruits[4].icon} na kaskadę.`;
     },
-    effect(game) {
-      this.setProps({
-        mult: 0,
-        onMatch: (matches) => {
+    props: ()=>({
+      mult: 0,
+        onMatch(matches) {
           const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
           const hasFruit = uniqueFruits.has(game.fruits[4].icon); 
           if (hasFruit) {
@@ -328,22 +292,18 @@ export const upgradeBlueprints = [
           }
           return UPGRADE_STATES.Failed;
         },
-        onScore: () => {
+        onScore() {
           if (this.props.mult == 0) return UPGRADE_STATES.Failed;
           const mult = this.props.mult;
           game.mult += this.props.mult;
           game.GameRenderer.displayTempScore();
           this.props.mult = 0;
           return { state: UPGRADE_STATES.Score, message: `+${mult} Mult`, style: SCORE_ACTIONS.Mult };
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+    }),
     price: 5,
-    props: { mult: 0, image: 'default',...COMMON }
+    image: 'default',
+    ...COMMON
   },
   {
     name: "Coconut Bank",
@@ -352,16 +312,15 @@ export const upgradeBlueprints = [
         return `${Style.Chance("+50%")} aby ${game.fruits[4].icon} był złoty, ${Style.Chance("-10%")} ${game.fruits[4].icon}, ${Style.Chance("+2.5%")} dla reszty`;
       return `${Style.Chance("+50%")} aby ${game.fruits[4].icon} był złoty, ${Style.Chance(`-${this.props.previousPercent}%`)} ${game.fruits[4].icon}, ${Style.Chance(`+${this.props.previousPercent/(game.fruits.length-1)}`)} dla reszty`;
     },
-    effect(game) {
-      this.reset = (game)=>{
-        game.fruits[4].percent += this.props.previousPercent;
-        game.fruits[4].props.upgrade.goldchance -= 50;
-        game.addChancesExcept(game.fruits[4], -this.props.previousPercent / (game.fruits.length - 1)); 
-      }
-      this.setProps({
-        previousPercent: -1,
-        applied: false,
-        onRoundStart: () => {
+    reset(game){
+      game.fruits[4].percent += this.props.previousPercent;
+      game.fruits[4].props.upgrade.goldchance -= 50;
+      game.addChancesExcept(game.fruits[4], -this.props.previousPercent / (game.fruits.length - 1)); 
+    },
+    props: ()=>({
+      previousPercent: -1,
+      applied: false,
+        onRoundStart(){
           game.fruits[4].props.upgrade.goldchance += 50;
           let percent = 10;
           if (game.fruits[4].percent < 10) {
@@ -373,20 +332,20 @@ export const upgradeBlueprints = [
           this.props.applied = false;
           return UPGRADE_STATES.Active;
         },
-        onRoundEnd: () => {
+        onRoundEnd(){
           this.reset(game);
           this.props.applied = false;
           return UPGRADE_STATES.Failed;
-        }
-      });
-    },
+        },
+    }),
     remove(game) {
       if(this.props?.applied==true){
         this.reset(game);
       }
     },
     price: 10,
-    props: { image: "coconutbank",...UNCOMMON }
+    image: "coconutbank",
+    ...UNCOMMON
   },
 
   {
@@ -403,7 +362,7 @@ export const upgradeBlueprints = [
       });
     },
     price: 10,
-    props: {image: 'goldenfruits',...COMMON}
+    image: 'goldenfruits',...COMMON
   },
 
   {
@@ -420,7 +379,7 @@ export const upgradeBlueprints = [
       });
     },
     price: 10,
-    props: { image: "metalplate",...COMMON }
+    image: "metalplate",...COMMON
   },
 
   {
@@ -429,12 +388,11 @@ export const upgradeBlueprints = [
       if (!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+10 pkt")}`;
       return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+10 pkt")} (Obecnie ${Style.Score(`+${this.props.value} pkt`)}, ${Style.Score(`+${this.props.score} pkt do wyniku`)})`;
     },
-    effect(game) {
-      this.setProps({
-        value: 5,
+    props: ()=>({
+      value: 5,
         isactive: true,
         score: 0,
-        onMatch: (matches) => {
+        onMatch(matches) {
           let found = false;
           matches.forEach(m => {
             if (m.fruit.icon === game.fruits[3].icon) {
@@ -445,7 +403,7 @@ export const upgradeBlueprints = [
           if (found) return UPGRADE_STATES.Active;
           return UPGRADE_STATES.Failed;
         },
-        onScore: () => {
+        onScore() {
           if (this.props.score == 0) return UPGRADE_STATES.Failed;
           const gained = this.props.score;
           game.tempscore += this.props.score;
@@ -453,18 +411,14 @@ export const upgradeBlueprints = [
           this.props.score = 0;
           return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
         },
-        onRoundEnd: () => {
+        onRoundEnd(){
           this.props.value += 10;
           return UPGRADE_STATES.Active;
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+    }),
     price: 6,
-    props: {image: 'grapeinterest',...UNCOMMON}
+    image: 'grapeinterest',
+    ...UNCOMMON
   },
 
   {
@@ -473,28 +427,22 @@ export const upgradeBlueprints = [
       if (this.score&&this.score>0) return `Każda kaskada daje dodatkowe ${Style.Score("+30 punktów")}, (obecnie ${Style.Score(`+${this.props.score}`)})`;
       return `Każda kaskada daje dodatkowe ${Style.Score("+30 punktów")}`;
     },
-    effect(game) {
-      this.setProps({
-        score: 0,
-        onMatch: () => {
+    props: ()=>({
+      score: 0,
+        onMatch(){
           this.props.score += 30;
           return UPGRADE_STATES.Active;
         },
-        onScore: () => {
+        onScore() {
           let messagescore = this.props.score;
           game.tempscore += this.props.score;
           game.GameRenderer.displayTempScore();
           this.props.score = 0;
           return {state: UPGRADE_STATES.Score,message: `+${messagescore} pkt`, style: SCORE_ACTIONS.Score};
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+    }),
     price: 4,
-    props: { score: 0,...COMMON }
+    ...COMMON
   },
 
   {
@@ -503,43 +451,36 @@ export const upgradeBlueprints = [
       if (!this.props.isactive) return `${Style.Mult("+1 mult")}. na końcu rundy dostaje ${Style.Mult("+1 mult")}`;
       return `${Style.Mult("+1 mult")}. na końcu rundy dostaje ${Style.Mult("+1 mult")}. obecnie ${Style.Mult("+" + this.props.mult + " mult")}`;
     },
-    effect(game) {
-      this.setProps({
-        mult: 1,
+    props: ()=>({
+    mult: 1,
         isactive: true,
-        onScore: () => {
+        onScore() {
           game.mult += this.props.mult;
           game.GameRenderer.displayTempScore();
           return {state: UPGRADE_STATES.Score, message: `+${this.props.mult} Mult`, style: SCORE_ACTIONS.Mult};
         
         },
-        onRoundEnd: () => {
+        onRoundEnd(){
           this.props.mult += 1;
           return UPGRADE_STATES.Active;
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+    }),
     price: 8,
-    props: {mult:1,...COMMON}
+    ...COMMON
   },
 
   {
     name: "High Five",
     descriptionfn: `Gdy zrobi się piątke, ${Style.Mult("X2 mult")}`,
-    effect(game) {
-      this.setProps({
-        mult: 0,
-        onMatch: (payload) => {
+    props: ()=>({
+    mult: 0,
+        onMatch(payload) {
           if (payload && game.isFiveLine(payload)){
             this.props.mult+=2;
             return {state: UPGRADE_STATES.Active, message: `+X2 Mult`, style: SCORE_ACTIONS.Mult} ;
           } return UPGRADE_STATES.Failed;
         },
-        onScore: () => {
+        onScore() {
           if (this.props.mult>0) {
             let messagemult = this.props.mult;
             game.mult *= this.props.mult;
@@ -548,38 +489,27 @@ export const upgradeBlueprints = [
             return {state: UPGRADE_STATES.Score,message: `X${messagemult} Mult`,style: SCORE_ACTIONS.Mult};
           }
           return UPGRADE_STATES.Failed;
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+    }),
     price: 6,
-    props: { image: "highfive",...UNCOMMON }
+    image: "highfive",...UNCOMMON
   },
 
   {
     name: "broke",
     descriptionfn: `Jeżeli ma się mniej niż $6, ${Style.Score("+250 punktów")}`,
-    effect(game) {
-      this.setProps({
-        onScore: () => {
+    props: ()=>({
+      onScore() {
           let hasMoney = game.money < 6;
           if (hasMoney) {
             game.tempscore += 250;
             return { state: UPGRADE_STATES.Score, message: "+250 pkt", style: SCORE_ACTIONS.Score };
           }
           return UPGRADE_STATES.Failed;
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+    }),
     price: 6,
-    props: {...defaultimage,...COMMON}
+    ...defaultimage,...COMMON
   },
 
   {
@@ -590,10 +520,9 @@ export const upgradeBlueprints = [
       }
       return `Daje + Mult ceny sprzedaży wszystkich kupionych ulepszeń.`;
     },
-    effect(game) {
-      this.setProps({
-        sellPriceMult: 0,
-        onRoundStart: () => {
+    props: ()=>({
+      sellPriceMult: 0,
+        onRoundStart(){
           let x = 0;
           game.upgrades.forEach(upgrade => {
             x += upgrade.sellPrice;
@@ -601,23 +530,19 @@ export const upgradeBlueprints = [
           this.props.sellPriceMult = x;
           return UPGRADE_STATES.Active;
         },
-        onRoundEnd: () => {
+        onRoundEnd(){
           this.sellPriceMult = 0;
           return UPGRADE_STATES.Failed;
         },
-        onScore: () => {
+        onScore() {
           game.mult += this.props.sellPriceMult;
           game.GameRenderer.displayTempScore();
           return { state: UPGRADE_STATES.Score, message: `+${this.props.sellPriceMult} Mult`, style: SCORE_ACTIONS.Mult };
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+    }),
+    
     price: 4,
-    props: UNCOMMON
+    ...UNCOMMON 
   },
 
   {
@@ -635,7 +560,7 @@ export const upgradeBlueprints = [
       if (counter > 1) game.upgradeDedupe = false;
     },
     price: 8,
-    props: RARE
+    ...RARE
   },
 
   {
@@ -646,18 +571,17 @@ export const upgradeBlueprints = [
       }
       return `Gdy zostanie zniszczony najrzadszy owoc, ${Style.Mult(`X1.5 Mult`)}`;
     },
-    effect(game) {
-      this.setProps({
-        mult: 1,
+    props: ()=>({
+      mult: 1,
         chosenFruit: null,
-        onRoundStart: () => {
+        onRoundStart(){
           const minPercent = Math.min(...game.fruits.map(f => f.percent));
           const lowestFruits = game.fruits.filter(f => f.percent === minPercent);
           const choice = lowestFruits[Math.floor(Math.random() * lowestFruits.length)];
           this.props.chosenFruit = choice;
           return UPGRADE_STATES.Active;
         },
-        onMatch: (payload) => {
+        onMatch(payload) {
           const uniqueFruits = new Set(payload.map(m => m.fruit.icon));
           if (uniqueFruits.has(this.props.chosenFruit.icon)) {
             this.props.mult *= 1.5;
@@ -665,7 +589,7 @@ export const upgradeBlueprints = [
           }
           return UPGRADE_STATES.Failed;
         },
-        onScore: () => {
+        onScore() {
           if (this.props.mult !== 1) {
             const gained = Math.round(this.props.mult * 100) / 100;
             game.mult *= this.props.mult;
@@ -674,32 +598,27 @@ export const upgradeBlueprints = [
             return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };
           }
           return UPGRADE_STATES.Failed;
-        }
-      });
-      
-    },
-    remove(game) {
-      
-    },
+        },
+    }),
+    
     price: 10,
-    props: UNCOMMON
+    ...UNCOMMON
   },
   {
     name: "Madness",
     descriptionfn(game){
         return `Gdy podczas kaskady zrobi się tylko trójkę ${Style.Mult(`+X1 Mult`)}, po turze wraca do oryginalnej wartości. (Obecnie ${Style.Mult(`X${this.props.mult}`)})`;
     },
-    effect(game){
-      this.setProps({
-        mult: 1,
-        onMatch: (payload) => {
+       props: ()=>({
+      mult: 1,
+        onMatch(payload) {
           if(game.isThreeLine(payload)){
             this.props.mult+=1;
             return UPGRADE_STATES.Active;
           }
           return UPGRADE_STATES.Failed;
         },
-        onScore: () => {
+        onScore() {
           if(this.props.mult==1){
           return UPGRADE_STATES.Failed;
           }
@@ -709,37 +628,28 @@ export const upgradeBlueprints = [
           game.GameRenderer.displayTempScore();
           this.props.mult = 1;
           return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };
-        }
-      });
-      
-    },
-    remove(game){
-      
-    },
+        },
+       }),
+    
     price: 8,
-    props: {image: 'clock', mult: 1,...UNCOMMON}
+    image: 'clock',...UNCOMMON
   },
   {
     name: "Zdrapka",
     descriptionfn: `${Style.Chance(`1 na 20`)} że za kaskade dostanie się ${Style.Money(`$20`)}`,
-    effect(game){
-      this.setProps({
-        onMatch: () => {
+    props: ()=>({
+      onMatch() {
           if(Math.random() < 0.05){
             game.money+=20;
             game.GameRenderer.updateMoney(20);
             return {state:UPGRADE_STATES.Active,message: `+$20`, style:SCORE_ACTIONS.Money};
           } 
           return UPGRADE_STATES.Failed;
-        }
-      });
-      
-    },
-    remove(game){
-      
-    },
+        },
+    }),
+    
     price: 8,
-    props: UNCOMMON
+    ...UNCOMMON
   },
   {
     name: "6pak",
@@ -747,11 +657,9 @@ export const upgradeBlueprints = [
       let value = this.props.mult ?? 1;
       return `Jeżeli podczas rundy zrobi się conajmniej szóstkę, ${Style.Mult(`+X2 Mult`)} do ulepszenia. (obecnie ${Style.Mult(`X${value} Mult`)})`;
     },
-    effect(game){
-      this.setProps({
-        found: false,
-        mult: 1,
-        onMatch: (payload) => {
+    props: ()=>({
+      mult: 1,
+        onMatch(payload) {
           if(game.isSixLine(payload)&&!this.props.found){
             this.props.found = true;
             this.props.mult+=2;
@@ -759,7 +667,7 @@ export const upgradeBlueprints = [
           }
           return UPGRADE_STATES.Failed;
         },
-        onScore: () =>{
+        onScore(){
           if(this.props.mult==1) return UPGRADE_STATES.Failed;
           game.mult *= this.props.mult;
           game.mult = Math.round(game.mult * 100) / 100;
@@ -767,18 +675,14 @@ export const upgradeBlueprints = [
           return { state: UPGRADE_STATES.Score, message: `X${this.props.mult} Mult`, style: SCORE_ACTIONS.Mult };
 
         },
-        onRoundEnd: () => {
+        onRoundEnd(){
           this.props.found = false;
           return UPGRADE_STATES.Active;
-        }
-      });
-      
-    },
-    remove(game){
-      
-    },
+        },
+    }),
+    found: false,
     price: 8,
-    props: {image: '6pak',...RARE}
+    image: '6pak',...RARE
   },
   {
     name: "Money Maker",
@@ -786,51 +690,40 @@ export const upgradeBlueprints = [
       if(this.bought) return `co kaskadę daje 3x punkty za trzymane $. (obecnie ${Style.Score(`+${game.money*3} pkt co kaskadę`)}, ${Style.Score(`+${this.props.score} pkt`)})`;
       return `co kaskadę daje 3x punkty za trzymane $. (obecnie ${Style.Score(`+${game.money*3} pkt co kaskadę`)})`;
     },
-    effect(game){
-      this.setProps({
-        score: 0,
-        onMatch: (matches) => {
+    props: ()=>({
+      score: 0,
+        onMatch(matches) {
             this.props.score+=game.money*3;
             return UPGRADE_STATES.Active;
         },
-        onScore: () => {
+        onScore() {
             const gained = this.props.score;
             game.tempscore+=this.props.score;
             game.GameRenderer.displayTempScore();
             this.props.score = 0;
             return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
 
-        }
-      });
-      
-    },
-    remove(game){
-      
-    },
+        },
+    }),
+    
     price: 4,
-    props: {image: 'moneymaker',...COMMON}
+    image: 'moneymaker',...COMMON
   },
   {
     name: "fish",
     descriptionfn(game){
       return `co rundę cena sprzedaży zwiększa się o ${Style.Money(`$3`)}. (Obecnie ${Style.Money('$'+this.sellPrice)})`;
     },
-    effect(game){
-      this.setProps({
-        sellPrice: 3,
-        onRoundEnd: () => {
+    props:()=>({
+      sellPrice: 3,
+      onRoundEnd(){
           this.props.sellPrice+=3;
           this.sellPrice=this.props.sellPrice;
           return {state: UPGRADE_STATES.Active,message: `Upgrade!`,style: SCORE_ACTIONS.Money};
         }
-      });
-      
-    },
-    remove(game){
-      
-    },
+    }),
     price: 6,
-    props: COMMON
+    ...COMMON
   },
   {
     name: "Tutti Frutti",
@@ -840,11 +733,11 @@ export const upgradeBlueprints = [
         return `Za ${fruit.icon}, ${Style.Score(`+20 pkt`)}, obecnie ${Style.Score(`${this.props.score ?? 0} pkt`)}`;
       return `Za zniszczony pierwszy owoc w rundzie dostaje ${Style.Score(`+20 pkt`)}. Owoc resetuje się na koniec rundy.`;
     },
-    effect(game){
-      this.setProps({
+    props: ()=>({
         chosenFruit: null,
         score: 0,
-        onMove: (matches) => {
+        onMove(payload) {
+         const matches=  payload.matches;
           if(this.props.chosenFruit==null){
             const firstFruit = matches[0]?.fruit ?? null;
             this.props.chosenFruit = firstFruit;
@@ -852,7 +745,7 @@ export const upgradeBlueprints = [
           }
           return  UPGRADE_STATES.Failed;
         },
-        onMatch: (matches) => {
+        onMatch(matches) {
           if(this.props.chosenFruit==null) return UPGRADE_STATES.Failed;
           var found = false
           matches.forEach(m => {
@@ -864,34 +757,28 @@ export const upgradeBlueprints = [
           if(found) return UPGRADE_STATES.Active;
           return UPGRADE_STATES.Failed;
         },
-        onRoundEnd: () => {
+        onRoundEnd(){
           this.props.chosenFruit = null;
           return UPGRADE_STATES.Active;
         },
-        onScore: () => {
+        onScore() {
           if(this.props.score<=0) return UPGRADE_STATES.Failed;
           const gained = this.props.score;
           game.tempscore+=this.props.score;
           game.GameRenderer.displayTempScore();
           this.props.score = 0;
           return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
-
-        }
-      });
-      
-    },
-    remove(game){
-      
-    },
+        },
+    }),
+    
     price: 6,
-    props: {...defaultimage,...COMMON}
+    ...defaultimage,...COMMON
     },
     {
       name: "Fruit Tycoon",
       descriptionfn: `Na koniec rundy, ${Style.Money("+$1")} za każdy ulepszony owoc w grze.`,
-      effect(game) {
-        this.setProps({
-          onRoundEnd: () => {
+      props: ()=>({
+        onRoundEnd(){
             let upgradedfruits=0;
             game.board.forEach(boardx => {
                 boardx.forEach(fruit => {
@@ -904,20 +791,16 @@ export const upgradeBlueprints = [
             game.money += upgradedfruits;
             game.GameRenderer.displayMoney();
             return UPGRADE_STATES.Active;
-          }
-        });
-        
-      },
-      remove(game) {  },
+          },
+      }),
       price: 8,
-      props: {...defaultimage,...UNCOMMON}
+      ...defaultimage,...UNCOMMON
     },
     {
   name: "Jackpot",
   descriptionfn: `Szansa ${Style.Chance("1 na 100")} że po rundzie dostaniesz ${Style.Money("$100")}`,
-  effect(game) {
-    this.setProps({
-      onRoundEnd: () => {
+  props: ()=>({
+    onRoundEnd(){
         if (Math.random() < 0.01) {
           game.money += 100;
           game.GameRenderer.displayMoney();
@@ -926,12 +809,9 @@ export const upgradeBlueprints = [
         }
         return UPGRADE_STATES.Failed;
       }
-    });
-    
-  },
-  remove(game) {  },
+  }),
   price: 10,
-  props: {...defaultimage,...COMMON}
+  ...defaultimage,...COMMON
 },
 {
   name: "Collector",
@@ -949,16 +829,14 @@ export const upgradeBlueprints = [
     }
     return `Jeżeli zniszczysz każdy rodzaj owocu w rundzie, ${Style.Score("+200 pkt")} za kaskade.`;
   },
-  effect(game) {
-    this.setProps({
-      score: 0,
-      collected: new Set(),
-
-      onMatch: (matches) => {
-        let size=this.props.collected.size;
-        matches.forEach(m => {
-            if(m.fruit.type==TYPES.Fruit) this.props.collected.add(m.fruit.icon)
-          });
+  props: ()=>({
+    score: 0,
+    collected: new Set(),
+    onMatch(matches) {
+    let size=this.props.collected.size;
+    matches.forEach(m => {
+        if(m.fruit.type==TYPES.Fruit) this.props.collected.add(m.fruit.icon)
+      });
         
         if (this.props.collected.size === game.fruits.length){
           this.props.score += 200;
@@ -967,7 +845,7 @@ export const upgradeBlueprints = [
         if(size<this.props.collected.size) return UPGRADE_STATES.Active;
         return UPGRADE_STATES.Failed;
       },
-      onScore: ()=>{
+      onScore(){
           if(this.props.score<=0) return UPGRADE_STATES.Failed;
           const gained = this.props.score;
           game.tempscore += this.props.score;
@@ -975,16 +853,14 @@ export const upgradeBlueprints = [
           this.props.score = 0;
           return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
       },
-      onRoundEnd: () => {
+      onRoundEnd(){
         this.props.collected.clear();
         return UPGRADE_STATES.Active;
-      }
-    });
+      },
+  }),
     
-  },
-  remove(game) {  },
   price: 9,
-  props: {...defaultimage,...COMMON}
+  ...defaultimage,...COMMON
 },
 {
   name: "BOOM!!",
@@ -999,7 +875,7 @@ export const upgradeBlueprints = [
     game.special[1].props.percent -= 1;
   },
   price: 4,
-  props: {image: 'boom',...COMMON}
+  image: 'boom',...COMMON
 },
 {
   name: "Boom?",
@@ -1015,21 +891,21 @@ export const upgradeBlueprints = [
     game.special[1].props.detonations -= 1;
   },
   price: 4,
-  props: {image: 'boom',...COMMON}
+  image: 'boom',...COMMON
 },
 {
   name: "lvlup",
   descriptionfn(game){
     return `Daje kartę ulepszeń dla pierwszego zniszczonego owoca (jeśli jest miejsce)`;
   },
-  effect(game){
-    this.setProps({
-      chosenFruit: null,
-      onRoundStart: ()=>{
+  props: ()=>({
+    chosenFruit: null,
+    onRoundStart(){
         this.isReady = true;
         return UPGRADE_STATES.Ready;
       },
-      onMove: (matches)=>{
+      onMove(payload){
+        const matches = payload.matches;
         if(game.consumables.length>=game.maxConsumables) return UPGRADE_STATES.Failed;
         if(this.props.chosenFruit!=null) return UPGRADE_STATES.Failed;
         console.log(matches);
@@ -1045,18 +921,13 @@ export const upgradeBlueprints = [
         game.GameRenderer.displayConsumablesCounter();
         return UPGRADE_STATES.Active;  
       },
-      onRoundEnd: ()=>{
+      onRoundEnd(){
         this.props.chosenFruit = null;
         return UPGRADE_STATES.Active;
-      }
-    });
-    
-  },
-  remove(game){
-     
-  },
+      },
+  }),
   price: 8,
-  props: COMMON
+  ...COMMON
 },
 {
   name: "Dice",
@@ -1064,37 +935,45 @@ export const upgradeBlueprints = [
     if(this.props.mult&&this.props.mult!=null)  return `Co ruch dostaje się ${Style.Mult(`X1-6 Mult`)} (Obecnie ${Style.Mult('X'+this.props.mult+" Mult")})`;
     return `Co ruch dostaje się ${Style.Mult(`X1-6 Mult`)}`;
   },
-  effect(game){
-    this.setProps({
-      mult: null,
-      onMove: ()=>{
+  props: ()=>({
+    mult: null,
+    onMove(){
         this.props.mult = Math.floor(Math.random()*6)+1;
         return UPGRADE_STATES.Failed; 
       },
-      onRoundEnd: ()=>{
+      onRoundEnd(){
         this.props.mult = null;
         return UPGRADE_STATES.Active;
       },
-      onScore: ()=>{
+      onScore(){
         if(this.props.mult==1) return UPGRADE_STATES.Failed;
         game.mult *= this.props.mult;
         game.mult = Math.round(game.mult * 100) / 100;
         game.GameRenderer.displayTempScore();
         return { state: UPGRADE_STATES.Score, message: `X${this.props.mult} Mult`, style: SCORE_ACTIONS.Mult };
-      }
-    });
-    
-  },
-  remove(game){
-    
-  },
+      },
+  }),
+  
+      
   price: 7,
-  props: UNCOMMON
+  ...UNCOMMON
 },
-{ name: "Mirror",
+{
+  name: "Mirror",
   descriptionfn(game) {
-    if (this?.mirroredUpgradeCopy)
-      return this.mirroredUpgradeCopy.description(game);
+    const neighbor = this.getUltimateNeighbor?.();
+    
+    // 1. Jeśli sąsiad jest zablokowany
+    if (neighbor && this.banned?.includes(neighbor.name)) {
+      return `Nie można skopiować ${neighbor.name}.`;
+    }
+
+    // 2. Wyświetlanie opisu skopiowanego ulepszenia
+    if (this.mirroredUpgradeCopy) {
+      return this.mirroredUpgrade.description(game);
+    }
+
+    // 3. Stan domyślny (brak sąsiada)
     return "Kopiuje ulepszenie po swojej prawej stronie.";
   },
 
@@ -1102,122 +981,113 @@ export const upgradeBlueprints = [
     this.mirroredUpgrade = null;
     this.mirroredUpgradeCopy = null;
     this.mirroredProps = {};
-    this.lastNeighbor = null;
-    this.applied = false;
+    this.banned = ["fish", "Soul Eater"]; // Tutaj Mirror MOŻE kopiować inne Mirror (przez ultimate)
 
-    // --- Find neighbor to the right ---
-    this.getRightNeighbor = () => {
-      const index = game.upgrades.indexOf(this);
-      if (index === -1 || index + 1 >= game.upgrades.length) return null;
-      return game.upgrades[index + 1];
-    };
     this.getUltimateNeighbor = () => {
-      let neighbor = game.upgrades[game.upgrades.indexOf(this) + 1];
-      const visited = new Set();
-      while (neighbor && neighbor.name === "Mirror" && !visited.has(neighbor)) {
-        visited.add(neighbor);
-        neighbor = game.upgrades[game.upgrades.indexOf(neighbor) + 1];
+      const myIndex = game.upgrades.indexOf(this);
+      if (myIndex === -1) return null;
+      
+      let nextIdx = myIndex + 1;
+      let neighbor = game.upgrades[nextIdx];
+
+      // Szukamy pierwszego ulepszenia, które nie jest Lustrem
+      while (neighbor && neighbor.name === "Mirror") {
+        nextIdx++;
+        neighbor = game.upgrades[nextIdx];
+        // Zabezpieczenie przed pętlą (choć przy kierunku w prawo mało prawdopodobne)
+        if (nextIdx > game.upgrades.length) break;
       }
       return neighbor || null;
     };
 
-    // --- Determine if this mirror is the "owner" of a chain ---
-    this.isOwner = () => {
-      const ultimateNeighbor = this.getUltimateNeighbor();
-      const myIndex = game.upgrades.indexOf(this);
-      for (let i = 0; i < myIndex; i++) {
-        const u = game.upgrades[i];
-        if (u.name === "Mirror" && u.getUltimateNeighbor?.() === ultimateNeighbor) {
-          return false; // a mirror before me already owns it
-        }
-      }
-      return true;
-    };
-
-    // --- Build a fresh independent copy of the neighbor ---
-    // --- Synchronize the mirror ---
     this.syncMirror = () => {
       const neighbor = this.getUltimateNeighbor();
-      if(neighbor===this.mirroredUpgrade) return;
-      // Remove previous copy if target changed
-      if (this.mirroredUpgradeCopy && neighbor !== this.mirroredUpgrade) {
-        if (typeof this.mirroredUpgradeCopy.remove === "function") {
-          this.mirroredUpgradeCopy.remove(game);
-          this.mirroredUpgradeCopy = null;
+      const isBanned = neighbor && this.banned.includes(neighbor.name);
+
+      // Jeśli cel jest ten sam, nie przeliczaj (optymalizacja)
+      if (neighbor === this.mirroredUpgrade) return;
+
+      // 1. Sprzątanie: wywołujemy remove() kopii, jeśli istniała
+      if (this.mirroredUpgradeCopy) {
+        if (typeof this.mirroredUpgradeCopy.props.remove === "function") {
+          this.mirroredUpgradeCopy.props?.remove(game);
         }
-        this.lastNeighbor = neighbor;
-        console.log("removed");
+        this.mirroredUpgradeCopy = null;
       }
+
       this.mirroredUpgrade = neighbor;
-      console.log("neighbor: ");
-      console.log(neighbor);
-      if (!neighbor) {
-        this.mirroredUpgrade = null;
+
+      // 2. Jeśli pusto lub banned
+      if (!neighbor || isBanned) {
         this.mirroredProps = {};
         this.props = { image: "brokenmirror" };
         return;
       }
 
-      // Just copy the neighbor — even if it's a Mirror
-      const copyUpgrade = Upgrade.Copy(neighbor);
-      //copyUpgrade.apply(game);
-      console.log("kopia: ");
-      console.log(copyUpgrade);
-      this.mirroredUpgradeCopy = copyUpgrade;
-      this.mirroredProps = copyUpgrade.props;
-      this.props = { ...this.mirroredProps, image: "mirror" };
+      // 3. Tworzenie nowej kopii
+      try {
+        const copyUpgrade = Upgrade.Copy(neighbor);
+        this.mirroredUpgradeCopy = copyUpgrade;
+        
+        // Ważne: Przenosimy triggery (onMatch itp.) do propsów lustra
+        this.mirroredProps = copyUpgrade.props || {};
+        this.props = { ...this.mirroredProps, image: "mirror" };
+
+        // Jeśli kopiowane ulepszenie ma effect (np. dodaje ruchy), wywołaj go dla lustra
+        // if (typeof copyUpgrade.props.effect === "function") {
+        //   copyUpgrade.props?.effect(game);
+        // }
+      } catch (e) {
+        console.error("Mirror Copy Error:", e);
+        this.props = { image: "brokenmirror" };
+      }
     };
 
-    // --- When upgrades layout changes ---
     this.onUpgradesChanged = () => {
       this.syncMirror();
       return UPGRADE_STATES.Active;
     };
 
-    // --- Initial sync ---
     this.syncMirror();
   },
 
   remove(game) {
-    if (this.mirroredUpgrade && typeof this.mirroredUpgrade.remove === "function") {
-      this.mirroredUpgrade.remove(game);
+    // Przy usuwaniu lustra musimy cofnąć efekty jego kopii
+    if (this.mirroredUpgradeCopy && typeof this.mirroredUpgradeCopy.remove === "function") {
+      this.mirroredUpgradeCopy.remove(game);
     }
+    this.mirroredUpgradeCopy = null;
     this.mirroredUpgrade = null;
-    this.mirroredProps = {};
-    this.props = { image: "brokenmirror" };
   },
 
   price: 8,
-  props: { image: "brokenmirror",...RARE },
+  image: "brokenmirror",
+  ...COMMON,
 },
 { name: "Adrenaline",
   descriptionfn(game){
     return `Jeżeli zostało mniej niż 3 ruchy, ${Style.Mult(`+10 Mult`)}`
   },
-  effect(game){
-    this.setProps({
-      onScore: ()=>{
+  props: ()=>({
+  onScore(){
         if(game.moves-game.movescounter<3){
         game.mult+=10;
         return { state: UPGRADE_STATES.Score, message: `+10 Mult`, style: SCORE_ACTIONS.Mult };
       }
       return UPGRADE_STATES.Failed;
     }
-    });
-  },
-  remove(game){},
-  price: 5,
-  props: {...defaultimage,...COMMON}
+  })
+    ,price: 5,
+  ...defaultimage,...COMMON
 },
 { name: "Critical Hit",
   descriptionfn(game){
     var mult = this.props.mult ?? 1;
     return `${Style.Chance(`1 na 20`)} że co kaskade dostanie się ${Style.Mult(`X3 Mult`)}, (Obecnie ${Style.Mult('X'+mult+' Mult')})`;
   },
-  effect(game){
-      this.setProps({
-        mult: 1,
-        onMatch: (matches)=>{
+  props: ()=>({
+  mult: 1,
+        onMatch(matches){
           if(Math.random()<0.05){
             this.props.mult *= 3;
             this.props.mult = Math.round(this.props.mult * 100) / 100;
@@ -1225,7 +1095,7 @@ export const upgradeBlueprints = [
           }
           return UPGRADE_STATES.Failed;
         },
-        onScore: ()=>{
+        onScore(){
           if(this.props.mult>1){
             const gained = this.props.mult;
             game.mult *= this.props.mult;
@@ -1235,66 +1105,62 @@ export const upgradeBlueprints = [
             return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };
           }
           return UPGRADE_STATES.Failed;
-        }
-      });
-  },
-  remove(game){},
-  price: 6,
-  props: {image: "critical_hit",...COMMON}
+        },
+      }),
+        price: 6,
+  image: "critical_hit",...COMMON
 },
 { name: "Soul Eater",
   descriptionfn(game){
     var mult = this.props.mult ?? 1;
     return `Na początku rundy niszczy ulepszenie po prawej stronie i zyskuje ${Style.Mult(`+Mult ceny sprzedaży`)} ulepszenia. (Obecnie ${Style.Mult(`+${mult} Mult`)})`;
   },
-  effect(game){
-    this.isReady = true;
-    this.getRightNeighbor = () => {
-      const index = game.upgrades.indexOf(this);
-      if (index === -1 || index + 1 >= game.upgrades.length) return null;
-      return game.upgrades[index + 1];
-    };
-    this.setProps({
-      mult: 1,
-      onRoundStart: () => {
+  props: ()=>({
+    mult: 1,
+      onRoundStart(){
         const neighbor = this.getRightNeighbor();
         if(neighbor!=null){
           const gained = neighbor.sellPrice
           const index = game.upgrades.indexOf(neighbor);
           this.props.mult += gained;
-          neighbor.remove(game);
+          neighbor.props?.remove?.call(this,game);
           game.upgrades.splice(index, 1);
           game.GameRenderer.displayPlayerUpgrades();
           return { state: UPGRADE_STATES.Active, message: `+${gained} Mult`, style: SCORE_ACTIONS.Info };
         }
         return {state: UPGRADE_STATES.Tried, message: `Failed`, style: SCORE_ACTIONS.Failed}
       },
-      onScore: ()=>{
+      onScore(){
           const gained = this.props.mult;
           game.mult += this.props.mult;
           game.GameRenderer.displayTempScore();
           return { state: UPGRADE_STATES.Score, message: `+${gained} Mult`, style: SCORE_ACTIONS.Mult };
         },
-        onRoundEnd : ()=>{
+        onRoundEnd(){
           this.isReady = true;
           return UPGRADE_STATES.Ready;
-        }
-    });
+        },
+      }),
+  effect(game){
+    this.isReady = true;
+    this.getRightNeighbor= () => {
+      const index = game.upgrades.indexOf(this);
+      if (index === -1 || index + 1 >= game.upgrades.length) return null;
+      return game.upgrades[index + 1];
+    }
 },
-remove(game){},
 price: 7,
-props: {...defaultimage,...COMMON }
+...defaultimage,...COMMON
 },
 { name: "counter",
   descriptionfn(game){
     var mult = this.props.mult ?? 1;
     return `Co 15 zniszczonych owoców ${Style.Mult(`+1 Mult`)}. (Obecnie ${Style.Mult(`${mult} Mult`)})`;
   },
-  effect(game){
-    this.setProps({
-      mult: 1,
+  props: ()=>({
+  mult: 1,
       count: 0,
-      onMatch: (matches) => {
+      onMatch(matches){
         this.props.count+=matches.length;
         var added = false;
         if(this.props.count>=15) added = true;
@@ -1305,27 +1171,22 @@ props: {...defaultimage,...COMMON }
         if(added) return UPGRADE_STATES.Active;
         return UPGRADE_STATES.Failed;
       },
-      onScore: ()=>{
+      onScore(){
         game.mult+=this.props.mult;
         game.GameRenderer.displayTempScore();
         return { state: UPGRADE_STATES.Score, message: `+${this.props.mult} Mult`, style: SCORE_ACTIONS.Mult };
-      }
-    });
-  },
-  remove(game){
-
-  },
+      },
+    }),
   price: 6,
-  props: {...defaultimage,...UNCOMMON}
+  ...defaultimage,...UNCOMMON
 
 },
 { name: "20/20",
   descriptionfn(game){
     return `Wszystkie ulepszenia kafelków aktywują się dwukrotnie`;
   },
-  effect(game){
-    this.setProps({
-      onConsumableUse: (consumable)=>{
+  props: ()=>({
+  onConsumableUse(consumable){
         if(!consumable){
           return UPGRADE_STATES.Failed;
         }
@@ -1335,14 +1196,10 @@ props: {...defaultimage,...COMMON }
         consumable.negative = false;
         consumable.apply(game);
         return {state: UPGRADE_STATES.Active, message: `Użyto!`, style: SCORE_ACTIONS.Info}
-      }
-    });
-  },
-  remove(game){
-
-  },
+      },
+    }),
   price: 10,
-  props: {image: 'lvlup',...RARE}
+  image: 'lvlup',...RARE
 
 },
 {
@@ -1351,10 +1208,9 @@ props: {...defaultimage,...COMMON }
     const mult = this.props?.mult ?? 1;
     return `${Style.Mult(`+X1 Mult`)} za każde nieużyte miejsce ulepszeń (Obecnie ${Style.Mult(`X${mult} Mult`)})`;
   },
-  effect(game){
-    this.setProps({
-      mult: 1,
-      onUpgradesChanged: () => {
+  props: ()=>({
+  mult: 1,
+      onUpgradesChanged(){
         const oldmult = this.props.mult;
         this.props.mult = game.maxUpgrades - game.upgrades.length + 1;
         if(this.props.mult!=oldmult){
@@ -1362,21 +1218,17 @@ props: {...defaultimage,...COMMON }
         }
         return UPGRADE_STATES.Failed;
       },
-      onScore: () => {
+      onScore() {
         if(mult<=1)  return UPGRADE_STATES.Failed;
           const gained = this.props.mult;
           game.mult *= this.props.mult;
           game.mult = Math.round(game.mult * 100) / 100;
           game.GameRenderer.displayTempScore();
           return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };  
-      }
-    });
-  },
-  remove(){
-
-  },
+      },
+    }),
   price: 6,
-  props: {...UNCOMMON}
+  ...UNCOMMON
 },
 {
   name: "Snowman",
@@ -1386,16 +1238,15 @@ props: {...defaultimage,...COMMON }
     if(score>0) text += `(Obecnie ${Style.Score(`+${score} pkt`)})`; 
     return text;
   },
-  effect(game){
-    this.setProps({
-      score: 0,
+  props: ()=>({
+  score: 0,
       add: 0,
-      onMatch: () => {
+      onMatch(){
           this.props.add += 20;
           this.props.score+=this.props.add;
           return { state: UPGRADE_STATES.Active, message: `+${this.props.add} pkt`, style: SCORE_ACTIONS.Score };  
       },
-      onScore: ()=>{
+      onScore(){
         if(this.score<=0) return UPGRADE_STATES.Failed;
         const gained = this.props.score;
         game.tempscore += this.props.score;
@@ -1403,14 +1254,10 @@ props: {...defaultimage,...COMMON }
         this.props.add = 0;
         this.props.score = 0;
         return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };  
-      }
-    });
-  },
-  remove(game){
-
-  },
+      },
+    }),
   price: 4,
-  props: {...COMMON}
+  ...COMMON
 },
 {
   name: "Tripple",
@@ -1418,44 +1265,38 @@ props: {...defaultimage,...COMMON }
     const score = this.props.score ?? 0;
     return `Jeżeli zrobi się tylko trójkę w kaskadzie, ${Style.Score(`+3 pkt`)} do ulepszenia. Na końcu rundy daje zebrane punkty. (Obecnie ${Style.Score(`+${score} Pkt`)})`;
   },
-  effect(game){
-    this.setProps({
-      score: 0,
-      onMatch: (payload) => {
+  props: ()=>({
+  score: 0,
+      onMatch(payload){
           if(game.isThreeLine(payload)){
             this.props.score+=3;
             return UPGRADE_STATES.Active;
           }
           return UPGRADE_STATES.Failed;
         },
-        onScore: () => {
+        onScore() {
           const gained = this.props.score;
           game.tempscore += this.props.score;
           game.GameRenderer.displayTempScore();
           return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
-        }
-    });
-  },
-  remove(game){
-
-  },
+        },
+      }),
   price: 4,
-  props: {...COMMON}
+  ...COMMON
 },
 {
   name: "fever",
   descriptionfn(game){
     return `Daje ${Style.Mult('10-20 Mult')}. ${Style.Chance(`1 na 10`)}, że zniknie na końcu rundy.`;
   },
-  effect(game){
-    this.setProps({
-        onScore: () => {
+  props: ()=>({
+  onScore() {
           const gained = Math.floor(Math.random()*10)+10;
           game.mult += gained;
           game.GameRenderer.displayTempScore();
           return { state: UPGRADE_STATES.Score, message: `+${gained} Mult`, style: SCORE_ACTIONS.Mult };
         },
-        onRoundEnd: () => {
+        onRoundEnd(){
           if(Math.floor(Math.random()*10)!=0) return;
           const index = game.upgrades.indexOf(this) ?? -1;
           if(index==-1) return;
@@ -1463,32 +1304,63 @@ props: {...defaultimage,...COMMON }
           game.GameRenderer.displayUpgradesCounter();
           game.GameRenderer.displayPlayerUpgrades();
           game.emit(GAME_TRIGGERS.onUpgradesChanged);
-        }
-    });
-  },
-  remove(game){
-
-  },
+        },
+      }),
   price: 6,
-  props: {...UNCOMMON}
+  ...UNCOMMON
 },
 {
-  name: "Dollar",
+  name: "Dolar",
   descriptionfn(game){
     return `Na końcu rundy daje ${Style.Money('$4')}`;
   },
-  effect(game){
-    this.setProps({
-        onRoundEnd: () => {
+  props: ()=>({
+  onRoundEnd(){
           game.money+=4;
           game.GameRenderer.updateMoney(4);
           return {state:UPGRADE_STATES.Active,message: `+$4`, style:SCORE_ACTIONS.Money};
-        }
-    });
+        },
+      }),
+        price: 4,
+  ...defaultimage,...COMMON
+},
+{
+  name: "Saper",
+  descriptionfn(game){
+    return `${Style.Chance('1 na 5')} na każdą bombę lub dynamit, że zostanie wysadzony na początku ruchu`;
   },
-  remove(game){},
-  price: 4,
-  props: {...defaultimage,...COMMON}
+  props: ()=>({
+    onMove(payload){
+      console.log(payload);
+      let game = payload.game;
+      let matches = payload.matches; 
+      const board = game.board;
+
+      // 1. Bezpieczniejsze pobieranie materiałów wybuchowych (bez indexOf)
+      const explosives = board.flatMap((row, y) => 
+        row.map((tile, x) => ({ x, y, tile }))
+          .filter(item => item.tile.type === 'bomb' || item.tile.type === 'dynamite')
+      );
+
+      let triggered = false;
+
+      // 2. Zbieramy wszystkie nowe trafienia
+      explosives.forEach(explosive => {
+        if (Math.random() < 0.2) {
+          const newMatches = game.triggerSpecial(explosive.x, explosive.y, explosive.tile);
+          if (newMatches && Array.isArray(newMatches)) {
+            matches.push(...newMatches);
+            triggered = true;
+          }
+        }
+      });
+      if(triggered)
+        return {state:UPGRADE_STATES.Active,message: `BOOM!`, style:SCORE_ACTIONS.Money};
+      return UPGRADE_STATES.Failed;
+      }
+  }),
+  price: 6,
+  ...COMMON
 }
 /*
 {
