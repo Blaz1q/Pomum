@@ -538,7 +538,8 @@ displayPlayerUpgrades() {
         },300);
     }
     
-    upgradeTrigger(upgrade,delay,action=UPGRADE_STATES.Active){
+    upgradeTrigger(upgrade,time,action=UPGRADE_STATES.Active){
+        const delay = 0;
         console.log(`upgrade trigger: ${upgrade.name}`,performance.now());
         const gameupgrades = this.game.upgrades;
         const index = gameupgrades.indexOf(upgrade);
@@ -554,7 +555,9 @@ displayPlayerUpgrades() {
             case UPGRADE_STATES.Active:
             case UPGRADE_STATES.Score:{
                 setTimeout(()=>{
+                    upgradecard.style.animationDuration = time+"ms";
                     upgradecard.classList.add("triggered");
+                    
                     //this.createPopup(`Wot?`, upgradecard);
 
                 setTimeout(()=>{
@@ -562,7 +565,7 @@ displayPlayerUpgrades() {
                     upgradecard.classList.remove("ready"); // remove ready if ready
                     upgrade.isReady = false;
                 },300);
-                },delay)
+            },delay)
             }
             break;
             case UPGRADE_STATES.Ready:

@@ -539,7 +539,8 @@ canvas#glcanvas {
     outline: 2px dashed #00f;
   }
   &.triggered{
-      animation: triggeredCard 0.3s ease-in-out;
+      animation: triggeredCard ease-in-out;
+      animation-duration: 0.3s;
   }
   &.ready .upgrade-inner{
     animation: readyCard 1s ease-in-out infinite;

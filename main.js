@@ -10,8 +10,10 @@ import { cyrb128, getRandomString, sfc32 } from "./random.js";
 import { Roll } from "./roll.js";
 const CELL_PX = 50;
 const FADE_MS = 300;
-const FALL_MS = 350;
-const ANIMATION_DURATION = 8*60;
+let FALL_MS = 350;
+let MIN_FALL_MS = 150;
+let emitTimingMs = 350;
+let minEmitMs = 150;
 export class Game{
     constructor(){
         //gold
@@ -52,16 +54,9 @@ export class Game{
         ];
         this.activeExplosions = [];
         this.equalizeChances();
-        this.triggers = {
-            [GAME_TRIGGERS.onMatch]: [],        // kiedy znajdzie się match
-            [GAME_TRIGGERS.onRoundStart]: [],
-            [GAME_TRIGGERS.onRoundEnd]: [],     // na koniec rundy
-            [GAME_TRIGGERS.onMove]: [],          //ruch    
-            [GAME_TRIGGERS.onSpawn]: [],
-            [GAME_TRIGGERS.onUpgradeTriggered]: [],
-            [GAME_TRIGGERS.onScore]: [],
-        };
+
         this.board = [];
+
         this.selected = null; // zapamiętany pierwszy klik
         this.locked = false;
         //upgrades
@@ -99,15 +94,10 @@ export class Game{
         this.voucherRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
         this.boosterRand = sfc32(this.hash[0],this.hash[1],this.hash[2],this.hash[3]);
     }
-    on(event, handler, upgrade) {
-    this.triggers[event].push({ handler, upgrade });
-    }
 async emit(event, payload) {
     const wait = ms => new Promise(r => setTimeout(r, ms));
     let visualChain = Promise.resolve();
-
     console.log(event);
-
     for (const upgrade of this.upgrades) {
         if (!upgrade || typeof upgrade !== "object") continue;
 
@@ -142,29 +132,23 @@ async emit(event, payload) {
             }
 
             // --- Handle result ---
-            if (state === UPGRADE_STATES.Active||state === UPGRADE_STATES.Ready||state === UPGRADE_STATES.Tried) {
+            if (state === UPGRADE_STATES.Active||state === UPGRADE_STATES.Ready||state === UPGRADE_STATES.Tried||state===UPGRADE_STATES.Score) {
                 visualChain = visualChain.then(() => {
-                    this.GameRenderer.upgradeTrigger(upgrade, 0,state);
+                    if(emitTimingMs>minEmitMs){
+                        emitTimingMs-=5;
+                    }
+                    const finaltiming = emitTimingMs;
+                    this.GameRenderer.upgradeTrigger(upgrade, finaltiming-50,state);
                     this.Audio.playSound("tick.mp3");
                     if (message) {
                         const upgradeSlot = this.GameRenderer.getPlayerUpgrades(this.upgrades.indexOf(upgrade));
                         this.GameRenderer.createPopup(message, upgradeSlot, style);
                     }
-                    return wait(350);
+                    return wait(finaltiming);
                 });
             }
-            else if (state === UPGRADE_STATES.Score) {
-                visualChain = visualChain.then(() => {
-                    this.GameRenderer.upgradeTrigger(upgrade, 0);
-                    this.Audio.playSound("tick.mp3");
-
-                    // NEW: show popup if message exists
-                    if (message) {
-                        const upgradeSlot = this.GameRenderer.getPlayerUpgrades(this.upgrades.indexOf(upgrade));
-                        this.GameRenderer.createPopup(message, upgradeSlot, style);
-                    }
-                    return wait(350);
-                });
+            if (state === UPGRADE_STATES.Score) {
+                emitTimingMs = 350;
                 await visualChain;
                 visualChain = Promise.resolve();
             }
@@ -250,6 +234,7 @@ rollUpgrades(count = 3) {
         this.GameRenderer.gameOver();
     }
     endround(){
+        emitTimingMs = 350;
         let addmoney = 0;
         this.GameRenderer.displayUpgradesCounter();
         this.GameRenderer.displayMoves();
@@ -477,7 +462,7 @@ trySwap(x1, y1, x2, y2) {
         upgrade.apply(this);
         this.emit(GAME_TRIGGERS.onConsumableUse,upgrade);
         //this.GameRenderer.displayMoney();
-        
+        emitTimingMs = 350;
         return true;
     }
     buy(upgrade){
@@ -507,6 +492,7 @@ trySwap(x1, y1, x2, y2) {
         this.GameRenderer.updateMoney(-upgrade.price);
         //this.GameRenderer.displayMoney();
         this.GameRenderer.updateRerollButton();
+        emitTimingMs = 350;
         return true;
     }
     sell(upgrade){
@@ -531,6 +517,7 @@ trySwap(x1, y1, x2, y2) {
         }
         this.GameRenderer.updateMoney(upgrade.sellPrice);
         this.GameRenderer.updateRerollButton();
+        emitTimingMs = 350;
         return true;
     }
 
@@ -1375,26 +1362,23 @@ createGhost(icon, xPx, yPx, w, h, classList = []) {
             await this.emit(GAME_TRIGGERS.onScore);
             console.log("finished");
             this.GameRenderer.displayTempScore();
-            let delay = 0;
-            if(this.triggers[GAME_TRIGGERS.onScore].length>0){delay = 300}
-            setTimeout(()=>{
-                this.locked = false; // koniec kaskady
+            this.locked = false; // koniec kaskady
                 this.score += Math.round(this.tempscore * this.mult);
                 this.tempscore = 0;
                 this.mult = 1;
                 this.pitch=1;
                 this.GameRenderer.displayScore();
                 this.GameRenderer.displayTempScore();
+                
+                FALL_MS = 350;
+                
                 if(this.score>=this.calcRoundScore()){
                     this.endround();
-                    return;
                 }
                 else if(this.movescounter>=this.moves&&this.score<this.calcRoundScore()){
                     this.locked = true;
                     this.gameover();
-                    return;
-                }
-            },delay);
+                };
             return;
         }
         this.locked = true;
@@ -1420,6 +1404,9 @@ createGhost(icon, xPx, yPx, w, h, classList = []) {
         matches = uniqueMatches;
         console.log(matches);
         await this.emit(GAME_TRIGGERS.onMatch, matches);
+        if(FALL_MS>MIN_FALL_MS){
+            FALL_MS-=10;
+        }
         console.log("ended.");
         // pozwól przeglądarce „zobaczyć” stan po swapie zanim nałożymy .fade
         requestAnimationFrame(() => {
