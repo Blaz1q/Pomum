@@ -3,17 +3,17 @@ import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { upgradesList } from "./upgrade.js";
 import { Audio } from "./sound.js";
 import { Tile } from "./Tile.js";
-import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES,UPGRADE_STATES, SCORE_ACTIONS, UPGRADE_RARITY } from "./dictionary.js";
+import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES,UPGRADE_STATES, SCORE_ACTIONS, UPGRADE_RARITY, Settings } from "./dictionary.js";
 import { RenderUI } from "./RenderUI.js";
 import { Animator,animate } from "./loadshaders.js";
 import { cyrb128, getRandomString, sfc32 } from "./random.js";
 import { Roll } from "./roll.js";
 const CELL_PX = 50;
-const FADE_MS = 300;
-let FALL_MS = 350;
-let MIN_FALL_MS = 150;
-let emitTimingMs = 350;
-let minEmitMs = 150;
+let FADE_MS = Settings.FADE_MS;
+let FALL_MS = Settings.FALL_MS;
+let MIN_FALL_MS = Settings.MIN_FALL_MS;
+let emitTimingMs = Settings.EMIT_TIMING_MS;
+let minEmitMs = Settings.MIN_EMIT_MS;
 export class Game{
     constructor(){
         //gold
@@ -148,7 +148,7 @@ async emit(event, payload) {
                 });
             }
             if (state === UPGRADE_STATES.Score) {
-                emitTimingMs = 350;
+                emitTimingMs = Settings.EMIT_TIMING_MS;
                 await visualChain;
                 visualChain = Promise.resolve();
             }
@@ -234,7 +234,7 @@ rollUpgrades(count = 3) {
         this.GameRenderer.gameOver();
     }
     endround(){
-        emitTimingMs = 350;
+        emitTimingMs = Settings.EMIT_TIMING_MS;
         let addmoney = 0;
         this.GameRenderer.displayUpgradesCounter();
         this.GameRenderer.displayMoves();
@@ -462,7 +462,7 @@ trySwap(x1, y1, x2, y2) {
         upgrade.apply(this);
         this.emit(GAME_TRIGGERS.onConsumableUse,upgrade);
         //this.GameRenderer.displayMoney();
-        emitTimingMs = 350;
+        emitTimingMs = Settings.EMIT_TIMING_MS;
         return true;
     }
     buy(upgrade){
@@ -492,7 +492,7 @@ trySwap(x1, y1, x2, y2) {
         this.GameRenderer.updateMoney(-upgrade.price);
         //this.GameRenderer.displayMoney();
         this.GameRenderer.updateRerollButton();
-        emitTimingMs = 350;
+        emitTimingMs = Settings.EMIT_TIMING_MS;
         return true;
     }
     sell(upgrade){
@@ -517,7 +517,7 @@ trySwap(x1, y1, x2, y2) {
         }
         this.GameRenderer.updateMoney(upgrade.sellPrice);
         this.GameRenderer.updateRerollButton();
-        emitTimingMs = 350;
+        emitTimingMs = Settings.EMIT_TIMING_MS;
         return true;
     }
 
@@ -1370,7 +1370,7 @@ createGhost(icon, xPx, yPx, w, h, classList = []) {
                 this.GameRenderer.displayScore();
                 this.GameRenderer.displayTempScore();
                 
-                FALL_MS = 350;
+                FALL_MS = Settings.FALL_MS;
                 
                 if(this.score>=this.calcRoundScore()){
                     this.endround();
@@ -1538,6 +1538,18 @@ function showCollection(){
 function hideCollection(){
     document.getElementById("collection").classList.add("hidden");
 }
+function changeGameSpeed(){
+    let val = document.getElementById("gameSpeed").value;
+    val = parseInt(val);
+    Settings.FALL_MS = val;
+    Settings.EMIT_TIMING_MS = val;
+    FALL_MS = val;
+    emitTimingMs = val;
+}
+function toggleSound(){
+    let val = document.getElementById("VolumeButton").checked;
+    Settings.PLAY_SOUND = val;
+}
 const R = document.getElementById('funcR');
 const G = document.getElementById('funcG');
 const B = document.getElementById('funcB');
@@ -1552,6 +1564,9 @@ function animateholo() {
   requestAnimationFrame(animateholo);
 }
 animateholo();
+window.toggleSound = toggleSound;
+window.showMenu = showMenu;
+window.changeGameSpeed = changeGameSpeed;
 window.skip = skip;
 window.game = game;
 window.showInfo = showInfo;
@@ -1568,3 +1583,4 @@ window.Consumable = Consumable;
 window.restartGame = restartGame;
 window.startGame = startGame;
 window.showMenu = showMenu;
+window.Settings = Settings;

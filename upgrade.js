@@ -1062,7 +1062,7 @@ export const upgradeBlueprints = [
 
   price: 8,
   image: "brokenmirror",
-  ...COMMON,
+  ...RARE,
 },
 { name: "Adrenaline",
   descriptionfn(game){
