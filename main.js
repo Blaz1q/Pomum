@@ -3,7 +3,7 @@ import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
 import { upgradesList } from "./upgrade.js";
 import { Audio } from "./sound.js";
 import { Tile } from "./Tile.js";
-import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES,UPGRADE_STATES, SCORE_ACTIONS, UPGRADE_RARITY, Settings } from "./dictionary.js";
+import { GAME_TRIGGERS,TYPES,MODIFIERS,STAGES,UPGRADE_STATES, SCORE_ACTIONS, UPGRADE_RARITY, Settings, COLORS, DURATIONS } from "./dictionary.js";
 import { RenderUI } from "./RenderUI.js";
 import { Animator,animate } from "./loadshaders.js";
 import { cyrb128, getRandomString, sfc32 } from "./random.js";
@@ -1481,7 +1481,7 @@ createGhost(icon, xPx, yPx, w, h, classList = []) {
     }
 }
 
-let game = new Game();
+export let game = new Game();
 console.log(game.fruits);
 //consumableList[0].consume(game);
 //game.startround();
@@ -1550,6 +1550,29 @@ function toggleSound(){
     let val = document.getElementById("VolumeButton").checked;
     Settings.PLAY_SOUND = val;
 }
+function toggleDarkMode(){
+    let val = document.getElementById("darkToggle").checked;
+    Settings.DARK_MODE = val;
+    if(Settings.DARK_MODE){
+        document.body.classList.remove("light");
+        document.body.classList.add("dark");
+    } else {
+        document.body.classList.remove("dark");
+        document.body.classList.add("light");
+    }
+    console.log();
+    if(game.GameRenderer.currentColor){
+        animate.animateColors(game.GameRenderer.currentColor,DURATIONS.ANIMATION_DURATION);
+    }else{
+         animate.animateColors(COLORS.magicPurples,DURATIONS.ANIMATION_DURATION);
+    }   
+}
+function showSettings(){
+    document.getElementById("settingsPanel").style.display = "flex";
+}
+function hideSettings(){
+    document.getElementById("settingsPanel").style.display = "none";
+}
 const R = document.getElementById('funcR');
 const G = document.getElementById('funcG');
 const B = document.getElementById('funcB');
@@ -1564,6 +1587,9 @@ function animateholo() {
   requestAnimationFrame(animateholo);
 }
 animateholo();
+window.showSettings = showSettings;
+window.hideSettings = hideSettings;
+window.toggleDarkMode = toggleDarkMode;
 window.toggleSound = toggleSound;
 window.showMenu = showMenu;
 window.changeGameSpeed = changeGameSpeed;

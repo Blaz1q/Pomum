@@ -1,3 +1,5 @@
+import { Settings } from "./dictionary.js";
+import { game } from "./main.js";
 async function loadShaderFile(url) {
     const response = await fetch(url);
     return await response.text();
@@ -154,13 +156,21 @@ export class Animator {
         ];
     }
 
-    animateColors(hexArray, durationFrames = 60) {
-        if(hexArray.length !== 3) {
+    animateColors(ColorPallete, durationFrames = 60) {
+        var color;
+        game.GameRenderer.currentColor = ColorPallete;
+        if(Settings.DARK_MODE){
+            color = ColorPallete.dark;
+        }
+        else{
+            color = ColorPallete.light;
+        }
+        if(color.length !== 3) {
             console.error("animateColors expects an array of 3 colors");
             return;
         }
         this.colorAnimStart = this.currentColors.map(c => [...c]);
-        this.targetColors = hexArray.map(c =>
+        this.targetColors = color.map(c =>
             Array.isArray(c) ? [...c] : Animator.hexToVec3(c)
         );
         this.colorAnimProgress = 0;

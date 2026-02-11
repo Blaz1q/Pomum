@@ -31,30 +31,12 @@
   <input type="checkbox" id="VolumeButton" checked onclick="toggleSound()"/>
   <label for="VolumeButton" class="VolumeLabel"></label>
 </div>
+
 <div id="menu">
     <img class="logo" src="./images/pomumlogo.png" alt="Pomum" srcset="">
     <button id="startBtn" onclick="startGame()">Rozpocznij</button>
     <button onclick="showCollection()">Kolekcja</button>
-    <div id="settingsPanel" class="hidden">
-      <h2>Settings</h2>
-      
-      <label>
-        Rozmiar kafelków
-        <input disabled type="range" min="20" step="5" max="100" />
-      </label>
-      <label>
-        Szybkość gry<br>
-        Szybka <input id="gameSpeed" onchange="changeGameSpeed()" type="range" min="100" step="250" max="850" /> Wolna 
-      </label>
-      <label>
-        Głośność
-        <input type="range" min="100" step="250" max="1100" />
-      </label>
-      <label>
-        <input type="checkbox" id="darkToggle">
-        Tryb ciemny
-      </label>
-    </div>
+    <button onclick="showSettings()">Ustawienia</button>
     <div id="collection" class="hidden">
       <button onclick="hideCollection()">Zamknij</button>
       <div class="scroll"></div>
@@ -112,6 +94,9 @@
           <tr>
               <td class="button">
                 <button class="label" onclick="showInfo()">Info</button>
+              </td>
+              <td class="button">
+                <button class="label" onclick="showSettings()">Ust.</button>
               </td>
           </tr>
         </table>
@@ -177,6 +162,28 @@
       -->
     </div>
   </div>
+  <div id="settingsPanel">
+    <div id="settingsPanel-content">
+      <button onclick="hideSettings()" class="closePopup">&times</button>
+      <h2>Ustawienia</h2>
+      <label>
+        Rozmiar kafelków
+        <input disabled type="range" min="20" step="5" max="100" />
+      </label>
+      <label>
+        Szybkość gry<br>
+        Szybka <input id="gameSpeed" onchange="changeGameSpeed()" value="350" type="range" min="150" step="200" max="750" /> Wolna 
+      </label>
+      <label>
+        Głośność
+        <input type="range" min="100" step="250" max="1100" disabled/>
+      </label>
+      <label>
+        <input onclick="toggleDarkMode()" type="checkbox" id="darkToggle">
+        Tryb ciemny
+      </label>
+    </div>
+    </div>
   <canvas id="glcanvas"></canvas>
 </body>
 </html>

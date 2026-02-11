@@ -1,5 +1,17 @@
 @charset "UTF-8";
 @import url("https://fonts.googleapis.com/css2?family=Jersey+25&display=swap");
+:root {
+  color-scheme: light dark;
+}
+
+.light {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
 body, html {
   margin: 0;
   font-family: "Segoe UI", Roboto, sans-serif;
@@ -18,6 +30,49 @@ canvas#glcanvas {
   display: block;
 }
 
+.closePopup {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  font-weight: 400;
+  color: light-dark(#333, #fff);
+  font-size: 2.5em;
+  border: 0;
+  background-color: transparent;
+  transition: 0.1s;
+  cursor: pointer;
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+.closePopup:hover {
+  transform: scale(1.2);
+}
+
+#settingsPanel-content {
+  z-index: 2000;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: 1.5rem;
+  background: light-dark(rgba(255, 255, 255, 0.85), rgba(32, 32, 32, 0.85));
+  color: light-dark(#333, #fff);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+#settingsPanel-content.hidden {
+  display: none;
+}
+#settingsPanel-content h2 {
+  margin-bottom: 1rem;
+}
+#settingsPanel-content label {
+  display: block;
+  margin: 0.5rem 0;
+}
+
 #menu {
   display: flex;
   flex-direction: column;
@@ -25,7 +80,7 @@ canvas#glcanvas {
   justify-content: center;
   min-height: 100vh;
   font-family: "Segoe UI", sans-serif;
-  color: #fff;
+  color: light-dark(#333, #fff);
   text-align: center;
 }
 #menu h1 {
@@ -40,7 +95,7 @@ canvas#glcanvas {
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  background: #fff;
+  background: light-dark(#fff, #eae8f0);
   color: #333;
   transition: transform 0.2s, background 0.2s;
 }
@@ -52,7 +107,7 @@ canvas#glcanvas {
   position: absolute;
   width: 70%;
   height: 90%;
-  background: rgba(255, 255, 255, 0.9);
+  background: light-dark(rgba(255, 255, 255, 0.85), rgba(32, 32, 32, 0.85));
   border-radius: 12px;
   overflow: hidden; /* << pozwala tooltipom wychodzić */
   padding-left: 7em;
@@ -85,37 +140,19 @@ canvas#glcanvas {
   left: -20px;
   top: 20px;
 }
-#menu #settingsPanel {
-  margin-top: 1.5rem;
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  text-align: left;
-}
-#menu #settingsPanel.hidden {
-  display: none;
-}
-#menu #settingsPanel h2 {
-  margin-bottom: 1rem;
-}
-#menu #settingsPanel label {
-  display: block;
-  margin: 0.5rem 0;
-}
 
 .game {
   display: flex;
   height: calc(100vh - 0.8em);
   gap: 0.5rem;
   margin: 0.4em;
+  color: light-dark(#333, #fff);
 }
 .game .left-panel {
   flex: 0 0 200px;
   gap: 0.6rem;
   padding: 0.8rem;
-  background: rgba(255, 255, 255, 0.85);
+  background: light-dark(rgba(255, 255, 255, 0.85), rgba(32, 32, 32, 0.85));
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -304,7 +341,7 @@ canvas#glcanvas {
   align-items: flex-start;
   gap: 0;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.378);
+  background: light-dark(rgba(255, 255, 255, 0.278), rgba(32, 32, 32, 0.278));
   transition: background 0.1s;
   min-height: 180px;
 }
@@ -353,7 +390,7 @@ canvas#glcanvas {
   margin-right: auto;
   grid-template-rows: repeat(9, 50px);
   grid-template-columns: repeat(9, 50px);
-  background-color: rgba(240, 243, 247, 0.4941176471);
+  background-color: light-dark(rgba(240, 243, 247, 0.4941176471), rgba(28, 28, 28, 0.4941176471));
   border-radius: 10px;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
 }
@@ -364,7 +401,7 @@ canvas#glcanvas {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
+  background: light-dark(#ffffff, #2e2e2e);
   cursor: grab;
   border-radius: 10px;
   transition: transform 200ms ease, opacity 300ms ease, background 200ms ease;
@@ -403,7 +440,7 @@ canvas#glcanvas {
 .game .right-panel #shop {
   display: none;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.278);
+  background: light-dark(rgba(255, 255, 255, 0.278), rgba(32, 32, 32, 0.278));
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   text-align: center;
@@ -658,7 +695,7 @@ canvas#glcanvas {
   transform: translateY(-15px); /* płynnie do góry */
 }
 
-#game-over, #info-container {
+#game-over, #info-container, #settingsPanel {
   position: fixed;
   top: 0;
   left: 0;
@@ -670,23 +707,23 @@ canvas#glcanvas {
   align-items: center;
   z-index: 999;
 }
-#game-over .game-over-content, #info-container .game-over-content {
-  background: #fff;
+#game-over .game-over-content, #info-container .game-over-content, #settingsPanel .game-over-content {
+  background: light-dark(rgba(255, 255, 255, 0.85), rgba(32, 32, 32, 0.85));
   padding: 2rem 3rem;
   border-radius: 15px;
   text-align: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
-#game-over .game-over-content .game-over h1, #info-container .game-over-content .game-over h1 {
+#game-over .game-over-content .game-over h1, #info-container .game-over-content .game-over h1, #settingsPanel .game-over-content .game-over h1 {
   margin: 0 0 1rem;
   font-size: 2.5rem;
   color: #c0392b;
 }
-#game-over .game-over-content .game-over p, #info-container .game-over-content .game-over p {
+#game-over .game-over-content .game-over p, #info-container .game-over-content .game-over p, #settingsPanel .game-over-content .game-over p {
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
 }
-#game-over .game-over-content button, #info-container .game-over-content button {
+#game-over .game-over-content button, #info-container .game-over-content button, #settingsPanel .game-over-content button {
   margin: 0.5rem;
   padding: 0.7rem 1.5rem;
   border: none;
@@ -698,7 +735,7 @@ canvas#glcanvas {
   color: #fff;
   transition: background 0.2s;
 }
-#game-over .game-over-content button:hover, #info-container .game-over-content button:hover {
+#game-over .game-over-content button:hover, #info-container .game-over-content button:hover, #settingsPanel .game-over-content button:hover {
   background: #e74c3c;
 }
 
@@ -810,13 +847,12 @@ canvas#glcanvas {
   color: black;
   z-index: 900;
   justify-content: center;
-  text-align: center;
-}
-#upgrade-tiles p {
-  font-size: 1.5em;
+  text-align: center p;
+  text-align-font-size: 1.5em;
 }
 #upgrade-tiles .container {
-  background: rgba(255, 255, 255, 0.34);
+  color: light-dark(#333, #fff);
+  background: light-dark(rgba(255, 255, 255, 0.278), rgba(32, 32, 32, 0.278));
   padding: 2rem;
   border-radius: 15px;
   display: flex;
@@ -855,7 +891,7 @@ canvas#glcanvas {
   z-index: 1;
   cursor: grab;
   border-radius: 10px;
-  background: #ffffff;
+  background: light-dark(#fff, #eae8f0);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .tile:hover {

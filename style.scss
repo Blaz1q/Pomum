@@ -6,13 +6,34 @@ $cardWidth: 120px;
 $cardHeight-sm: 120px;
 $cardWidth-sm: 80px;
 $game-bg: #f0f3f77e;
+$game-bg-dark: #1c1c1c7e;
 $tile-bg: #ffffff;
+$tile-bg-dark: #2e2e2e;
 $tile-hover: #ffe6a7;
 $chance: #86b587;
 $mult: #e07272;
 $score: #72abe0;
 $moves: #e4d147;
 $money: #e5db1c;
+$text-color-light: #333;
+$text-color-dark: #fff;
+$bg-color: rgba(255, 255, 255, 0.85);
+$bg-color-dark: rgba(32, 32, 32, 0.85);
+$shop-bg-light: rgba(255, 255, 255, 0.278);
+$shop-bg-dark: rgba(32, 32, 32, 0.278);
+$button-color: #fff;
+$button-color-dark: #eae8f0;
+$button-hover: #ffe6a7;
+$button-hover-dark: #a18787;
+:root {
+  color-scheme: light dark;
+}
+.light{
+  color-scheme: light;
+}
+.dark{
+  color-scheme: dark;
+}
 body, html {
   margin: 0;
   font-family: "Segoe UI", Roboto, sans-serif;
@@ -29,6 +50,50 @@ canvas#glcanvas {
   z-index: -1;         /* behind all other content */
   display: block;
 }
+.closePopup{
+  position:absolute;
+  right: 5px;
+  top:5px;
+  font-weight:400;
+  color: light-dark($text-color-light,$text-color-dark);
+  font-size: 2.5em;
+  border: 0;
+  background-color: transparent;
+  transition: .1s;
+  cursor: pointer;
+  margin-block-start: 0;
+    margin-block-end: 0;
+  &:hover{
+    transform: scale(1.2);
+  }
+}
+#settingsPanel-content {
+  z-index: 2000;
+    position: absolute;
+    left: 50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+    margin-top: 1.5rem;
+    background: light-dark($bg-color,$bg-color-dark);
+    color: light-dark($text-color-light,$text-color-dark);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    text-align: left;
+
+    &.hidden {
+      display: none;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin: 0.5rem 0;
+    }
+  }
 #menu {
   display: flex;
   flex-direction: column;
@@ -36,7 +101,7 @@ canvas#glcanvas {
   justify-content: center;
   min-height: 100vh;
   font-family: "Segoe UI", sans-serif;
-  color: #fff;
+  color: light-dark($text-color-light,$text-color-dark);
   text-align: center;
 
   h1 {
@@ -52,7 +117,7 @@ canvas#glcanvas {
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    background: #fff;
+    background: light-dark($button-color,$button-color-dark) ;
     color: #333;
     transition: transform 0.2s, background 0.2s;
 
@@ -65,7 +130,7 @@ canvas#glcanvas {
   position: absolute;
   width: 70%;
   height: 90%;
-  background: rgba(255,255,255,0.9);
+  background: light-dark($bg-color,$bg-color-dark);
   border-radius: 12px;
   overflow: hidden;   /* << pozwala tooltipom wychodzić */
   padding-left: 7em;
@@ -101,35 +166,13 @@ canvas#glcanvas {
   }
 }
 }
-
-  #settingsPanel {
-    margin-top: 1.5rem;
-    background: rgba(255,255,255,0.9);
-    color: #333;
-    padding: 1rem 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    text-align: left;
-
-    &.hidden {
-      display: none;
-    }
-
-    h2 {
-      margin-bottom: 1rem;
-    }
-
-    label {
-      display: block;
-      margin: 0.5rem 0;
-    }
-  }
 }
 .game {
   display: flex;
   height: calc(100vh - .8em) ;
   gap: .5rem;
   margin: .4em;
+  color: light-dark($text-color-light,$text-color-dark);
   .left-panel {
     .location{
       .round, #boss-container{
@@ -250,7 +293,7 @@ canvas#glcanvas {
   flex: 0 0 200px;
   gap: 0.6rem;
   padding: 0.8rem;
-  background: rgba(255, 255, 255, 0.85);
+  background: light-dark($bg-color,$bg-color-dark);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 
@@ -337,7 +380,7 @@ canvas#glcanvas {
   align-items: flex-start;
   gap: 0;                      // remove natural gap
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.378);
+  background: light-dark($shop-bg-light,$shop-bg-dark);
   transition: background 0.1s;
   min-height: $cardHeight;
 
@@ -375,7 +418,7 @@ canvas#glcanvas {
       margin-right: auto;
       grid-template-rows: repeat($grid-size, $cellsize);
       grid-template-columns: repeat($grid-size, $cellsize);
-      background-color: $game-bg;
+      background-color: light-dark($game-bg,$game-bg-dark);
       border-radius: 10px;
       box-shadow: inset 0 2px 6px rgba(0,0,0,0.15);
       div {
@@ -385,7 +428,7 @@ canvas#glcanvas {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: $tile-bg;
+        background: light-dark($tile-bg,$tile-bg-dark);
         cursor:grab;
         border-radius: 10px;
         transition: transform 200ms ease, opacity 300ms ease, background 200ms ease;
@@ -428,7 +471,7 @@ canvas#glcanvas {
     #shop {
       display: none; // hidden initially
       padding: 1rem;
-      background: rgba(255, 255, 255, 0.278);
+      background: light-dark($shop-bg-light,$shop-bg-dark) ;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       text-align: center;
@@ -684,7 +727,7 @@ canvas#glcanvas {
     }
   }
 }
-#game-over,#info-container {
+#game-over,#info-container,#settingsPanel{
   position: fixed;
   top: 0;
   left: 0;
@@ -697,7 +740,7 @@ canvas#glcanvas {
   z-index: 999; // nad wszystkim
 
   .game-over-content {
-    background: #fff;
+    background: light-dark($bg-color,$bg-color-dark);
     padding: 2rem 3rem;
     border-radius: 15px;
     text-align: center;
@@ -827,12 +870,13 @@ canvas#glcanvas {
   //font-size: 1.5em;
   z-index: 900; // above most elements
   justify-content: center;
-  text-align: center;
+  text-align: center
   p{
     font-size: 1.5em;
   }
   .container {
-      background: rgba(255, 255, 255, 0.34);
+    color: light-dark($text-color-light,$text-color-dark);
+      background: light-dark($shop-bg-light,$shop-bg-dark);
       padding: 2rem;
       border-radius: 15px;
       display: flex;
@@ -874,7 +918,7 @@ canvas#glcanvas {
   z-index: 1;
   cursor: grab;
   border-radius: 10px;
-  background: #ffffff;
+  background: light-dark($button-color,$button-color-dark);;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {

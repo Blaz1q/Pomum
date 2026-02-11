@@ -62,7 +62,6 @@ export class Upgrade extends UpgradeBase{
     this.url = "./images/cards/"
     this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
     this.specialFunc;
-    
   }
   changeModifier(game,modifier){
     this.modifier = modifier;
