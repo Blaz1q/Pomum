@@ -87,12 +87,13 @@ export const COLORS = {
         dark:  ["#1E9ED6", "#2BB2E8", "#3CC6F5"],
     }
 }
+let darkModeMql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
 export var Settings = {
     MIN_FALL_MS: 150,
     FALL_MS: 350,
     EMIT_TIMING_MS: 350,
     MIN_EMIT_MS: 150,
-    DARK_MODE: true,
+    DARK_MODE: darkModeMql && darkModeMql.matches,
     CELL_PX: 50,
     FADE_MS: 300,
     VOLUME: 1,

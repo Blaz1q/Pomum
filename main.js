@@ -1560,7 +1560,6 @@ function toggleDarkMode(){
         document.body.classList.remove("dark");
         document.body.classList.add("light");
     }
-    console.log();
     if(game.GameRenderer.currentColor){
         animate.animateColors(game.GameRenderer.currentColor,DURATIONS.ANIMATION_DURATION);
     }else{
@@ -1568,6 +1567,7 @@ function toggleDarkMode(){
     }   
 }
 function showSettings(){
+    document.getElementById("darkToggle").checked = Settings.DARK_MODE;
     document.getElementById("settingsPanel").style.display = "flex";
 }
 function hideSettings(){
