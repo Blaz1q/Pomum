@@ -733,6 +733,7 @@ canvas#glcanvas {
   left: 0;
   width: 100%;
   height: 100%;
+  color: light-dark($text-color-light,$text-color-dark);
   background: rgba(0,0,0,0.7); // przyciemnione tło
   display: none; // ukryty domyślnie
   justify-content: center;
