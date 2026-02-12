@@ -53,7 +53,7 @@ export const UPGRADE_RARITY = {
     ConsumableCommon: 1,
     ConsumableRare: 0.7,
     PomumPackCommon: 1,
-    PomomPackRare: 0.2,
+    PomumPackRare: 0.5,
 }
 export const UPGRADE_RARITY_NAME = {
     Common: {name: `Common`,display: `Common`},

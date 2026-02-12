@@ -846,7 +846,6 @@ canvas#glcanvas {
   font-family: "Jersey 25", sans-serif;
   font-weight: bold;
   color: black;
-  z-index: 900;
   justify-content: center;
   text-align: center p;
   text-align-font-size: 1.5em;

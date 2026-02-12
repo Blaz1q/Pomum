@@ -1,5 +1,5 @@
 import { consumableList } from "./consumable.js";
-import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
+import { Upgrade,ConsumablePack,Consumable,Tarot } from "./upgradeBase.js";
 import { upgradesList } from "./upgrade.js";
 import { Audio } from "./sound.js";
 import { Tile } from "./Tile.js";
@@ -198,12 +198,16 @@ rollUpgrades(count = 3) {
             // negative / modifier rolling
             this.roll.Modifier(up);
             picked.push(up);
-        } else {
+        } else if(entry.type=="Consumable"){
             // it's a consumable
             picked.push(
                 new Consumable(
                     entry
                 )
+            );
+        } else  if(entry.type=="Tarot"){
+            picked.push(
+                new Tarot(entry)
             );
         }
     }
@@ -441,7 +445,7 @@ trySwap(x1, y1, x2, y2) {
         }
     }
     useConsumable(upgrade) {
-        if (upgrade.type === "Consumable") {
+        if (upgrade instanceof Consumable && upgrade.canUse(this)) {
             upgrade.apply(this);
             this.emit(GAME_TRIGGERS.onConsumableUse,upgrade);
             const idx = this.consumables.indexOf(upgrade);
@@ -454,7 +458,8 @@ trySwap(x1, y1, x2, y2) {
         }
     }
     buyanduse(upgrade){
-        if(this.stage!==STAGES.Shop) return false;
+        //if(this.stage!==STAGES.Shop) return false;
+        if(upgrade instanceof Consumable && !upgrade.canUse(this)) return false;
         if(this.money<upgrade.price) return false;
         this.Audio.playSound('buy.mp3');
         this.money -= upgrade.price;
@@ -476,7 +481,7 @@ trySwap(x1, y1, x2, y2) {
             upgrade.apply(this);
             this.GameRenderer.displayPlayerUpgrade(upgrade);
             this.emit(GAME_TRIGGERS.onUpgradesChanged);
-        }else if(upgrade.type=="Consumable"){
+        }else if(upgrade instanceof Consumable){
             if(upgrade.negative) this.maxConsumables+=1;
             this.consumables.push(upgrade);
             this.GameRenderer.displayPlayerConsumable(upgrade);  
@@ -507,7 +512,7 @@ trySwap(x1, y1, x2, y2) {
             this.GameRenderer.displayUpgradesCounter();
             this.emit(GAME_TRIGGERS.onUpgradesChanged);
         }
-        else if(upgrade.type=="Consumable"){
+        else if(upgrade instanceof Consumable){
             const index = this.consumables.indexOf(upgrade) ?? -1;
             if(index==-1) return;
             console.log("SELLINNN");

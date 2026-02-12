@@ -208,6 +208,7 @@ displayMoney() {
         document.getElementsByClassName("game")[0].style.display = "none";
     }
     showGame(){
+        this.refreshUseButtons();
         document.getElementById("body").style.display = "grid";
         if(this.game.stage!=STAGES.Boss){
             const palettes = Object.values(GAMECOLORS);
@@ -897,53 +898,54 @@ displayUpgradeButtons(wrapper, upgrade) {
             wrapper.style.transition = "transform 0.05s ease-out"; 
             wrapper.style.transform = "translateY(-20px)";
             wrapper.classList.add("SelectedUpgrade");
-            const buttons = wrapper.querySelector('.consumable-buttons');
-            if (buttons) {
-                buttons.style.display = "flex";
-                buttons.style.transition = "opacity 0.2s ease"; // dodajemy płynność dla opacity
-                buttons.style.opacity = "1";
+            this.refreshUseButtons();
+            const buttonsContainer = wrapper.querySelector('.consumable-buttons');
+
+            if (buttonsContainer) {
+                buttonsContainer.style.display = "flex";
+                buttonsContainer.style.transition = "opacity 0.2s ease";
+                buttonsContainer.style.opacity = "1";
             }
-            const btnBuy = buttons.querySelector('button:nth-child(1)'); // Zakładamy, że Buy jest pierwszy
-            const btnBuyAndUse = buttons.querySelector('button:nth-child(2)');
-            btnBuy.classList.remove("disabled");
-            btnBuyAndUse?.classList.remove("disabled");
-            const isUpgradeSpaceFull = upgrade.type === "Upgrade" && this.game.upgrades.length >= this.game.maxUpgrades && !upgrade.negative;
-            const isConsumableSpaceFull = upgrade.type === "Consumable" && this.game.consumables.length >= this.game.maxConsumables && !upgrade.negative;
-            const isTooExpensive = this.game.money < upgrade.price;
-            if (btnBuy && btnBuy.textContent === "Kup") {
-                    // Blokujemy, jeśli brak miejsca LUB brak pieniędzy
-                const disabled = isUpgradeSpaceFull || isConsumableSpaceFull || isTooExpensive;
-                if(disabled){
+            // Pobieramy wszystkie przyciski wewnątrz kontenera do tablicy
+                const allBtns = Array.from(buttonsContainer.querySelectorAll('button'));
+
+                // Szukamy konkretnych przycisków na podstawie ich tekstu (trim() usuwa zbędne spacje)
+                const btnBuy = allBtns.find(b => b.textContent.trim().toLowerCase() === 'kup');
+                const btnUse = allBtns.find(b => b.textContent.trim().toLowerCase() === 'użyj');
+                const btnBuyAndUse = allBtns.find(b => b.textContent.trim().toLowerCase() === 'kup i użyj');
+
+                // Bezpieczne usuwanie klasy (używamy ?. aby uniknąć błędów, jeśli przycisk nie zostanie znaleziony)
+                btnBuy?.classList.remove("disabled");
+                btnUse?.classList.remove("disabled");
+                btnBuyAndUse?.classList.remove("disabled");
+            const hasSpace = upgrade.hasSpace(game);
+            const hasMoney = !upgrade.hasMoney(game);
+            let canUse = true;
+            if(upgrade instanceof Consumable){
+                canUse = upgrade.canUse(game);
+            }
+            if (btnBuy) {
+                if(!hasSpace&&!hasMoney){
                     btnBuy.classList.add("disabled");
                 }
             }
-            if(btnBuyAndUse&&btnBuyAndUse.textContent == "Kup i Użyj"){
-                if(isTooExpensive){
+            if(btnBuyAndUse){
+                if(!hasMoney&&!canUse){
                     btnBuyAndUse?.classList.add("disabled");
+                }
+            }
+            if(btnUse){
+                if(!canUse){
+                    btnUse.classList.add("disabled");
                 }
             }
         });
     }
 }
-createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
-    if(params.origin && params.origin.type == "ConsumablePack"){
-        this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
-    }
+createBuyButton(upgrade,wrapper,params){
     function buy(game,upgrade,params){
         let success = false;
-        if(game.money<upgrade.price){
-            console.log("not enough money");
-            game.GameRenderer.notEnoughMoney();
-            return false;
-        }
-        if(upgrade.type==="Upgrade"&&game.upgrades.length>=game.maxUpgrades&&!upgrade.negative){
-            console.log("not enough upgrade space");
-            game.GameRenderer.notEnoughSpace(document.getElementById("player-upgrades-container"));
-            return false;
-        }
-        if(upgrade.type==="Consumable"&&game.consumables.length>=game.maxConsumables&&!upgrade.negative){
-            console.log("not enough consumable space space");
-            game.GameRenderer.notEnoughSpace(document.getElementById("player-consumables-container"));
+        if(!upgrade.canBuy(game)){
             return false;
         }
         success = game.buy(upgrade);
@@ -962,8 +964,6 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         }
         return false;
     }
-    const btnRow = document.createElement("div");
-    btnRow.className = "consumable-buttons";
     const btnBuy = document.createElement("button");
     btnBuy.textContent = "Kup";
     btnBuy.addEventListener("click", (e) => {
@@ -971,6 +971,9 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         buy(this.game,upgrade,params);
         this.refreshBuyButtons();
     });
+    return btnBuy;
+}
+createUseButtons(upgrade){
     const btnUse = document.createElement("button");
     btnUse.textContent = "Użyj";
     btnUse.addEventListener("click", (e) => {
@@ -980,6 +983,9 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
         this.game.useConsumable(upgrade);
         //this.fadeOutAndRemove(wrapper);
     });
+    return btnUse;
+}
+createBuyAndUseButton(upgrade,wrapper,params){
     const btnBuyUse = document.createElement("button");
     btnBuyUse.textContent = "Kup i Użyj";
     btnBuyUse.addEventListener("click", (e) => {
@@ -997,13 +1003,16 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
             container.innerHTML = "";
         }
         if(success){
-            game.GameRenderer.fadeOutAndRemove(wrapper);
+            this.game.GameRenderer.fadeOutAndRemove(wrapper);
             //wrapper.remove();
         }
         else{
-            game.GameRenderer.notEnoughMoney();
+            this.game.GameRenderer.notEnoughMoney();
         }
     });
+    return btnBuyUse;
+}
+createSellButton(wrapper,upgrade){
     const btnSell = document.createElement("button");
     btnSell.textContent = "Sprzedaj";
     btnSell.addEventListener("click", (e)=>{
@@ -1013,31 +1022,61 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
             //game.GameRenderer.fadeOutAndRemove(wrapper);
             wrapper.remove();
         }
-    })
+    });
+    return btnSell;
+}
+createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
+    if(params.origin && params.origin.type == "ConsumablePack"){
+        this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
+    }
+    const btnRow = document.createElement("div");
+    btnRow.className = "consumable-buttons";
     if(params.bought===false){
+        const btnBuy = this.createBuyButton(upgrade,wrapper,params);
         btnRow.appendChild(btnBuy);
-        if(upgrade.type==="Consumable"){
+
+        if(upgrade instanceof Consumable){
+            const btnBuyUse = this.createBuyAndUseButton(upgrade,wrapper,params);
             btnRow.appendChild(btnBuyUse);
         }
     }
     else{
-       if(upgrade.type==="Consumable"){
+       if(upgrade instanceof Consumable){
+            const btnUse = this.createUseButtons(upgrade);
             btnRow.appendChild(btnUse); 
         }
+        const btnSell = this.createSellButton(wrapper,upgrade);
         btnRow.appendChild(btnSell);
     }       
     return btnRow;    
     }
+    refreshUseButtons(){
+        const consumables = this.game.consumables;
+        let i =0;
+        document.querySelectorAll(".consumable-buttons button").forEach(btn => {
+        if (btn.textContent === "Użyj") {
+            
+            const wrapper = btn.closest(".upgrade-wrapper");
+            if (!wrapper) return;
+            // Find upgrade type from dataset
+            const type = wrapper.dataset.type;
+            if(consumables[i].canUse(this.game)){
+                btn.classList.remove("disabled");
+            }
+            i++;
+        }
+    });
+    }
     refreshBuyButtons() {
-    // Disable or remove buy buttons when limits are reached
+        // Disable or remove buy buttons when limits are reached
     const noUpgradeSpace = this.game.upgrades.length >= this.game.maxUpgrades;
     const noConsumableSpace = this.game.consumables.length >= this.game.maxConsumables;
-
+    
     document.querySelectorAll(".consumable-buttons button").forEach(btn => {
         if (btn.textContent === "Buy") {
             const wrapper = btn.closest(".upgrade-wrapper");
             if (!wrapper) return;
-
+            
             // Find upgrade type from dataset
             const type = wrapper.dataset.type;
             if(type==="Upgrade"){

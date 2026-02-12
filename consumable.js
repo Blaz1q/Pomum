@@ -1,7 +1,7 @@
 import { Upgrade,Consumable,Voucher,ConsumablePack } from "./upgradeBase.js";
 import { Style } from "./dictionary.js";
 import { upgradesList } from "./upgrade.js";
-import { GAME_TRIGGERS, MODIFIERS, UPGRADE_RARITY, UPGRADE_RARITY_NAME } from "./dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, UPGRADE_RARITY, UPGRADE_RARITY_NAME, STAGES } from "./dictionary.js";
 export const consumableList = [];
 export const consumablePacks = [];
 export const vouchers = [];
@@ -346,19 +346,41 @@ const consumableGoldBlueprints = [
     }
 ];
 const tarotCards = [
-    {
+    /*{
       name: "Głupiec",
       descriptionfn(game){
         return `Daje ostatnią użytą kartę.`
-      }
-    },
+      },
+        canUse(){
+            return true;
+        },
+        effect(){
+
+        },
+      price: 4,
+      image: 'default',
+    },*/
     {
         name: "Mag",
         descriptionfn(game){
             return `Zamienia szanse 2 losowych owoców.`;
-        }
-
-    },
+        },
+        effect(game){
+            let index = Math.floor(Math.random()*game.fruits.length);
+            let index2 = Math.floor(Math.random()*game.fruits.length);
+            while(index==index2){
+                index2 = Math.floor(Math.random()*game.fruits.length);
+            }
+            
+            let fruit1 = game.fruits[index];
+            const temp = fruit1;
+            let fruit2 = game.fruits[index2];
+            fruit1.props.percent = fruit2.props.percent;
+            fruit2.props.percent = temp.props.percent;
+        },
+      price: 4,
+      image: 'magician',
+    },/*
     {
         name: "Arcykapłanka"
     },
@@ -385,39 +407,92 @@ const tarotCards = [
     },
     {
         name: "Powóz"
-    },
+    },*/
     {
         name: "Siła",
         descriptionfn(game){
-            return ``
-        }
-    },
+            return `Po użyciu daje ${Style.Mult('+10 Mult')}`;
+        },
+        effect(game){
+            game.mult+=10;
+            game.GameRenderer.displayTempScore();
+        },
+        canUse(game){
+            return game.stage!=STAGES.Shop&&game.locked==false;
+        },
+        price: 4,
+        image: "strength"
+    },/*
     {
         name: "Pustelnik",
         descriptionfn(game){
             return `Daje tyle $, ile złotych kafelków na planszy. (max. $20)`;
         }
-    },
+    },*/
     {
         name: "Fortuna",
         descriptionfn(game){
             return `${Style.Chance('1 na 4')} że ulepszenie dostaje bonusowe ${Style.Chance(MODIFIERS.Chip)}, lub ${Style.Chance(MODIFIERS.Mult)}`;
         },
         effect(game){
-
+            // if(Math.random()>=0.25){
+            //     return;
+            // }
+            let index = Math.floor(Math.random()*game.upgrades.length);
+            let upgrade = game.upgrades[index];
+            if(Math.random()<0.5){
+                upgrade.modifier = MODIFIERS.Chip;
+            }
+            else{
+                upgrade.modifier = MODIFIERS.Mult;
+            }
+            upgrade.addSpecial(game);
+            game.GameRenderer.updateUpgrade(index);
         },
         price: 4,
-        props: {image: 'default'}
+        image: 'tarot_default',
     },
-    {
+    /*{
         name: "Sprawiedliwość"
-    },
+    },*/
     {
         name: "Szubieniczyk",
         descriptionfn(game){
-            return `Niszczy `
-        }
+            return `Niszczy 10 losowych kafelków na planszy.`;
+        },
+        effect(game) {
+            let matches = [];
+            let usedCoords = new Set(); // Przechowujemy klucze tekstowe (np. "2,5")
+            let results = []; // Tablica wynikowa ze współrzędnymi
+
+            while (results.length < 10) {
+                let x = Math.floor(Math.random() * game.matrixsize);
+                let y = Math.floor(Math.random() * game.matrixsize);
+                let key = `${x},${y}`;
+
+                if (!usedCoords.has(key)) {
+                    usedCoords.add(key);
+                    results.push({ x, y });
+                }
+            }
+
+            // Mapujemy wyniki na format oczekiwany przez silnik (z danymi o owocu)
+            matches = results.map(pos => ({
+                x: pos.x,
+                y: pos.y,
+                fruit: game.board[pos.x][pos.y]
+            }));
+
+            // Przekazujemy tablicę obiektów do procesowania
+            game.processMatches(matches);
+        },
+        canUse(game){
+            return game.stage!=STAGES.Shop&&game.locked==false;
+        },
+      price: 4,
+      image: 'tarot_default',
     },
+    /*
     {
         name: "Śmierć"
     },
@@ -427,15 +502,43 @@ const tarotCards = [
     {
         name: "Diabeł"
     },
-    {
+    */{
         name: "Wieża",
         descriptionfn(game){
-            return `Losuje szanse wszystkich owoców`;
+            return `${Style.Chance(`1 na 2`)} na losowanie szans wszystkich owoców.`;
         },
+        effect(game){
+            if(Math.random()>=0.5) return;
+            let percent = 100;
+            game.fruits.forEach(fruit => {
+                const result = Math.random()*percent;
+                fruit.props.percent = result;
+                percent-=result;
+            });
+        },
+      price: 4,
+      image: 'tower',
     },
     {
-        name: "Gwiazdy"
-    },
+        name: "Gwiazdy",
+        descriptionfn(game){
+            return `Niszczy losowy rząd i kolumnę na planszy.`;
+        },
+        effect(game) {
+            let cords = {x: Math.floor(Math.random()*game.matrixsize),y: Math.floor(Math.random()*game.matrixsize)};
+            let matches = [];
+            for(var i=0;i<game.matrixsize;i++){
+                matches.push({x:cords.x,y:i,fruit:game.board[cords.x][i]});
+                matches.push({x:i,y:cords.y,fruit:game.board[i][cords.y]});
+            }
+            game.processMatches(matches);
+        },
+        canUse(game){
+            return game.stage!=STAGES.Shop&&game.locked==false;
+        },
+      price: 4,
+      image: 'tarot_default',
+    },/*
     {
         name: "Księżyc"
     },
@@ -448,6 +551,7 @@ const tarotCards = [
     {
         name: "Świat"
     }
+        */
     
 ]
 function silverDesc(fruit){
@@ -570,8 +674,12 @@ consumableUpgradeBlueprints.forEach(consumable => {
     consumable.type = "Consumable";
     consumable.rarity = UPGRADE_RARITY_NAME.ConsumableRare;
 });
+tarotCards.forEach(card => {
+    card.type = "Tarot";
+    card.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
+});
 pomumpackItems.push(...consumableBlueprints);
-consumableList.push(...consumableBlueprints,...consumableGoldBlueprints,...consumableSilverBlueprints,...consumableUpgradeBlueprints);
+consumableList.push(...consumableBlueprints,...consumableGoldBlueprints,...consumableSilverBlueprints,...consumableUpgradeBlueprints,...tarotCards);
 const pomumpackSmall = new ConsumablePack({
     name: "Pomumpack",
     descriptionfn() {
@@ -646,7 +754,20 @@ const pomumpackUpgrade = new ConsumablePack({
     },
      image: 'pomumpackupgrade' 
 });
+
+const tarotPack = new ConsumablePack({
+    name: "Tarot Pack",
+    descriptionfn() {
+        return `Znajdują się ${this.props.maxRoll} karty tarota. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+    },
+    consumables: tarotCards,
+    price: 4,
+    props: {
+        maxSelect: 1, maxRoll: 3
+    },
+    image: 'tarot_pack'
+})
 consumablePacks.push(pomumpackSmall);
 consumablePacks.push(pomumpackBig);
 consumablePacks.push(pomumpackMega);
-consumablePacks.push(pomumpackGold,pomumpackSilver,pomumpackUpgrade);
+consumablePacks.push(pomumpackGold,pomumpackSilver,pomumpackUpgrade,tarotPack);

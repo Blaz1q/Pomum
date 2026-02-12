@@ -1,4 +1,4 @@
-import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, UPGRADE_RARITY, UPGRADE_RARITY_NAME, UPGRADE_STATES } from "./dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, SCORE_ACTIONS, STAGES, UPGRADE_RARITY, UPGRADE_RARITY_NAME, UPGRADE_STATES } from "./dictionary.js";
 import { Roll } from "./roll.js";
 import { upgradesList } from "./upgrade.js";
 
@@ -30,6 +30,20 @@ export class UpgradeBase {
     this.image = ()=>{
       return `${this.url}${props.image ? props.image.toLowerCase() : this.name?.toLowerCase()}.png`;
     }
+  }
+  canBuy(game){
+    throw new Error("Method canBuy must be implemented.");
+  }
+  hasMoney(game){
+    if(this.price>game.money){
+      console.log("not enough money");
+      game.GameRenderer.notEnoughMoney();
+      return false;
+    }
+    return true;
+  }
+  hasSpace(game){
+    throw new Error("Method hasSpace must be implemented.");
   }
   description(game){
     if (typeof this.descriptionfn === "function") {
@@ -90,6 +104,18 @@ export class Upgrade extends UpgradeBase{
     game.mult = Math.round(game.mult * 100) / 100;
     game.GameRenderer.displayTempScore();
     return {state:UPGRADE_STATES.Score,message: `X1.5 Mult`,style: SCORE_ACTIONS.Mult};
+  }
+  hasSpace(game){
+    let space = game.upgrades.length<game.maxUpgrades || this.negative;
+    
+    return space;
+  }
+  canBuy(game){
+    if(this.hasSpace(game)==false){
+      console.log("not enough upgrade space");
+      game.GameRenderer.notEnoughSpace(document.getElementById("player-upgrades-container"));
+    }
+    return this.hasMoney(game)&&this.hasSpace(game);
   }
   addSpecial(game){
     if(this.modifier==MODIFIERS.Chip){
@@ -223,9 +249,15 @@ export class ConsumablePack extends UpgradeBase{
     constructor(props = {}){
         super(props);
         this.consumables = props.consumables;
-        this.url = "./images/cards/";
+        this.url = "./images/boosters/";
         this.type = "ConsumablePack";
         this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.Common;
+    }
+    canBuy(){
+      return true;
+    }
+    hasSpace(){
+      return true;
     }
     roll(game) {
     // Start with all available consumables
@@ -259,6 +291,8 @@ export class ConsumablePack extends UpgradeBase{
         let upgrade = new Upgrade(c);
         game.roll.Modifier(upgrade,{negative: 0.0025,modifier:0.015});
         return upgrade;
+      }else if(c.type=="Tarot"){
+        return new Tarot(c);
       }
       return null;
     });
@@ -277,7 +311,13 @@ export class Voucher extends UpgradeBase{
     this.bought = true;
     this.props.effect.call(this,game);
     //this.effect?.call(this, game); // this wewnątrz effect wskazuje na instancję
-  }
+    }
+    hasSpace(){
+      return true;
+    }
+    canBuy(){
+      return true;
+    }
 }
 export class Consumable extends UpgradeBase{
     constructor(props = {}){
@@ -295,6 +335,21 @@ export class Consumable extends UpgradeBase{
       }
       this.props?.effect?.call(this,game);
     }
+    hasSpace(game){
+      let space = game.consumables.length < game.maxConsumables || this.negative;
+      
+      return space;
+    }
+    canBuy(game){
+      if(this.hasSpace(game)==false){
+        console.log("not enough consumable space");
+        game.GameRenderer.notEnoughSpace(document.getElementById("player-consumables-container"));
+      }
+      return this.hasMoney(game)&&this.hasSpace(game);
+    }
+    canUse(game){
+      return true; 
+    }
     sell(game) {
     this.bought = false;
     if(this.negative==true){
@@ -303,4 +358,14 @@ export class Consumable extends UpgradeBase{
     }
     game.money += Math.floor(this.sellPrice);
   }
+}
+export class Tarot extends Consumable{
+    constructor(props = {}){
+      super(props);
+      this.type = 'Tarot';
+      this.props.canUse = props?.canUse;
+    }
+    canUse(game){
+      return this.props?.canUse?.call(this,game) ?? true;
+    }
 }
