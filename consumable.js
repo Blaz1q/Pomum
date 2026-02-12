@@ -435,9 +435,9 @@ const tarotCards = [
             return `${Style.Chance('1 na 4')} że ulepszenie dostaje bonusowe ${Style.Chance(MODIFIERS.Chip)}, lub ${Style.Chance(MODIFIERS.Mult)}`;
         },
         effect(game){
-            // if(Math.random()>=0.25){
-            //     return;
-            // }
+            if(Math.random()>=0.25){
+                return;
+            }
             let index = Math.floor(Math.random()*game.upgrades.length);
             let upgrade = game.upgrades[index];
             if(Math.random()<0.5){
