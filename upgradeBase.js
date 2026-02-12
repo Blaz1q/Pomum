@@ -304,7 +304,7 @@ export class Voucher extends UpgradeBase{
     constructor(props = {}){
         super(props);
         this.type = "Voucher";
-        this.url = "./images/cards/";
+        this.url = "./images/vouchers/";
         this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
     }
     apply(game) {
