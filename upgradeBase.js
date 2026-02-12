@@ -35,12 +35,13 @@ export class UpgradeBase {
     throw new Error("Method canBuy must be implemented.");
   }
   hasMoney(game){
-    if(this.price>game.money){
+    return this.price<=game.money
+  }
+  notEnoughMoney(){
+    if(this.hasMoney(game)==false){
       console.log("not enough money");
       game.GameRenderer.notEnoughMoney();
-      return false;
     }
-    return true;
   }
   hasSpace(game){
     throw new Error("Method hasSpace must be implemented.");
@@ -111,6 +112,7 @@ export class Upgrade extends UpgradeBase{
     return space;
   }
   canBuy(game){
+    this.notEnoughMoney();
     if(this.hasSpace(game)==false){
       console.log("not enough upgrade space");
       game.GameRenderer.notEnoughSpace(document.getElementById("player-upgrades-container"));
@@ -254,7 +256,8 @@ export class ConsumablePack extends UpgradeBase{
         this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.Common;
     }
     canBuy(){
-      return true;
+      this.notEnoughMoney();
+      return this.hasMoney(game);
     }
     hasSpace(){
       return true;
@@ -316,7 +319,8 @@ export class Voucher extends UpgradeBase{
       return true;
     }
     canBuy(){
-      return true;
+      this.notEnoughMoney();
+      return this.hasMoney(game);
     }
 }
 export class Consumable extends UpgradeBase{
@@ -325,6 +329,7 @@ export class Consumable extends UpgradeBase{
         this.type = "Consumable";
         this.url = "./images/consumables/";
         this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
+        this.negative = false;
     }
     apply(game){
       this.bought = true;
@@ -341,6 +346,7 @@ export class Consumable extends UpgradeBase{
       return space;
     }
     canBuy(game){
+      this.notEnoughMoney();
       if(this.hasSpace(game)==false){
         console.log("not enough consumable space");
         game.GameRenderer.notEnoughSpace(document.getElementById("player-consumables-container"));

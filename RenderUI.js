@@ -919,18 +919,18 @@ displayUpgradeButtons(wrapper, upgrade) {
                 btnUse?.classList.remove("disabled");
                 btnBuyAndUse?.classList.remove("disabled");
             const hasSpace = upgrade.hasSpace(game);
-            const hasMoney = !upgrade.hasMoney(game);
+            const hasMoney = upgrade.hasMoney(game);
             let canUse = true;
             if(upgrade instanceof Consumable){
                 canUse = upgrade.canUse(game);
             }
             if (btnBuy) {
-                if(!hasSpace&&!hasMoney){
+                if(!hasSpace||!hasMoney){
                     btnBuy.classList.add("disabled");
                 }
             }
             if(btnBuyAndUse){
-                if(!hasMoney&&!canUse){
+                if(!hasMoney||!canUse){
                     btnBuyAndUse?.classList.add("disabled");
                 }
             }
@@ -944,8 +944,9 @@ displayUpgradeButtons(wrapper, upgrade) {
 }
 createBuyButton(upgrade,wrapper,params){
     function buy(game,upgrade,params){
+        console.log("buy?");
         let success = false;
-        if(!upgrade.canBuy(game)){
+        if(upgrade.canBuy(game)==false){
             return false;
         }
         success = game.buy(upgrade);
@@ -969,7 +970,7 @@ createBuyButton(upgrade,wrapper,params){
     btnBuy.addEventListener("click", (e) => {
         e.stopPropagation();
         buy(this.game,upgrade,params);
-        this.refreshBuyButtons();
+        //this.refreshBuyButtons();
     });
     return btnBuy;
 }
@@ -1018,7 +1019,7 @@ createSellButton(wrapper,upgrade){
     btnSell.addEventListener("click", (e)=>{
         e.stopPropagation();
         if(this.game.sell(upgrade)){
-            this.refreshBuyButtons();
+            //this.refreshBuyButtons();
             //game.GameRenderer.fadeOutAndRemove(wrapper);
             wrapper.remove();
         }
@@ -1079,11 +1080,14 @@ createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
             
             // Find upgrade type from dataset
             const type = wrapper.dataset.type;
+            if(noUpgradeSpace||noConsumableSpace){
+                btn.classList.remove("disabled");
+            }
             if(type==="Upgrade"){
-                btn.disabled = noUpgradeSpace;
+               // btn.disabled = noUpgradeSpace;
             }
             if(type==="Consumable"){
-                btn.disabled = noConsumableSpace;
+               // btn.disabled = noConsumableSpace;
             }
         }
     });
