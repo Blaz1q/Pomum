@@ -10,6 +10,13 @@
   <script type="module" defer src="loadshaders.js"></script>
 </head>
 <body>
+<svg style="position: absolute; width: 0; height: 0; display: none">
+  <filter id="burn-filter">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" result="noise" />
+    <feColorMatrix in="noise" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 40 -15" result="mask" />
+    <feComposite operator="in" in="SourceGraphic" in2="mask" />
+  </filter>
+</svg>
 <svg style="display:none">
   <filter id="holo-map" color-interpolation-filters="sRGB">
     <!-- Keep IDs for JS -->
@@ -87,7 +94,7 @@
              </td>
           </tr>
           <tr>
-            <td class="money" colspan="2">
+            <td class="moneycontainer" colspan="2">
               <span id="money" class="value">$2</span>
             </td>
           </tr>

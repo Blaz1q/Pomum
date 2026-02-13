@@ -148,14 +148,6 @@ canvas#glcanvas {
   margin: 0.4em;
   color: light-dark(#333, #fff);
 }
-.game .left-panel {
-  flex: 0 0 200px;
-  gap: 0.6rem;
-  padding: 0.8rem;
-  background: light-dark(rgba(255, 255, 255, 0.85), rgba(32, 32, 32, 0.85));
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
 .game .left-panel .location .round, .game .left-panel .location #boss-container {
   display: flex;
   justify-content: center;
@@ -245,22 +237,30 @@ canvas#glcanvas {
   color: #222;
   background-color: #ffb35d;
 }
-.game .left-panel .info .stats-table .money {
+.game .left-panel .info .stats-table .moneycontainer.earned {
+  background-color: #62e51c;
+  transition: background 0s;
+}
+.game .left-panel .info .stats-table .moneycontainer.lost {
+  background-color: #e5521c;
+  transition: background 0s;
+}
+.game .left-panel .info .stats-table .moneycontainer {
   transition: background 200ms ease-out;
   padding: 0.8rem 0.5rem;
   background-color: #e5db1c;
   color: #222;
 }
-.game .left-panel .info .stats-table .money.earned {
-  background-color: #62e51c;
-  transition: background 0s;
-}
-.game .left-panel .info .stats-table .money.lost {
-  background-color: #e5521c;
-  transition: background 0s;
-}
 .game .left-panel div {
   margin-bottom: 1em;
+}
+.game .left-panel {
+  flex: 0 0 200px;
+  gap: 0.6rem;
+  padding: 0.8rem;
+  background: light-dark(rgba(255, 255, 255, 0.85), rgba(32, 32, 32, 0.85));
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 .game .left-panel h2, .game .left-panel h1 {
   font-size: 1rem;
@@ -599,12 +599,6 @@ canvas#glcanvas {
 .upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
   width: 120px;
   height: 180px;
-  position: relative;
-  cursor: pointer;
-  transform-style: preserve-3d;
-  animation: skewCard 6s infinite ease-in-out;
-  transition: box-shadow 0.2s ease;
-  z-index: 5;
 }
 @media (max-width: 1024px) {
   .upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
@@ -623,6 +617,14 @@ canvas#glcanvas {
     width: 64px;
     height: 96px;
   }
+}
+.upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
+  position: relative;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  animation: skewCard 6s infinite ease-in-out;
+  transition: box-shadow 0.2s ease;
+  z-index: 5;
 }
 .upgrade-wrapper .upgrade-card .upgrade-inner, .boss-wrapper .upgrade-card .upgrade-inner {
   width: 100%;

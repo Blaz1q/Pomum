@@ -138,11 +138,13 @@ async emit(event, payload) {
                         emitTimingMs-=5;
                     }
                     const finaltiming = emitTimingMs;
-                    this.GameRenderer.upgradeTrigger(upgrade, finaltiming-50,state);
+                    upgrade.UpgradeRenderer.trigger(finaltiming-50,state)
+                    //this.GameRenderer.upgradeTrigger(upgrade, finaltiming-50,state);
                     this.Audio.playSound("tick.mp3");
                     if (message) {
-                        const upgradeSlot = this.GameRenderer.getPlayerUpgrades(this.upgrades.indexOf(upgrade));
-                        this.GameRenderer.createPopup(message, upgradeSlot, style);
+                        //const upgradeSlot = this.GameRenderer.getPlayerUpgrades(this.upgrades.indexOf(upgrade));
+                        upgrade.UpgradeRenderer.createPopup(message,style);
+                        //this.GameRenderer.createPopup(message, upgradeSlot, style);
                     }
                     return wait(finaltiming);
                 });
@@ -446,6 +448,7 @@ trySwap(x1, y1, x2, y2) {
     }
     useConsumable(upgrade) {
         if (upgrade instanceof Consumable && upgrade.canUse(this)) {
+            this.GameRenderer.resetAllUpgrades();
             upgrade.apply(this);
             this.emit(GAME_TRIGGERS.onConsumableUse,upgrade);
             const idx = this.consumables.indexOf(upgrade);
@@ -453,7 +456,8 @@ trySwap(x1, y1, x2, y2) {
                 this.consumables.splice(idx, 1); // removes the element in-place
             }
             this.Audio.playSound('pop.mp3');
-            this.GameRenderer.displayPlayerConsumables();
+            game.GameRenderer.dissolveAndRemove(upgrade.wrapper,1000);
+            //this.GameRenderer.displayPlayerConsumables();
             this.GameRenderer.displayConsumablesCounter();
         }
     }
@@ -465,6 +469,7 @@ trySwap(x1, y1, x2, y2) {
         this.money -= upgrade.price;
         this.GameRenderer.updateMoney(-upgrade.price);
         upgrade.apply(this);
+        this.GameRenderer.resetAllUpgrades();
         this.emit(GAME_TRIGGERS.onConsumableUse,upgrade);
         //this.GameRenderer.displayMoney();
         emitTimingMs = Settings.EMIT_TIMING_MS;
@@ -479,12 +484,12 @@ trySwap(x1, y1, x2, y2) {
         if(upgrade.type=="Upgrade"){
             this.upgrades.push(upgrade);
             upgrade.apply(this);
-            this.GameRenderer.displayPlayerUpgrade(upgrade);
+            this.GameRenderer.displayPlayerUpgrades();
             this.emit(GAME_TRIGGERS.onUpgradesChanged);
         }else if(upgrade instanceof Consumable){
             if(upgrade.negative) this.maxConsumables+=1;
             this.consumables.push(upgrade);
-            this.GameRenderer.displayPlayerConsumable(upgrade);  
+            this.GameRenderer.displayPlayerConsumables();  
         }
         else if(upgrade.type=="ConsumablePack"){
             this.GameRenderer.OpenBoosterPack(upgrade);
@@ -1360,6 +1365,13 @@ createGhost(icon, xPx, yPx, w, h, classList = []) {
     }
     return g;
 }
+/*
+TODO: 
+połączyć triggerspecial i processMatches w jedno, 
+ponieważ niektóre ulepszenia nie wykrywają czy zniszczyły bombe czy nie (w tym przypadku Tarot Gwiazdy)
+
+najlepiej też przerzucić logikę do innej klasy, bo game robi wszystko.
+*/
     async processMatches(matches){
         console.log("processMatches");
         if(matches.length === 0){

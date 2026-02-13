@@ -1,5 +1,6 @@
 import { UPGRADE_RARITY,MODIFIERS } from "./dictionary.js";
 import { vouchers,consumablePacks } from "./consumable.js";
+import { ConsumablePack } from "./upgradeBase.js";
 
 export class Roll{
     constructor(game){
@@ -46,8 +47,10 @@ export class Roll{
         if (!consumablePacks.length) return [];
         const result = [];
         for (let n = 0; n < count; n++) {
+            
             const item = this.weightedPick(consumablePacks,this.game.boosterRand.bind(this));
-            result.push(item);
+            let pack = new ConsumablePack(item);
+            result.push(pack);
         }
         console.log(result);
         return result;

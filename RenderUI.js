@@ -1,20 +1,31 @@
 import { consumableList } from "./consumable.js";
-import { Upgrade,ConsumablePack,Consumable } from "./upgradeBase.js";
-import { animate,Animator } from "./loadshaders.js";
-import { Style,COLORS,GAMECOLORS, DURATIONS, STAGES, MODIFIERS, GAME_TRIGGERS, UPGRADE_STATES, UPGRADE_RARITY_NAME } from "./dictionary.js";
+import { Upgrade, ConsumablePack, Consumable } from "./upgradeBase.js";
+import { animate, Animator } from "./loadshaders.js";
+import {
+  Style,
+  COLORS,
+  GAMECOLORS,
+  DURATIONS,
+  STAGES,
+  MODIFIERS,
+  GAME_TRIGGERS,
+  UPGRADE_STATES,
+  UPGRADE_RARITY_NAME,
+} from "./dictionary.js";
 import { rollBoss } from "./Boss.js";
 import { upgradesList } from "./upgrade.js";
 export class RenderUI {
-    constructor(game) {
-        this.game = game;
-        this.moneyBox = document.getElementById("money");
-        this.movesBox;
-        this.scoreBox;
-    }
-    displayMoves() {
-        this.game.moveBox.innerHTML = this.game.movescounter + "/" + this.game.moves;
-    }
-displayMoney() {
+  constructor(game) {
+    this.game = game;
+    this.moneyBox = document.getElementById("money");
+    this.movesBox;
+    this.scoreBox;
+  }
+  displayMoves() {
+    this.game.moveBox.innerHTML =
+      this.game.movescounter + "/" + this.game.moves;
+  }
+  displayMoney() {
     const moneyBox = this.moneyBox;
 
     const start = this.prevMoney ?? 0;
@@ -22,243 +33,275 @@ displayMoney() {
     this.prevMoney = end;
 
     const animateNumber = (element, start, end) => {
-        if (start === end) {
-            element.innerHTML = "$" + end;
-            return;
+      if (start === end) {
+        element.innerHTML = "$" + end;
+        return;
+      }
+
+      const duration = 250;
+      const startTime = performance.now();
+
+      const animate = (now) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        const value = Math.round(start + (end - start) * eased);
+        element.innerHTML = "$" + value;
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          element.classList.remove("money-pop");
+          void element.offsetWidth;
+          element.classList.add("money-pop");
         }
+      };
 
-        const duration = 250;
-        const startTime = performance.now();
-
-        const animate = (now) => {
-            const progress = Math.min((now - startTime) / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-
-            const value = Math.round(start + (end - start) * eased);
-            element.innerHTML = "$" + value;
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                element.classList.remove("money-pop");
-                void element.offsetWidth;
-                element.classList.add("money-pop");
-            }
-        };
-
-        requestAnimationFrame(animate);
+      requestAnimationFrame(animate);
     };
 
     animateNumber(moneyBox, start, end);
-}
-    updateMoney(ammount){
-        let moneyContainer = document.getElementsByClassName('money')[0];
-        moneyContainer.className = 'money';
-        if(ammount==0){
-            return;
-        }
-        let char = '';
-        if(ammount<0){
-            char='-';
-            moneyContainer.classList.add('lost');
-        }else{
-            char = '+';
-            moneyContainer.classList.add('earned');
-        }
-        ammount = Math.abs(ammount);
-        this.moneyBox.innerHTML = char+'$'+ammount;
-        setTimeout(()=>{
-            this.displayMoney();
-            moneyContainer.className = 'money';
-        },300);
+  }
+  updateMoney(ammount) {
+    let moneyContainer = document.getElementsByClassName("moneycontainer")[0];
+    if (ammount == 0) {
+      return;
     }
-    notEnoughMoney(){
-        let moneyContainer = document.getElementsByClassName('money')[0];
-        moneyContainer.classList.add('notEnough');
-        setTimeout(()=>{
-            moneyContainer.classList.remove('notEnough');
-        },400);    
+    let char = "";
+    if (ammount < 0) {
+      char = "-";
+      moneyContainer.classList.add("lost");
+    } else {
+      char = "+";
+      moneyContainer.classList.add("earned");
     }
-    notEnoughSpace(container){
-        container.classList.add('notEnough');
-        setTimeout(()=>{
-            container.classList.remove('notEnough');
-        },400);    
-    }
-    displayRound() {
-        this.game.roundBox.innerHTML = this.game.round;
-    }
-    displayScore() {
+    ammount = Math.abs(ammount);
+    this.moneyBox.innerHTML = char + "$" + ammount;
+    setTimeout(() => {
+      this.displayMoney();
+      moneyContainer.classList.remove("lost");
+      moneyContainer.classList.remove("earned");
+    }, 300);
+  }
+  notEnoughMoney() {
+    let moneyContainer = document.getElementsByClassName("moneycontainer")[0];
+    moneyContainer.classList.add("notEnough");
+    setTimeout(() => {
+      moneyContainer.classList.remove("notEnough");
+    }, 400);
+  }
+  notEnoughSpace(container) {
+    container.classList.add("notEnough");
+    setTimeout(() => {
+      container.classList.remove("notEnough");
+    }, 400);
+  }
+  displayRound() {
+    this.game.roundBox.innerHTML = this.game.round;
+  }
+  displayScore() {
     const roundScoreBox = document.getElementById("roundscore");
     const totalScoreBox = document.getElementById("score");
 
     const newRoundScore = this.game.calcRoundScore();
-    const newTotalScore  = this.game.score;
+    const newTotalScore = this.game.score;
 
     const oldRoundScore = parseInt(roundScoreBox.innerHTML) || 0;
     const oldTotalScore = parseInt(totalScoreBox.innerHTML) || 0;
 
     const animateNumber = (element, start, end) => {
-        if (start === end) return;
+      if (start === end) return;
 
-        const duration = 250; // ms
-        const startTime = performance.now();
+      const duration = 250; // ms
+      const startTime = performance.now();
 
-        const animate = (now) => {
-            const progress = Math.min((now - startTime) / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+      const animate = (now) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
 
-            const value = Math.round(start + (end - start) * eased);
-            element.innerHTML = value;
+        const value = Math.round(start + (end - start) * eased);
+        element.innerHTML = value;
 
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                // końcowy "pop"
-                element.classList.remove("pop-anim");
-                void element.offsetWidth;
-                element.classList.add("pop-anim");
-            }
-        };
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // końcowy "pop"
+          element.classList.remove("pop-anim");
+          void element.offsetWidth;
+          element.classList.add("pop-anim");
+        }
+      };
 
-        requestAnimationFrame(animate);
+      requestAnimationFrame(animate);
     };
 
     animateNumber(roundScoreBox, oldRoundScore, newRoundScore);
     animateNumber(totalScoreBox, oldTotalScore, newTotalScore);
-}
+  }
 
-    
-    displayTempScore() {
-        const scoreBox = this.game.tempscoreBox;
-        const multBox = this.game.multBox;
+  displayTempScore() {
+    const scoreBox = this.game.tempscoreBox;
+    const multBox = this.game.multBox;
 
-        const newScore = this.game.tempscore;
-        const newMult = this.game.mult;
+    const newScore = this.game.tempscore;
+    const newMult = this.game.mult;
 
-        const oldScore = scoreBox.innerHTML;
-        const oldMult = multBox.innerHTML;
+    const oldScore = scoreBox.innerHTML;
+    const oldMult = multBox.innerHTML;
 
-        // Aktualizacja wartości
-        scoreBox.innerHTML = newScore;
-        multBox.innerHTML = newMult;
+    // Aktualizacja wartości
+    scoreBox.innerHTML = newScore;
+    multBox.innerHTML = newMult;
 
-        // Funkcja dodająca animację "podskoku"
-        const addPopAnimation = (element) => {
-            element.classList.remove("pop-anim"); 
-            void element.offsetWidth; 
-            element.classList.add("pop-anim");
-        };
+    // Funkcja dodająca animację "podskoku"
+    const addPopAnimation = (element) => {
+      element.classList.remove("pop-anim");
+      void element.offsetWidth;
+      element.classList.add("pop-anim");
+    };
 
-        // Jeśli zmienił się score — animacja
-        if (oldScore != newScore) {
-            addPopAnimation(scoreBox);
-        }
+    // Jeśli zmienił się score — animacja
+    if (oldScore != newScore) {
+      addPopAnimation(scoreBox);
+    }
 
-        // Jeśli zmienił się mult — animacja
-        if (oldMult != newMult) {
-            addPopAnimation(multBox);
-        }
+    // Jeśli zmienił się mult — animacja
+    if (oldMult != newMult) {
+      addPopAnimation(multBox);
     }
-    displayUpgradesCounter(){
-        document.getElementById("upgrades-counter").innerHTML = `(${this.game.upgrades.length}/${this.game.maxUpgrades})`;
+  }
+  displayUpgradesCounter() {
+    document.getElementById("upgrades-counter").innerHTML =
+      `(${this.game.upgrades.length}/${this.game.maxUpgrades})`;
+  }
+  displayConsumablesCounter() {
+    document.getElementById("consumables-counter").innerHTML =
+      `(${this.game.consumables.length}/${this.game.maxConsumables})`;
+  }
+  displayBoosterPacks() {
+    const boosterPack = document.getElementById("boosterpack-container");
+    boosterPack.innerHTML = "";
+    boosterPack.appendChild(
+      this.displayUpgrades(this.game.roll.ConsumablePacks(2), {
+        bought: false,
+      }),
+    );
+  }
+  displayCoupons() {
+    const coupon = document.getElementById("voucher-container");
+    coupon.innerHTML = "";
+    coupon.appendChild(
+      this.displayUpgrades(this.game.roll.Vouchers(1), { bought: false }),
+    );
+  }
+  OpenBoosterPack(boosterPack) {
+    console.log(boosterPack);
+    animate.animateColors(COLORS.magicPurples, DURATIONS.ANIMATION_DURATION);
+    const consumableContainer = document.getElementById(
+      "consumables-container",
+    );
+    consumableContainer.innerHTML = "";
+    consumableContainer.appendChild(
+      this.displayUpgrades(boosterPack.roll(this.game), {
+        bought: false,
+        free: true,
+        origin: boosterPack,
+      }),
+    );
+    this.displayBoosterAmmount();
+    this.displayTiles();
+    this.dispalyTileOverlay();
+    this.hideShop();
+  }
+  displayBoosterAmmount() {
+    document.getElementById("booster-amount").innerHTML =
+      "Wybierz swoje karty. Pozostało: " + this.game.BuysFromBoosterLeft;
+  }
+  showMenu() {
+    document.getElementById("menu").style.display = "flex";
+    animate.animateColors(COLORS.magicPurples, DURATIONS.ANIMATION_DURATION);
+    animate.smoothRotateTo(-1, DURATIONS.SWIRL_DURATION);
+  }
+  hideMenu() {
+    document.getElementById("menu").style.display = "none";
+  }
+  hideGame() {
+    document.getElementById("body").style.display = "none";
+  }
+  showGameContainer() {
+    document.getElementsByClassName("game")[0].style.display = "flex";
+  }
+  hideGameContainer() {
+    document.getElementsByClassName("game")[0].style.display = "none";
+  }
+  showGame() {
+    //this.refreshUseButtons();
+    document.getElementById("body").style.display = "grid";
+    if (this.game.stage != STAGES.Boss) {
+      const palettes = Object.values(GAMECOLORS);
+      const randomPalette =
+        palettes[Math.floor(Math.random() * palettes.length)];
+      animate.animateColors(randomPalette, DURATIONS.ANIMATION_DURATION);
+      animate.smoothRotateTo(0.5, DURATIONS.SWIRL_DURATION);
+    } else {
+      animate.animateColors(COLORS.boss, DURATIONS.ANIMATION_DURATION);
+      animate.smoothRotateTo(-2, DURATIONS.SWIRL_DURATION);
     }
-     displayConsumablesCounter(){
-        document.getElementById("consumables-counter").innerHTML = `(${this.game.consumables.length}/${this.game.maxConsumables})`;
-    }
-    displayBoosterPacks(){
-        const boosterPack = document.getElementById("boosterpack-container");
-        boosterPack.innerHTML = "";
-        boosterPack.appendChild(this.displayUpgrades(this.game.roll.ConsumablePacks(2),{bought: false}));
-    }
-    displayCoupons(){
-        const coupon = document.getElementById("voucher-container");
-        coupon.innerHTML = "";
-        coupon.appendChild(this.displayUpgrades(this.game.roll.Vouchers(1),{bought: false}));
-    }
-    OpenBoosterPack(boosterPack){
-        console.log(boosterPack);
-        animate.animateColors(COLORS.magicPurples,DURATIONS.ANIMATION_DURATION);
-        const consumableContainer = document.getElementById("consumables-container");
-        consumableContainer.innerHTML = "";
-        consumableContainer.appendChild(this.displayUpgrades(boosterPack.roll(this.game),{bought:false,free:true,origin: boosterPack}));
-        this.displayBoosterAmmount();
-        this.displayTiles();
-        this.dispalyTileOverlay();
-        this.hideShop();
-    }
-    displayBoosterAmmount(){
-        document.getElementById("booster-amount").innerHTML = "Wybierz swoje karty. Pozostało: "+this.game.BuysFromBoosterLeft;
-    }
-    showMenu(){
-        document.getElementById("menu").style.display = "flex";
-        animate.animateColors(COLORS.magicPurples,DURATIONS.ANIMATION_DURATION);
-        animate.smoothRotateTo(-1,DURATIONS.SWIRL_DURATION);
-    }
-    hideMenu(){
-        document.getElementById("menu").style.display = "none";
-    }
-    hideGame(){
-        document.getElementById("body").style.display = "none";
-    }
-    showGameContainer(){
-        document.getElementsByClassName("game")[0].style.display = "flex";
-    }
-    hideGameContainer(){
-        document.getElementsByClassName("game")[0].style.display = "none";
-    }
-    showGame(){
-        this.refreshUseButtons();
-        document.getElementById("body").style.display = "grid";
-        if(this.game.stage!=STAGES.Boss){
-            const palettes = Object.values(GAMECOLORS);
-            const randomPalette = palettes[Math.floor(Math.random() * palettes.length)];
-            animate.animateColors(randomPalette,DURATIONS.ANIMATION_DURATION);
-            animate.smoothRotateTo(0.5,DURATIONS.SWIRL_DURATION);
-        }
-        else{
-            animate.animateColors(COLORS.boss,DURATIONS.ANIMATION_DURATION);
-            animate.smoothRotateTo(-2,DURATIONS.SWIRL_DURATION);
-        }
-    }
-    hideShop(){
-        let shop = document.getElementById("shop");
-        shop.style.display="none";
-    }
-    showShop(){
-        animate.animateColors(COLORS.shopGreens,DURATIONS.ANIMATION_DURATION);
-        animate.smoothRotateTo(1,DURATIONS.SWIRL_DURATION);
-        let shop = document.getElementById("shop");
-        shop.style.display="grid";
-    }
-    dispalyTileOverlay(){
-        let container = document.getElementById("upgrade-tiles");
-        container.style.display = "flex";
-    }
-    hideTileOverlay(){
-        let container = document.getElementById("upgrade-tiles");
-        container.style.display = "none";
-    }
-    displayTiles() {
+  }
+  resetAllUpgrades() {
+    // Pobieramy wszystkie wrappery z DOM
+    const allWrappers = document.querySelectorAll(".SelectedUpgrade");
+
+    allWrappers.forEach((wrapper) => {
+      // Resetujemy transformację do pozycji początkowej
+      wrapper.style.transform = "translateY(0)";
+      wrapper.classList.remove("SelectedUpgrade");
+      // Opcjonalnie: resetujemy też przyciski consumable, jeśli je wcześniej pokazałeś
+      const buttons = wrapper.querySelector(".consumable-buttons");
+      if (buttons) {
+        buttons.style.opacity = "0";
+        buttons.style.display = "none";
+      }
+    });
+  }
+  hideShop() {
+    let shop = document.getElementById("shop");
+    shop.style.display = "none";
+  }
+  showShop() {
+    animate.animateColors(COLORS.shopGreens, DURATIONS.ANIMATION_DURATION);
+    animate.smoothRotateTo(1, DURATIONS.SWIRL_DURATION);
+    let shop = document.getElementById("shop");
+    shop.style.display = "grid";
+  }
+  dispalyTileOverlay() {
+    let container = document.getElementById("upgrade-tiles");
+    container.style.display = "flex";
+  }
+  hideTileOverlay() {
+    let container = document.getElementById("upgrade-tiles");
+    container.style.display = "none";
+  }
+  displayTiles() {
     const tiles = this.game.fruits;
     const tileContainer = document.getElementById("tiles");
     tileContainer.innerHTML = "";
 
-    tiles.forEach(tile => {
-        const wrapper = document.createElement("div");
-        wrapper.classList.add("tile");
-        wrapper.textContent = tile.icon;
-        wrapper.style.position = "relative"; // needed for tooltip positioning
+    tiles.forEach((tile) => {
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("tile");
+      wrapper.textContent = tile.icon;
+      wrapper.style.position = "relative"; // needed for tooltip positioning
 
-        // Tooltip element (like upgrade-desc)
-        const desc = document.createElement("div");
-        desc.className = "upgrade-desc";
-        desc.innerHTML = `<h1>${tile.name}</h1><p>${tile.description ?? ""}</p>`; // placeholder
-        wrapper.appendChild(desc);
+      // Tooltip element (like upgrade-desc)
+      const desc = document.createElement("div");
+      desc.className = "upgrade-desc";
+      desc.innerHTML = `<h1>${tile.name}</h1><p>${tile.description ?? ""}</p>`; // placeholder
+      wrapper.appendChild(desc);
 
-        // Show tooltip on hover
-        wrapper.addEventListener("mouseenter", () => {
-            desc.innerHTML = `
+      // Show tooltip on hover
+      wrapper.addEventListener("mouseenter", () => {
+        desc.innerHTML = `
                 <p><b>Level:</b> ${tile.props?.upgrade?.level ?? "-"}</p>
                 <p><span class="chance">Szansa:</span> ${tile.percent ?? 0}</p>
                 <p><span class="mult">Mult:</span> ${tile.props?.upgrade?.mult ?? 0}</p>
@@ -266,195 +309,104 @@ displayMoney() {
                 <p><span class="chance">Gold Chance:</span> ${tile.props?.upgrade?.goldchance ?? 0}%</p>
                 <p><span class="chance">Silver Chance:</span> ${tile.props?.upgrade?.silverchance ?? 0}%</p>
             `;
-            desc.style.opacity = "1";
-        });
-        wrapper.addEventListener("mouseleave", () => {
-            desc.style.opacity = "0";
-        });
+        desc.style.opacity = "1";
+      });
+      wrapper.addEventListener("mouseleave", () => {
+        desc.style.opacity = "0";
+      });
 
-        tileContainer.appendChild(wrapper);
+      tileContainer.appendChild(wrapper);
     });
-}
-displayPlayerConsumables() {
+  }
+  displayPlayerConsumables() {
     const container = document.getElementById("player-consumables-container");
     if (!container) return;
 
     const oldPositions = this.getPositions(container);
 
     container.innerHTML = "";
-    const fragment = this.displayUpgrades(this.game.consumables, { bought: true });
-
-    fragment.querySelectorAll(".upgrade-wrapper")
-        .forEach(w => this.applyDragEvents(w));
+    const fragment = this.displayUpgrades(this.game.consumables, {
+      bought: true,
+    });
+    this.game.consumables.forEach(consumable => {
+      consumable.UpgradeRenderer.applyDragEvents();
+    });
 
     container.appendChild(fragment);
 
     this.animateReorder(oldPositions);
 
     this.displayConsumablesCounter();
-}
-animateReorder(oldPositions, duration = 280) {
+  }
+  animateReorder(oldPositions, duration = 280) {
     // FLIP: oldPositions is array [{ el, top, left }]
     return new Promise((resolve) => {
-        if (!oldPositions || oldPositions.length === 0) return resolve();
+      if (!oldPositions || oldPositions.length === 0) return resolve();
 
-        const animated = [];
-        oldPositions.forEach(({ el, top, left }) => {
-            if (!el || !document.body.contains(el)) return; // removed from DOM
-            const newRect = el.getBoundingClientRect();
-            const dx = left - newRect.left;
-            const dy = top - newRect.top;
+      const animated = [];
+      oldPositions.forEach(({ el, top, left }) => {
+        if (!el || !document.body.contains(el)) return; // removed from DOM
+        const newRect = el.getBoundingClientRect();
+        const dx = left - newRect.left;
+        const dy = top - newRect.top;
 
-            if (dx === 0 && dy === 0) return;
+        if (dx === 0 && dy === 0) return;
 
-            // prepare invert
-            el.style.transition = "none";
-            el.style.transform = `translate(${dx}px, ${dy}px)`;
-            // force layout
-            // eslint-disable-next-line no-unused-expressions
-            el.offsetHeight;
+        // prepare invert
+        el.style.transition = "none";
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+        // force layout
+        // eslint-disable-next-line no-unused-expressions
+        el.offsetHeight;
 
-            // schedule play
-            requestAnimationFrame(() => {
-                el.style.transition = `transform ${duration}ms cubic-bezier(.2,.9,.25,1)`;
-                el.style.transform = "";
-            });
-
-            animated.push(el);
+        // schedule play
+        requestAnimationFrame(() => {
+          el.style.transition = `transform ${duration}ms cubic-bezier(.2,.9,.25,1)`;
+          el.style.transform = "";
         });
 
-        if (animated.length === 0) return resolve();
+        animated.push(el);
+      });
 
-        // wait for all transitions to end (or timeout)
-        let remaining = animated.length;
-        const cleanup = () => {
-            animated.forEach(a => {
-                a.style.transition = "";
-                a.style.transform = "";
-            });
-            resolve();
-        };
+      if (animated.length === 0) return resolve();
 
-        const onEnd = (ev) => {
-            const target = ev.currentTarget;
-            target.removeEventListener("transitionend", onEnd);
-            remaining--;
-            if (remaining <= 0) cleanup();
-        };
-
-        animated.forEach(a => {
-            a.addEventListener("transitionend", onEnd);
+      // wait for all transitions to end (or timeout)
+      let remaining = animated.length;
+      const cleanup = () => {
+        animated.forEach((a) => {
+          a.style.transition = "";
+          a.style.transform = "";
         });
+        resolve();
+      };
 
-        // safety timeout
-        setTimeout(() => {
-            // remove listeners and clear transforms
-            animated.forEach(a => a.removeEventListener("transitionend", onEnd));
-            cleanup();
-        }, duration + 120);
+      const onEnd = (ev) => {
+        const target = ev.currentTarget;
+        target.removeEventListener("transitionend", onEnd);
+        remaining--;
+        if (remaining <= 0) cleanup();
+      };
+
+      animated.forEach((a) => {
+        a.addEventListener("transitionend", onEnd);
+      });
+
+      // safety timeout
+      setTimeout(() => {
+        // remove listeners and clear transforms
+        animated.forEach((a) => a.removeEventListener("transitionend", onEnd));
+        cleanup();
+      }, duration + 120);
     });
-}
+  }
 
-getPositions(container) {
-    return [...container.children].map(el => {
-        const rect = el.getBoundingClientRect();
-        return { el, top: rect.top, left: rect.left };
+  getPositions(container) {
+    return [...container.children].map((el) => {
+      const rect = el.getBoundingClientRect();
+      return { el, top: rect.top, left: rect.left };
     });
-}
-applyDragEvents(wrapper) {
-    wrapper.draggable = true;
-
-    wrapper.addEventListener("dragstart", (e) => {
-        const container = wrapper.parentElement;
-        if (!container) return;
-        e.dataTransfer.setData("text/plain", [...container.children].indexOf(wrapper));
-        wrapper.classList.add("dragging");
-    });
-
-    wrapper.addEventListener("dragend", () => {
-        wrapper.classList.remove("dragging");
-        wrapper.style.transform = "";
-    });
-
-    wrapper.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        wrapper.classList.add("drag-over");
-    });
-
-    wrapper.addEventListener("dragleave", () => {
-        wrapper.classList.remove("drag-over");
-    });
-
-    wrapper.addEventListener("drop", (e) => {
-    e.preventDefault();
-    wrapper.classList.remove("drag-over");
-
-    const container = wrapper.parentElement;
-    if (!container) return;
-
-    const draggedIndex = parseInt(e.dataTransfer.getData("text/plain"));
-    const targetIndex = [...container.children].indexOf(wrapper);
-    if (draggedIndex === targetIndex) return;
-
-    const draggedElement = container.children[draggedIndex];
-
-    // 1️⃣ FIRST — snapshot original card positions
-    const oldPositions =this.getPositions(container);
-
-    // --- reorder in the DOM ---
-    if (draggedIndex < targetIndex) {
-        container.insertBefore(draggedElement, container.children[targetIndex + 1] || null);
-    } else {
-        container.insertBefore(draggedElement, container.children[targetIndex]);
-    }
-
-    // 2️⃣ LAST → INVERT → PLAY — animate to new places
-    this.animateReorder(oldPositions);
-
-    // Update upgrade list
-    const movedUpgrade = this.game.upgrades.splice(draggedIndex, 1)[0];
-    this.game.upgrades.splice(targetIndex, 0, movedUpgrade);
-
-    this.game.emit(GAME_TRIGGERS.onUpgradesChanged);
-    this.displayUpgradesCounter();
-});
-
-}
-displayPlayerConsumable(consumable){
-    const container = document.getElementById("player-consumables-container");
-    if (!container) return;
-
-    const oldPositions = this.getPositions(container);
-
-    const fragment = this.displayUpgrades([consumable],{bought: true});
-    fragment.querySelectorAll(".upgrade-wrapper")
-        .forEach(w => this.applyDragEvents(w));
-    const el = fragment.firstElementChild;
-    container.appendChild(el);
-    this.fadeInAndShow(el);
-    this.animateReorder(oldPositions);
-
-    // update the counter
-    this.displayConsumablesCounter();
-}
-displayPlayerUpgrade(upgrade){
-    const container = document.getElementById("player-upgrades-container");
-    if (!container) return;
-
-    const oldPositions = this.getPositions(container);
-
-    const fragment = this.displayUpgrades([upgrade],{bought: true});
-    fragment.querySelectorAll(".upgrade-wrapper")
-        .forEach(w => this.applyDragEvents(w));
-    const el = fragment.firstElementChild;
-    container.appendChild(el);
-    this.fadeInAndShow(el);
-    this.animateReorder(oldPositions);
-
-    // update the counter
-    this.displayUpgradesCounter();
-}
-displayPlayerUpgrades() {
+  }
+  displayPlayerUpgrades() {
     const container = document.getElementById("player-upgrades-container");
     if (!container) return;
 
@@ -465,9 +417,9 @@ displayPlayerUpgrades() {
     container.innerHTML = "";
     const fragment = this.displayUpgrades(this.game.upgrades, { bought: true });
 
-    fragment.querySelectorAll(".upgrade-wrapper")
-        .forEach(w => this.applyDragEvents(w));
-
+    this.game.upgrades.forEach(upgrade => {
+      upgrade.UpgradeRenderer.applyDragEvents();
+    });
     container.appendChild(fragment);
 
     // 3) animate from old → new
@@ -475,325 +427,142 @@ displayPlayerUpgrades() {
 
     // update the counter
     this.displayUpgradesCounter();
-}
-    getPlayerUpgrades(upgradeid) {
-        return document.querySelectorAll('#player-upgrades-container .upgrade-wrapper.bought')[upgradeid];
-    }
-    createPopup(text, targetElement, style = 'mult') {
-    if (!targetElement) return;
-
-    // Create popup container (relative to card)
-    const popup = document.createElement("div");
-    popup.className = "upgrade-popup-container";
-
-    // Create square (background)
-    const square = document.createElement("div");
-    square.className = "upgrade-popup-square";
-    square.classList.add(style);
-    console.log(style);
-    square.style.transform = `rotate(${(Math.random() * 20 - 10).toFixed(2)}deg)`; // small random tilt
-
-    // Create text
-    const label = document.createElement("div");
-    label.className = "upgrade-popup-text";
-    label.textContent = text;
-
-    // Assemble
-    popup.appendChild(square);
-    popup.appendChild(label);
-
-    // Add directly inside the upgrade card’s container
-    targetElement.appendChild(popup);
-
-    // Animate in
-    requestAnimationFrame(() => {
-        popup.style.opacity = "1";
+  }
+  getPlayerUpgrades(upgradeid) {
+    return document.querySelectorAll(
+      "#player-upgrades-container .upgrade-wrapper.bought",
+    )[upgradeid];
+  }
+  displayCollection() {
+    const collection = document.getElementsByClassName("scroll")[0];
+    document.getElementById("collection").classList.remove("hidden");
+    if (collection.children.length != 0) return;
+    collection.innerHTML = "";
+    upgradesList.forEach((blueprint) => {
+      //console.log(blueprint);
+      const up = new Upgrade(blueprint);
+      collection.appendChild(
+        this.displayUpgrades([up], {
+          displayPrice: false,
+          displayButtons: false,
+        }),
+      );
     });
-
-    // Fade out & remove
+  }
+  triggerBoss() {
+    const bossContainer = document.getElementById("boss-container");
+    const upgradecard = bossContainer.children[0];
+    upgradecard.classList.add("triggered");
+    this.game.Audio.playSound("tick.mp3");
     setTimeout(() => {
-        popup.style.opacity = "0";
-        setTimeout(() => popup.remove(), 400);
-    }, 500);
-}
-    displayCollection(){
-        const collection = document.getElementsByClassName("scroll")[0];
-        document.getElementById("collection").classList.remove("hidden");
-        if(collection.children.length!=0) return;
-        collection.innerHTML = "";
-        upgradesList.forEach(blueprint => {
-            //console.log(blueprint);
-            const up = new Upgrade(
-                blueprint  
-            );
-            collection.appendChild(this.displayUpgrades([up],{displayPrice: false,displayButtons: false}));
-        });
-        }
-    triggerBoss(){
-        const bossContainer = document.getElementById("boss-container");
-        const upgradecard = bossContainer.children[0];
-        upgradecard.classList.add("triggered");
-        this.game.Audio.playSound("tick.mp3");
-        setTimeout(()=>{
-                upgradecard.classList.remove("triggered");
-        },300);
-    }
-    
-    upgradeTrigger(upgrade,time,action=UPGRADE_STATES.Active){
-        const delay = 0;
-        console.log(`upgrade trigger: ${upgrade.name}`,performance.now());
-        const gameupgrades = this.game.upgrades;
-        const index = gameupgrades.indexOf(upgrade);
-        if(index<0) return;
-        let upgradecard = this.getPlayerUpgrades(index);
+      upgradecard.classList.remove("triggered");
+    }, 300);
+  }
+  displayUpgradesInShop() {
+    const shopEl = document.getElementById("upgrades-container");
+    shopEl.innerHTML = "";
+    shopEl.appendChild(
+      this.displayUpgrades(this.game.rollUpgrades(), { bought: false }),
+    );
+  }
+  displayBossInGame() {
+    const bossContainer = document.getElementById("boss-container");
+    bossContainer.innerHTML = "";
+    this.game.nextBoss = rollBoss(this.game);
+    bossContainer.appendChild(this.displayBoss(this.game.nextBoss));
+  }
+  displayBossCounter() {
+    const counter = document.getElementById("bosscounter");
+    if (this.game.stage == STAGES.Boss) counter.innerHTML = 0;
+    else counter.innerHTML = 3 - (this.game.round % 4) + 1;
+  }
+  displayBoss(boss) {
+    console.log(boss);
+    const wrapper = document.createElement("div");
+    wrapper.className = "boss-wrapper";
+    const cardInner = document.createElement("div");
+    cardInner.className = "upgrade-inner";
+    cardInner.style.backgroundImage = `url('${boss.image}')`;
 
-        const descElement = upgradecard.querySelector(".upgrade-desc");
-        descElement.innerHTML = this.createDescription(upgrade);
+    const card = document.createElement("div");
+    card.className = "upgrade-card";
+    card.style.animationDelay = `-${Math.random() * 3}s`;
+    card.appendChild(cardInner);
+    this.addParalax(card);
+    // Description
+    const desc = document.createElement("div");
+    desc.className = "upgrade-desc";
+    desc.innerHTML = `<h1>${boss.name}</h1><p>${boss.description(this.game)}</p>`;
+    wrapper.appendChild(card);
+    wrapper.appendChild(desc);
+    return wrapper;
+  }
 
-        const upgradePrice = upgradecard.querySelector(".upgrade-price");
-        upgradePrice.innerHTML = "$"+upgrade.sellPrice;
-        switch(action){
-            case UPGRADE_STATES.Active:
-            case UPGRADE_STATES.Score:{
-                setTimeout(()=>{
-                    upgradecard.style.animationDuration = time+"ms";
-                    upgradecard.classList.add("triggered");
-                    
-                    //this.createPopup(`Wot?`, upgradecard);
-
-                setTimeout(()=>{
-                    upgradecard.classList.remove("triggered");
-                    upgradecard.classList.remove("ready"); // remove ready if ready
-                    upgrade.isReady = false;
-                },300);
-            },delay)
-            }
-            break;
-            case UPGRADE_STATES.Ready:
-            {
-                upgradecard.classList.add("ready");
-            }
-            break;
-            case UPGRADE_STATES.Tried:
-            {
-                upgradecard.classList.remove("ready");
-            }
-            break;
-        }
-    }
-    
-    displayUpgradesInShop() {
-        const shopEl = document.getElementById("upgrades-container");
-        shopEl.innerHTML = ""; 
-        shopEl.appendChild(this.displayUpgrades(this.game.rollUpgrades(),{bought:false}));
-    }
-    displayBossInGame(){
-        const bossContainer = document.getElementById("boss-container");
-        bossContainer.innerHTML = "";
-        this.game.nextBoss = rollBoss(this.game);
-        bossContainer.appendChild(this.displayBoss(this.game.nextBoss));
-    }
-    createDescription(upgrade){
-        let description=`<h1>${upgrade.name}</h1>`;
-        if(upgrade.negative==true){
-            description += `<p>${Style.Chance('negative')}</p>`;
-        }
-        description += `<p>${upgrade.description(this.game)}</p>`;
-        if(upgrade.modifier!=MODIFIERS.None){
-            description += `<p>${Style.Chance(upgrade.modifier)}</p>`;
-        }
-        if(upgrade.rarity!=UPGRADE_RARITY_NAME.None){
-            description += `<p>${Style.Money(upgrade.rarity.display)}</p>`
-        }
-        
-        return description;
-    }
-    displayBossCounter(){
-        const counter = document.getElementById("bosscounter");
-        if(this.game.stage==STAGES.Boss) counter.innerHTML = 0;
-        else counter.innerHTML = (3 - this.game.round%4 +1);
-    }
-    displayBoss(boss){
-        console.log(boss);
-        const wrapper = document.createElement("div");
-        wrapper.className = "boss-wrapper";
-        const cardInner = document.createElement("div");
-        cardInner.className = "upgrade-inner";
-        cardInner.style.backgroundImage = `url('${boss.image}')`
-
-        const card = document.createElement("div");
-        card.className = "upgrade-card";
-        card.style.animationDelay = `-${Math.random() * 3}s`;
-        card.appendChild(cardInner);
-        this.addParalax(card);
-        // Description
-        const desc = document.createElement("div");
-        desc.className = "upgrade-desc";
-        desc.innerHTML = `<h1>${boss.name}</h1><p>${boss.description(this.game)}</p>`;
-        wrapper.appendChild(card);
-        wrapper.appendChild(desc);
-        return wrapper;
-    }
-    updateUpgrade(index, params = { bought: true, origin: null }) {
-        const upgrade = this.game.upgrades[index] ?? null;
-        if (!upgrade) return;
-
-        const oldWrapper = this.getPlayerUpgrades(index);
-        if (!oldWrapper) return;
-
-        const newWrapper = this.renderUpgrade(upgrade, params);
-        this.applyDragEvents(newWrapper);
-
-        oldWrapper.replaceWith(newWrapper);
-        this.upgradeTrigger(upgrade, 0);
-        this.game.Audio.playSound('tick.mp3');
-    }
-    renderUpgrade(upgrade,params){
-        let bought = params.bought ?? false;
-        let displayPrice = params.displayPrice ?? true;
-        let displayButtons = params.displayButtons ?? true;
-        
-        const wrapper = document.createElement("div");
-        const originalZ = wrapper.style.zIndex || 0;
-        
-        
-        wrapper.addEventListener('mouseenter', () => wrapper.style.zIndex = 500);
-        wrapper.addEventListener('mouseleave', () => wrapper.style.zIndex = originalZ);
-        if(displayButtons){
-            wrapper.addEventListener('click', () => this.displayUpgradeButtons(wrapper,upgrade));
-        }
-        wrapper.className = "upgrade-wrapper";
-        wrapper.dataset.type = upgrade.type;
-        if (bought) wrapper.classList.add("bought");
-        console.log(upgrade.isReady);
-        if (upgrade.isReady){
-            wrapper.classList.add("ready");
-        }
-        if(params.free){
-            upgrade.price = 0;
-        }
-
-        // Price above card
-        const priceEl = document.createElement("div");
-        priceEl.className = "upgrade-price";
-        priceEl.textContent = `$${params.bought ? upgrade.sellPrice : upgrade.price}`;
-        
-        // Card inner
-        const cardInner = document.createElement("div");
-        cardInner.className = "upgrade-inner";
-        let classes  = [];
-        if(upgrade.negative){
-            classes.push("negative");
-        }
-        if(upgrade.modifier!=MODIFIERS.None){
-            classes.push("holo");
-        }
-        if(!bought&&classes.length>0){
-            classes.forEach(element => {
-                cardInner.classList.add(element);
-            });
-            wrapper.classList.add("triggered");
-            if(upgrade.negative){
-                this.game.Audio.playSound('foil_reverse.mp3');
-            }
-            else{
-                this.game.Audio.playSound('foil.mp3');
-            }
-            this.game.Audio.playSound('tick.mp3');
-            
-            setTimeout(() => wrapper.classList.remove("triggered"), 300+Math.floor(Math.random()*20));
-        }
-        else if(bought&&classes.length>0){
-            classes.forEach(element => {
-                cardInner.classList.add(element);
-            });
-        }
-        cardInner.style.backgroundImage = `url('${upgrade.image()}')`;
-        
-        // Card
-       
-        const card = document.createElement("div");
-        card.className = "upgrade-card";
-        card.style.animationDelay = `-${Math.random() * 3}s`; 
-        
-        card.appendChild(cardInner);
-        this.addParalax(card);
-        // Description
-        const desc = document.createElement("div");
-        desc.className = "upgrade-desc";
-        desc.innerHTML = this.createDescription(upgrade);
-        
-        wrapper.addEventListener("mouseenter", () => {
-            desc.innerHTML = this.createDescription(upgrade);
-        });
-        
-        // Click handlers
-        if(displayPrice){
-            wrapper.appendChild(priceEl);
-        }
-        wrapper.appendChild(card);
-        wrapper.appendChild(desc);
-        if(displayButtons){
-            wrapper.appendChild(this.createUpgradeButtons(wrapper,upgrade,params));
-        }
-        return wrapper;
-    }
-    displayUpgrades(upgrades, params = { bought:false, origin: null }) {
+  displayUpgrades(upgrades, params = { bought: false, origin: null }) {
     console.log(params.origin);
-    
+
     let full = document.createDocumentFragment();
 
-    if(params.origin && params.origin.type == "ConsumablePack"){
-        this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
+    if (params.origin && params.origin.type == "ConsumablePack") {
+      this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
     }
-    upgrades.forEach(up => {
-        const wrapper = this.renderUpgrade(up,params);
-        full.appendChild(wrapper);
+    upgrades.forEach((up) => {
+      if (!up.UpgradeRenderer) {
+        up.initRenderer(this.game);
+      }
+      up.UpgradeRenderer.render(params);
+      const wrapper = up.wrapper;
+      full.appendChild(wrapper);
     });
 
     return full;
-}
-gameOver(){
+  }
+  gameOver() {
     document.getElementById("game-over").style.display = "flex";
-    animate.animateColors(COLORS.gameOver,DURATIONS.ANIMATION_DURATION);
-    animate.smoothRotateTo(-1,DURATIONS.SWIRL_DURATION);
+    animate.animateColors(COLORS.gameOver, DURATIONS.ANIMATION_DURATION);
+    animate.smoothRotateTo(-1, DURATIONS.SWIRL_DURATION);
     let upgrades = document.getElementById("final-upgrades");
-    upgrades.innerHTML="";
-    upgrades.appendChild(this.displayUpgrades(this.game.upgrades,{displayPrice: false,displayButtons: false}));
+    upgrades.innerHTML = "";
+    upgrades.appendChild(
+      this.displayUpgrades(this.game.upgrades, {
+        displayPrice: false,
+        displayButtons: false,
+      }),
+    );
     document.getElementById("seed").innerHTML = this.game.seed;
-    document.getElementById("final-score").innerHTML = this.game.round; 
-}
-addParalax(card){
-card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left; // x position within the card
-    const y = e.clientY - rect.top;  // y position within the card
+    document.getElementById("final-score").innerHTML = this.game.round;
+  }
+  addParalax(card) {
+    card.addEventListener("mousemove", (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left; // x position within the card
+      const y = e.clientY - rect.top; // y position within the card
 
-    const halfWidth = rect.width / 2;
-    const halfHeight = rect.height / 2;
+      const halfWidth = rect.width / 2;
+      const halfHeight = rect.height / 2;
 
-    // rotation
-    const rotateY = ((x - halfWidth) / halfWidth) * 10;  // max ±20°
-    const rotateX = ((halfHeight - y) / halfHeight) * 15;  // max ±15°
-    card.style.transform = `perspective(800px) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+      // rotation
+      const rotateY = ((x - halfWidth) / halfWidth) * 10; // max ±20°
+      const rotateX = ((halfHeight - y) / halfHeight) * 15; // max ±15°
+      card.style.transform = `perspective(800px) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
 
-    // dynamic shadow
-    const shadowX = -((x - halfWidth) / halfWidth) * 10; // horizontal shadow offset
-    const shadowY = -((y - halfHeight) / halfHeight) * 10; // vertical shadow offset
-    const blur = 0; // blur radius
-    const shadowColor = 'rgba(0,0,0,0.35)';
-    card.style.filter = `drop-shadow(${shadowX}px ${shadowY}px ${blur}px ${shadowColor})`;
-});
+      // dynamic shadow
+      const shadowX = -((x - halfWidth) / halfWidth) * 10; // horizontal shadow offset
+      const shadowY = -((y - halfHeight) / halfHeight) * 10; // vertical shadow offset
+      const blur = 0; // blur radius
+      const shadowColor = "rgba(0,0,0,0.35)";
+      card.style.filter = `drop-shadow(${shadowX}px ${shadowY}px ${blur}px ${shadowColor})`;
+    });
 
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = '';
-  });
+    card.addEventListener("mouseleave", () => {
+      card.style.transform = "";
+    });
 
-  card.addEventListener('mouseenter', () => {
-    card.style.transition = 'transform 0.2s ease, filter 0.2s ease'; // shorter transition when starting hover
-  });
-}
-fadeInAndShow(wrapper, duration = 150) {
+    card.addEventListener("mouseenter", () => {
+      card.style.transition = "transform 0.2s ease, filter 0.2s ease"; // shorter transition when starting hover
+    });
+  }
+  fadeInAndShow(wrapper, duration = 150) {
     if (!wrapper) return;
 
     // Ensure wrapper is not display:none
@@ -817,17 +586,92 @@ fadeInAndShow(wrapper, duration = 150) {
 
     // Kick animation
     requestAnimationFrame(() => {
-        wrapper.style.opacity = "1";
-        wrapper.style.maxWidth = fullWidth + "px";
+      wrapper.style.opacity = "1";
+      wrapper.style.maxWidth = fullWidth + "px";
     });
 
     // Clean up after animation (optional)
     setTimeout(() => {
-        wrapper.style.overflow = "";
-        wrapper.style.maxWidth = "none";  // restore natural sizing
+      wrapper.style.overflow = "";
+      wrapper.style.maxWidth = "none"; // restore natural sizing
     }, duration);
-}
-fadeOutAndRemove(wrapper, duration = 100) {
+  }
+
+  async dissolveAndRemove(wrapper, duration = 600) {
+
+    if (!wrapper) return;
+    await new Promise(resolve => setTimeout(resolve, 300));
+    // 1. Lock layout - przygotowanie wymiarów (z Twojego 1. kodu)
+    const rect = wrapper.getBoundingClientRect();
+    const computed = getComputedStyle(wrapper);
+    wrapper.style.width = rect.width + "px";
+    wrapper.style.maxWidth = rect.width + "px";
+    if (!computed.marginRight || computed.marginRight === "0px") {
+      wrapper.style.marginRight = "1.5em";
+    }
+
+    // 2. Dynamiczne tworzenie filtra SVG dla tej konkretnej karty
+    // Zapobiega to błędom, gdy palimy kilka kart jednocześnie
+    const filterId = `burn-${Math.random().toString(36).substr(2, 9)}`;
+    const svgHtml = `
+      <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="${filterId}">
+          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" result="noise" />
+          <feColorMatrix in="noise" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 40 -15" result="mask" />
+          <feComposite operator="in" in="SourceGraphic" in2="mask" />
+        </filter>
+      </svg>
+    `;
+    document.body.insertAdjacentHTML('beforeend', svgHtml);
+    const filterElement = document.getElementById(filterId);
+    const colorMatrix = filterElement.querySelector('feColorMatrix');
+
+    // 3. Konfiguracja przejść CSS
+    wrapper.style.transition = `
+        opacity ${duration}ms ease-in,
+        max-width ${duration}ms cubic-bezier(.2,.9,.25,1),
+        margin-right ${duration}ms cubic-bezier(.2,.9,.25,1),
+        transform ${duration}ms ease-out,
+        filter ${duration}ms linear
+    `;
+
+    // 4. Logika animacji "wypalania"
+    let startTime = null;
+    const animateBurn = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = (timestamp - startTime) / duration;
+
+      // Przesuwamy próg od -15 (widoczne) do -45 (całkowicie zjedzone)
+      const threshold = -15 - (progress * 30);
+      colorMatrix.setAttribute("values", `1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 40 ${threshold}`);
+
+      if (progress < 1) {
+        requestAnimationFrame(animateBurn);
+      }
+    };
+
+    // 5. Odpalenie całości
+    requestAnimationFrame((timestamp) => {
+      animateBurn(timestamp);
+
+      wrapper.style.filter = `url(#${filterId}) drop-shadow(0 0 15px rgba(255, 100, 0, 0.8))`;
+      wrapper.style.opacity = "0";
+      wrapper.style.maxWidth = "0";
+      wrapper.style.marginRight = "0";
+      wrapper.style.transform = "scale(1.1) translateY(-30px) rotate(8deg)";
+    });
+
+    // 6. Sprzątanie
+    setTimeout(() => {
+      if (wrapper?.parentElement) {
+        wrapper.parentElement.removeChild(wrapper);
+      }
+      // Usuwamy też definicję filtra z DOM
+      filterElement.parentElement.remove();
+    }, duration);
+  }
+  fadeOutAndRemove(wrapper, duration = 100) {
+    //console.log(wrapper);
     if (!wrapper) return;
 
     // Lock computed size so the transition has a stable starting point
@@ -838,7 +682,7 @@ fadeOutAndRemove(wrapper, duration = 100) {
     wrapper.style.opacity = "1";
 
     if (!computed.marginRight || computed.marginRight === "0px") {
-        wrapper.style.marginRight = "1.5em"; // match your normal gap
+      wrapper.style.marginRight = "1.5em"; // match your normal gap
     }
     // Apply transitions
     wrapper.style.transition = `
@@ -849,247 +693,22 @@ fadeOutAndRemove(wrapper, duration = 100) {
 
     // Start the animation in the next frame
     requestAnimationFrame(() => {
-        wrapper.style.opacity = "0";
-        wrapper.style.maxWidth = "0";
-        wrapper.style.marginRight = "0";
+      wrapper.style.opacity = "0";
+      wrapper.style.maxWidth = "0";
+      wrapper.style.marginRight = "0";
     });
 
     // Remove after animation completes
     setTimeout(() => {
-        if (wrapper?.parentElement) {
-            wrapper.parentElement.removeChild(wrapper);
-        }
+      if (wrapper?.parentElement) {
+        wrapper.parentElement.removeChild(wrapper);
+      }
     }, duration);
-}
-resetAllUpgrades() {
-    // Pobieramy wszystkie wrappery z DOM
-    const allWrappers = document.querySelectorAll('.SelectedUpgrade');
-
-    allWrappers.forEach(wrapper => {
-        // Resetujemy transformację do pozycji początkowej
-        wrapper.style.transform = "translateY(0)";
-        wrapper.classList.remove("SelectedUpgrade");
-        // Opcjonalnie: resetujemy też przyciski consumable, jeśli je wcześniej pokazałeś
-        const buttons = wrapper.querySelector('.consumable-buttons');
-        if (buttons) {
-            buttons.style.opacity = "0";
-            buttons.style.display = "none";
-        }
-    });
-}
-updateRerollButton(){
-    const rerollButton = document.querySelectorAll('.shopbutton')[0];
+  }
+  updateRerollButton() {
+    const rerollButton = document.querySelectorAll(".shopbutton")[0];
     const isTooExpensive = this.game.money < 4;
-    if(isTooExpensive) rerollButton.classList.add("disabled");
+    if (isTooExpensive) rerollButton.classList.add("disabled");
     else rerollButton.classList.remove("disabled");
-}
-displayUpgradeButtons(wrapper, upgrade) {
-    // 1. Sprawdzamy, czy ten konkretny wrapper jest już "podniesiony"
-    // Sprawdzamy styl inline lub (lepiej) konkretną wartość transformacji
-    const isAlreadyActive = wrapper.style.transform === "translateY(-20px)";
-
-    // 2. Najpierw resetujemy absolutnie wszystkie wrappery
-    this.resetAllUpgrades();
-
-    // 3. Jeśli wrapper NIE był aktywny, to go podnosimy. 
-    // Jeśli BYŁ aktywny, to po prostu zostaje zresetowany (efekt zamknięcia).
-    if (!isAlreadyActive) {
-        requestAnimationFrame(() => {
-            wrapper.style.transition = "transform 0.05s ease-out"; 
-            wrapper.style.transform = "translateY(-20px)";
-            wrapper.classList.add("SelectedUpgrade");
-            this.refreshUseButtons();
-            const buttonsContainer = wrapper.querySelector('.consumable-buttons');
-
-            if (buttonsContainer) {
-                buttonsContainer.style.display = "flex";
-                buttonsContainer.style.transition = "opacity 0.2s ease";
-                buttonsContainer.style.opacity = "1";
-            }
-            // Pobieramy wszystkie przyciski wewnątrz kontenera do tablicy
-                const allBtns = Array.from(buttonsContainer.querySelectorAll('button'));
-
-                // Szukamy konkretnych przycisków na podstawie ich tekstu (trim() usuwa zbędne spacje)
-                const btnBuy = allBtns.find(b => b.textContent.trim().toLowerCase() === 'kup');
-                const btnUse = allBtns.find(b => b.textContent.trim().toLowerCase() === 'użyj');
-                const btnBuyAndUse = allBtns.find(b => b.textContent.trim().toLowerCase() === 'kup i użyj');
-
-                // Bezpieczne usuwanie klasy (używamy ?. aby uniknąć błędów, jeśli przycisk nie zostanie znaleziony)
-                btnBuy?.classList.remove("disabled");
-                btnUse?.classList.remove("disabled");
-                btnBuyAndUse?.classList.remove("disabled");
-            const hasSpace = upgrade.hasSpace(game);
-            const hasMoney = upgrade.hasMoney(game);
-            let canUse = true;
-            if(upgrade instanceof Consumable){
-                canUse = upgrade.canUse(game);
-            }
-            if (btnBuy) {
-                if(!hasSpace||!hasMoney){
-                    btnBuy.classList.add("disabled");
-                }
-            }
-            if(btnBuyAndUse){
-                if(!hasMoney||!canUse){
-                    btnBuyAndUse?.classList.add("disabled");
-                }
-            }
-            if(btnUse){
-                if(!canUse){
-                    btnUse.classList.add("disabled");
-                }
-            }
-        });
-    }
-}
-createBuyButton(upgrade,wrapper,params){
-    function buy(game,upgrade,params){
-        console.log("buy?");
-        let success = false;
-        if(upgrade.canBuy(game)==false){
-            return false;
-        }
-        success = game.buy(upgrade);
-        console.log(success);
-        if (success&&params.origin&&params.origin.type=="ConsumablePack"){
-            game.BuysFromBoosterLeft--;
-            game.GameRenderer.displayBoosterAmmount();
-        }
-        if(params.origin&&params.origin.type=="ConsumablePack"&&game.BuysFromBoosterLeft <= 0){
-            const container = document.getElementById("consumables-container");
-            container.innerHTML = "";
-        }
-        if(success){
-            game.GameRenderer.fadeOutAndRemove(wrapper);
-            return true;
-        }
-        return false;
-    }
-    const btnBuy = document.createElement("button");
-    btnBuy.textContent = "Kup";
-    btnBuy.addEventListener("click", (e) => {
-        e.stopPropagation();
-        buy(this.game,upgrade,params);
-        //this.refreshBuyButtons();
-    });
-    return btnBuy;
-}
-createUseButtons(upgrade){
-    const btnUse = document.createElement("button");
-    btnUse.textContent = "Użyj";
-    btnUse.addEventListener("click", (e) => {
-        e.stopPropagation();
-        console.log("using");
-        console.log(upgrade);
-        this.game.useConsumable(upgrade);
-        //this.fadeOutAndRemove(wrapper);
-    });
-    return btnUse;
-}
-createBuyAndUseButton(upgrade,wrapper,params){
-    const btnBuyUse = document.createElement("button");
-    btnBuyUse.textContent = "Kup i Użyj";
-    btnBuyUse.addEventListener("click", (e) => {
-        e.stopPropagation();
-        console.log("using");
-        console.log(upgrade);
-        let success = this.game.buyanduse(upgrade);
-        
-        if (success&&params.origin&&params.origin.type=="ConsumablePack"){
-            this.game.BuysFromBoosterLeft--;
-            this.displayBoosterAmmount();
-        }
-        if(params.origin&&params.origin.type=="ConsumablePack"&&game.BuysFromBoosterLeft <= 0){
-            const container = document.getElementById("consumables-container");
-            container.innerHTML = "";
-        }
-        if(success){
-            this.game.GameRenderer.fadeOutAndRemove(wrapper);
-            //wrapper.remove();
-        }
-        else{
-            this.game.GameRenderer.notEnoughMoney();
-        }
-    });
-    return btnBuyUse;
-}
-createSellButton(wrapper,upgrade){
-    const btnSell = document.createElement("button");
-    btnSell.textContent = "Sprzedaj";
-    btnSell.addEventListener("click", (e)=>{
-        e.stopPropagation();
-        if(this.game.sell(upgrade)){
-            //this.refreshBuyButtons();
-            //game.GameRenderer.fadeOutAndRemove(wrapper);
-            wrapper.remove();
-        }
-    });
-    return btnSell;
-}
-createUpgradeButtons(wrapper,upgrade,params = {bought:false,origin:null}){
-    if(params.origin && params.origin.type == "ConsumablePack"){
-        this.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
-    }
-    const btnRow = document.createElement("div");
-    btnRow.className = "consumable-buttons";
-    if(params.bought===false){
-        const btnBuy = this.createBuyButton(upgrade,wrapper,params);
-        btnRow.appendChild(btnBuy);
-
-        if(upgrade instanceof Consumable){
-            const btnBuyUse = this.createBuyAndUseButton(upgrade,wrapper,params);
-            btnRow.appendChild(btnBuyUse);
-        }
-    }
-    else{
-       if(upgrade instanceof Consumable){
-            const btnUse = this.createUseButtons(upgrade);
-            btnRow.appendChild(btnUse); 
-        }
-        const btnSell = this.createSellButton(wrapper,upgrade);
-        btnRow.appendChild(btnSell);
-    }       
-    return btnRow;    
-    }
-    refreshUseButtons(){
-        const consumables = this.game.consumables;
-        let i =0;
-        document.querySelectorAll(".consumable-buttons button").forEach(btn => {
-        if (btn.textContent === "Użyj") {
-            
-            const wrapper = btn.closest(".upgrade-wrapper");
-            if (!wrapper) return;
-            // Find upgrade type from dataset
-            const type = wrapper.dataset.type;
-            if(consumables[i].canUse(this.game)){
-                btn.classList.remove("disabled");
-            }
-            i++;
-        }
-    });
-    }
-    refreshBuyButtons() {
-        // Disable or remove buy buttons when limits are reached
-    const noUpgradeSpace = this.game.upgrades.length >= this.game.maxUpgrades;
-    const noConsumableSpace = this.game.consumables.length >= this.game.maxConsumables;
-    
-    document.querySelectorAll(".consumable-buttons button").forEach(btn => {
-        if (btn.textContent === "Buy") {
-            const wrapper = btn.closest(".upgrade-wrapper");
-            if (!wrapper) return;
-            
-            // Find upgrade type from dataset
-            const type = wrapper.dataset.type;
-            if(noUpgradeSpace||noConsumableSpace){
-                btn.classList.remove("disabled");
-            }
-            if(type==="Upgrade"){
-               // btn.disabled = noUpgradeSpace;
-            }
-            if(type==="Consumable"){
-               // btn.disabled = noConsumableSpace;
-            }
-        }
-    });
-}
+  }
 }
