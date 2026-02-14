@@ -475,7 +475,7 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 0,
       onMatch(payload) {
-        if (payload && game.isFiveLine(payload)) {
+        if (payload && game.matchesManager.isFiveLine(payload)) {
           this.props.mult += 2;
           return { state: UPGRADE_STATES.Active, message: `+X2 Mult`, style: SCORE_ACTIONS.Mult };
         } return UPGRADE_STATES.Failed;
@@ -612,7 +612,7 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 1,
       onMatch(payload) {
-        if (game.isThreeLine(payload)) {
+        if (game.matchesManager.isThreeLine(payload)) {
           this.props.mult += 1;
           return UPGRADE_STATES.Active;
         }
@@ -660,7 +660,7 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 1,
       onMatch(payload) {
-        if (game.isSixLine(payload) && !this.props.found) {
+        if (game.matchesManager.isSixLine(payload) && !this.props.found) {
           this.props.found = true;
           this.props.mult += 2;
           return { state: UPGRADE_STATES.Active, message: `Upgrade!`, style: SCORE_ACTIONS.Money };
@@ -981,7 +981,7 @@ export const upgradeBlueprints = [
       this.mirroredUpgrade = null;
       this.mirroredUpgradeCopy = null;
       this.mirroredProps = {};
-      this.banned = ["fish", "Soul Eater"]; // Tutaj Mirror MOŻE kopiować inne Mirror (przez ultimate)
+      this.banned = ["fish", "Pożeracz"]; // Tutaj Mirror MOŻE kopiować inne Mirror (przez ultimate)
 
       this.getUltimateNeighbor = () => {
         const myIndex = game.upgrades.indexOf(this);
@@ -1113,10 +1113,10 @@ export const upgradeBlueprints = [
     image: "critical_hit", ...COMMON
   },
   {
-    name: "Soul Eater",
+    name: "Pożeracz",
     descriptionfn(game) {
       var mult = this.props.mult ?? 1;
-      return `Na początku rundy niszczy ulepszenie po prawej stronie i zyskuje ${Style.Mult(`+Mult ceny sprzedaży`)} ulepszenia. (Obecnie ${Style.Mult(`+${mult} Mult`)})`;
+      return `Na początku rundy niszczy ulepszenie po prawej stronie i zyskuje ${Style.Mult(`+ Mult`)} ceny sprzedaży ulepszenia. (Obecnie ${Style.Mult(`+${mult} Mult`)})`;
     },
     props: () => ({
       mult: 1,
@@ -1128,7 +1128,9 @@ export const upgradeBlueprints = [
           this.props.mult += gained;
           neighbor.props?.remove?.call(this, game);
           game.upgrades.splice(index, 1);
-          game.GameRenderer.displayPlayerUpgrades();
+          game.GameRenderer.dissolveAndRemove(neighbor.wrapper, 1000);
+
+          //game.GameRenderer.displayPlayerUpgrades();
           return { state: UPGRADE_STATES.Active, message: `+${gained} Mult`, style: SCORE_ACTIONS.Info };
         }
         return { state: UPGRADE_STATES.Tried, message: `Failed`, style: SCORE_ACTIONS.Failed }
@@ -1290,7 +1292,7 @@ export const upgradeBlueprints = [
     ...COMMON
   },
   {
-    name: "fever",
+    name: "Gorączka",
     descriptionfn(game) {
       return `Daje ${Style.Mult('10-20 Mult')}. ${Style.Chance(`1 na 10`)}, że zniknie na końcu rundy.`;
     },
@@ -1307,11 +1309,14 @@ export const upgradeBlueprints = [
         if (index == -1) return;
         game.upgrades.splice(index, 1);
         game.GameRenderer.displayUpgradesCounter();
-        game.GameRenderer.displayPlayerUpgrades();
+        game.GameRenderer.dissolveAndRemove(this.wrapper,1000);
+        //game.GameRenderer.displayPlayerUpgrades();
         game.emit(GAME_TRIGGERS.onUpgradesChanged);
+         return { state: UPGRADE_STATES.Active, message: `:(`, style: SCORE_ACTIONS.Info }
       },
     }),
     price: 6,
+    image: 'fever',
     ...UNCOMMON
   },
   {
@@ -1341,22 +1346,21 @@ export const upgradeBlueprints = [
         let matches = payload.matches;
         const board = game.board;
 
-        // 1. Bezpieczniejsze pobieranie materiałów wybuchowych (bez indexOf)
-        const explosives = board.flatMap((row, y) =>
-          row.map((tile, x) => ({ x, y, tile }))
-            .filter(item => item.tile.type === 'bomb' || item.tile.type === 'dynamite')
-        );
 
+        // 1. Bezpieczniejsze pobieranie materiałów wybuchowych (bez indexOf)
+        let explosives = [];
+        for (let y = 0; y < board.length; y++) {
+          //console.log(board[y]);
+          explosives.push(...game.matchesManager.specialMatches(board[y]));
+        }
         let triggered = false;
 
         // 2. Zbieramy wszystkie nowe trafienia
+
         explosives.forEach(explosive => {
           if (Math.random() < 0.2) {
-            const newMatches = game.triggerSpecial(explosive.x, explosive.y, explosive.tile);
-            if (newMatches && Array.isArray(newMatches)) {
-              matches.push(...newMatches);
-              triggered = true;
-            }
+            matches.push(explosive);
+            triggered = true;
           }
         });
         if (triggered)
@@ -1382,5 +1386,3 @@ upgradeBlueprints.forEach(upgrade => {
 });
 // push all blueprints into upgradesList
 upgradeBlueprints.forEach(bp => upgradesList.push(bp));
-
-

@@ -13,10 +13,10 @@ export function cyrb128(str) {
     h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
     h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
     h1 ^= (h2 ^ h3 ^ h4), h2 ^= h1, h3 ^= h1, h4 ^= h1;
-    return [h1>>>0, h2>>>0, h3>>>0, h4>>>0];
+    return [h1 >>> 0, h2 >>> 0, h3 >>> 0, h4 >>> 0];
 }
 export function sfc32(a, b, c, d) {
-    return function() {
+    return function () {
         a |= 0; b |= 0; c |= 0; d |= 0;
         let t = (a + b | 0) + d | 0;
         d = d + 1 | 0;
@@ -28,11 +28,11 @@ export function sfc32(a, b, c, d) {
     }
 }
 export function getRandomString(count) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let result = "";
-  for (let i = 0; i < count; i++) {
-    const randomIndex = Math.floor(Math.random() * chars.length);
-    result += chars[randomIndex];
-  }
-  return result;
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let result = "";
+    for (let i = 0; i < count; i++) {
+        const randomIndex = Math.floor(Math.random() * chars.length);
+        result += chars[randomIndex];
+    }
+    return result;
 }

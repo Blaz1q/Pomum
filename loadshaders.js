@@ -7,16 +7,16 @@ async function loadShaderFile(url) {
 const canvas = document.getElementById('glcanvas');
 const gl = canvas.getContext('webgl');
 function compileShader(gl, type, source) {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, source);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, source);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
         console.error(gl.getShaderInfoLog(s));
         gl.deleteShader(s);
         return null;
-      }
-      return s;
     }
+    return s;
+}
 async function initShaders() {
     const vsSrc = await loadShaderFile('./shaders/vertex.vert');
     const fsSrc = await loadShaderFile('./shaders/fragment.frag');
@@ -147,25 +147,25 @@ export class Animator {
         return this.light;
     }
     static hexToVec3(hex) {
-        hex = hex.replace('#','');
-        if(hex.length === 3) hex = hex.split('').map(c => c+c).join('');
+        hex = hex.replace('#', '');
+        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
         return [
-            parseInt(hex.slice(0,2),16)/255,
-            parseInt(hex.slice(2,4),16)/255,
-            parseInt(hex.slice(4,6),16)/255
+            parseInt(hex.slice(0, 2), 16) / 255,
+            parseInt(hex.slice(2, 4), 16) / 255,
+            parseInt(hex.slice(4, 6), 16) / 255
         ];
     }
 
     animateColors(ColorPallete, durationFrames = 60) {
         var color;
         game.GameRenderer.currentColor = ColorPallete;
-        if(Settings.DARK_MODE){
+        if (Settings.DARK_MODE) {
             color = ColorPallete.dark;
         }
-        else{
+        else {
             color = ColorPallete.light;
         }
-        if(color.length !== 3) {
+        if (color.length !== 3) {
             console.error("animateColors expects an array of 3 colors");
             return;
         }
@@ -179,18 +179,18 @@ export class Animator {
     }
 
     updateColors() {
-        if(!this.colorAnimating) return this.currentColors;
+        if (!this.colorAnimating) return this.currentColors;
 
         this.colorAnimProgress += 1 / this.colorAnimDuration;
-        if(this.colorAnimProgress >= 1) {
+        if (this.colorAnimProgress >= 1) {
             this.colorAnimProgress = 1;
             this.colorAnimating = false;
         }
 
         const eased = Animator.easeInShortOutLong(this.colorAnimProgress);
 
-        for(let c = 0; c < 3; c++) {
-            for(let i = 0; i < 3; i++) {
+        for (let c = 0; c < 3; c++) {
+            for (let i = 0; i < 3; i++) {
                 this.currentColors[c][i] = this.colorAnimStart[c][i] +
                     (this.targetColors[c][i] - this.colorAnimStart[c][i]) * eased;
             }
@@ -200,39 +200,39 @@ export class Animator {
 }
 export const animate = new Animator();
 function createProgram(gl, vsSrc, fsSrc) {
-      const vs = compileShader(gl, gl.VERTEX_SHADER, vsSrc);
-      const fs = compileShader(gl, gl.FRAGMENT_SHADER, fsSrc);
-      const prog = gl.createProgram();
-      gl.attachShader(prog, vs);
-      gl.attachShader(prog, fs);
-      gl.linkProgram(prog);
-      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    const vs = compileShader(gl, gl.VERTEX_SHADER, vsSrc);
+    const fs = compileShader(gl, gl.FRAGMENT_SHADER, fsSrc);
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
         console.error(gl.getProgramInfoLog(prog));
         gl.deleteProgram(prog);
         return null;
-      }
-      return prog;
     }
+    return prog;
+}
 initShaders().then(program => {
     const canvas = document.getElementById('glcanvas');
     const gl = canvas.getContext('webgl');
     function compileShader(gl, type, source) {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, source);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-        console.error(gl.getShaderInfoLog(s));
-        gl.deleteShader(s);
-        return null;
-      }
-      return s;
+        const s = gl.createShader(type);
+        gl.shaderSource(s, source);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+            console.error(gl.getShaderInfoLog(s));
+            gl.deleteShader(s);
+            return null;
+        }
+        return s;
     }
-    
+
 
     function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     }
     window.addEventListener('resize', resize);
     // full‐screen quad
@@ -240,55 +240,55 @@ initShaders().then(program => {
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     const positions = new Float32Array([
-      -1, -1,
-       1, -1,
-      -1,  1,
-      -1,  1,
-       1, -1,
-       1,  1,
+        -1, -1,
+        1, -1,
+        -1, 1,
+        -1, 1,
+        1, -1,
+        1, 1,
     ]);
-    
+
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-    
+
     const u_timeLoc = gl.getUniformLocation(program, "u_time");
     const u_resLoc = gl.getUniformLocation(program, "u_resolution");
     const u_vortexStrengthLoc = gl.getUniformLocation(program, "u_vortexStrength");
     const u_waveAmp = gl.getUniformLocation(program, "u_waveAmp");
     const u_waveFreq = gl.getUniformLocation(program, "u_waveFreq");
-    
+
     let startTime = performance.now();
 
     function render() {
         const smoothCols = animate.updateColors();
         const waveSettings = animate.updateWave();
         const fluidSettings = animate.updateFluid();
-      const timeNow = (performance.now() - startTime) * 0.001;
-      gl.useProgram(program);
-      gl.uniform1f(u_waveAmp,waveSettings.amp);
-    gl.uniform1f(u_waveFreq,waveSettings.freq);
-      gl.uniform1f(u_vortexStrengthLoc, animate.updateRotate()); // 1.0 = normal, higher = stronger swirl 
-        
-      // set up position
-      gl.enableVertexAttribArray(posAttribLocation);
-      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-      gl.vertexAttribPointer(posAttribLocation, 2, gl.FLOAT, false, 0, 0);
-    gl.uniform3f(gl.getUniformLocation(program, "u_color1"), ...smoothCols[0]);
-    gl.uniform3f(gl.getUniformLocation(program, "u_color2"), ...smoothCols[1]);
-    gl.uniform3f(gl.getUniformLocation(program, "u_color3"), ...smoothCols[2]);
+        const timeNow = (performance.now() - startTime) * 0.001;
+        gl.useProgram(program);
+        gl.uniform1f(u_waveAmp, waveSettings.amp);
+        gl.uniform1f(u_waveFreq, waveSettings.freq);
+        gl.uniform1f(u_vortexStrengthLoc, animate.updateRotate()); // 1.0 = normal, higher = stronger swirl 
+
+        // set up position
+        gl.enableVertexAttribArray(posAttribLocation);
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.vertexAttribPointer(posAttribLocation, 2, gl.FLOAT, false, 0, 0);
+        gl.uniform3f(gl.getUniformLocation(program, "u_color1"), ...smoothCols[0]);
+        gl.uniform3f(gl.getUniformLocation(program, "u_color2"), ...smoothCols[1]);
+        gl.uniform3f(gl.getUniformLocation(program, "u_color3"), ...smoothCols[2]);
         gl.uniform1f(gl.getUniformLocation(program, "u_noiseScale"), 5);
-    gl.uniform1f(gl.getUniformLocation(program, "u_fluidAmp"), fluidSettings.amp);
-    gl.uniform1f(gl.getUniformLocation(program, "u_fluidFreq"), fluidSettings.freq);
-    gl.uniform3f(gl.getUniformLocation(program, "u_particleColor"), 1.0, 1.0, 1.0); // white
-    gl.uniform1f(gl.getUniformLocation(program, "u_starSize"), 0.1);
-    gl.uniform1i(gl.getUniformLocation(program, "u_starCount"), 60);
-    gl.uniform1f(gl.getUniformLocation(program, "u_particleIntensity"), animate.updateLight());
-    // uniforms
-      gl.uniform1f(u_timeLoc, timeNow);
-      gl.uniform2f(u_resLoc, canvas.width, canvas.height);
+        gl.uniform1f(gl.getUniformLocation(program, "u_fluidAmp"), fluidSettings.amp);
+        gl.uniform1f(gl.getUniformLocation(program, "u_fluidFreq"), fluidSettings.freq);
+        gl.uniform3f(gl.getUniformLocation(program, "u_particleColor"), 1.0, 1.0, 1.0); // white
+        gl.uniform1f(gl.getUniformLocation(program, "u_starSize"), 0.1);
+        gl.uniform1i(gl.getUniformLocation(program, "u_starCount"), 60);
+        gl.uniform1f(gl.getUniformLocation(program, "u_particleIntensity"), animate.updateLight());
+        // uniforms
+        gl.uniform1f(u_timeLoc, timeNow);
+        gl.uniform2f(u_resLoc, canvas.width, canvas.height);
 
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-      requestAnimationFrame(render);
+        requestAnimationFrame(render);
     }
 
     resize();

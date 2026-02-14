@@ -469,21 +469,21 @@ const tarotCards = [
             return `Daje 2 losowe karty tarota.`
         }
     },*/
-    {
-        name: "Kochankowie",
-        descriptionfn(game){
-          return `Cofa ${Style.Moves('2 ruchy')}`;
-        },
-        effect(game){
-          game.movescounter -= 2;
-          game.GameRenderer.displayMoves();
-        },
-        canUse(game) {
-        return game.stage != STAGES.Shop && game.locked == false;
-      },
-      price: 4,
-      image: "tarot_default",
-    },/*
+  {
+    name: "Kochankowie",
+    descriptionfn(game) {
+      return `Cofa ${Style.Moves('2 ruchy')}`;
+    },
+    effect(game) {
+      game.movescounter -= 2;
+      game.GameRenderer.displayMoves();
+    },
+    canUse(game) {
+      return game.stage != STAGES.Shop && game.locked == false;
+    },
+    price: 4,
+    image: "tarot_default",
+  },/*
     {
         name: "Powóz"
     },*/
@@ -515,7 +515,7 @@ const tarotCards = [
     },
     effect(game) {
       if (Math.random() >= 0.25) {
-        this.message = {text: ":(",style: SCORE_ACTIONS.Info};
+        this.message = { text: ":(", style: SCORE_ACTIONS.Info };
         //this.UpgradeRenderer.createPopup(":(",SCORE_ACTIONS.Info);
         return;
       }
@@ -528,7 +528,7 @@ const tarotCards = [
       }
       upgrade.addSpecial(game);
       game.GameRenderer.updateUpgrade(index);
-      this.message = {text: "Sukces!", style: SCORE_ACTIONS.Money};
+      this.message = { text: "Sukces!", style: SCORE_ACTIONS.Money };
       //this.UpgradeRenderer.createPopup("Sukces!",SCORE_ACTIONS.Money);
     },
     price: 4,
@@ -559,14 +559,12 @@ const tarotCards = [
       }
 
       // Mapujemy wyniki na format oczekiwany przez silnik (z danymi o owocu)
-      matches = results.map((pos) => ({
-        x: pos.x,
-        y: pos.y,
-        fruit: game.board[pos.x][pos.y],
-      }));
+      results.forEach(pos => {
+        matches.push(game.board[pos.x][pos.y]);
+      });
 
       // Przekazujemy tablicę obiektów do procesowania
-      game.processMatches(matches);
+      game.matchesManager.processMatches(matches);
     },
     canUse(game) {
       return game.stage != STAGES.Shop && game.locked == false;
@@ -591,17 +589,17 @@ const tarotCards = [
     },
     effect(game) {
       console.log(this);
-      if (Math.random() >= 0.5){
-        this.message = {text: ":(",style: SCORE_ACTIONS.Info};
+      if (Math.random() >= 0.5) {
+        this.message = { text: ":(", style: SCORE_ACTIONS.Info };
         return;
-      } 
+      }
       let percent = 100;
       game.fruits.forEach((fruit) => {
         const result = Math.random() * percent;
         fruit.props.percent = result;
         percent -= result;
       });
-      this.message = {text: "Sukces!",style: SCORE_ACTIONS.Money};
+      this.message = { text: "Sukces!", style: SCORE_ACTIONS.Money };
       //this.UpgradeRenderer.createPopup("Sukces!",SCORE_ACTIONS.Money);
     },
     price: 4,
@@ -619,10 +617,10 @@ const tarotCards = [
       };
       let matches = [];
       for (var i = 0; i < game.matrixsize; i++) {
-        matches.push({ x: cords.x, y: i, fruit: game.board[cords.x][i] });
-        matches.push({ x: i, y: cords.y, fruit: game.board[i][cords.y] });
+        matches.push(game.board[cords.x][i]);
+        matches.push(game.board[i][cords.y]);
       }
-      game.processMatches(matches);
+      game.matchesManager.processMatches(matches);
     },
     canUse(game) {
       return game.stage != STAGES.Shop && game.locked == false;
@@ -782,94 +780,94 @@ consumableList.push(
 );
 export const consumablePacks = [
   {
-  name: "Pomumpack",
-  descriptionfn() {
-    return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
-  },
-  consumables: pomumpackItems,
-  price: 4,
-  props: {
-    maxSelect: 1,
-    maxRoll: 3,
-  },
-  image: "pomumpack", // Dodane domyślne wartości
+    name: "Pomumpack",
+    descriptionfn() {
+      return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+    },
+    consumables: pomumpackItems,
+    price: 4,
+    props: {
+      maxSelect: 1,
+      maxRoll: 3,
+    },
+    image: "pomumpack", // Dodane domyślne wartości
   },
   {
-  name: "Poumpack BIG",
-  descriptionfn() {
-    return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+    name: "Poumpack BIG",
+    descriptionfn() {
+      return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+    },
+    consumables: pomumpackItems,
+    price: 6,
+    props: {
+      maxSelect: 1,
+      maxRoll: 4,
+    },
+    image: "pomumpackbig",
   },
-  consumables: pomumpackItems,
-  price: 6,
-  props: {
-    maxSelect: 1,
-    maxRoll: 4,
+  {
+    name: "Poumpack MEGA",
+    descriptionfn() {
+      return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+    },
+    consumables: pomumpackItems,
+    price: 8,
+    props: {
+      maxSelect: 2,
+      maxRoll: 5,
+    },
+    image: "pomumpackmega",
   },
-  image: "pomumpackbig",
-},
-{
-  name: "Poumpack MEGA",
-  descriptionfn() {
-    return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+  {
+    name: "Pomumpack GOLD",
+    descriptionfn() {
+      return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+    },
+    consumables: consumableGoldBlueprints,
+    price: 4,
+    props: {
+      maxSelect: 1,
+      maxRoll: 3,
+    },
+    image: "pomumpack_gold",
   },
-  consumables: pomumpackItems,
-  price: 8,
-  props: {
-    maxSelect: 2,
-    maxRoll: 5,
+  {
+    name: "Pomumpack SILVER",
+    descriptionfn() {
+      return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+    },
+    consumables: consumableSilverBlueprints,
+    price: 4,
+    props: {
+      maxSelect: 1,
+      maxRoll: 3,
+    },
+    image: "pomumpack_silver",
   },
-  image: "pomumpackmega",
-},
-{
-  name: "Pomumpack GOLD",
-  descriptionfn() {
-    return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+  {
+    name: "Pomumpack Upgrade",
+    descriptionfn() {
+      return `Znajdują się ${this.props.maxRoll} karty ulepszeń. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+    },
+    consumables: upgradesList,
+    price: 4,
+    props: {
+      maxSelect: 1,
+      maxRoll: 3,
+    },
+    image: "pomumpackupgrade",
   },
-  consumables: consumableGoldBlueprints,
-  price: 4,
-  props: {
-    maxSelect: 1,
-    maxRoll: 3,
-  },
-  image: "pomumpack_gold",
-},
-{
-  name: "Pomumpack SILVER",
-  descriptionfn() {
-    return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
-  },
-  consumables: consumableSilverBlueprints,
-  price: 4,
-  props: {
-    maxSelect: 1,
-    maxRoll: 3,
-  },
-  image: "pomumpack_silver",
-},
-{
-  name: "Pomumpack Upgrade",
-  descriptionfn() {
-    return `Znajdują się ${this.props.maxRoll} karty ulepszeń. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
-  },
-  consumables: upgradesList,
-  price: 4,
-  props: {
-    maxSelect: 1,
-    maxRoll: 3,
-  },
-  image: "pomumpackupgrade",
-},
-{
-  name: "Tarot Pack",
-  descriptionfn() {
-    return `Znajdują się ${this.props.maxRoll} karty tarota. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
-  },
-  consumables: tarotCards,
-  price: 4,
-  props: {
-    maxSelect: 1,
-    maxRoll: 3,
-  },
-  image: "tarot_pack",
-}];
-
+  {
+    name: "Tarot Pack",
+    descriptionfn() {
+      return `Znajdują się ${this.props.maxRoll} karty tarota. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+    },
+    consumables: tarotCards,
+    price: 4,
+    props: {
+      maxSelect: 1,
+      maxRoll: 3,
+    },
+    image: "tarot_pack",
+  }
+];

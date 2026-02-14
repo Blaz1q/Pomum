@@ -102,20 +102,20 @@ export class UpgradeRenderer {
   }
   createDescription() {
     const upgrade = this.upgrade;
-      let description = `<h1>${upgrade.name}</h1>`;
-      if (upgrade.negative == true) {
-        description += `<p>${Style.Chance("negative")}</p>`;
-      }
-      description += `<p>${upgrade.description(this.gameRenderer.game)}</p>`;
-      if (upgrade.modifier != MODIFIERS.None) {
-        description += `<p>${Style.Chance(upgrade.modifier)}</p>`;
-      }
-      if (upgrade.rarity != UPGRADE_RARITY_NAME.None) {
-        description += `<p>${Style.Money(upgrade.rarity.display)}</p>`;
-      }
-  
-      return description;
+    let description = `<h1>${upgrade.name}</h1>`;
+    if (upgrade.negative == true) {
+      description += `<p>${Style.Chance("negative")}</p>`;
     }
+    description += `<p>${upgrade.description(this.gameRenderer.game)}</p>`;
+    if (upgrade.modifier != MODIFIERS.None) {
+      description += `<p>${Style.Chance(upgrade.modifier)}</p>`;
+    }
+    if (upgrade.rarity != UPGRADE_RARITY_NAME.None) {
+      description += `<p>${Style.Money(upgrade.rarity.display)}</p>`;
+    }
+
+    return description;
+  }
   displayButtons() {
     // 1. Sprawdzamy, czy ten konkretny wrapper jest już "podniesiony"
     // Sprawdzamy styl inline lub (lepiej) konkretną wartość transformacji
@@ -222,12 +222,12 @@ export class UpgradeRenderer {
       ) {
         const container = document.getElementById("consumables-container");
         Array.from(container.children).forEach(child => {
-          if(child!=wrapper) this.gameRenderer.fadeOutAndRemove(child, 100);
+          if (child != wrapper) this.gameRenderer.fadeOutAndRemove(child, 100);
         });
         //return;
       }
       if (success) {
-        this.gameRenderer.dissolveAndRemove(wrapper,1000);
+        this.gameRenderer.dissolveAndRemove(wrapper, 1000);
         //wrapper.remove();
       } else {
         //this.gameRenderer.game.GameRenderer.notEnoughMoney();
@@ -251,31 +251,31 @@ export class UpgradeRenderer {
     return btnSell;
   }
   createButtons(params = { bought: false, origin: null }) {
-      if (params.origin && params.origin.type == "ConsumablePack") {
-        this.gameRenderer.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
-      }
-      const upgrade = this.upgrade;
-      const wrapper = upgrade.wrapper;
-      const btnRow = document.createElement("div");
-      btnRow.className = "consumable-buttons";
-      if (params.bought === false) {
-        const btnBuy = this.createBuyButton(params);
-        btnRow.appendChild(btnBuy);
-  
-        if (upgrade instanceof Consumable) {
-          const btnBuyUse = this.createBuyAndUseButton(params);
-          btnRow.appendChild(btnBuyUse);
-        }
-      } else {
-        if (upgrade instanceof Consumable) {
-          const btnUse = this.createUseButton(upgrade);
-          btnRow.appendChild(btnUse);
-        }
-        const btnSell = this.createSellButton(wrapper, upgrade);
-        btnRow.appendChild(btnSell);
-      }
-      return btnRow;
+    if (params.origin && params.origin.type == "ConsumablePack") {
+      this.gameRenderer.game.BuysFromBoosterLeft = params.origin.props.maxSelect;
     }
+    const upgrade = this.upgrade;
+    const wrapper = upgrade.wrapper;
+    const btnRow = document.createElement("div");
+    btnRow.className = "consumable-buttons";
+    if (params.bought === false) {
+      const btnBuy = this.createBuyButton(params);
+      btnRow.appendChild(btnBuy);
+
+      if (upgrade instanceof Consumable) {
+        const btnBuyUse = this.createBuyAndUseButton(params);
+        btnRow.appendChild(btnBuyUse);
+      }
+    } else {
+      if (upgrade instanceof Consumable) {
+        const btnUse = this.createUseButton(upgrade);
+        btnRow.appendChild(btnUse);
+      }
+      const btnSell = this.createSellButton(wrapper, upgrade);
+      btnRow.appendChild(btnSell);
+    }
+    return btnRow;
+  }
   refreshAllButtons() {
     const wrapper = this.upgrade.wrapper;
     const upgrade = this.upgrade;
@@ -358,52 +358,52 @@ export class UpgradeRenderer {
     }, 500);
   }
   trigger(time, action = UPGRADE_STATES.Active) {
-      const upgrade = this.upgrade;
-      const delay = 0;
-      console.log(`upgrade trigger: ${upgrade.name}`, performance.now());
-      const gameupgrades = this.gameRenderer.game.upgrades;
-      const index = gameupgrades.indexOf(upgrade);
-      if (index < 0) return;
-      let upgradecard = upgrade.wrapper;
-      //let upgradecard = this.getPlayerUpgrades(index);
-  
-      const descElement = upgradecard.querySelector(".upgrade-desc");
-      descElement.innerHTML = this.createDescription();
-  
-      const upgradePrice = upgradecard.querySelector(".upgrade-price");
-      upgradePrice.innerHTML = "$" + upgrade.sellPrice;
-      switch (action) {
-        case UPGRADE_STATES.Active:
-        case UPGRADE_STATES.Score:
-          {
+    const upgrade = this.upgrade;
+    const delay = 0;
+    console.log(`upgrade trigger: ${upgrade.name}`, performance.now());
+    const gameupgrades = this.gameRenderer.game.upgrades;
+    const index = gameupgrades.indexOf(upgrade);
+    if (index < 0) return;
+    let upgradecard = upgrade.wrapper;
+    //let upgradecard = this.getPlayerUpgrades(index);
+
+    const descElement = upgradecard.querySelector(".upgrade-desc");
+    descElement.innerHTML = this.createDescription();
+
+    const upgradePrice = upgradecard.querySelector(".upgrade-price");
+    upgradePrice.innerHTML = "$" + upgrade.sellPrice;
+    switch (action) {
+      case UPGRADE_STATES.Active:
+      case UPGRADE_STATES.Score:
+        {
+          setTimeout(() => {
+            upgradecard.style.animationDuration = time + "ms";
+            upgradecard.classList.add("triggered");
+
+            //this.createPopup(`Wot?`, upgradecard);
+
             setTimeout(() => {
-              upgradecard.style.animationDuration = time + "ms";
-              upgradecard.classList.add("triggered");
-  
-              //this.createPopup(`Wot?`, upgradecard);
-  
-              setTimeout(() => {
-                upgradecard.classList.remove("triggered");
-                upgradecard.classList.remove("ready"); // remove ready if ready
-                upgrade.isReady = false;
-              }, 300);
-            }, delay);
-          }
-          break;
-        case UPGRADE_STATES.Ready:
-          {
-            upgradecard.classList.add("ready");
-          }
-          break;
-        case UPGRADE_STATES.Tried:
-          {
-            upgradecard.classList.remove("ready");
-          }
-          break;
-      }
+              upgradecard.classList.remove("triggered");
+              upgradecard.classList.remove("ready"); // remove ready if ready
+              upgrade.isReady = false;
+            }, 300);
+          }, delay);
+        }
+        break;
+      case UPGRADE_STATES.Ready:
+        {
+          upgradecard.classList.add("ready");
+        }
+        break;
+      case UPGRADE_STATES.Tried:
+        {
+          upgradecard.classList.remove("ready");
+        }
+        break;
     }
-    update(params = { bought: true, origin: null }) {
-    
+  }
+  update(params = { bought: true, origin: null }) {
+
     const upgrade = this.upgrade;
     if (!upgrade) return;
 

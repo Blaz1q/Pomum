@@ -351,10 +351,10 @@ export class Consumable extends UpgradeBase {
       game.GameRenderer.displayConsumablesCounter();
     }
     this.props?.effect?.call(this, game);
-    if(this.message){
-      this.UpgradeRenderer.createPopup(this.message.text,this.message.style);
-    }else{
-      this.UpgradeRenderer.createPopup("Użyto!",SCORE_ACTIONS.Info);
+    if (this.message) {
+      this.UpgradeRenderer.createPopup(this.message.text, this.message.style);
+    } else {
+      this.UpgradeRenderer.createPopup("Użyto!", SCORE_ACTIONS.Info);
     }
   }
   hasSpace(game) {
