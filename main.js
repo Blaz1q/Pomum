@@ -160,6 +160,7 @@ export class Game {
                     emitTimingMs = Settings.EMIT_TIMING_MS;
                     await visualChain;
                     visualChain = Promise.resolve();
+                    upgrade.reset();
                 }
             }
         }
