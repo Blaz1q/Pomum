@@ -535,7 +535,7 @@ const tarotCards = [
       //this.UpgradeRenderer.createPopup("Sukces!",SCORE_ACTIONS.Money);
     },
     price: 4,
-    image: "tarot_default",
+    image: "fortuna",
   },
   /*{
         name: "Sprawiedliwość"
@@ -609,7 +609,7 @@ const tarotCards = [
     image: "tower",
   },
   {
-    name: "Gwiazdy",
+    name: "Gwiazda",
     descriptionfn(game) {
       return `Niszczy losowy rząd i kolumnę na planszy.`;
     },
@@ -629,7 +629,7 @@ const tarotCards = [
       return game.stage != STAGES.Shop && game.locked == false;
     },
     price: 4,
-    image: "tarot_default",
+    image: "gwiazda",
   } /*
     {
         name: "Księżyc"
