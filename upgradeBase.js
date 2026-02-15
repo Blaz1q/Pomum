@@ -45,7 +45,7 @@ export class UpgradeBase {
     throw new Error("Method canBuy must be implemented.");
   }
   hasMoney(game) {
-    return this.price <= game.money;
+    return this.price <= game.money + game.minMoney;
   }
   notEnoughMoney() {
     if (this.hasMoney(game) == false) {
@@ -246,7 +246,9 @@ export class Upgrade extends UpgradeBase {
     this.props?.effect?.call(this, game);
     //this.effect?.call(this, game); // this wewnątrz effect wskazuje na instancję
   }
-
+  reset(){
+    this.props?.reset?.call(this,game);
+  }
   sell(game) {
     this.bought = false;
     if (this.negative) {

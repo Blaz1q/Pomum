@@ -18,6 +18,10 @@ let minEmitMs = Settings.MIN_EMIT_MS;
 export class Game {
     constructor() {
         //gold
+        this.FALL_MS = Settings.FALL_MS;
+        this.FADE_MS = Settings.FADE_MS;
+
+        this.minMoney = 0;
         this.money = 2;
         this.goldChance = 0;
         //moves
@@ -223,7 +227,7 @@ export class Game {
         this.moveBox.innerHTML = this.movescounter + "/" + this.moves;
     }
     rerollUpgrades() {
-        if (this.money < 4) {
+        if (this.money + this.minMoney < 4) {
             this.GameRenderer.notEnoughMoney();
             return;
         }
@@ -234,7 +238,7 @@ export class Game {
         this.GameRenderer.updateRerollButton();
     }
     rerollBoosters() {
-        if (this.money < 2) return;
+        if (this.money + this.minMoney < 2) return;
         this.money -= 2;
         this.GameRenderer.displayBoosterPacks();
         this.GameRenderer.displayMoney();
@@ -400,7 +404,7 @@ export class Game {
         // animate swap first
         this.animateSwap(x1, y1, x2, y2, true, async () => {
             // trigger special if exists
-
+            this.locked = true;
             if (special) {
                 //let triggerMatches = this.triggerSpecial(special.x, special.y, special.tile, { includeSwapped: true, swappedX: special.swappedX, swappedY: special.swappedY });
                 let triggerMatches = [this.board[y1][x1], this.board[y2][x2]];
@@ -488,7 +492,7 @@ export class Game {
     buy(upgrade) {
         console.log("buyin");
         if (this.stage !== STAGES.Shop) return false; // not in shop -> can't buy
-        if (this.money < upgrade.price) return false; // not enough money
+        if (this.money + this.minMoney < upgrade.price) return false; // not enough money
         this.Audio.playSound('buy.mp3');
         console.log("buying true");
         if (upgrade.type == "Upgrade") {
@@ -569,7 +573,7 @@ export class Game {
                 icon: base.icon, type: TYPES.Fruit,
                 x: x,
                 y: y,
-                modifier: this.rollModifier(base),
+                modifier: this.roll.tileModifier(base),
                 debuffed: base.props.debuffed,
                 upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
             });
@@ -584,7 +588,7 @@ export class Game {
                     icon: base.icon, type: TYPES.Fruit,
                     x: x,
                     y: y,
-                    modifier: this.rollModifier(base),
+                    modifier: this.roll.tileModifier(base),
                     debuffed: base.props.debuffed,
                     upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
                 });
@@ -597,22 +601,10 @@ export class Game {
             icon: base.icon, type: TYPES.Fruit,
             x: x,
             y: y,
-            modifier: this.rollModifier(base),
+            modifier: this.roll.tileModifier(base),
             debuffed: base.props.debuffed,
             upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
         });
-    }
-    rollModifier(tile) {
-        let modifier = MODIFIERS.None;
-        const goldChance = tile.props.upgrade.goldchance ?? 0;
-        const silverChance = tile.props.upgrade.silverchance ?? 0;
-
-        const isSilver = this.rand() * 100 < silverChance;
-        const isGold = this.rand() * 100 < goldChance;
-
-        if (isSilver) modifier = MODIFIERS.Silver;
-        if (isGold) modifier = MODIFIERS.Gold; // gold nadpisuje silver jeśli oba trafione
-        return modifier;
     }
     updateCell(x, y) {
         const idx = y * this.matrixsize + x;
@@ -668,9 +660,6 @@ export class Game {
         }
         this.GameRenderer.displayScore();
     }
-
-
-
     swap(x1, y1, x2, y2) {
         if (Math.abs(x1 - x2) + Math.abs(y1 - y2) !== 1) {
             return { success: false, matches: [], special: null };
@@ -770,7 +759,7 @@ export class Game {
             }
         }, 160);
     }
-    _waitForTransition(el, property = 'transform', timeout = FALL_MS + 100) {
+    _waitForTransition(el, property = 'transform', timeout = this.FALL_MS + 100) {
         return new Promise(resolve => {
             if (!el) return resolve();
             let fired = false;
@@ -922,7 +911,7 @@ export class Game {
             const classes = Array.from(cell.classList).filter(c => c !== 'fade');
 
             const ghost = this.createGhost(cell.textContent, relLeft, relTop, rect.width, rect.height, classes);
-            ghost.style.transition = `transform ${FALL_MS}ms ease`;
+            ghost.style.transition = `transform ${this.FALL_MS}ms ease`;
             this.gameContainer.appendChild(ghost);
 
             cell.style.visibility = "hidden";
@@ -934,7 +923,7 @@ export class Game {
             });
 
             ghosts.push(ghost);
-            ghostPromises.push(this._waitForTransition(ghost, 'transform', FALL_MS + 150));
+            ghostPromises.push(this._waitForTransition(ghost, 'transform', this.FALL_MS + 150));
         }
 
         // new tile ghosts — set classes according to the tile props (gold/silver/debuffed)
@@ -956,14 +945,14 @@ export class Game {
                     if (tile.type === TYPES.Bomb || tile.type === TYPES.Dynamite) classes.push('special');
                 }
                 const ghost = this.createGhost(tile.icon, left, top, cellW, cellH, classes);
-                ghost.style.transition = `transform ${FALL_MS}ms ease`;
+                ghost.style.transition = `transform ${this.FALL_MS}ms ease`;
                 ghost.style.transform = `translateY(-${spawn * CELL_PX}px)`; // start above
                 this.gameContainer.appendChild(ghost);
                 requestAnimationFrame(() => {
                     ghost.style.transform = `translateY(0)`;
                 });
                 ghosts.push(ghost);
-                ghostPromises.push(this._waitForTransition(ghost, 'transform', FALL_MS + 150));
+                ghostPromises.push(this._waitForTransition(ghost, 'transform', this.FALL_MS + 150));
             }
         }
 
@@ -1038,7 +1027,7 @@ export class Game {
         this.GameRenderer.displayScore();
         this.GameRenderer.displayTempScore();
 
-        FALL_MS = Settings.FALL_MS;
+        this.FALL_MS = Settings.FALL_MS;
 
         if (this.score >= this.calcRoundScore()) {
             this.endround();
@@ -1112,7 +1101,7 @@ function changeGameSpeed() {
     val = parseInt(val);
     Settings.FALL_MS = val;
     Settings.EMIT_TIMING_MS = val;
-    FALL_MS = val;
+    this.FALL_MS = val;
     emitTimingMs = val;
 }
 function toggleSound() {

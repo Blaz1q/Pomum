@@ -321,8 +321,8 @@ export class UpgradeRenderer {
   createPopup(text, style = "mult") {
     const targetElement = this.upgrade.wrapper;
     if (!targetElement) return;
-    console.log("adding!!");
-    console.log(text);
+    //console.log("adding!!");
+    //console.log(text);
     // Create popup container (relative to card)
     const popup = document.createElement("div");
     popup.className = "upgrade-popup-container";
@@ -331,7 +331,7 @@ export class UpgradeRenderer {
     const square = document.createElement("div");
     square.className = "upgrade-popup-square";
     square.classList.add(style);
-    console.log(style);
+    //console.log(style);
     square.style.transform = `rotate(${(Math.random() * 20 - 10).toFixed(2)}deg)`; // small random tilt
 
     // Create text
@@ -414,7 +414,7 @@ export class UpgradeRenderer {
     this.applyDragEvents();
 
     oldWrapper.replaceWith(newWrapper);
-    this.upgradeTrigger(upgrade, 0);
+    this.trigger(0);
     this.gameRenderer.game.Audio.playSound("tick.mp3");
   }
   applyDragEvents() {

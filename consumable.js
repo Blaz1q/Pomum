@@ -252,7 +252,8 @@ export const consumableUpgradeBlueprints = [
       upgrades[index].negative = true;
       game.maxUpgrades += 1;
       game.GameRenderer.displayUpgradesCounter();
-      game.GameRenderer.updateUpgrade(game.upgrades.indexOf(upgrades[index]));
+      upgrades[index].UpgradeRenderer.update();
+      //game.GameRenderer.updateUpgrade(game.upgrades.indexOf());
       game.Audio.playSound("foil_reverse.mp3");
     },
     price: 8,
@@ -319,7 +320,8 @@ export const consumableUpgradeBlueprints = [
       if (Math.random() < 0.5) upgrade.modifier = MODIFIERS.Chip;
       else upgrade.modifier = MODIFIERS.Mult;
       upgrade.addSpecial(game);
-      game.GameRenderer.updateUpgrade(index);
+      upgrade.UpgradeRenderer.update();
+      //game.GameRenderer.updateUpgrade(index);
       game.Audio.playSound("foil.mp3");
     },
     price: 8,
@@ -527,7 +529,8 @@ const tarotCards = [
         upgrade.modifier = MODIFIERS.Mult;
       }
       upgrade.addSpecial(game);
-      game.GameRenderer.updateUpgrade(index);
+      upgrade.UpgradeRenderer.update();
+      //game.GameRenderer.updateUpgrade(index);
       this.message = { text: "Sukces!", style: SCORE_ACTIONS.Money };
       //this.UpgradeRenderer.createPopup("Sukces!",SCORE_ACTIONS.Money);
     },

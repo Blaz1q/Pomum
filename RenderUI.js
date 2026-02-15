@@ -31,13 +31,17 @@ export class RenderUI {
     const start = this.prevMoney ?? 0;
     const end = this.game.money;
     this.prevMoney = end;
-
+    const formatMoney = (val) => {
+        const isNegative = val < 0;
+        const absoluteValue = Math.abs(val);
+        return isNegative ? `-$${absoluteValue}` : `$${absoluteValue}`;
+      };
     const animateNumber = (element, start, end) => {
       if (start === end) {
-        element.innerHTML = "$" + end;
+        element.innerHTML = formatMoney(end);
         return;
       }
-
+      
       const duration = 250;
       const startTime = performance.now();
 
@@ -46,7 +50,7 @@ export class RenderUI {
         const eased = 1 - Math.pow(1 - progress, 3);
 
         const value = Math.round(start + (end - start) * eased);
-        element.innerHTML = "$" + value;
+        element.innerHTML = formatMoney(value);
 
         if (progress < 1) {
           requestAnimationFrame(animate);
@@ -707,7 +711,7 @@ export class RenderUI {
   }
   updateRerollButton() {
     const rerollButton = document.querySelectorAll(".shopbutton")[0];
-    const isTooExpensive = this.game.money < 4;
+    const isTooExpensive = this.game.money + this.game.minMoney < 4;
     if (isTooExpensive) rerollButton.classList.add("disabled");
     else rerollButton.classList.remove("disabled");
   }

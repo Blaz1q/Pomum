@@ -31,12 +31,13 @@ export const upgradeBlueprints = [
           game.tempscore += this.props.score;
           game.GameRenderer.displayTempScore();
           const gained = this.props.score;
-          this.props.score = 0;
-
           return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
         }
         return UPGRADE_STATES.Failed;
       },
+      reset(){
+        this.props.score = 0;
+      }
     }),
     price: 4,
     ...COMMON
@@ -169,9 +170,11 @@ export const upgradeBlueprints = [
         const mult = this.props.mult;
         game.mult += this.props.mult;
         game.GameRenderer.displayTempScore();
-        this.props.mult = 0;
         return { state: UPGRADE_STATES.Score, message: `+${mult} Mult`, style: SCORE_ACTIONS.Mult };
       },
+      reset(){
+        this.props.mult = 0;
+      }
     }),
     price: 5,
     ...COMMON
@@ -200,9 +203,11 @@ export const upgradeBlueprints = [
         const mult = this.props.mult;
         game.mult += this.props.mult;
         game.GameRenderer.displayTempScore();
-        this.props.mult = 0;
         return { state: UPGRADE_STATES.Score, message: `+${mult} Mult`, style: SCORE_ACTIONS.Mult };
       },
+      reset(){
+        this.props.mult = 0;
+      }
     }),
     price: 5,
     image: 'default', ...COMMON
@@ -235,11 +240,13 @@ export const upgradeBlueprints = [
         const mult = this.props.mult;
         game.mult += this.props.mult;
         game.GameRenderer.displayTempScore();
-        this.props.mult = 0;
         return { state: UPGRADE_STATES.Score, message: `+${mult} Mult`, style: SCORE_ACTIONS.Mult };
+      },
+      reset(){
+        this.props.mult = 0;
       }
     }),
-
+    
   },
   {
     name: "grapelover",
@@ -265,9 +272,11 @@ export const upgradeBlueprints = [
         const mult = this.props.mult;
         game.mult += this.props.mult;
         game.GameRenderer.displayTempScore();
-        this.props.mult = 0;
         return { state: UPGRADE_STATES.Score, message: `+${mult} Mult`, style: SCORE_ACTIONS.Mult };
       },
+      reset(){
+        this.props.mult = 0;
+      }
     }),
     price: 5,
     image: 'default',
@@ -297,9 +306,11 @@ export const upgradeBlueprints = [
         const mult = this.props.mult;
         game.mult += this.props.mult;
         game.GameRenderer.displayTempScore();
-        this.props.mult = 0;
         return { state: UPGRADE_STATES.Score, message: `+${mult} Mult`, style: SCORE_ACTIONS.Mult };
       },
+      reset(){
+        this.props.mult = 0;
+      }
     }),
     price: 5,
     image: 'default',
@@ -408,8 +419,10 @@ export const upgradeBlueprints = [
         const gained = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        this.props.score = 0;
         return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
+      },
+      reset(){
+        this.props.score = 0;
       },
       onRoundEnd() {
         this.props.value += 10;
@@ -437,9 +450,11 @@ export const upgradeBlueprints = [
         let messagescore = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        this.props.score = 0;
         return { state: UPGRADE_STATES.Score, message: `+${messagescore} pkt`, style: SCORE_ACTIONS.Score };
       },
+      reset(){
+        this.props.score = 0;
+      }
     }),
     price: 4,
     ...COMMON
@@ -485,11 +500,13 @@ export const upgradeBlueprints = [
           let messagemult = this.props.mult;
           game.mult *= this.props.mult;
           game.GameRenderer.displayTempScore();
-          this.props.mult = 0;
           return { state: UPGRADE_STATES.Score, message: `X${messagemult} Mult`, style: SCORE_ACTIONS.Mult };
         }
         return UPGRADE_STATES.Failed;
       },
+      reset(){
+        this.props.mult = 0;
+      }
     }),
     price: 6,
     image: "highfive", ...UNCOMMON
@@ -594,11 +611,13 @@ export const upgradeBlueprints = [
           const gained = Math.round(this.props.mult * 100) / 100;
           game.mult *= this.props.mult;
           game.mult = Math.round(game.mult * 100) / 100;
-          this.props.mult = 1;
           return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };
         }
         return UPGRADE_STATES.Failed;
       },
+      reset(){
+        this.props.mult = 1;
+      }
     }),
 
     price: 10,
@@ -626,9 +645,11 @@ export const upgradeBlueprints = [
         game.mult *= this.props.mult;
         game.mult = Math.round(game.mult * 100) / 100;
         game.GameRenderer.displayTempScore();
-        this.props.mult = 1;
         return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };
       },
+      reset(){
+        this.props.mult = 1;
+      }
     }),
 
     price: 8,
@@ -700,10 +721,11 @@ export const upgradeBlueprints = [
         const gained = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        this.props.score = 0;
         return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
-
       },
+      reset(){
+        this.props.score = 0;
+      }
     }),
 
     price: 4,
@@ -766,9 +788,11 @@ export const upgradeBlueprints = [
         const gained = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        this.props.score = 0;
         return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
       },
+      reset(){
+        this.props.score = 0;
+      }
     }),
 
     price: 6,
@@ -850,8 +874,10 @@ export const upgradeBlueprints = [
         const gained = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        this.props.score = 0;
         return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
+      },
+      reset(){
+                this.props.score = 0;
       },
       onRoundEnd() {
         this.props.collected.clear();
@@ -1103,11 +1129,13 @@ export const upgradeBlueprints = [
           game.mult *= this.props.mult;
           game.mult = Math.round(game.mult * 100) / 100;
           game.GameRenderer.displayTempScore();
-          this.props.mult = 1;
           return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };
         }
         return UPGRADE_STATES.Failed;
       },
+      reset(){
+        this.props.mult = 1;
+      }
     }),
     price: 6,
     image: "critical_hit", ...COMMON
@@ -1258,10 +1286,14 @@ export const upgradeBlueprints = [
         const gained = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        this.props.add = 0;
-        this.props.score = 0;
+        // this.props.add = 0;
+        // this.props.score = 0;
         return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
       },
+      reset(){
+        this.props.add = 0;
+        this.props.score = 0;
+      }
     }),
     price: 4,
     ...COMMON
@@ -1275,7 +1307,7 @@ export const upgradeBlueprints = [
     props: () => ({
       score: 0,
       onMatch(payload) {
-        if (game.isThreeLine(payload)) {
+        if (game.matchesManager.isThreeLine(payload)) {
           this.props.score += 3;
           return UPGRADE_STATES.Active;
         }
@@ -1370,7 +1402,38 @@ export const upgradeBlueprints = [
     }),
     price: 6,
     ...COMMON
-  }
+  },
+  {
+    name: "Karta Kredytowa",
+    descriptionfn(game) {
+      return `Pozwala wziąć ${Style.Money(`$10`)} długu`;
+    },
+    effect(game){
+      game.minMoney += 10;
+    },
+    remove(game){
+      game.minMoney -= 10;
+    },
+    price: 4,
+    ...COMMON,
+    ...defaultimage
+  },/*
+  {
+    name: "Kosiarka",
+    descriptionfn(game) {
+      return `Uruchamia ponownie wszystkie ulepszenia.`;
+    },
+    
+    props: () => ({
+      canRetrigger: true,
+      async onScore(payload) {      
+      return { state: UPGRADE_STATES.Active, message: "ECHO!" };
+      }
+    }
+    ),
+    price: 6,
+    ...COMMON
+  }*/
   /*
   {
     name: "",

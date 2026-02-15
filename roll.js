@@ -26,6 +26,18 @@ export class Roll {
             }
         }
     }
+    tileModifier(tile) {
+        let modifier = MODIFIERS.None;
+        const goldChance = tile.props.upgrade.goldchance ?? 0;
+        const silverChance = tile.props.upgrade.silverchance ?? 0;
+
+        const isSilver = game.rand() * 100 < silverChance;
+        const isGold = game.rand() * 100 < goldChance;
+
+        if (isSilver) modifier = MODIFIERS.Silver;
+        if (isGold) modifier = MODIFIERS.Gold; // gold nadpisuje silver jeśli oba trafione
+        return modifier;
+    }
     Vouchers(count = 1) {
         if (!vouchers || vouchers.length === 0) return [];
 

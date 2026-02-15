@@ -2,10 +2,7 @@ import { TYPES, GAME_TRIGGERS, Settings, MODIFIERS } from "./dictionary.js";
 import { Tile } from "./Tile.js";
 
 let FADE_MS = Settings.FADE_MS;
-let FALL_MS = Settings.FALL_MS;
 let MIN_FALL_MS = Settings.MIN_FALL_MS;
-let emitTimingMs = Settings.EMIT_TIMING_MS;
-let minEmitMs = Settings.MIN_EMIT_MS;
 export class Matches {
     constructor(game) {
         this.game = game;
@@ -13,15 +10,15 @@ export class Matches {
     }
     specialMatches(matches) {
         let special = [];
-        console.log("matches:");
-        console.log(matches);
+        //console.log("matches:");
+        //console.log(matches);
         matches.forEach(match => {
             if (match.type == TYPES.Bomb || match.type === TYPES.Dynamite) {
                 special.push(match);
             }
         });
-        console.log("special matches:");
-        console.log(special);
+        //console.log("special matches:");
+        //console.log(special);
         return special;
     }
     dedupe(matches) {
@@ -48,7 +45,7 @@ export class Matches {
             await this.game.finishMatches();
             return;
         }
-        this.locked = true;
+        this.game.locked = true;
 
         console.log("waiting for matches..")
 
@@ -61,8 +58,8 @@ export class Matches {
         }
         console.log(matches);
         await this.game.emit(GAME_TRIGGERS.onMatch, matches);
-        if (FALL_MS > MIN_FALL_MS) {
-            FALL_MS -= 10;
+        if (this.game.FALL_MS > MIN_FALL_MS) {
+            this.game.FALL_MS -= 10;
         }
         console.log("ended.");
         // pozwól przeglądarce „zobaczyć” stan po swapie zanim nałożymy .fade

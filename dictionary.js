@@ -7,7 +7,9 @@ export const GAME_TRIGGERS = {
     onUpgradeTriggered: "upgradeTrigger",
     onScore: "score",
     onUpgradesChanged: "UpgradesChanged",
-    onConsumableUse: "ConsumableUse"
+    onConsumableUse: "ConsumableUse",
+    onRetrigger: 'Retrigger',
+    onReset: 'Reset'
 };
 export const TYPES = {
     Fruit: "fruit",
