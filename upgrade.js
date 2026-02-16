@@ -190,7 +190,7 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 0,
       onMatch(matches) {
-        const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+        const uniqueFruits = new Set(matches.map(m => m.icon));
         const hasFruit = uniqueFruits.has(game.fruits[1].icon);
         if (hasFruit) {
           this.props.mult += 1;
@@ -859,7 +859,7 @@ export const upgradeBlueprints = [
       onMatch(matches) {
         let size = this.props.collected.size;
         matches.forEach(m => {
-          if (m.fruit.type == TYPES.Fruit) this.props.collected.add(m.icon)
+          if (m.type == TYPES.Fruit) this.props.collected.add(m.icon)
         });
 
         if (this.props.collected.size === game.fruits.length) {
@@ -935,7 +935,7 @@ export const upgradeBlueprints = [
         if (game.consumables.length >= game.maxConsumables) return UPGRADE_STATES.Failed;
         if (this.props.chosenFruit != null) return UPGRADE_STATES.Failed;
         console.log(matches);
-        let match = matches.filter(m => m.fruit.type === TYPES.Fruit);
+        let match = matches.filter(m => m.type === TYPES.Fruit);
         const firstFruit = match[0]?.fruit ?? null; //fix this
         this.props.chosenFruit = firstFruit;
         const pool = consumableList.filter(cons => cons?.props?.getFruit?.(game)?.icon === this.props.chosenFruit.icon);
