@@ -1186,7 +1186,7 @@ export const upgradeBlueprints = [
     ...defaultimage, ...COMMON
   },
   {
-    name: "counter",
+    name: "Liczydło",
     descriptionfn(game) {
       var mult = this.props.mult ?? 1;
       return `Co 15 zniszczonych owoców ${Style.Mult(`+1 Mult`)}. (Obecnie ${Style.Mult(`${mult} Mult`)})`;
@@ -1212,7 +1212,7 @@ export const upgradeBlueprints = [
       },
     }),
     price: 6,
-    ...defaultimage, ...UNCOMMON
+    image: 'counter', ...UNCOMMON
 
   },
   {

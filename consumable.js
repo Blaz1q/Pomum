@@ -588,11 +588,11 @@ const tarotCards = [
     */ {
     name: "Wieża",
     descriptionfn(game) {
-      return `${Style.Chance(`1 na 2`)} na losowanie szans wszystkich owoców.`;
+      return `${Style.Chance(`1 na 5`)} na losowanie szans wszystkich owoców.`;
     },
     effect(game) {
       console.log(this);
-      if (Math.random() >= 0.5) {
+      if (Math.random() >= 0.2) {
         this.message = { text: ":(", style: SCORE_ACTIONS.Info };
         return;
       }
