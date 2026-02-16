@@ -20,7 +20,7 @@ export const upgradeBlueprints = [
     props: () => ({
       score: 0,
       onMatch(payload) {
-        const uniqueFruits = new Set(payload.map(m => m.fruit.icon));
+        const uniqueFruits = new Set(payload.map(m => m.icon));
         const hasFruit = uniqueFruits.has(game.fruits[0].icon);
         if (hasFruit) return UPGRADE_STATES.Failed;
         this.score += 60;
@@ -157,7 +157,7 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 0,
       onMatch(matches) {
-        const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+        const uniqueFruits = new Set(matches.map(m => m.icon));
         const hasFruit = uniqueFruits.has(game.fruits[0].icon);
         if (hasFruit) {
           this.props.mult += 1;
@@ -227,7 +227,7 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 0,
       onMatch(matches) {
-        const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+        const uniqueFruits = new Set(matches.map(m => m.icon));
         const hasFruit = uniqueFruits.has(game.fruits[2].icon);
         if (hasFruit) {
           this.props.mult += 1;
@@ -259,7 +259,7 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 0,
       onMatch(matches) {
-        const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+        const uniqueFruits = new Set(matches.map(m => m.icon));
         const hasFruit = uniqueFruits.has(game.fruits[3].icon);
         if (hasFruit) {
           this.props.mult += 1;
@@ -293,7 +293,7 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 0,
       onMatch(matches) {
-        const uniqueFruits = new Set(matches.map(m => m.fruit.icon));
+        const uniqueFruits = new Set(matches.map(m => m.icon));
         const hasFruit = uniqueFruits.has(game.fruits[4].icon);
         if (hasFruit) {
           this.props.mult += 1;
@@ -406,7 +406,7 @@ export const upgradeBlueprints = [
       onMatch(matches) {
         let found = false;
         matches.forEach(m => {
-          if (m.fruit.icon === game.fruits[3].icon) {
+          if (m.icon === game.fruits[3].icon) {
             this.props.score += this.props.value;
             found = true;
           }
@@ -599,7 +599,7 @@ export const upgradeBlueprints = [
         return UPGRADE_STATES.Active;
       },
       onMatch(payload) {
-        const uniqueFruits = new Set(payload.map(m => m.fruit.icon));
+        const uniqueFruits = new Set(payload.map(m => m.icon));
         if (uniqueFruits.has(this.props.chosenFruit.icon)) {
           this.props.mult *= 1.5;
           return UPGRADE_STATES.Active;
@@ -771,7 +771,7 @@ export const upgradeBlueprints = [
         if (this.props.chosenFruit == null) return UPGRADE_STATES.Failed;
         var found = false
         matches.forEach(m => {
-          if (m.fruit.icon === this.props.chosenFruit.icon) {
+          if (m.icon === this.props.chosenFruit.icon) {
             this.props.score += 20;
             found = true;
           }
@@ -859,7 +859,7 @@ export const upgradeBlueprints = [
       onMatch(matches) {
         let size = this.props.collected.size;
         matches.forEach(m => {
-          if (m.fruit.type == TYPES.Fruit) this.props.collected.add(m.fruit.icon)
+          if (m.fruit.type == TYPES.Fruit) this.props.collected.add(m.icon)
         });
 
         if (this.props.collected.size === game.fruits.length) {
