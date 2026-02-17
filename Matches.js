@@ -7,6 +7,7 @@ export class Matches {
     constructor(game) {
         this.game = game;
         this.matrixsize = game.matrixsize;
+        this.activeExplosions = [];
     }
     specialMatches(matches) {
         let special = [];
@@ -36,11 +37,16 @@ export class Matches {
         return uniqueMatches;
     }
     async processMatches(matches) {
+        if(this.game.activeExplosions.length>0){
+            console.log(this.game.activeExplosions);
+            this.game.activeExplosions.forEach(tile=>{
+                matches.push(...this.triggerSpecial(tile));
+            });
+        }
         let unique = this.specialMatches(matches);
         unique.forEach(tile => {
             matches.push(...this.triggerSpecial(tile));
         });
-        this.triggerSpecial()
         if (matches.length === 0) {
             await this.game.finishMatches();
             return;
@@ -74,7 +80,7 @@ export class Matches {
 
                     if (tile.props.detonations > 0) {
                         // still has detonations → keep in activeExplosions
-                        this.game.activeExplosions.push({ type: tile.type, detonations: tile.props.detonations });
+                        this.game.activeExplosions.push(tile);
                         continue; // skip fading / removal
                     }
                     // detonations now 0 → remove from activeExplosions if exists
@@ -136,8 +142,10 @@ export class Matches {
 
     triggerSpecial(tile, options = {}, collected = new Set()) {
         if (!tile) return;
-
-        const { x, y } = tile;
+        console.log("triggerSpecial");
+        console.log(tile);
+        const x = tile.x;
+        const y = tile.y;
         const key = `${x},${y}`;
 
         if (collected.has(key)) return;

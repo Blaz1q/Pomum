@@ -835,7 +835,9 @@ export class Game {
             const oldKey = `${exp.x},${exp.y}`;
             if (moveMap[oldKey]) {
                 const [nx, ny] = moveMap[oldKey].split(",").map(Number);
-                return { ...exp, x: nx, y: ny };
+                exp.x = nx;
+                exp.y = ny;
+                return exp;
             }
             return exp;
         });
@@ -972,16 +974,16 @@ export class Game {
         this.render();
 
         // 8) Continue cascade as before (compute specials / matches)
-        let triggerMatches = [];
-        if (this.activeExplosions.length > 0) {
-            for (const exp of [...this.activeExplosions]) {
-                const tile = this.board[exp.y][exp.x];
-                if (tile) triggerMatches.push(...this.triggerSpecial(exp.x, exp.y, tile));
-            }
-        }
+        // let triggerMatches = [];
+        // if (this.activeExplosions.length > 0) {
+        //     for (const exp of [...this.activeExplosions]) {
+        //         const tile = this.board[exp.y][exp.x];
+        //         if (tile) triggerMatches.push(...this.triggerSpecial(exp.x, exp.y, tile));
+        //     }
+        // }
 
         let matches = this.matchesManager.findMatches();
-        matches.push(...triggerMatches);
+        //matches.push(...triggerMatches);
         const map = {};
         for (const m of matches) map[`${m.x},${m.y}`] = m;
         matches = Object.values(map);
