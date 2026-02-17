@@ -169,10 +169,10 @@ export class Upgrade extends UpgradeBase {
           if (!copyBp) return null;
           copyUpgrade = new Upgrade(copyBp);
       }
-      if (typeof copyUpgrade.props?.effect === "function") {
-        copyUpgrade.props?.effect.call(this, game);
-        console.log("applied");
-      }
+      // if (typeof copyUpgrade.props?.effect === "function") {
+      //   copyUpgrade.props?.effect.call(this, game);
+      //   console.log("applied");
+      // }
       for (const key in source.props) {
         const val = source.props[key];
         if (typeof val !== "function") {
@@ -249,13 +249,17 @@ export class Upgrade extends UpgradeBase {
   reset(){
     this.props?.reset?.call(this,game);
   }
-  sell(game) {
-    this.bought = false;
+  remove(game){
+     this.bought = false;
     if (this.negative) {
       game.maxUpgrades -= 1;
       game.GameRenderer.displayUpgradesCounter();
     }
     this.props?.remove?.call(this, game);
+  }
+  sell(game) {
+    this.bought = false;
+    this.remove(game);
     //this.remove.call(this, game); // this wewnątrz remove wskazuje na instancję
     this.removeSpecial(game);
     game.money += Math.floor(this.sellPrice);

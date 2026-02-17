@@ -271,11 +271,13 @@ export const consumableUpgradeBlueprints = [
       const newUpgrade = Upgrade.Copy(copy);
       console.log(newUpgrade);
       game.upgrades.forEach((upgrade) => {
-        if (upgrade != copy) upgrade.props?.remove(game);
+        upgrade.remove(game);
       });
       game.upgrades = [];
-      newUpgrade.props?.effect(game);
       game.upgrades.push(copy, newUpgrade);
+      game.upgrades.forEach(upgrade => {
+          upgrade.apply(game);
+      });
       game.GameRenderer.displayPlayerUpgrades();
       game.GameRenderer.displayUpgradesCounter();
     },
