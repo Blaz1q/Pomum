@@ -23,7 +23,7 @@ export const upgradeBlueprints = [
         const uniqueFruits = new Set(payload.map(m => m.icon));
         const hasFruit = uniqueFruits.has(game.fruits[0].icon);
         if (hasFruit) return UPGRADE_STATES.Failed;
-        this.score += 60;
+        this.props.score += 60;
         return UPGRADE_STATES.Active;
       },
       onScore() {
