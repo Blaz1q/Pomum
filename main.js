@@ -786,65 +786,50 @@ export class Game {
     // french 15
     // po stylidstce 20
     collapseBoard(spawnCounts, preSpawns = null) {
-        // compute final placements but do NOT mutate DOM here
-        console.log("Collapse started", performance.now());
-        const size = this.board.length;
-        const moveMap = {}; // oldKey -> newKey
+    const size = this.board.length;
 
-        for (let x = 0; x < size; x++) {
-            let writeY = size - 1;
+    for (let x = 0; x < size; x++) {
+        let writeY = size - 1;
 
-            for (let y = size - 1; y >= 0; y--) {
-                const tile = this.board[y][x];
-                if (tile) {
-                    if (writeY !== y) {
-                        const oldKey = `${x},${y}`;
-                        const newKey = `${x},${writeY}`;
-                        moveMap[oldKey] = newKey;
-
-                        this.board[writeY][x] = tile;
-                        this.board[y][x] = null;
-
-                        tile.x = x;
-                        tile.y = writeY;
-                    }
-                    writeY--;
-                }
-            }
-
-            // fill empty cells with new random tiles (or use preSpawns)
-            for (let y = writeY; y >= 0; y--) {
-                if (preSpawns && preSpawns[x] && preSpawns[x].length > 0) {
-                    // preSpawns stored highest-first (index 0 -> finalY writeY)
-                    // When we generated preSpawns we should have created them in this order.
-                    const next = preSpawns[x].shift();
-                    this.board[y][x] = next;
-
-                    next.x = x;
-                    next.y = y;
-                } else {
-                    tile = this.randomTile(x, y);
-                    this.board[y][x] = this.randomTile(x, y);
-                }
-                spawnCounts[x]++;
+        // Przesuwanie istniejących kafelków w dół
+        for (let y = size - 1; y >= 0; y--) {
+            const tile = this.board[y][x];
+            if (tile) {
+                this.board[y][x] = null; // Czyścimy starą pozycję
+                this.board[writeY][x] = tile;
+                
+                // Aktualizujemy właściwości obiektu - to automatycznie 
+                // naprawia pozycję w activeExplosions, bo to ta sama referencja!
+                tile.x = x;
+                tile.y = writeY;
+                
+                writeY--;
             }
         }
 
-        // update active explosions based on moveMap
-        this.activeExplosions = this.activeExplosions.map(exp => {
-            const oldKey = `${exp.x},${exp.y}`;
-            if (moveMap[oldKey]) {
-                const [nx, ny] = moveMap[oldKey].split(",").map(Number);
-                exp.x = nx;
-                exp.y = ny;
-                return exp;
+        // Dodawanie nowych kafelków
+        for (let y = writeY; y >= 0; y--) {
+            let next;
+            if (preSpawns && preSpawns[x] && preSpawns[x].length > 0) {
+                next = preSpawns[x].shift();
+            } else {
+                next = this.randomTile(x, y);
             }
-            return exp;
-        });
-
-        console.log(spawnCounts);
-        return spawnCounts;
+            this.board[y][x] = next;
+            next.x = x;
+            next.y = y;
+            spawnCounts[x]++;
+        }
     }
+
+    // Opcjonalnie: upewnij się, że w activeExplosions nie ma "duchów" 
+    // kafelków, które zostały usunięte z planszy
+    this.activeExplosions = this.activeExplosions.filter(exp => 
+        this.board[exp.y][exp.x] === exp
+    );
+
+    return spawnCounts;
+}
 
     // === NEW single-pass animateCollapse that animates both existing and new tiles together ===
 
@@ -987,7 +972,8 @@ export class Game {
         const map = {};
         for (const m of matches) map[`${m.x},${m.y}`] = m;
         matches = Object.values(map);
-
+        console.log("wizard");
+        console.log(matches);
         await new Promise(r => setTimeout(r, 10));
         this.matchesManager.processMatches(matches);
     }
@@ -1104,8 +1090,8 @@ function changeGameSpeed() {
     val = parseInt(val);
     Settings.FALL_MS = val;
     Settings.EMIT_TIMING_MS = val;
-    this.FALL_MS = val;
-    emitTimingMs = val;
+    game.FALL_MS = val;
+    game.emitTimingMs = val;
 }
 function toggleSound() {
     let val = document.getElementById("VolumeButton").checked;

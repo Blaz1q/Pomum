@@ -22,6 +22,74 @@ export class Matches {
         //console.log(special);
         return special;
     }
+    collectAllImpactedTiles(seeds) {
+    const visited = new Set();
+    const toProcess = [...seeds];
+    const results = [];
+
+    // Helper do generowania klucza
+    const getKey = (t) => `${t.x},${t.y}`;
+
+    // Najpierw dodaj naturalne dopasowania z planszy (jeśli nie ma ich w seeds)
+    const boardMatches = this.findMatches() || [];
+    boardMatches.forEach(m => {
+        const key = getKey(m);
+        if (!visited.has(key)) {
+            visited.add(key);
+            results.push(m);
+        }
+    });
+
+    // Procesuj kolejkę (eksplozje i ich reakcje łańcuchowe)
+    let head = 0;
+    while (head < toProcess.length) {
+        const tile = toProcess[head++];
+        const key = getKey(tile);
+
+        if (visited.has(key) && head > seeds.length) continue; 
+        visited.add(key);
+        if (!results.some(r => r.x === tile.x && r.y === tile.y)) {
+            results.push(tile);
+        }
+
+        // Jeśli to specjalny kafelek, dodaj jego sąsiadów do kolejki
+        if (tile.type === TYPES.Bomb || tile.type === TYPES.Dynamite) {
+            const neighbors = this.getNeighborsForSpecial(tile);
+            for (const neighbor of neighbors) {
+                const nKey = getKey(neighbor);
+                if (!visited.has(nKey)) {
+                    toProcess.push(neighbor);
+                }
+            }
+        }
+    }
+    return results;
+}
+
+// Pomocnicza metoda wyciągnięta z triggerSpecial
+getNeighborsForSpecial(tile) {
+    const { x, y } = tile;
+    const neighbors = [];
+    
+    const add = (nx, ny) => {
+        if (nx >= 0 && ny >= 0 && nx < this.matrixsize && ny < this.matrixsize) {
+            const t = this.game.board[ny][nx];
+            if (t) neighbors.push(t);
+        }
+    };
+
+    if (tile.type === TYPES.Dynamite) {
+        add(x + 1, y); add(x - 1, y); add(x, y + 1); add(x, y - 1);
+    } else if (tile.type === TYPES.Bomb) {
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                if (dx === 0 && dy === 0) continue;
+                add(x + dx, y + dy);
+            }
+        }
+    }
+    return neighbors;
+}
     dedupe(matches) {
         const seen = new Set();
         const uniqueMatches = matches.filter(tile => {
@@ -37,24 +105,26 @@ export class Matches {
         return uniqueMatches;
     }
     async processMatches(matches) {
-        if(this.game.activeExplosions.length>0){
-            console.log(this.game.activeExplosions);
-            this.game.activeExplosions.forEach(tile=>{
-                matches.push(...this.triggerSpecial(tile));
-            });
+        let seeds = [...matches];
+        if (this.game.activeExplosions.length > 0) {
+            seeds.push(...this.game.activeExplosions);
         }
+
+        // 2. Jednorazowe wywołanie triggerSpecial dla wszystkich nasion
+        // To zwróci unikalną listę wszystkich trafionych kafelków
+        let finalMatches = this.collectAllImpactedTiles(seeds);
         let unique = this.specialMatches(matches);
         unique.forEach(tile => {
             matches.push(...this.triggerSpecial(tile));
         });
-        if (matches.length === 0) {
+        if (finalMatches.length === 0) {
             await this.game.finishMatches();
             return;
         }
         this.game.locked = true;
 
         console.log("waiting for matches..")
-
+        matches = finalMatches;
         //console.log(this.isSixLine(matches));
         //dedupe matches.
 

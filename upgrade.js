@@ -157,11 +157,15 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 0,
       onMatch(matches) {
-        const uniqueFruits = new Set(matches.map(m => m.icon));
-        const hasFruit = uniqueFruits.has(game.fruits[0].icon);
-        if (hasFruit) {
-          this.props.mult += 1;
-          return UPGRADE_STATES.Active;
+        let gained = 0;
+        matches.forEach(fruit => {
+            if(fruit.icon == game.fruits[0].icon){
+              gained++;
+            }
+        });
+        if(gained>0){
+          this.props.mult += gained;
+          return { state: UPGRADE_STATES.Active, message: `+${gained} Mult`, style: SCORE_ACTIONS.Mult };
         }
         return UPGRADE_STATES.Failed;
       },
@@ -190,11 +194,15 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 0,
       onMatch(matches) {
-        const uniqueFruits = new Set(matches.map(m => m.icon));
-        const hasFruit = uniqueFruits.has(game.fruits[1].icon);
-        if (hasFruit) {
-          this.props.mult += 1;
-          return UPGRADE_STATES.Active;
+        let gained = 0;
+        matches.forEach(fruit => {
+            if(fruit.icon == game.fruits[1].icon){
+              gained++;
+            }
+        });
+        if(gained>0){
+          this.props.mult += gained;
+          return { state: UPGRADE_STATES.Active, message: `+${gained} Mult`, style: SCORE_ACTIONS.Mult };
         }
         return UPGRADE_STATES.Failed;
       },
@@ -227,11 +235,15 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 0,
       onMatch(matches) {
-        const uniqueFruits = new Set(matches.map(m => m.icon));
-        const hasFruit = uniqueFruits.has(game.fruits[2].icon);
-        if (hasFruit) {
-          this.props.mult += 1;
-          return UPGRADE_STATES.Active;
+        let gained = 0;
+        matches.forEach(fruit => {
+            if(fruit.icon == game.fruits[2].icon){
+              gained++;
+            }
+        });
+        if(gained>0){
+          this.props.mult += gained;
+          return { state: UPGRADE_STATES.Active, message: `+${gained} Mult`, style: SCORE_ACTIONS.Mult };
         }
         return UPGRADE_STATES.Failed;
       },
@@ -259,11 +271,15 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 0,
       onMatch(matches) {
-        const uniqueFruits = new Set(matches.map(m => m.icon));
-        const hasFruit = uniqueFruits.has(game.fruits[3].icon);
-        if (hasFruit) {
-          this.props.mult += 1;
-          return UPGRADE_STATES.Active;
+        let gained = 0;
+        matches.forEach(fruit => {
+            if(fruit.icon == game.fruits[3].icon){
+              gained++;
+            }
+        });
+        if(gained>0){
+          this.props.mult += gained;
+          return { state: UPGRADE_STATES.Active, message: `+${gained} Mult`, style: SCORE_ACTIONS.Mult };
         }
         return UPGRADE_STATES.Failed;
       },
@@ -293,11 +309,15 @@ export const upgradeBlueprints = [
     props: () => ({
       mult: 0,
       onMatch(matches) {
-        const uniqueFruits = new Set(matches.map(m => m.icon));
-        const hasFruit = uniqueFruits.has(game.fruits[4].icon);
-        if (hasFruit) {
-          this.props.mult += 1;
-          return UPGRADE_STATES.Active;
+        let gained = 0;
+        matches.forEach(fruit => {
+            if(fruit.icon == game.fruits[4].icon){
+              gained++;
+            }
+        });
+        if(gained>0){
+          this.props.mult += gained;
+          return { state: UPGRADE_STATES.Active, message: `+${gained} Mult`, style: SCORE_ACTIONS.Mult };
         }
         return UPGRADE_STATES.Failed;
       },
@@ -444,7 +464,7 @@ export const upgradeBlueprints = [
       score: 0,
       onMatch() {
         this.props.score += 30;
-        return UPGRADE_STATES.Active;
+        return { state: UPGRADE_STATES.Active, message: `+30 pkt`, style: SCORE_ACTIONS.Score };
       },
       onScore() {
         let messagescore = this.props.score;
@@ -926,14 +946,15 @@ export const upgradeBlueprints = [
     },
     props: () => ({
       chosenFruit: null,
+      tried: false,
       onRoundStart() {
         this.isReady = true;
         return UPGRADE_STATES.Ready;
       },
       onMove(payload) {
         const matches = payload.matches;
-        if (game.consumables.length >= game.maxConsumables) return UPGRADE_STATES.Failed;
-        if (this.props.chosenFruit != null) return UPGRADE_STATES.Failed;
+        //if (game.consumables.length >= game.maxConsumables) return UPGRADE_STATES.Failed;
+        if (this.props.tried == true) return UPGRADE_STATES.Failed;
         console.log(matches);
         let match = matches.filter(m => m.type === TYPES.Fruit);
         const firstFruit = match[0] ?? null; //fix this
@@ -945,9 +966,11 @@ export const upgradeBlueprints = [
         game.Audio.playSound('pop.mp3');
         game.GameRenderer.displayPlayerConsumables();
         game.GameRenderer.displayConsumablesCounter();
+        this.props.tried = true;
         return UPGRADE_STATES.Active;
       },
       onRoundEnd() {
+        this.props.tried = false;
         this.props.chosenFruit = null;
         return UPGRADE_STATES.Active;
       },
@@ -1060,9 +1083,9 @@ export const upgradeBlueprints = [
           this.props = { ...this.mirroredProps, image: "mirror" };
 
           // Jeśli kopiowane ulepszenie ma effect (np. dodaje ruchy), wywołaj go dla lustra
-          // if (typeof copyUpgrade.props.effect === "function") {
-          //   copyUpgrade.props?.effect(game);
-          // }
+          if (typeof copyUpgrade.props.effect === "function") {
+            copyUpgrade.props?.effect(game);
+          }
         } catch (e) {
           console.error("Mirror Copy Error:", e);
           this.props = { image: "brokenmirror" };
