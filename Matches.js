@@ -27,42 +27,39 @@ export class Matches {
     const toProcess = [...seeds];
     const results = [];
 
-    // Helper do generowania klucza
     const getKey = (t) => `${t.x},${t.y}`;
 
-    // Najpierw dodaj naturalne dopasowania z planszy (jeśli nie ma ich w seeds)
-    const boardMatches = this.findMatches() || [];
-    boardMatches.forEach(m => {
-        const key = getKey(m);
-        if (!visited.has(key)) {
-            visited.add(key);
-            results.push(m);
-        }
-    });
+    // 1. Dodaj nasiona do visited, żeby nie przetwarzać ich dwa razy
+    seeds.forEach(s => visited.add(getKey(s)));
 
-    // Procesuj kolejkę (eksplozje i ich reakcje łańcuchowe)
+    // 2. BFS dla reakcji łańcuchowej
     let head = 0;
     while (head < toProcess.length) {
         const tile = toProcess[head++];
-        const key = getKey(tile);
+        results.push(tile);
 
-        if (visited.has(key) && head > seeds.length) continue; 
-        visited.add(key);
-        if (!results.some(r => r.x === tile.x && r.y === tile.y)) {
-            results.push(tile);
-        }
-
-        // Jeśli to specjalny kafelek, dodaj jego sąsiadów do kolejki
+        // Jeśli trafiony element to bomba/dynamit -> niszczy sąsiadów
         if (tile.type === TYPES.Bomb || tile.type === TYPES.Dynamite) {
             const neighbors = this.getNeighborsForSpecial(tile);
-            for (const neighbor of neighbors) {
-                const nKey = getKey(neighbor);
+            for (const n of neighbors) {
+                const nKey = getKey(n);
                 if (!visited.has(nKey)) {
-                    toProcess.push(neighbor);
+                    visited.add(nKey);
+                    toProcess.push(n); // Dodajemy sąsiada do kolejki - jeśli to bomba, ona też wybuchnie!
                 }
             }
         }
     }
+    
+    // 3. Dodaj normalne dopasowania (owoce), które mogły nie zostać trafione przez bomby
+    const boardMatches = this.findMatches() || [];
+    boardMatches.forEach(m => {
+        if (!visited.has(getKey(m))) {
+            results.push(m);
+            visited.add(getKey(m));
+        }
+    });
+
     return results;
 }
 
@@ -105,110 +102,115 @@ getNeighborsForSpecial(tile) {
         return uniqueMatches;
     }
     async processMatches(matches) {
-        let seeds = [...matches];
-        if (this.game.activeExplosions.length > 0) {
-            seeds.push(...this.game.activeExplosions);
-        }
-
-        // 2. Jednorazowe wywołanie triggerSpecial dla wszystkich nasion
-        // To zwróci unikalną listę wszystkich trafionych kafelków
-        let finalMatches = this.collectAllImpactedTiles(seeds);
-        let unique = this.specialMatches(matches);
-        unique.forEach(tile => {
-            matches.push(...this.triggerSpecial(tile));
-        });
-        if (finalMatches.length === 0) {
-            await this.game.finishMatches();
-            return;
-        }
-        this.game.locked = true;
-
-        console.log("waiting for matches..")
-        matches = finalMatches;
-        //console.log(this.isSixLine(matches));
-        //dedupe matches.
-
-        matches = this.dedupe(matches); //przez to że deduplikacja jest tutaj, możliwe będzie kopiowanie niektórych upgrade'ów (np. SAPER).
-        if (this.isFiveLine(matches) || this.isLShape(matches)) {
-            this.game.mult += 1.5;
-        }
-        console.log(matches);
-        await this.game.emit(GAME_TRIGGERS.onMatch, matches);
-        if (this.game.FALL_MS > MIN_FALL_MS) {
-            this.game.FALL_MS -= 10;
-        }
-        console.log("ended.");
-        // pozwól przeglądarce „zobaczyć” stan po swapie zanim nałożymy .fade
-        requestAnimationFrame(() => {
-            for (const m of matches) {
-                const idx = m.y * this.matrixsize + m.x;
-                const cell = this.game.gameContainer.children[idx];
-                const tile = this.game.board[m.y][m.x];
-                if (tile && (tile.type === TYPES.Bomb || tile.type === TYPES.Dynamite)) {
-                    // decrement detonations
-                    tile.props.detonations -= 1;
-
-                    if (tile.props.detonations > 0) {
-                        // still has detonations → keep in activeExplosions
-                        this.game.activeExplosions.push(tile);
-                        continue; // skip fading / removal
-                    }
-                    // detonations now 0 → remove from activeExplosions if exists
-                    this.game.activeExplosions = this.game.activeExplosions.filter(e => !(e.x === m.x && e.y === m.y));
-                }
-                if (cell) cell.classList.add("fade");
-            }
-            setTimeout(() => {
-                // fizycznie usuń z board
-                let groups = {};
-                let addmoney = 0;
-                for (const m of matches) {
-                    const tile = this.game.board[m.y][m.x];
-                    let skip = false;
-                    this.game.activeExplosions.forEach(detonation => {
-                        if (m.x == detonation.x && m.y == detonation.y) skip = true;
-                    });
-                    if (skip) continue;
-                    let gold = tile.props.modifier == MODIFIERS.Gold;
-                    let silver = tile.props.modifier == MODIFIERS.Silver;
-                    let type = tile.icon;
-                    if (gold) {
-                        addmoney++;
-                    }
-                    if (silver) {
-                        this.game.mult = this.game.mult * 1.5;
-                    }
-                    if (!groups[type]) {
-                        groups[type] = {
-                            mult: 0,
-                            multAdded: false
-                        };
-                    }
-                    if (!groups[type].multAdded && !tile.props.debuffed) {
-                        groups[type].mult = tile.props.upgrade.mult;
-                        groups[type].multAdded = true;
-                    }
-                    if (!tile.props.debuffed) this.game.tempscore += Math.round(tile.props.upgrade.score);
-                    this.game.board[m.y][m.x] = null;
-                }
-                if (addmoney > 0) {
-                    this.game.Audio.playSound('buy.mp3');
-                    this.game.GameRenderer.updateMoney(addmoney);
-                    this.game.money += addmoney;
-                }
-                for (let type in groups) {
-                    let group = groups[type];
-                    this.game.mult += group.mult;
-                    this.game.mult = Math.round(this.game.mult * 100) / 100;
-                }
-                this.game.Audio.playSound('score_sound.mp3', this.game.pitch);
-                this.game.pitch += 0.2;
-                this.game.GameRenderer.displayTempScore();
-                // animacja spadania istniejących owoców
-                this.game.animateCollapse();
-            }, FADE_MS);
-        });
+    // 1. Definiujemy punkty zapalne (to co przyszło z dopasowań + to co już wybucha)
+    let seeds = [...matches];
+    if (this.game.activeExplosions.length > 0) {
+        seeds.push(...this.game.activeExplosions);
     }
+
+    // 2. JEDNO wywołanie, które zajmie się całą rekurencją i reakcjami łańcuchowymi
+    // collectAllImpactedTiles sam wywoła getNeighborsForSpecial, więc nie potrzebujemy triggerSpecial!
+    let finalMatches = this.collectAllImpactedTiles(seeds);
+
+    if (finalMatches.length === 0) {
+        await this.game.finishMatches();
+        return;
+    }
+
+    this.game.locked = true;
+    
+    // Nadpisujemy matches wynikiem z optymalnego zbierania
+    matches = finalMatches;
+
+    // 3. Sprawdzanie bonusów (mnożniki za 5-line / L-Shape)
+    if (this.isFiveLine(matches) || this.isLShape(matches)) {
+        this.game.mult += 1.5;
+    }
+
+    // 4. Emitowanie zdarzeń i dźwięków
+    await this.game.emit(GAME_TRIGGERS.onMatch, matches);
+    
+    if (this.game.FALL_MS > MIN_FALL_MS) {
+        this.game.FALL_MS -= 10;
+    }
+
+    // 5. Animacja Fading i obsługa detonacji
+    requestAnimationFrame(() => {
+        for (const m of matches) {
+            const idx = m.y * this.matrixsize + m.x;
+            const cell = this.game.gameContainer.children[idx];
+            const tile = this.game.board[m.y][m.x];
+
+            if (tile && (tile.type === TYPES.Bomb || tile.type === TYPES.Dynamite)) {
+                tile.props.detonations -= 1;
+
+                if (tile.props.detonations > 0) {
+                    // Dodaj do aktywnych, jeśli ma jeszcze ładunki
+                    if (!this.game.activeExplosions.includes(tile)) {
+                        this.game.activeExplosions.push(tile);
+                    }
+                    continue; // Nie dodajemy klasy .fade, bo bomba zostaje
+                } else {
+                    // Usuń z aktywnych, jeśli wybuchła całkowicie
+                    this.game.activeExplosions = this.game.activeExplosions.filter(e => e !== tile);
+                }
+            }
+            if (cell) cell.classList.add("fade");
+        }
+
+        // 6. Fizyczne usuwanie z tablicy board po zakończeniu fade
+        setTimeout(() => {
+            let groups = {};
+            let addmoney = 0;
+
+            for (const m of matches) {
+                const tile = this.game.board[m.y][m.x];
+                if (!tile) continue;
+
+                // Skip, jeśli to bomba która ma jeszcze detonacje
+                let isStillActive = this.game.activeExplosions.some(e => e.x === m.x && e.y === m.y);
+                if (isStillActive) continue;
+
+                // Logika złota/srebra/punktów
+                if (tile.props.modifier == MODIFIERS.Gold) addmoney++;
+                if (tile.props.modifier == MODIFIERS.Silver) this.game.mult *= 1.5;
+
+                let type = tile.icon;
+                if (!groups[type]) groups[type] = { mult: 0, added: false };
+                
+                if (!groups[type].added && !tile.props.debuffed) {
+                    groups[type].mult = tile.props.upgrade.mult;
+                    groups[type].added = true;
+                }
+
+                if (!tile.props.debuffed) {
+                    this.game.tempscore += Math.round(tile.props.upgrade.score);
+                }
+
+                // Usunięcie z tablicy
+                this.game.board[m.y][m.x] = null;
+            }
+
+            // Aktualizacja multów z grup
+            for (let type in groups) {
+                this.game.mult += groups[type].mult;
+            }
+            this.game.mult = Math.round(this.game.mult * 100) / 100;
+
+            if (addmoney > 0) {
+                this.game.Audio.playSound('buy.mp3');
+                this.game.money += addmoney;
+                this.game.GameRenderer.updateMoney(addmoney);
+            }
+
+            this.game.Audio.playSound('score_sound.mp3', this.game.pitch);
+            this.game.pitch += 0.2;
+            this.game.GameRenderer.displayTempScore();
+            
+            this.game.animateCollapse();
+        }, FADE_MS);
+    });
+}
 
     triggerSpecial(tile, options = {}, collected = new Set()) {
         if (!tile) return;
