@@ -761,7 +761,7 @@ export const upgradeBlueprints = [
       onMove(payload) {
         const matches = payload.matches;
         if (this.props.chosenFruit == null) {
-          const firstFruit = matches[0]?.fruit ?? null;
+          const firstFruit = matches[0] ?? null;
           this.props.chosenFruit = firstFruit;
           return UPGRADE_STATES.Active;
         }
@@ -936,11 +936,11 @@ export const upgradeBlueprints = [
         if (this.props.chosenFruit != null) return UPGRADE_STATES.Failed;
         console.log(matches);
         let match = matches.filter(m => m.type === TYPES.Fruit);
-        const firstFruit = match[0]?.fruit ?? null; //fix this
+        const firstFruit = match[0] ?? null; //fix this
         this.props.chosenFruit = firstFruit;
-        const pool = consumableList.filter(cons => cons?.props?.getFruit?.(game)?.icon === this.props.chosenFruit.icon);
+        const pool = consumableList.filter(cons => cons?.getFruit?.(game)?.icon === this.props.chosenFruit.icon);
         const rc = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null;
-        let consumable = new Consumable(rc.name, rc.description, rc.effect, rc.price, rc.props);
+        let consumable = new Consumable(rc);
         game.consumables.push(consumable);
         game.Audio.playSound('pop.mp3');
         game.GameRenderer.displayPlayerConsumables();
