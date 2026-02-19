@@ -30,6 +30,7 @@ export class Game {
         this.movescounter = 0;
         this.moveBox = document.getElementById("moves");
         //game
+        this.continue = false;
         this.round = 0;
         this.level = 0;
         this.Audio = Audio;
@@ -246,11 +247,18 @@ export class Game {
         this.GameRenderer.displayBoosterPacks();
         this.GameRenderer.displayMoney();
     }
+    gamewon(){
+        this.GameRenderer.gameWon();
+    }
     gameover() {
         this.GameRenderer.gameOver();
     }
     endround() {
         emitTimingMs = Settings.EMIT_TIMING_MS;
+        if(this.round==20&&this.continue==false){
+            this.gamewon();
+            return;
+        }
         let addmoney = 0;
         this.GameRenderer.displayUpgradesCounter();
         this.GameRenderer.displayMoves();
@@ -1117,6 +1125,11 @@ function toggleDarkMode() {
         animate.animateColors(COLORS.magicPurples, DURATIONS.ANIMATION_DURATION);
     }
 }
+function continueGame(){
+    game.continue = true;
+    game.endround();
+    document.getElementById("game-won").style.display = "none";
+}
 function toggleLowGraphics(){
     let val = document.getElementById("graphicsToggle").checked;
     Settings.LOW_GRAPHICS = val;
@@ -1142,6 +1155,7 @@ function animateholo() {
     requestAnimationFrame(animateholo);
 }
 animateholo();
+window.continueGame = continueGame;
 window.showSettings = showSettings;
 window.hideSettings = hideSettings;
 window.toggleDarkMode = toggleDarkMode;

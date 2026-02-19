@@ -1,5 +1,10 @@
 import { Settings } from "./dictionary.js";
 import { game } from "./main.js";
+//performance test
+let frameTimes = [];
+let autoPerformanceCheckDone = false;
+const SAMPLES_NEEDED = 60;
+
 async function loadShaderFile(url) {
     const response = await fetch(url);
     return await response.text();
@@ -259,11 +264,33 @@ initShaders().then(program => {
     let startTime = performance.now();
 
     function render() {
+        const now = performance.now();
+
         const smoothCols = animate.updateColors();
         const waveSettings = animate.updateWave();
         const fluidSettings = animate.updateFluid();
         const timeNow = (performance.now() - startTime) * 0.001;
+        
         const currentLight = animate.updateLight();
+        
+        if (!autoPerformanceCheckDone && !Settings.LOW_GRAPHICS) {
+            if (animate.lastFrameTime) {
+                const delta = now - animate.lastFrameTime;
+                frameTimes.push(delta);
+            }
+            animate.lastFrameTime = now;
+
+            if (frameTimes.length >= SAMPLES_NEEDED) {
+                const avgDelta = frameTimes.reduce((a, b) => a + b) / frameTimes.length;
+                
+                // Jeśli średni czas klatki > 33ms (poniżej 30 FPS)
+                if (avgDelta > 33) {
+                    console.warn("Wykryto niską wydajność. Przełączanie na tryb uproszczony.");
+                    Settings.LOW_GRAPHICS = true;
+                }
+                autoPerformanceCheckDone = true; 
+            }
+        }
 
         if (Settings.LOW_GRAPHICS) {
             // Używamy pierwszego koloru z palety jako tła

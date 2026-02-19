@@ -697,7 +697,7 @@ canvas#glcanvas {
   transform: translateY(-15px); /* płynnie do góry */
 }
 
-#game-over, #info-container, #settingsPanel {
+#game-won, #game-over, #info-container, #settingsPanel {
   position: fixed;
   top: 0;
   left: 0;
@@ -710,23 +710,23 @@ canvas#glcanvas {
   align-items: center;
   z-index: 999;
 }
-#game-over .game-over-content, #info-container .game-over-content, #settingsPanel .game-over-content {
+#game-won .game-over-content, #game-over .game-over-content, #info-container .game-over-content, #settingsPanel .game-over-content {
   background: light-dark(rgba(255, 255, 255, 0.85), rgba(32, 32, 32, 0.85));
   padding: 2rem 3rem;
   border-radius: 15px;
   text-align: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
-#game-over .game-over-content .game-over h1, #info-container .game-over-content .game-over h1, #settingsPanel .game-over-content .game-over h1 {
+#game-won .game-over-content .game-over h1, #game-over .game-over-content .game-over h1, #info-container .game-over-content .game-over h1, #settingsPanel .game-over-content .game-over h1 {
   margin: 0 0 1rem;
   font-size: 2.5rem;
   color: #c0392b;
 }
-#game-over .game-over-content .game-over p, #info-container .game-over-content .game-over p, #settingsPanel .game-over-content .game-over p {
+#game-won .game-over-content .game-over p, #game-over .game-over-content .game-over p, #info-container .game-over-content .game-over p, #settingsPanel .game-over-content .game-over p {
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
 }
-#game-over .game-over-content button, #info-container .game-over-content button, #settingsPanel .game-over-content button {
+#game-won .game-over-content button, #game-over .game-over-content button, #info-container .game-over-content button, #settingsPanel .game-over-content button {
   margin: 0.5rem;
   padding: 0.7rem 1.5rem;
   border: none;
@@ -738,7 +738,7 @@ canvas#glcanvas {
   color: #fff;
   transition: background 0.2s;
 }
-#game-over .game-over-content button:hover, #info-container .game-over-content button:hover, #settingsPanel .game-over-content button:hover {
+#game-won .game-over-content button:hover, #game-over .game-over-content button:hover, #info-container .game-over-content button:hover, #settingsPanel .game-over-content button:hover {
   background: #e74c3c;
 }
 

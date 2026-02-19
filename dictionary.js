@@ -76,6 +76,10 @@ export const COLORS = {
         light: ["#b1b1b1ff", "#cfcfcfff", "#e6e6e6ff"],
         dark: ["#6E6E6E", "#858585", "#9C9C9C"],
     },
+    gameWon: {
+        light: ["#FFD700", "#FFDF33", "#FFEA70"],
+        dark: ["#B8860B", "#D4A017", "#E6B800"], 
+    },
     shopGreens: {
         light: ["#3CB371", "#45D17A", "#58E78F"],
         dark: ["#2E8B57", "#2FAE68", "#35C978"],

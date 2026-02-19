@@ -404,7 +404,28 @@ export class RenderUI {
       }, duration + 120);
     });
   }
-
+  displayStatistics() {
+    const statsContainers = document.querySelectorAll(".stats");
+    statsContainers.forEach(container => {
+        // Wstawiamy wygenerowany HTML do środka elementu
+        container.innerHTML = "";
+        // Generujemy nowy wrapper i dodajemy go jako dziecko
+        container.appendChild(this.renderStats());
+    });
+}
+  renderStats(){
+    const wrapper = document.createElement("div");
+    let zniszczone_owoce = document.createElement("p");
+    zniszczone_owoce.innerHTML = "Zniszczone owoce: <b>"+this.game.stats.countAllDestroyed()+"</b>";
+    let najczesciej_zniszczony = document.createElement("p");
+    const bestStat = this.game.stats.destroyedTiles.reduce((prev, current) => {
+      return (prev.count > current.count) ? prev : current;
+    });
+    najczesciej_zniszczony.innerHTML = "Najczęściej zniszczony: <b>"+bestStat.icon+"</b>";
+    wrapper.appendChild(zniszczone_owoce);
+    wrapper.appendChild(najczesciej_zniszczony);
+    return wrapper;
+  }
   getPositions(container) {
     return [...container.children].map((el) => {
       const rect = el.getBoundingClientRect();
@@ -522,11 +543,26 @@ export class RenderUI {
 
     return full;
   }
+  gameWon(){
+    document.getElementById("game-won").style.display = "flex";
+    animate.animateColors(COLORS.gameWon, DURATIONS.ANIMATION_DURATION);
+    animate.smoothRotateTo(-1, DURATIONS.SWIRL_DURATION);
+    this.displaySeed();
+    this.displayStatistics();
+    //document.getElementById("final-score").innerHTML = this.game.round;
+  }
+  displaySeed(){
+    const seeds = document.querySelectorAll(".seed");
+    seeds.forEach(seed => {
+        seed.textContent = this.game.seed;
+    });
+  }
   gameOver() {
     document.getElementById("game-over").style.display = "flex";
     animate.animateColors(COLORS.gameOver, DURATIONS.ANIMATION_DURATION);
     animate.smoothRotateTo(-1, DURATIONS.SWIRL_DURATION);
     let upgrades = document.getElementById("final-upgrades");
+    this.displayStatistics();
     upgrades.innerHTML = "";
     upgrades.appendChild(
       this.displayUpgrades(this.game.upgrades, {
@@ -534,7 +570,7 @@ export class RenderUI {
         displayButtons: false,
       }),
     );
-    document.getElementById("seed").innerHTML = this.game.seed;
+    this.displaySeed();
     document.getElementById("final-score").innerHTML = this.game.round;
   }
   addParalax(card) {
