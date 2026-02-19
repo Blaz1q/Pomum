@@ -111,12 +111,13 @@ getNeighborsForSpecial(tile) {
     // 2. JEDNO wywołanie, które zajmie się całą rekurencją i reakcjami łańcuchowymi
     // collectAllImpactedTiles sam wywoła getNeighborsForSpecial, więc nie potrzebujemy triggerSpecial!
     let finalMatches = this.collectAllImpactedTiles(seeds);
-
+    
+    this.game.stats.setDestroyedTiles(finalMatches);
     if (finalMatches.length === 0) {
         await this.game.finishMatches();
         return;
     }
-
+    
     this.game.locked = true;
     
     // Nadpisujemy matches wynikiem z optymalnego zbierania

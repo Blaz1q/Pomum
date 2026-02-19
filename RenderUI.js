@@ -73,6 +73,7 @@ export class RenderUI {
     }
     let char = "";
     if (ammount < 0) {
+      this.game.stats.moneySpent-=ammount;
       char = "-";
       moneyContainer.classList.add("lost");
     } else {

@@ -9,6 +9,7 @@ import { Animator, animate } from "./loadshaders.js";
 import { cyrb128, getRandomString, sfc32 } from "./random.js";
 import { Roll } from "./roll.js";
 import { Matches } from "./Matches.js";
+import { Stats } from "./Stats.js";
 const CELL_PX = 50;
 let FADE_MS = Settings.FADE_MS;
 let FALL_MS = Settings.FALL_MS;
@@ -42,6 +43,7 @@ export class Game {
         this.silverChance = 0;
         this.tempscore = 0;
         this.score = 0;
+        this.stats = new Stats();
         this.GameRenderer = new RenderUI(this);
         this.scoreBox = document.getElementById("score");
         this.tempscoreBox = document.getElementById("tempscore");
@@ -464,6 +466,7 @@ export class Game {
     useConsumable(upgrade) {
         if (upgrade instanceof Consumable && upgrade.canUse(this)) {
             this.GameRenderer.resetAllUpgrades();
+            this.stats.updateTarot(upgrade);
             upgrade.apply(this);
             this.emit(GAME_TRIGGERS.onConsumableUse, upgrade);
             const idx = this.consumables.indexOf(upgrade);
@@ -480,6 +483,7 @@ export class Game {
         //if(this.stage!==STAGES.Shop) return false;
         if (upgrade instanceof Consumable && !upgrade.canUse(this)) return false;
         if (this.money + this.minMoney < upgrade.price) return false;
+        this.stats.updateTarot(upgrade);
         this.Audio.playSound('buy.mp3');
         this.money -= upgrade.price;
         this.GameRenderer.updateMoney(-upgrade.price);
@@ -1113,6 +1117,10 @@ function toggleDarkMode() {
         animate.animateColors(COLORS.magicPurples, DURATIONS.ANIMATION_DURATION);
     }
 }
+function toggleLowGraphics(){
+    let val = document.getElementById("graphicsToggle").checked;
+    Settings.LOW_GRAPHICS = val;
+}
 function showSettings() {
     document.getElementById("darkToggle").checked = Settings.DARK_MODE;
     document.getElementById("settingsPanel").style.display = "flex";
@@ -1137,6 +1145,7 @@ animateholo();
 window.showSettings = showSettings;
 window.hideSettings = hideSettings;
 window.toggleDarkMode = toggleDarkMode;
+window.toggleLowGraphics = toggleLowGraphics;
 window.toggleSound = toggleSound;
 window.showMenu = showMenu;
 window.changeGameSpeed = changeGameSpeed;
@@ -1158,3 +1167,4 @@ window.startGame = startGame;
 window.showMenu = showMenu;
 window.Settings = Settings;
 window.Tile = Tile;
+window.Stats = Stats;

@@ -100,6 +100,7 @@ export var Settings = {
     FADE_MS: 300,
     VOLUME: 1,
     PLAY_SOUND: true,
+    LOW_GRAPHICS: false,
 }
 export const GAMECOLORS = {
     warmOranges: {

@@ -536,6 +536,9 @@ const tarotCards = [
       this.message = { text: "Sukces!", style: SCORE_ACTIONS.Money };
       //this.UpgradeRenderer.createPopup("Sukces!",SCORE_ACTIONS.Money);
     },
+    canUse(game) {
+      return game.upgrades.length>0;
+    },
     price: 4,
     image: "fortuna",
   },

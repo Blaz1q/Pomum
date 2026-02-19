@@ -263,6 +263,22 @@ initShaders().then(program => {
         const waveSettings = animate.updateWave();
         const fluidSettings = animate.updateFluid();
         const timeNow = (performance.now() - startTime) * 0.001;
+        const currentLight = animate.updateLight();
+
+        if (Settings.LOW_GRAPHICS) {
+            // Używamy pierwszego koloru z palety jako tła
+            // Mnożymy przez jasność (light), aby zachować efekt ściemniania
+            const r = smoothCols[0][0] * currentLight*2;
+            const g = smoothCols[0][1] * currentLight*2;
+            const b = smoothCols[0][2] * currentLight*2;
+
+            gl.clearColor(r, g, b, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            
+            // Kontynuujemy pętlę, ale nie wykonujemy ciężkich operacji shadera
+            requestAnimationFrame(render);
+            return; 
+        }
         gl.useProgram(program);
         gl.uniform1f(u_waveAmp, waveSettings.amp);
         gl.uniform1f(u_waveFreq, waveSettings.freq);
