@@ -1030,7 +1030,7 @@ export const upgradeBlueprints = [
       this.mirroredUpgrade = null;
       this.mirroredUpgradeCopy = null;
       this.mirroredProps = {};
-      this.banned = ["fish", "Pożeracz"]; // Tutaj Mirror MOŻE kopiować inne Mirror (przez ultimate)
+      this.banned = ["fish", "Pożeracz", "Wampir", "Gorączka"]; // Tutaj Mirror MOŻE kopiować inne Mirror (przez ultimate)
 
       this.getUltimateNeighbor = () => {
         const myIndex = game.upgrades.indexOf(this);
@@ -1440,7 +1440,77 @@ export const upgradeBlueprints = [
     price: 4,
     ...COMMON,
     image: 'credit'
-  },/*
+  },
+  {
+    name: "Wróżka",
+    descriptionfn(game){
+      return `Za każdą użytą kartę tarota w grze ${Style.Mult(`+1 Mult`)}. (Obecnie ${Style.Mult(`+${game.stats.usedTarots} Mult`)})`;
+    },
+    props: ()=>({
+      onScore(){
+        if(game.stats.usedTarots<0) return UPGRADE_STATES.Failed;
+        game.mult += game.stats.usedTarots;
+        game.GameRenderer.displayTempScore();
+        return { state: UPGRADE_STATES.Score, message: `+${game.stats.usedTarots} Mult`, style: SCORE_ACTIONS.Mult };
+      }
+    }),
+    price: 5,
+    ...UNCOMMON,
+    ...defaultimage
+  },
+  {
+    name: "Lody",
+    descriptionfn(game){
+      return `Daje ${Style.Score(`+${this.props.score} pkt`)}. Co rundę punkty zmniejszają się o ${Style.Score(`-20 pkt`)}.`;
+    },
+    props: ()=>({
+      score: 500,
+      onRoundEnd(){
+        this.props.score -= 20;
+        return { state: UPGRADE_STATES.Active, message: `-20 pkt`, style: SCORE_ACTIONS.Score };
+      },
+      onScore(){
+        game.score += this.props.score;
+        game.GameRenderer.displayTempScore();
+        return { state: UPGRADE_STATES.Score, message: `+${this.props.score} pkt`, style: SCORE_ACTIONS.Score };
+      }
+    }),
+    price: 5,
+    ...UNCOMMON,
+  },
+  {
+    name: "Wampir",
+    descriptionfn(game){
+      return `Za każdy zniszczony ulepszony kafelek ${Style.Mult(`+X0.1 Mult`)}. Kafelek traci swoje ulepszenie. (Obecnie ${Style.Mult(`X${this.props.mult} Mult`)})`;
+    },
+    props: ()=>({
+      mult: 1,
+      onMatch(payload){
+        let gained = 0;
+        payload.forEach(tile => {
+          if(tile.props.modifier!=MODIFIERS.None){
+            gained+=0.1;
+            tile.props.modifier = MODIFIERS.None;
+          }
+        });
+        this.props.mult+=gained;
+        this.props.mult = Math.round(this.props.mult*100)/100;
+          if(gained>0){
+            return { state: UPGRADE_STATES.Active, message: `Upgrade!`, style: SCORE_ACTIONS.Money };
+          }
+          return UPGRADE_STATES.Failed;
+      },
+      onScore(){
+        if(this.mult<=0) return UPGRADE_STATES.Failed;
+        game.mult *= this.props.mult;
+        game.GameRenderer.displayTempScore();
+        return { state: UPGRADE_STATES.Score, message: `X${this.props.mult} Mult`, style: SCORE_ACTIONS.Mult };
+      }
+    }),
+    price: 6,
+    ...UNCOMMON,
+  }
+  /*
   {
     name: "Kosiarka",
     descriptionfn(game) {

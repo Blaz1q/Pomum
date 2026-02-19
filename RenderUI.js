@@ -149,8 +149,9 @@ export class RenderUI {
     const multBox = this.game.multBox;
 
     const newScore = this.game.tempscore;
-    const newMult = this.game.mult;
-
+    let newMult = this.game.mult;
+    newMult = Math.round(newMult * 100) / 100;
+    this.game.mult = newMult;
     const oldScore = scoreBox.innerHTML;
     const oldMult = multBox.innerHTML;
 
@@ -641,6 +642,7 @@ export class RenderUI {
   async dissolveAndRemove(wrapper, duration = 600) {
 
     if (!wrapper) return;
+    this.game.Audio.playSound("burn.mp3");
     await new Promise(resolve => setTimeout(resolve, 300));
     // 1. Lock layout - przygotowanie wymiarów (z Twojego 1. kodu)
     const rect = wrapper.getBoundingClientRect();
@@ -714,7 +716,6 @@ export class RenderUI {
   fadeOutAndRemove(wrapper, duration = 100) {
     //console.log(wrapper);
     if (!wrapper) return;
-
     // Lock computed size so the transition has a stable starting point
     const rect = wrapper.getBoundingClientRect();
     const computed = getComputedStyle(wrapper);

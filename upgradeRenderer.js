@@ -227,6 +227,7 @@ export class UpgradeRenderer {
         //return;
       }
       if (success) {
+        this.removeButtons();
         this.gameRenderer.dissolveAndRemove(wrapper, 1000);
         //wrapper.remove();
       } else {
@@ -414,8 +415,13 @@ export class UpgradeRenderer {
     this.applyDragEvents();
 
     oldWrapper.replaceWith(newWrapper);
-    this.trigger(0);
+    this.trigger(300);
     this.gameRenderer.game.Audio.playSound("tick.mp3");
+  }
+  removeButtons(){
+    const wrapper = this.upgrade.wrapper;
+    const buttonsContainer = wrapper.querySelector(".consumable-buttons");
+    buttonsContainer.innerHTML = "";
   }
   applyDragEvents() {
     const wrapper = this.upgrade.wrapper;
