@@ -188,7 +188,7 @@ export class RenderUI {
     const boosterPack = document.getElementById("boosterpack-container");
     boosterPack.innerHTML = "";
     boosterPack.appendChild(
-      this.displayUpgrades(this.game.roll.ConsumablePacks(2), {
+      this.displayUpgrades(this.game.roll.ConsumablePacks(this.game.maxBoosters), {
         bought: false,
       }),
     );

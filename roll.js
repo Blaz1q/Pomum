@@ -1,6 +1,6 @@
 import { UPGRADE_RARITY, MODIFIERS } from "./dictionary.js";
-import { vouchers, consumablePacks } from "./consumable.js";
-import { ConsumablePack } from "./upgradeBase.js";
+import { consumablePacks,coupons } from "./consumable.js";
+import { ConsumablePack, Voucher } from "./upgradeBase.js";
 
 export class Roll {
     constructor(game) {
@@ -39,19 +39,24 @@ export class Roll {
         return modifier;
     }
     Vouchers(count = 1) {
-        if (!vouchers || vouchers.length === 0) return [];
+        if (!coupons || coupons.length === 0) return [];
 
         // Get names of already owned vouchers
         const ownedNames = new Set(this.game.coupons.map(v => v.name));
 
         // Filter out owned vouchers
-        const available = vouchers.filter(v => !ownedNames.has(v.name));
+        const available = coupons.filter(v => !ownedNames.has(v.name));
 
         if (available.length === 0) return []; // player owns all vouchers
 
-        // Shuffle and pick `count` vouchers
-        const shuffled = [...available].sort(() => this.game.voucherRand() - 0.5);
-        return shuffled.slice(0, count);
+        const result = [];
+        for(let n =0; n<count; n++){
+            const item  = this.weightedPick(available, this.game.voucherRand.bind(this));
+            let coupon = new Voucher(item);
+            result.push(coupon);
+        
+        }
+        return result;
     }
     ConsumablePacks(count = 2) {
         const game = this.game;

@@ -70,6 +70,7 @@ export class Game {
         //upgrades
         this.maxUpgrades = 4;
         this.maxConsumables = 2;
+        this.maxBoosters = 2;
         //storage
         this.upgrades = [];
         this.consumables = [];

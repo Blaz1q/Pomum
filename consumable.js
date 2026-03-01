@@ -9,7 +9,6 @@ import {
   STAGES,
 } from "./dictionary.js";
 export const consumableList = [];
-export const vouchers = [];
 const pomumpackItems = [];
 function desc(fruit) {
   return `daje ${Style.Score("+2 punkty")}, ${Style.Mult("+0.4 mult")} do ${fruit.icon}, obecnie ${Style.Score("+" + fruit.props.upgrade.score + " punktów")}, ${Style.Mult("+" + fruit.props.upgrade.mult + " mult")}`;
@@ -677,20 +676,21 @@ function evilfunc(game, fruit) {
     game.addChancesExcept(fruit, 1.25);
   }
 }
-const voucher = new Voucher({
-  name: "Voucher",
-  descriptionfn(game) {
-    return `Zwiększa miejsce na ulepszenia o 1. (Obecnie ${Style.Chance(game.maxUpgrades)} -> ${Style.Chance(game.maxUpgrades + 1)})`;
+export const coupons = [
+  {
+   name: "Voucher",
+    descriptionfn(game) {
+      return `Zwiększa miejsce na ulepszenia o 1. (Obecnie ${Style.Chance(game.maxUpgrades)} -> ${Style.Chance(game.maxUpgrades + 1)})`;
+    },
+    effect(game) {
+      game.maxUpgrades += 1;
+      game.GameRenderer.displayUpgradesCounter();
+      game.emit(GAME_TRIGGERS.onUpgradesChanged);
+    },
+    price: 10,
+    image: "coupon_plus1",
   },
-  effect(game) {
-    game.maxUpgrades += 1;
-    game.GameRenderer.displayUpgradesCounter();
-    game.emit(GAME_TRIGGERS.onUpgradesChanged);
-  },
-  price: 10,
-  image: "coupon_plus1",
-});
-const overstock = new Voucher({
+  {
   name: "Overstock",
   descriptionfn(game) {
     // dynamiczny opis, by zawsze pokazywał aktualny stan sklepu
@@ -703,9 +703,8 @@ const overstock = new Voucher({
   },
   price: 10,
   image: "coupon_hand",
-});
-
-const movevoucher = new Voucher({
+},
+{
   name: "Moves",
   descriptionfn(game) {
     return `Zwiększa możliwe ruchy w rundzie o ${Style.Moves(`+1 ruch`)}`;
@@ -716,9 +715,8 @@ const movevoucher = new Voucher({
   },
   price: 10,
   image: "default",
-});
-
-const percentageVoucher = new Voucher({
+},
+{
   name: "Power",
   descriptionfn(game) {
     return `Ulepszone karty pojawiają się ${Style.Chance(`X2`)} częściej`;
@@ -728,9 +726,8 @@ const percentageVoucher = new Voucher({
   },
   price: 10,
   image: "default",
-});
-
-const consumableVoucher = new Voucher({
+},
+{
   name: "Voucher?",
   descriptionfn(game) {
     return `Zwiększa miejsce na ulepszenia kafelków o 1. (Obecnie ${Style.Chance(game.maxConsumables)} -> ${Style.Chance(game.maxConsumables + 1)})`;
@@ -741,14 +738,19 @@ const consumableVoucher = new Voucher({
   },
   price: 10,
   image: "default",
-});
-vouchers.push(
-  voucher,
-  overstock,
-  movevoucher,
-  percentageVoucher,
-  consumableVoucher,
-);
+},
+{
+  name: "Booster",
+  descriptionfn(game) {
+    return `Zwiększa miejsce na BoosterPacki w sklepie o 1. (Obecnie ${Style.Chance(game.maxBoosters)} -> ${Style.Chance(game.maxBoosters + 1)})`
+  },
+  effect(game) {
+    game.maxBoosters += 1;
+  },
+  price: 10,
+  image: "default",
+}
+];
 consumableBlueprints.push(...consumableLvlUp, ...consumbaleEvil);
 consumbaleEvil.forEach((consumable) => {
   consumable.type = "Consumable";
