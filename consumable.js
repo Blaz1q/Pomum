@@ -688,7 +688,7 @@ export const coupons = [
       game.emit(GAME_TRIGGERS.onUpgradesChanged);
     },
     price: 10,
-    image: "coupon_plus1",
+    image: "plusone",
   },
   {
   name: "Overstock",
@@ -702,7 +702,7 @@ export const coupons = [
     game.shopSize = (game.shopSize || 3) + 1; // przykład aktualizacji stanu
   },
   price: 10,
-  image: "coupon_hand",
+  image: "overstock",
 },
 {
   name: "Moves",
@@ -714,7 +714,7 @@ export const coupons = [
     game.GameRenderer.displayMoves();
   },
   price: 10,
-  image: "default",
+  image: "default_coupon",
 },
 {
   name: "Power",
@@ -725,7 +725,7 @@ export const coupons = [
     game.bonusPercentage.modifier += 0.05;
   },
   price: 10,
-  image: "default",
+  image: "default_coupon",
 },
 {
   name: "Voucher?",
@@ -737,7 +737,7 @@ export const coupons = [
     game.GameRenderer.displayConsumablesCounter();
   },
   price: 10,
-  image: "default",
+  image: "default_coupon",
 },
 {
   name: "Booster",
@@ -748,7 +748,7 @@ export const coupons = [
     game.maxBoosters += 1;
   },
   price: 10,
-  image: "default",
+  image: "default_coupon",
 }
 ];
 consumableBlueprints.push(...consumableLvlUp, ...consumbaleEvil);
