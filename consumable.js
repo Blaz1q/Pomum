@@ -678,7 +678,7 @@ function evilfunc(game, fruit) {
 }
 export const coupons = [
   {
-   name: "Voucher",
+   name: "+1",
     descriptionfn(game) {
       return `Zwiększa miejsce na ulepszenia o 1. (Obecnie ${Style.Chance(game.maxUpgrades)} -> ${Style.Chance(game.maxUpgrades + 1)})`;
     },
@@ -688,7 +688,7 @@ export const coupons = [
       game.emit(GAME_TRIGGERS.onUpgradesChanged);
     },
     price: 10,
-    image: "plusone",
+    image: "upgradeplus",
   },
   {
   name: "Overstock",
@@ -705,7 +705,7 @@ export const coupons = [
   image: "overstock",
 },
 {
-  name: "Moves",
+  name: "Przejście",
   descriptionfn(game) {
     return `Zwiększa możliwe ruchy w rundzie o ${Style.Moves(`+1 ruch`)}`;
   },
@@ -714,10 +714,10 @@ export const coupons = [
     game.GameRenderer.displayMoves();
   },
   price: 10,
-  image: "default_coupon",
+  image: "moves",
 },
 {
-  name: "Power",
+  name: "Moc",
   descriptionfn(game) {
     return `Ulepszone karty pojawiają się ${Style.Chance(`X2`)} częściej`;
   },
@@ -725,10 +725,10 @@ export const coupons = [
     game.bonusPercentage.modifier += 0.05;
   },
   price: 10,
-  image: "default_coupon",
+  image: "power",
 },
 {
-  name: "Voucher?",
+  name: "Sałatka",
   descriptionfn(game) {
     return `Zwiększa miejsce na ulepszenia kafelków o 1. (Obecnie ${Style.Chance(game.maxConsumables)} -> ${Style.Chance(game.maxConsumables + 1)})`;
   },
@@ -737,7 +737,7 @@ export const coupons = [
     game.GameRenderer.displayConsumablesCounter();
   },
   price: 10,
-  image: "default_coupon",
+  image: "consumableplus",
 },
 {
   name: "Booster",
