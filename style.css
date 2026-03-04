@@ -534,7 +534,6 @@ canvas#glcanvas {
 }
 
 .upgrade-wrapper, .boss-wrapper {
-  transition: transform 1s ease-in-out;
   font-family: "Jersey 25", sans-serif;
   letter-spacing: 0.5px;
   position: relative;
@@ -624,6 +623,7 @@ canvas#glcanvas {
   transform-style: preserve-3d;
   animation: skewCard 6s infinite ease-in-out;
   transition: box-shadow 0.2s ease;
+  transform: perspective(1000px) rotateX(10deg) rotateY(-15deg);
   z-index: 5;
 }
 .upgrade-wrapper .upgrade-card .upgrade-inner, .boss-wrapper .upgrade-card .upgrade-inner {
@@ -636,6 +636,7 @@ canvas#glcanvas {
   align-items: flex-end;
   transition: filter 0.3s ease, transform 0.3s ease;
   transform-origin: center center; /* scale from center */
+  transition: filter 0.3s ease, transform 0.3s ease;
 }
 .upgrade-wrapper .upgrade-card:hover, .boss-wrapper .upgrade-card:hover {
   animation: none;
@@ -1070,29 +1071,21 @@ canvas#glcanvas {
   }
 }
 @keyframes skewCard {
-  0% {
-    transform: rotateX(10deg) rotateY(-15deg);
-    filter: drop-shadow(3px 8px 0px rgba(0, 0, 0, 0.35));
+  0%, 100% {
+    transform: perspective(1000px) rotateX(10deg) rotateY(-15deg);
+    filter: drop-shadow(4px 10px 0px rgba(0, 0, 0, 0.35));
   }
-  20% {
-    transform: rotateX(-10deg) rotateY(-15deg);
-    filter: drop-shadow(-3px 8px 0px rgba(0, 0, 0, 0.35));
+  25% {
+    transform: perspective(1000px) rotateX(-10deg) rotateY(-15deg);
+    filter: drop-shadow(4px -4px 0px rgba(0, 0, 0, 0.35));
   }
-  40% {
-    transform: rotateX(-10deg) rotateY(15deg);
-    filter: drop-shadow(-3px 4px 0px rgba(0, 0, 0, 0.3));
+  50% {
+    transform: perspective(1000px) rotateX(-10deg) rotateY(15deg);
+    filter: drop-shadow(-4px -4px 0px rgba(0, 0, 0, 0.35));
   }
-  60% {
-    transform: rotateX(10deg) rotateY(15deg);
-    filter: drop-shadow(3px 4zpx 0px rgba(0, 0, 0, 0.3));
-  }
-  80% {
-    transform: rotateX(-10deg) rotateY(-15deg);
-    filter: drop-shadow(-3px 8px 0px rgba(0, 0, 0, 0.35));
-  }
-  100% {
-    transform: rotateX(10deg) rotateY(-15deg);
-    filter: drop-shadow(3px 8px 0px rgba(0, 0, 0, 0.35));
+  75% {
+    transform: perspective(1000px) rotateX(10deg) rotateY(15deg);
+    filter: drop-shadow(-4px 10px 0px rgba(0, 0, 0, 0.35));
   }
 }
 @keyframes holoShift {

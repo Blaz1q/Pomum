@@ -104,47 +104,62 @@ export class RenderUI {
   displayRound() {
     this.game.roundBox.innerHTML = this.game.round;
   }
-  displayScore() {
+  formatNumber(num) {
+    if (num < 1e9) {
+      return Math.floor(num).toLocaleString('pl-PL');; // Standard display for smaller numbers
+    }
+    // toExponential(2) gives exactly 2.98e+30 style
+    return num.toExponential(2).replace("+", ""); 
+  }
+displayScore() {
     const roundScoreBox = document.getElementById("roundscore");
     const totalScoreBox = document.getElementById("score");
 
     const newRoundScore = this.game.calcRoundScore();
     const newTotalScore = this.game.score;
 
-    const oldRoundScore = parseInt(roundScoreBox.innerHTML) || 0;
-    const oldTotalScore = parseInt(totalScoreBox.innerHTML) || 0;
+    // 1. Używamy zmiennych pomocniczych w klasie zamiast czytania z HTML.
+    // Jeśli te zmienne nie istnieją, inicjalizujemy je zerem.
+    this.lastDisplayedRound = this.lastDisplayedRound || 0;
+    this.lastDisplayedTotal = this.lastDisplayedTotal || 0;
 
-    const animateNumber = (element, start, end) => {
-      if (start === end) return;
-
-      const duration = 250; // ms
-      const startTime = performance.now();
-
-      const animate = (now) => {
-        const progress = Math.min((now - startTime) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
-
-        const value = Math.round(start + (end - start) * eased);
-        element.innerHTML = value;
-
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          // końcowy "pop"
-          element.classList.remove("pop-anim");
-          void element.offsetWidth;
-          element.classList.add("pop-anim");
+    const animateNumber = (element, start, end, key) => {
+        // 2. Bardzo ważne: jeśli różnica jest zerowa, nie rób nic.
+        if (Math.abs(start - end) < 0.1) {
+            element.innerHTML = this.formatNumber(end);
+            return;
         }
-      };
 
-      requestAnimationFrame(animate);
+        const duration = 250;
+        const startTime = performance.now();
+
+        const animate = (now) => {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+
+            const currentValue = start + (end - start) * eased;
+            element.innerHTML = this.formatNumber(currentValue);
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                // 3. Aktualizujemy "ostatnią wartość" po zakończeniu animacji
+                this[key] = end; 
+                
+                element.classList.remove("pop-anim");
+                void element.offsetWidth;
+                element.classList.add("pop-anim");
+            }
+        };
+
+        requestAnimationFrame(animate);
     };
 
-    animateNumber(roundScoreBox, oldRoundScore, newRoundScore);
-    animateNumber(totalScoreBox, oldTotalScore, newTotalScore);
-  }
-
-  displayTempScore() {
+    // Odpalamy animację przekazując klucz pod którym zapiszemy nową wartość
+    animateNumber(roundScoreBox, this.lastDisplayedRound, newRoundScore, 'lastDisplayedRound');
+    animateNumber(totalScoreBox, this.lastDisplayedTotal, newTotalScore, 'lastDisplayedTotal');
+}
+displayTempScore() {
     const scoreBox = this.game.tempscoreBox;
     const multBox = this.game.multBox;
 
@@ -152,30 +167,32 @@ export class RenderUI {
     let newMult = this.game.mult;
     newMult = Math.round(newMult * 100) / 100;
     this.game.mult = newMult;
-    const oldScore = scoreBox.innerHTML;
-    const oldMult = multBox.innerHTML;
 
-    // Aktualizacja wartości
-    scoreBox.innerHTML = newScore;
-    multBox.innerHTML = newMult;
+    // Get current text before updating
+    const oldScoreStr = scoreBox.innerHTML;
+    const oldMultStr = multBox.innerHTML;
 
-    // Funkcja dodająca animację "podskoku"
+    // Format the new values
+    const formattedScore = this.formatNumber(newScore);
+    const formattedMult = newMult >= 1e6 ? this.formatNumber(newMult) : newMult;
+
+    scoreBox.innerHTML = formattedScore;
+    multBox.innerHTML = formattedMult;
+
     const addPopAnimation = (element) => {
-      element.classList.remove("pop-anim");
-      void element.offsetWidth;
-      element.classList.add("pop-anim");
+        element.classList.remove("pop-anim");
+        void element.offsetWidth;
+        element.classList.add("pop-anim");
     };
 
-    // Jeśli zmienił się score — animacja
-    if (oldScore != newScore) {
-      addPopAnimation(scoreBox);
+    if (oldScoreStr !== formattedScore.toString()) {
+        addPopAnimation(scoreBox);
     }
 
-    // Jeśli zmienił się mult — animacja
-    if (oldMult != newMult) {
-      addPopAnimation(multBox);
+    if (oldMultStr !== formattedMult.toString()) {
+        addPopAnimation(multBox);
     }
-  }
+}
   displayUpgradesCounter() {
     document.getElementById("upgrades-counter").innerHTML =
       `(${this.game.upgrades.length}/${this.game.maxUpgrades})`;
@@ -574,36 +591,62 @@ export class RenderUI {
     this.displaySeed();
     document.getElementById("final-score").innerHTML = this.game.round;
   }
-  addParalax(card) {
-    card.addEventListener("mousemove", (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left; // x position within the card
-      const y = e.clientY - rect.top; // y position within the card
+addParalax(card) {
+  card.addEventListener("mousemove", (e) => {
+    // Force animation to stay off while moving
+    card.style.animation = "none";
+    card.style.transition = "none";
 
-      const halfWidth = rect.width / 2;
-      const halfHeight = rect.height / 2;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-      // rotation
-      const rotateY = ((x - halfWidth) / halfWidth) * 10; // max ±20°
-      const rotateX = ((halfHeight - y) / halfHeight) * 15; // max ±15°
-      card.style.transform = `perspective(800px) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+    const halfWidth = rect.width / 2;
+    const halfHeight = rect.height / 2;
 
-      // dynamic shadow
-      const shadowX = -((x - halfWidth) / halfWidth) * 10; // horizontal shadow offset
-      const shadowY = -((y - halfHeight) / halfHeight) * 10; // vertical shadow offset
-      const blur = 0; // blur radius
-      const shadowColor = "rgba(0,0,0,0.35)";
-      card.style.filter = `drop-shadow(${shadowX}px ${shadowY}px ${blur}px ${shadowColor})`;
-    });
+    const rotateY = ((x - halfWidth) / halfWidth) * 10;
+    const rotateX = ((halfHeight - y) / halfHeight) * 15;
 
-    card.addEventListener("mouseleave", () => {
-      card.style.transform = "";
-    });
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    
+    const shadowX = -((x - halfWidth) / halfWidth) * 10;
+    const shadowY = -((y - halfHeight) / halfHeight) * 10;
+    card.style.filter = `drop-shadow(${shadowX}px ${shadowY}px 0px rgba(0,0,0,0.3))`;
+  });
 
-    card.addEventListener("mouseenter", () => {
-      card.style.transition = "transform 0.2s ease, filter 0.2s ease"; // shorter transition when starting hover
-    });
-  }
+  card.addEventListener("mouseleave", () => {
+    // 1. Target the 0% Keyframe
+    const startX = "10deg";
+    const startY = "-15deg";
+    const startShadow = "4px 10px 0px rgba(0, 0, 0, 0.35)";
+
+    // 2. Apply a simple, clean transition
+    const duration = 1000; // ms
+    card.style.transition = `transform ${duration}ms ease-out, filter ${duration}ms ease-out`;
+    
+    // Trigger the movement
+    card.style.transform = `perspective(1000px) rotateX(${startX}) rotateY(${startY})`;
+    card.style.filter = `drop-shadow(${startShadow})`;
+
+    // 3. Clear the timeout if it exists (prevents animation overlaps)
+    if (card.parallaxTimeout) clearTimeout(card.parallaxTimeout);
+
+    // 4. Wait for the transition, then hand over
+    card.parallaxTimeout = setTimeout(() => {
+      // If the user isn't hovering anymore, start the idle sway
+      if (!card.matches(':hover')) {
+        card.style.transition = "none"; // Reset transitions
+        card.style.animation = "skewCard 6s infinite ease-in-out";
+        
+        // Final cleanup: remove inline styles so CSS can take over fully
+        setTimeout(() => {
+          card.style.transform = "";
+          card.style.filter = "";
+        }, 50);
+      }
+    }, duration);
+  });
+}
   fadeInAndShow(wrapper, duration = 150) {
     if (!wrapper) return;
 

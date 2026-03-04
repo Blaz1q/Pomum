@@ -1509,7 +1509,13 @@ export const upgradeBlueprints = [
     }),
     price: 6,
     ...UNCOMMON,
-  }
+  },
+  // {
+  //   name: "",
+  //   descriptionfn(game){
+  //     return `Jeżeli przez ${Style.Moves('3 ruchy')} zniszczy się tylko trójki, ${Style.Mult('')}`
+  //   }
+  // }
   /*
   {
     name: "Kosiarka",
