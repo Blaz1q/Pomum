@@ -105,6 +105,7 @@ export var Settings = {
     VOLUME: 1,
     PLAY_SOUND: true,
     LOW_GRAPHICS: false,
+    OLD_FRUITS: false,
 }
 export const GAMECOLORS = {
     warmOranges: {

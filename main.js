@@ -50,11 +50,11 @@ export class Game {
         this.tempscoreBox = document.getElementById("tempscore");
         this.multBox = document.getElementById("mult");
         this.fruits = [
-            new Tile({ icon: "🍎", type: TYPES.Fruit }),
-            new Tile({ icon: "🍐", type: TYPES.Fruit }),
-            new Tile({ icon: "🍍", type: TYPES.Fruit }),
-            new Tile({ icon: "🍇", type: TYPES.Fruit }),
-            new Tile({ icon: "🥥", type: TYPES.Fruit }),
+            new Tile({ icon: "🍎", type: TYPES.Fruit, image: 'apple.png' }),
+            new Tile({ icon: "🍐", type: TYPES.Fruit, image: 'pear.png' }),
+            new Tile({ icon: "🍍", type: TYPES.Fruit, image: 'pineapple.png' }),
+            new Tile({ icon: "🍇", type: TYPES.Fruit, image: 'grape.png' }),
+            new Tile({ icon: "🥥", type: TYPES.Fruit, image: 'coconut.png' }),
         ];
         this.special = [
             new Tile({ icon: "🧨", type: TYPES.Dynamite, detonations: 1, percent: 1 }),
@@ -334,41 +334,7 @@ export class Game {
         return Math.floor(Math.pow(1.5, this.round) * 350) + bonus * 1000;
     }
     createElement(Tile) {
-        const x = Tile.x;
-        const y = Tile.y;
-        const icon = Tile.icon;
-        let element = document.createElement("div");
-        element.textContent = icon;
-        element.dataset.x = x;
-        element.dataset.y = y;
-
-        // kliknięcie
-        element.addEventListener("click", () => this.handleClick(x, y, element));
-
-        // przeciąganie
-        element.draggable = true;
-        element.addEventListener("dragstart", (e) => {
-            e.dataTransfer.setData("text/plain", JSON.stringify({ x, y }));
-
-            // Pusty obrazek zamiast kafla
-            const img = new Image();
-            img.src =
-                'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>';
-            e.dataTransfer.setDragImage(img, 0, 0);
-        });
-
-        element.addEventListener("dragover", (e) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = "move"; // jawnie ustaw efekt
-        });
-
-        element.addEventListener("drop", (e) => {
-            e.preventDefault();
-            e.stopPropagation(); // <- WAŻNE
-            let from = JSON.parse(e.dataTransfer.getData("text/plain"));
-            this.handleDragDrop(from, { x, y });
-        });
-        return element;
+        return Tile.render(this);
     }
     handleClick(x, y, element) {
         if (!this.selected) {
@@ -587,6 +553,7 @@ export class Game {
                 icon: base.icon, type: TYPES.Fruit,
                 x: x,
                 y: y,
+                image: base.imagename,
                 modifier: this.roll.tileModifier(base),
                 debuffed: base.props.debuffed,
                 upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
@@ -602,6 +569,7 @@ export class Game {
                     icon: base.icon, type: TYPES.Fruit,
                     x: x,
                     y: y,
+                    image: base.imagename,
                     modifier: this.roll.tileModifier(base),
                     debuffed: base.props.debuffed,
                     upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
@@ -615,6 +583,7 @@ export class Game {
             icon: base.icon, type: TYPES.Fruit,
             x: x,
             y: y,
+            image: base.imagename,
             modifier: this.roll.tileModifier(base),
             debuffed: base.props.debuffed,
             upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
@@ -653,22 +622,9 @@ export class Game {
             for (let x = 0; x < this.matrixsize; x++) {
                 const tile = this.board[y][x];
                 //const icon = tile ? tile.icon : " ";
-                const isGold = this.board[y][x].props.modifier == MODIFIERS.Gold;
-                const isSilver = this.board[y][x].props.modifier == MODIFIERS.Silver;
-                const isDebuffed = this.board[y][x].props.debuffed;
+                
                 const el = this.createElement(tile);
-                el.style.transform = "translate(0,0)";
-                el.style.transition = "";
-                if (isGold) {
-                    el.classList.add("gold");
-                }
-                if (isSilver) {
-                    el.classList.add("silver");
-                }
-                if (isDebuffed) {
-                    el.classList.add("debuffed")
-                }
-                el.classList.remove("fade");
+                
                 this.gameContainer.appendChild(el);
             }
         }
@@ -713,6 +669,10 @@ export class Game {
         const idx2 = y2 * this.matrixsize + x2;
         const el1 = this.gameContainer.children[idx1];
         const el2 = this.gameContainer.children[idx2];
+
+        const tile1 = this.board[y1][x1];
+        const tile2 = this.board[y2][x2];
+
         if (!el1 || !el2) return;
 
         const contRect = this.gameContainer.getBoundingClientRect();
@@ -733,9 +693,11 @@ export class Game {
             if (!sourceEl) return [];
             return Array.from(sourceEl.classList).filter(c => c !== 'fade'); // don't copy "fade"
         };
+        const ghostTile1 = success ? tile2 : tile1;
+        const ghostTile2 = success ? tile1 : tile2;
 
-        const g1 = this.createGhost(preIcon1, start1.x, start1.y, start1.w, start1.h, copyClasses(el1));
-        const g2 = this.createGhost(preIcon2, start2.x, start2.y, start2.w, start2.h, copyClasses(el2));
+        const g1 = ghostTile1.renderGhost(start1.x, start1.y, start1.w, start1.h);
+        const g2 = ghostTile2.renderGhost(start2.x, start2.y, start2.w, start2.h);
 
         el1.style.visibility = "hidden";
         el2.style.visibility = "hidden";
@@ -902,23 +864,29 @@ export class Game {
         // existing tiles ghosts — copy classes from the original cell so ghost matches gold/silver/debuffed
         for (const key of Object.keys(targets)) {
             const { x, fromY, toY } = targets[key];
+            
+            // 1. Pobieramy instancję klasy Tile z logiki gry
+            const tileInstance = this.board[fromY][x];
+            if (!tileInstance) continue;
+
             const idx = fromY * this.matrixsize + x;
             const cell = this.gameContainer.children[idx];
             if (!cell) continue;
+
             const rect = cell.getBoundingClientRect();
             const relLeft = rect.left - containerRect.left;
             const relTop = rect.top - containerRect.top;
 
-            const classes = Array.from(cell.classList).filter(c => c !== 'fade');
-
-            const ghost = this.createGhost(cell.textContent, relLeft, relTop, rect.width, rect.height, classes);
+            // 2. Wywołujemy renderGhost na INSTANCJI KLASY, a nie na elemencie DOM
+            const ghost = tileInstance.renderGhost(relLeft, relTop, rect.width, rect.height);
+            
             ghost.style.transition = `transform ${this.FALL_MS}ms ease`;
             this.gameContainer.appendChild(ghost);
 
             cell.style.visibility = "hidden";
             hideOriginals.push(cell);
 
-            const dy = (toY - fromY) * CELL_PX;
+            const dy = (toY - fromY) * cellH; // Używamy cellH obliczonego wcześniej
             requestAnimationFrame(() => {
                 ghost.style.transform = `translateY(${dy}px)`;
             });
@@ -945,7 +913,8 @@ export class Game {
                     // if you have other semantic classes for bombs/dynamite, add here:
                     if (tile.type === TYPES.Bomb || tile.type === TYPES.Dynamite) classes.push('special');
                 }
-                const ghost = this.createGhost(tile.icon, left, top, cellW, cellH, classes);
+                const ghost = tile.renderGhost(left, top, cellW, cellH);
+                //const ghost = this.createGhost(tile.icon, left, top, cellW, cellH, classes);
                 ghost.style.transition = `transform ${this.FALL_MS}ms ease`;
                 ghost.style.transform = `translateY(-${spawn * CELL_PX}px)`; // start above
                 this.gameContainer.appendChild(ghost);
@@ -1135,8 +1104,14 @@ function toggleLowGraphics(){
     let val = document.getElementById("graphicsToggle").checked;
     Settings.LOW_GRAPHICS = val;
 }
+function toggleOldFruits(){
+    let val = document.getElementById("oldFruits").checked;
+    Settings.OLD_FRUITS = val;
+}
 function showSettings() {
     document.getElementById("darkToggle").checked = Settings.DARK_MODE;
+    document.getElementById("graphicsToggle").checked = Settings.LOW_GRAPHICS;
+    document.getElementById("oldFruits").checked = Settings.OLD_FRUITS;
     document.getElementById("settingsPanel").style.display = "flex";
 }
 function hideSettings() {
@@ -1162,6 +1137,7 @@ window.hideSettings = hideSettings;
 window.toggleDarkMode = toggleDarkMode;
 window.toggleLowGraphics = toggleLowGraphics;
 window.toggleSound = toggleSound;
+window.toggleOldFruits = toggleOldFruits;
 window.showMenu = showMenu;
 window.changeGameSpeed = changeGameSpeed;
 window.skip = skip;

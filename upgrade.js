@@ -360,7 +360,7 @@ export const upgradeBlueprints = [
         this.props.previousPercent = percent;
         game.fruits[4].percent -= this.props.previousPercent;
         game.addChancesExcept(game.fruits[4], this.props.previousPercent / (game.fruits.length - 1));
-        this.props.applied = false;
+        this.props.applied = true;
         return UPGRADE_STATES.Active;
       },
       onRoundEnd() {
