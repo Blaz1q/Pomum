@@ -1,6 +1,10 @@
 import { UPGRADE_RARITY, MODIFIERS } from "./dictionary.js";
-import { consumablePacks,coupons } from "./consumable.js";
-import { ConsumablePack, Voucher } from "./upgradeBase.js";
+import { consumablePacks,coupons } from "./entityData/consumablelist.js";
+import { ConsumablePack } from "./entities/ConsumablePack.js";
+import { Voucher } from "./entities/Voucher.js";
+import { upgradesList } from "./entityData/upgradelist.js";
+import { Upgrade } from "./entities/Upgrade.js";
+
 
 export class Roll {
     constructor(game) {

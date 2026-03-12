@@ -434,7 +434,6 @@ canvas#glcanvas {
   background-color: #ffa749;
 }
 .game .right-panel #body div:hover {
-  transform: scale(1.15);
   background: #ffe6a7;
 }
 .game .right-panel #shop {
@@ -961,12 +960,12 @@ canvas#glcanvas {
   height: 100%;
   background-size: contain;
   background-repeat: no-repeat;
-  background-image: url("./images/icons/volume_disabled.png");
+  background-image: url("../images/icons/volume_disabled.png");
 }
 
 /* Zmiana ikony po zaznaczeniu */
 #VolumeButton:checked + .VolumeLabel::before {
-  background-image: url("./images/icons/volume_enabled.png");
+  background-image: url("../images/icons/volume_enabled.png");
 }
 
 .notEnough {

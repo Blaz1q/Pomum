@@ -1,4 +1,4 @@
-import { MODIFIERS, UPGRADE_RARITY_NAME, Style, GAME_TRIGGERS, UPGRADE_STATES } from "./dictionary.js";
+import { MODIFIERS, UPGRADE_RARITY_NAME, Style, GAME_TRIGGERS, UPGRADE_STATES } from "../dictionary.js";
 export class UpgradeRenderer {
   constructor(upgrade, gameRenderer) {
     this.upgrade = upgrade;
@@ -26,7 +26,7 @@ export class UpgradeRenderer {
     wrapper.className = "upgrade-wrapper";
     wrapper.dataset.type = upgrade.type;
     if (bought) wrapper.classList.add("bought");
-    console.log(upgrade.isReady);
+    //console.log(upgrade.isReady);
     if (upgrade.isReady) {
       wrapper.classList.add("ready");
     }
@@ -148,7 +148,10 @@ export class UpgradeRenderer {
     const upgrade = this.upgrade;
     const wrapper = upgrade.wrapper;
     let game = this.gameRenderer.game;
-    function buy(game, upgrade, params) {
+    const btnBuy = document.createElement("button");
+    btnBuy.textContent = "Kup";
+    btnBuy.addEventListener("click", (e) => {
+      e.stopPropagation();
       console.log(game);
       console.log("buy?");
       let success = false;
@@ -173,16 +176,14 @@ export class UpgradeRenderer {
         return;
       }
       if (success) {
-        game.GameRenderer.fadeOutAndRemove(wrapper);
-        return true;
+        if(upgrade.type=="Voucher"){
+          this.removeButtons();
+          game.GameRenderer.dissolveAndRemove(wrapper, 1000);
+        }else{
+          game.GameRenderer.fadeOutAndRemove(wrapper);
+        }
+        
       }
-      return false;
-    }
-    const btnBuy = document.createElement("button");
-    btnBuy.textContent = "Kup";
-    btnBuy.addEventListener("click", (e) => {
-      e.stopPropagation();
-      buy(game, upgrade, params);
       //this.refreshBuyButtons();
     });
     return btnBuy;

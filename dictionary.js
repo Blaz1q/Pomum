@@ -16,6 +16,10 @@ export const TYPES = {
     Bomb: "bomb",
     Dynamite: "dynamite"
 };
+export const PRIORITY = {
+    NORMAL: 0,
+    RETRIGGER: 1,
+}
 export const MODIFIERS = {
     None: "none",
     Gold: "gold",

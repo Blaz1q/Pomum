@@ -1,5 +1,5 @@
 import { TYPES, GAME_TRIGGERS, Settings, MODIFIERS } from "./dictionary.js";
-import { Tile } from "./Tile.js";
+import { Tile } from "./entities/Tile.js";
 
 let FADE_MS = Settings.FADE_MS;
 let MIN_FALL_MS = Settings.MIN_FALL_MS;

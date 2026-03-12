@@ -1,15 +1,24 @@
-import { consumableList } from "./consumable.js";
-import { Upgrade, ConsumablePack, Consumable, Tarot } from "./upgradeBase.js";
-import { upgradesList } from "./upgrade.js";
-import { Audio } from "./sound.js";
-import { Tile } from "./Tile.js";
+import { ConsumablePack } from "./entities/ConsumablePack.js";
+import { Upgrade } from "./entities/Upgrade.js";
+import { Consumable } from "./entities/Consumable.js";
+import { Tarot } from "./entities/Tarot.js";
+
+import { consumableList } from "./entityData/consumablelist.js";
+import { upgradesList } from "./entityData/upgradelist.js";
+
+import { Audio } from "./utils/sound.js";
+import { Tile } from "./entities/Tile.js";
 import { GAME_TRIGGERS, TYPES, MODIFIERS, STAGES, UPGRADE_STATES, SCORE_ACTIONS, UPGRADE_RARITY, Settings, COLORS, DURATIONS } from "./dictionary.js";
-import { RenderUI } from "./RenderUI.js";
+import { RenderUI } from "./UI/RenderUI.js";
 import { Animator, animate } from "./loadshaders.js";
 import { cyrb128, getRandomString, sfc32 } from "./random.js";
 import { Roll } from "./roll.js";
 import { Matches } from "./Matches.js";
-import { Stats } from "./Stats.js";
+import { Stats } from "./utils/Stats.js";
+import { Queue } from "./utils/Queue.js"
+
+import { TriggerManager } from "./managers/TriggerManager.js";
+
 const CELL_PX = 50;
 let FADE_MS = Settings.FADE_MS;
 let FALL_MS = Settings.FALL_MS;
@@ -85,7 +94,7 @@ export class Game {
             modifier: 0,
         }
         this.matchesManager = new Matches(this);
-
+        this.triggerManager = new TriggerManager(this);
         //random
         this.roll = new Roll(this);
         this.seed = getRandomString(6);
@@ -106,9 +115,18 @@ export class Game {
         this.boosterRand = sfc32(this.hash[0], this.hash[1], this.hash[2], this.hash[3]);
     }
     async emit(event, payload) {
+        if(event!=GAME_TRIGGERS.onScore){
+            this.triggerManager.emit(event, payload);
+        }
+        else{
+            await this.triggerManager.emit(event, payload);
+        }
+        
+        return;
         const wait = ms => new Promise(r => setTimeout(r, ms));
         let visualChain = Promise.resolve();
         console.log(event);
+        this.triggerManager.emit(event, payload);
         for (const upgrade of this.upgrades) {
             if (!upgrade || typeof upgrade !== "object") continue;
 
@@ -1131,13 +1149,13 @@ function animateholo() {
     requestAnimationFrame(animateholo);
 }
 animateholo();
+window.toggleOldFruits = toggleOldFruits;
 window.continueGame = continueGame;
 window.showSettings = showSettings;
 window.hideSettings = hideSettings;
 window.toggleDarkMode = toggleDarkMode;
 window.toggleLowGraphics = toggleLowGraphics;
 window.toggleSound = toggleSound;
-window.toggleOldFruits = toggleOldFruits;
 window.showMenu = showMenu;
 window.changeGameSpeed = changeGameSpeed;
 window.skip = skip;

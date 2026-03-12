@@ -1,4 +1,4 @@
-import { Tarot } from "./upgradeBase.js";
+import { Tarot } from "../entities/Tarot.js";
 export class Stats {
   constructor() {
     this.destroyedTiles = [];
