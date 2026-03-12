@@ -135,7 +135,8 @@ async processHandlers(event, upgrade, payload) {
         for (const upgrade of upgrades) {
             
             const handlers = this.getHandlers(upgrade, event); 
-            if (handlers.length > 0) {
+
+            if (handlers&&handlers.length > 0) {
                 this.eventQueue.enqueue({ upgrade, event, payload },upgrade.priority);
             }
         }
