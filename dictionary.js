@@ -17,8 +17,9 @@ export const TYPES = {
     Dynamite: "dynamite"
 };
 export const PRIORITY = {
-    NORMAL: 0,
-    RETRIGGER: 1,
+    REPEAT: 0,
+    NORMAL: 1,
+    RETRIGGER: 2,
 }
 export const MODIFIERS = {
     None: "none",

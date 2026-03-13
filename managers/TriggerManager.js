@@ -70,8 +70,8 @@ async processHandlers(event, upgrade, payload) {
         // Pobieramy repeat z wyniku (domyślnie 1, jeśli nie podano)
         // Używamy payload lub pomocniczej zmiennej, by śledzić, ile razy już się wykonało
         const iterKey = `${upgrade.name}_${event}`;
-        let currentIter = this.iterators.get(iterKey) || 1;
-        let totalRepeat = result.repeat ?? 1;
+        let currentIter = this.iterators.get(iterKey) || 0;
+        let totalRepeat = upgrade.repeats[event] ?? 0;
 
         // 2. Jeśli mamy jeszcze powtórzenia (repeat > 1), dodajemy RESZTĘ do kolejki
         if (currentIter < totalRepeat) {
@@ -123,7 +123,7 @@ async processHandlers(event, upgrade, payload) {
             this.visualChain = Promise.resolve();
             this.activeScores.add(upgrade);
         }
-        if(result?.retrigger&&totalRepeat==currentIter){
+        if((result?.retrigger||upgrade.priority==PRIORITY.REPEAT)&&totalRepeat==currentIter){
             upgrade.isExhausted = true;
         }
         if(currentIter>=totalRepeat){

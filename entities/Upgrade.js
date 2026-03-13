@@ -15,6 +15,7 @@ export class Upgrade extends UpgradeBase {
     this.url = "./images/cards/";
     this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
     this.specialFunc;
+    this.repeats = props.repeats ?? {};
   }
   changeModifier(game, modifier) {
     this.modifier = modifier;
@@ -118,6 +119,7 @@ export class Upgrade extends UpgradeBase {
       copyUpgrade.rarity = source.rarity;
       copyUpgrade.modifier = source.modifier;
       copyUpgrade.type = source.type;
+      copyUpgrade.priority = source.priority;
       return copyUpgrade;
     };
 

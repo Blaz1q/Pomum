@@ -1079,6 +1079,7 @@ export const upgradeBlueprints = [
           const copyUpgrade = Upgrade.Copy(neighbor);
           this.mirroredUpgradeCopy = copyUpgrade;
 
+          this.priority = neighbor.priority;
           // Ważne: Przenosimy triggery (onMatch itp.) do propsów lustra
           this.mirroredProps = copyUpgrade.props || {};
           this.props = { ...this.mirroredProps, image: "mirror" };
@@ -1533,7 +1534,7 @@ export const upgradeBlueprints = [
             //game.triggerManager.addToQueue([up], GAME_TRIGGERS.onScore, payload);
           }
         });
-        return { state: UPGRADE_STATES.Score, message: "AGAIN!", style: SCORE_ACTIONS.Money,repeat: 1,retrigger:{upgrades: [...upgradesToRetrigger], event: GAME_TRIGGERS.onScore, payload: payload}};
+        return { state: UPGRADE_STATES.Score, message: "AGAIN!", style: SCORE_ACTIONS.Money,retrigger:{upgrades: [...upgradesToRetrigger], event: GAME_TRIGGERS.onScore, payload: payload}};
       },
       reset(){
         this.isExhausted = false;
@@ -1542,9 +1543,81 @@ export const upgradeBlueprints = [
     ),
     priority: PRIORITY.RETRIGGER,
     price: 6,
+    repeats: {
+      [GAME_TRIGGERS.onScore]: 1 
+    },
     ...COMMON,
     image: 'brokenmirror'
-  }
+  },
+{
+  name: "Demencja",
+  descriptionfn(game) {
+    const count = Style.Chance('3 razy');
+    return `Pier… pierwsze… ulepszenie… ono się… hmm… aktywuje… tak… ${count}. Tak, ${count} się aktywuje… pierwsze ulepszenie… ${count}.`;
+  },
+  props: () => ({
+    upgradeindex: null,
+    prevrepeats: null,
+
+    // Funkcja resetująca - teraz wywoływana wewnętrznie przy każdej zmianie
+    resetupgrade(self){
+      if (self.props.upgradeindex && self.props.prevrepeats !== null) {
+        self.props.upgradeindex.repeats[GAME_TRIGGERS.onScore] = self.props.prevrepeats;
+      }
+      self.props.prevrepeats = null;
+      self.props.upgradeindex = null;
+    },
+    reset() {
+      this.props.resetupgrade(this);
+    },
+
+    changeUpgrade(self) {
+      const firstUpgrade = game.triggerManager.playerInventory[0];
+      
+      // Jeśli pierwsze ulepszenie w eq to to samo, co już mamy, nic nie rób
+      if (self.props.upgradeindex === firstUpgrade) return;
+
+      // Jeśli w eq pojawiło się coś nowego (albo zniknęło), najpierw posprzątaj po starym!
+      this.resetupgrade(self);
+
+      // Nie pozwól Demencji ulepszać samej siebie
+      if (firstUpgrade && firstUpgrade !== self) {
+        self.props.upgradeindex = firstUpgrade;
+        // Ważne: zapisujemy bazową wartość OD RAZU przy podpięciu
+        self.props.prevrepeats = firstUpgrade.repeats[GAME_TRIGGERS.onScore] || 0;
+      }
+    },
+
+    onScore(payload) {
+      // Sprawdzamy, czy ulepszenie na 1. slocie się nie zmieniło
+      this.props.changeUpgrade(this);
+
+      if (!this.props.upgradeindex) {
+        return UPGRADE_STATES.Failed;
+      }
+
+      // Ustawiamy repeats na docelowe 2 (3 aktywacje łącznie)
+      this.props.upgradeindex.repeats[GAME_TRIGGERS.onScore] = 2;
+
+      return { 
+        state: UPGRADE_STATES.Score, 
+        message: "Co ja tu robię?", 
+        style: SCORE_ACTIONS.Info 
+      };
+    },
+
+    onUpgradesChanged() {
+      // Przy zmianie ulepszeń wymuszamy pełny reset i ponowne przypisanie
+      this.props.resetupgrade(this);
+      this.props.changeUpgrade(this);
+      return UPGRADE_STATES.Failed;
+    }
+  }),
+  ...COMMON,
+  ...defaultimage,
+  price: 4,
+  priority: PRIORITY.REPEAT
+}
   /*
   {
     name: "",
