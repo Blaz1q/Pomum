@@ -23,11 +23,13 @@ const CELL_PX = 50;
 let FADE_MS = Settings.FADE_MS;
 let FALL_MS = Settings.FALL_MS;
 let MIN_FALL_MS = Settings.MIN_FALL_MS;
-let emitTimingMs = Settings.EMIT_TIMING_MS;
-let minEmitMs = Settings.MIN_EMIT_MS;
+
 export class Game {
     constructor() {
         //gold
+        this.emitTimingMs = Settings.EMIT_TIMING_MS;
+        this.minEmitMs = Settings.MIN_EMIT_MS;
+
         this.FALL_MS = Settings.FALL_MS;
         this.FADE_MS = Settings.FADE_MS;
 
@@ -273,7 +275,7 @@ export class Game {
         this.GameRenderer.gameOver();
     }
     endround() {
-        emitTimingMs = Settings.EMIT_TIMING_MS;
+        this.emitTimingMs = Settings.EMIT_TIMING_MS;
         if(this.round==20&&this.continue==false){
             this.gamewon();
             return;
@@ -484,7 +486,7 @@ export class Game {
         this.GameRenderer.resetAllUpgrades();
         this.emit(GAME_TRIGGERS.onConsumableUse, upgrade);
         //this.GameRenderer.displayMoney();
-        emitTimingMs = Settings.EMIT_TIMING_MS;
+        this.emitTimingMs = Settings.EMIT_TIMING_MS;
         return true;
     }
     buy(upgrade) {
@@ -514,7 +516,7 @@ export class Game {
         this.GameRenderer.updateMoney(-upgrade.price);
         //this.GameRenderer.displayMoney();
         this.GameRenderer.updateRerollButton();
-        emitTimingMs = Settings.EMIT_TIMING_MS;
+        this.emitTimingMs = Settings.EMIT_TIMING_MS;
         return true;
     }
     sell(upgrade) {
@@ -539,7 +541,7 @@ export class Game {
         }
         this.GameRenderer.updateMoney(upgrade.sellPrice);
         this.GameRenderer.updateRerollButton();
-        emitTimingMs = Settings.EMIT_TIMING_MS;
+        this.emitTimingMs = Settings.EMIT_TIMING_MS;
         return true;
     }
 

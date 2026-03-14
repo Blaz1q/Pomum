@@ -661,10 +661,12 @@ canvas#glcanvas {
     &:hover {
       //animation-play-state: paused;
       animation: none;
+      
       //filter: drop-shadow(0 10px 0 rgba(0, 0, 0, 0.35));
 
       .upgrade-inner {
-        transform: translateY(-5px) scale(1.05) rotateX(0deg) rotateY(0deg);
+        animation: bounce-hover .23s;
+        transform: rotateX(0deg) scale(1.045) rotateY(0deg);
 
       }
     }
@@ -1142,7 +1144,31 @@ canvas#glcanvas {
 .pop-anim {
     animation: popBounce 0.2s ease-out;
 }
-
+@keyframes bounce-hover {
+  0% {
+    transform: scale(1);
+    animation-timing-function: ease-out;
+  }
+  20% {
+    transform: scale(1.065); /* Lekki wznios i powiększenie */
+    animation-timing-function: ease-in;
+  }
+  40% {
+    transform: scale(1.01);  /* Opadanie i lekkie spłaszczenie */
+    animation-timing-function: ease-out;
+  }
+  60% {
+    transform: scale(1.05); /* Mniejsze odbicie w górę */
+    animation-timing-function: ease-in;
+  }
+  80% {
+    transform: scale(1.01);  /* Prawie powrót, lekkie uniesienie */
+    animation-timing-function: ease-out;
+  }
+  100% {
+    transform: scale(1.045);  /* Pozycja końcowa hovera - lekko uniesiona */
+  }
+}
 @keyframes popBounce {
     0%   { transform: scale(1); }
     20%  { transform: scale(1.25); }

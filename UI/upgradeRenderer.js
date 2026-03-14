@@ -320,7 +320,7 @@ export class UpgradeRenderer {
       }
     }
   }
-  createPopup(text, style = "mult") {
+  createPopup(text, style = "mult",duration = 400) {
     const targetElement = this.upgrade.wrapper;
     if (!targetElement) return;
     //console.log("adding!!");
@@ -356,8 +356,8 @@ export class UpgradeRenderer {
     // Fade out & remove
     setTimeout(() => {
       popup.style.opacity = "0";
-      setTimeout(() => popup.remove(), 400);
-    }, 500);
+      setTimeout(() => popup.remove(), duration-50);
+    }, duration);
   }
   trigger(time, action = UPGRADE_STATES.Active) {
     const upgrade = this.upgrade;

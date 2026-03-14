@@ -57,23 +57,67 @@ getHandlers(upgrade,event){
             const handlers = [mainHandler, specialHandler].filter(Boolean);
             return handlers;
 }
-async processHandlers(event, upgrade, payload) {
-    const wait = ms => new Promise(r => setTimeout(r, ms));
-    const handlers = this.getHandlers(upgrade, event); 
-    if(!handlers) return;
-    for (const handler of handlers) {
-        // 1. Wykonujemy JEDEN strzał logiki
-        let result = handler.call(upgrade, payload);
-        
-        if (!result) continue;
+    async processHandlers(event, upgrade, payload) {
+        const wait = ms => new Promise(r => setTimeout(r, ms));
+        const handlers = this.getHandlers(upgrade, event); 
+        if (!handlers || handlers.length === 0) return;
 
-        // Pobieramy repeat z wyniku (domyślnie 1, jeśli nie podano)
-        // Używamy payload lub pomocniczej zmiennej, by śledzić, ile razy już się wykonało
+        // 1. Zarządzanie iteracjami na poziomie KARTY + EVENTU
         const iterKey = `${upgrade.name}_${event}`;
-        let currentIter = this.iterators.get(iterKey) || 0;
-        let totalRepeat = upgrade.repeats[event] ?? 0;
+        let currentIter = this.iterators.get(iterKey) || 1; // Zaczynamy od 1
+        
+        // Pobieramy bonusowe powtórzenia z ulepszenia (Twoja nowa tablica/obiekt)
+        let extraRepeats = upgrade.repeats?.[event] ?? 0;
+        let totalRepeat = 1 + extraRepeats; // 1 (bazowe) + bonus
 
-        // 2. Jeśli mamy jeszcze powtórzenia (repeat > 1), dodajemy RESZTĘ do kolejki
+        // 2. Wykonujemy WSZYSTKIE handlery przypisane do tego eventu w tej JEDNEJ iteracji
+        for (const handler of handlers) {
+            let result = handler.call(upgrade, payload);
+            if (!result) continue;
+
+            // --- LOGIKA RETRIGGERA ---
+            if (result.retrigger) {
+                this.addToQueue(result.retrigger.upgrades, result.retrigger.event, result.retrigger.payload);
+            }
+
+            // --- WIZUALIZACJA ---
+            let state = (typeof result === "object" && result !== null)
+                ? (result.state ?? result.UPGRADE_STATES ?? null)
+                : result;
+            
+            let message = result?.message ?? null;
+            let style = result?.style ?? SCORE_ACTIONS.Mult;
+
+            if (state && state !== UPGRADE_STATES.Failed) {
+                this.visualChain = this.visualChain.then(() => {
+                    if (this.game.emitTimingMs > this.game.minEmitMs) {
+                        this.game.emitTimingMs -= 5;
+                    }
+                    const finaltiming = this.game.emitTimingMs;
+                    upgrade.UpgradeRenderer.trigger(finaltiming - 50, state);
+                    this.Audio.playSound("tick.mp3");
+                    
+                    if (message) {
+                        upgrade.UpgradeRenderer.createPopup(message, style,finaltiming-50);
+                    }
+                    return wait(finaltiming);
+                });
+
+                if (state === UPGRADE_STATES.Score) {
+                    await this.visualChain;
+                    this.visualChain = Promise.resolve();
+                    this.activeScores.add(upgrade);
+                }
+            }
+
+            // --- OBSŁUGA EXHAUSTED ---
+            // Jeśli karta ma priorytet REPEAT lub odpaliła retrigger, po ostatniej iteracji odpoczywa
+            if ((result.retrigger) && currentIter >= totalRepeat) {
+                upgrade.isExhausted = true;
+            }
+        }
+
+        // 3. PLANOWANIE KOLEJNEJ ITERACJI (Cała karta wraca do kolejki)
         if (currentIter < totalRepeat) {
             this.iterators.set(iterKey, currentIter + 1);
             this.eventQueue.unshift({ 
@@ -81,56 +125,11 @@ async processHandlers(event, upgrade, payload) {
                 event: event, 
                 payload: payload 
             }, upgrade.priority);
-        }
-        if (result?.retrigger) {
-            // Retrigger wskakuje do kolejki i dzięki pętli while w emit() 
-            // może zostać obsłużony przed kolejną iteracją repeat tej karty!
-            this.addToQueue(result.retrigger.upgrades, result.retrigger.event, result.retrigger.payload);
-            
-            // Oznaczamy jako zużyte, jeśli taka Twoja logika
-        }
-        // 3. Normalizacja wyniku dla wizualizacji
-        let state = (typeof result === "object" && result !== null)
-            ? (result.state ?? result.UPGRADE_STATES ?? null)
-            : result;
-       
-        let message = result?.message ?? null;
-        let style = result?.style ?? SCORE_ACTIONS.Mult;
-
-        // 4. Obsługa Retriggera
-        
-
-        // 5. Dodanie do łańcucha wizualnego (BEZ await w środku pętli)
-        if (state && state !== UPGRADE_STATES.Failed) {
-            
-
-            this.visualChain = this.visualChain.then(() => {
-                if (this.game.emitTimingMs > this.game.minEmitMs) {
-                    this.game.emitTimingMs -= 5;
-                }
-                const finaltiming = this.game.emitTimingMs;
-                upgrade.UpgradeRenderer.trigger(finaltiming - 50, state);
-                this.Audio.playSound("tick.mp3");
-                
-                if (message) {
-                    upgrade.UpgradeRenderer.createPopup(message, style);
-                }
-                return wait(finaltiming);
-            });
-        }
-        if (state === UPGRADE_STATES.Score) {
-            await this.visualChain;
-            this.visualChain = Promise.resolve();
-            this.activeScores.add(upgrade);
-        }
-        if((result?.retrigger||upgrade.priority==PRIORITY.REPEAT)&&totalRepeat==currentIter){
-            upgrade.isExhausted = true;
-        }
-        if(currentIter>=totalRepeat){
-           this.iterators.delete(iterKey);
+        } else {
+            // Sprzątamy po zakończeniu wszystkich powtórzeń
+            this.iterators.delete(iterKey);
         }
     }
-}
     addToQueue(upgrades, event, payload) {
         for (const upgrade of upgrades) {
             
