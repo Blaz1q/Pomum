@@ -9,7 +9,7 @@ export class Audio {
     if (!Settings.PLAY_SOUND) {
       return;
     }
-    const finalurl = '../sounds/' + url;
+    const finalurl = './sounds/' + url;
     //console.log(finalurl);
     const buffer = await loadSound(finalurl);
     const source = audioContext.createBufferSource();
@@ -23,13 +23,7 @@ const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundBufferCache = {};
 async function loadSound(url) {
   if (soundBufferCache[url]) return soundBufferCache[url];
-  let response;
-  try{
-    response = await fetch(url);
-  }catch(e){
-    response = await fetch("Pomum/"+url);
-  }
-  
+  const response = await fetch(url);
   const arrayBuffer = await response.arrayBuffer();
   const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
   soundBufferCache[url] = audioBuffer;
