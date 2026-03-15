@@ -534,25 +534,6 @@ canvas#glcanvas {
     }
   }
 }
-.calcscore{
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  div{
-    font-weight: bold;
-    display: block;
-    padding: 0.5em;
-    padding-left: 2em;
-    padding-right: 2em;
-    border-radius: 1em;
-  }
-  #tempscore{
-    background-color: $score;
-  }
-  #mult{
-    background-color: $mult;
-  }
-}
 /* Price above the card */
 
 /* Card */
@@ -850,7 +831,7 @@ canvas#glcanvas {
 }
 .upgradeinfo{
     white-space: nowrap;
-  background-color: rgb(0, 163, 41);
+  background-color: rgb(106, 0, 163);
   border-radius: .2em;
   padding-left: .2em;
   padding-right: .2em;
@@ -890,15 +871,19 @@ canvas#glcanvas {
       position: relative;
       max-width: 900px;
       width: 90%;
-
+      
       #tiles, #consumables-container {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         gap: 0.5rem;
+        min-height: $cardHeight;
+        @media (max-width: 1024px) { min-height: $cardHeight-sm; }
+        @media (max-width: 800px)  { min-height: $cardHeight-sm; }
+        @media (max-width: 600px)  { min-height: $cardHeight-sm * 0.8; }
         margin-bottom: 1rem;
+        padding-bottom: 4em;
       }
-
       button.upgradetiles {
         padding: 0.8rem 1.5rem;
         border: none;

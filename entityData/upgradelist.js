@@ -630,7 +630,7 @@ export const upgradeBlueprints = [
       onScore() {
         if (this.props.mult !== 1) {
           const gained = Math.round(this.props.mult * 100) / 100;
-          game.mult *= this.props.mult;
+          game.mult *= gained;
           game.mult = Math.round(game.mult * 100) / 100;
           return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };
         }

@@ -368,7 +368,6 @@ export class UpgradeRenderer {
     if (index < 0) return;
     let upgradecard = upgrade.wrapper;
     //let upgradecard = this.getPlayerUpgrades(index);
-
     const descElement = upgradecard.querySelector(".upgrade-desc");
     descElement.innerHTML = this.createDescription();
 
@@ -388,7 +387,7 @@ export class UpgradeRenderer {
               upgradecard.classList.remove("triggered");
               upgradecard.classList.remove("ready"); // remove ready if ready
               upgrade.isReady = false;
-            }, 300);
+            }, time);
           }, delay);
         }
         break;
