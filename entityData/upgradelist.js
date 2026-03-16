@@ -1529,7 +1529,7 @@ export const upgradeBlueprints = [
       canRetrigger: true,
       onScore(payload) {      
         let upgradesToRetrigger = [];
-        game.triggerManager.playerInventory.forEach(up=>{
+        game.upgrades.forEach(up=>{
           if(up!=this&&up.priority!=PRIORITY.RETRIGGER){
             upgradesToRetrigger.push(up);
             //game.triggerManager.addToQueue([up], GAME_TRIGGERS.onScore, payload);
@@ -1553,34 +1553,35 @@ export const upgradeBlueprints = [
 {
   name: "Demencja",
   descriptionfn(game) {
-    const count = Style.Chance('3 razy');
-    return `Pier… pierwsze… ulepszenie… ono się… hmm… aktywuje… tak… ${count}. Tak, ${count} się aktywuje… pierwsze ulepszenie… ${count}.`;
+  const count = Style.Chance('3 razy');
+  return `Pierwsze ulepszenie… ono… aktywuje się… ${count}. Tak, ${count}… ${Style.Chance('chyba…?')}`;
   },
   props: () => ({
     upgradeindex: null,
     prevrepeats: null,
-
+    chance: 0.5,
     // Funkcja resetująca - teraz wywoływana wewnętrznie przy każdej zmianie
     resetupgrade(self){
       if (self.props.upgradeindex && self.props.prevrepeats !== null) {
         self.props.upgradeindex.repeats[GAME_TRIGGERS.onScore] = self.props.prevrepeats;
       }
-      self.props.prevrepeats = null;
-      self.props.upgradeindex = null;
     },
     reset() {
       this.props.resetupgrade(this);
+      this.props.prevrepeats = null;
+      this.props.upgradeindex = null;
     },
 
     changeUpgrade(self) {
-      const firstUpgrade = game.triggerManager.playerInventory[0];
+      const firstUpgrade = game.upgrades[0];
       
       // Jeśli pierwsze ulepszenie w eq to to samo, co już mamy, nic nie rób
       if (self.props.upgradeindex === firstUpgrade) return;
 
       // Jeśli w eq pojawiło się coś nowego (albo zniknęło), najpierw posprzątaj po starym!
       this.resetupgrade(self);
-
+      self.props.prevrepeats = null;
+      self.props.upgradeindex = null;
       // Nie pozwól Demencji ulepszać samej siebie
       if (firstUpgrade && firstUpgrade !== self) {
         self.props.upgradeindex = firstUpgrade;
@@ -1592,8 +1593,8 @@ export const upgradeBlueprints = [
     onScore(payload) {
       // Sprawdzamy, czy ulepszenie na 1. slocie się nie zmieniło
       this.props.changeUpgrade(this);
-
-      if (!this.props.upgradeindex) {
+      this.props.resetupgrade(this);
+      if (!this.props.upgradeindex||Math.random()<this.props.chance) {
         return UPGRADE_STATES.Failed;
       }
 

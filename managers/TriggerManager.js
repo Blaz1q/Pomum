@@ -1,14 +1,15 @@
 import { UPGRADE_STATES, SCORE_ACTIONS, PRIORITY, Settings } from "../dictionary.js";
 import { PriorityQueue } from "../utils/PriorityQueue.js";
 import { Queue } from "../utils/Queue.js";
+import { GAME_TRIGGERS } from "../dictionary.js";
 
 export class TriggerManager {
     constructor(game) {
         this.game = game;
-        this.playerInventory = game.upgrades;
         this.Audio = game.Audio;
         
         this.eventQueue = new PriorityQueue();
+        this.queues = new Map();
         // Globalny łańcuch wizualny dla całej instancji
         this.visualChain = Promise.resolve();
         this.activeScores = new Set(); 
@@ -17,19 +18,19 @@ export class TriggerManager {
 
     async emit(event, payload) {
         // Czyścimy flagi z poprzedniego pełnego wywołania
-        this.playerInventory.forEach(u => u.isExhausted = false);
+        this.game.upgrades.forEach(u => u.isExhausted = false);
         this.visualChain = Promise.resolve(); // Resetujemy łańcuch na start nowej akcji gracza
-
+        const queue = this.handleQueues(event);
         // 1. Dodajemy bazowe karty wg priorytetów
         for (const [key, value] of Object.entries(PRIORITY)) {
-            const priorityUpgrades = this.playerInventory.filter(u => u.priority === value);
+            const priorityUpgrades = this.game.upgrades.filter(u => u.priority === value);
             console.log(priorityUpgrades);
             this.addToQueue(priorityUpgrades, event, payload);
         }
-
+        
         // 2. Procesujemy kolejkę (obsługa retriggerów)
-        while (this.eventQueue.size > 0) {
-            const { upgrade, event, payload } = this.eventQueue.dequeue();
+        while (queue.size > 0) {
+            const { upgrade, event, payload } = queue.dequeue();
             console.log(upgrade.name+" "+event);
             // Mechanizm EXHAUSTED (opcjonalny bezpiecznik)
             if (upgrade.isExhausted) continue;
@@ -41,7 +42,7 @@ export class TriggerManager {
         await this.visualChain;
         
         // 4. Dopiero teraz reset
-        this.resetAll();
+        this.resetAll(event);
     }
 getHandlers(upgrade,event){
     if (!upgrade || typeof upgrade !== "object" || upgrade.isExhausted) return null;
@@ -60,6 +61,7 @@ getHandlers(upgrade,event){
     async processHandlers(event, upgrade, payload) {
         const wait = ms => new Promise(r => setTimeout(r, ms));
         const handlers = this.getHandlers(upgrade, event); 
+        const queue = this.handleQueues(event);
         if (!handlers || handlers.length === 0) return;
 
         // 1. Zarządzanie iteracjami na poziomie KARTY + EVENTU
@@ -120,7 +122,7 @@ getHandlers(upgrade,event){
         // 3. PLANOWANIE KOLEJNEJ ITERACJI (Cała karta wraca do kolejki)
         if (currentIter < totalRepeat) {
             this.iterators.set(iterKey, currentIter + 1);
-            this.eventQueue.unshift({ 
+            queue.unshift({ 
                 upgrade, 
                 event: event, 
                 payload: payload 
@@ -131,17 +133,25 @@ getHandlers(upgrade,event){
         }
     }
     addToQueue(upgrades, event, payload) {
+        const queue = this.handleQueues(event);
+        
         for (const upgrade of upgrades) {
             
             const handlers = this.getHandlers(upgrade, event); 
 
             if (handlers&&handlers.length > 0) {
-                this.eventQueue.enqueue({ upgrade, event, payload },upgrade.priority);
+                queue.enqueue({ upgrade, event, payload },upgrade.priority);
             }
         }
     }
-
-    resetAll() {
+    handleQueues(event){
+        if(!this.queues.get(event)){
+            this.queues.set(event,new PriorityQueue());
+        }
+        return this.queues.get(event);
+    }
+    resetAll(event) {
+        if(event!=GAME_TRIGGERS.onScore) return;
         this.activeScores.forEach(upgrade => {
             if (typeof upgrade.reset === "function") {
                 upgrade.reset();
