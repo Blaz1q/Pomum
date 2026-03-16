@@ -1547,8 +1547,8 @@ export const upgradeBlueprints = [
     repeats: {
       [GAME_TRIGGERS.onScore]: 1 
     },
-    ...COMMON,
-    image: 'brokenmirror'
+    ...RARE,
+    image: "kosiarka",
   },
 {
   name: "Demencja",
@@ -1614,8 +1614,8 @@ export const upgradeBlueprints = [
       return UPGRADE_STATES.Failed;
     }
   }),
-  ...COMMON,
-  ...defaultimage,
+  ...RARE,
+  image: "demencja",
   price: 4,
   priority: PRIORITY.REPEAT
 }
