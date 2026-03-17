@@ -1131,7 +1131,8 @@ export const upgradeBlueprints = [
       }
     })
     , price: 5,
-    ...defaultimage, ...COMMON
+    image: "adrenaline",
+    ...COMMON
   },
   {
     name: "Critical Hit",
@@ -1390,7 +1391,8 @@ export const upgradeBlueprints = [
       },
     }),
     price: 4,
-    ...defaultimage, ...COMMON
+    image: "dolar",
+    ...COMMON
   },
   {
     name: "Saper",
