@@ -465,6 +465,10 @@ canvas#glcanvas {
           //transform: scale(1.15);
           background: $tile-hover;
         }
+        &.triggered{
+          animation: triggeredCard ease-in-out;
+          animation-duration: 0.3s;
+        }
       }
     }
 

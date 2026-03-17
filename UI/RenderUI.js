@@ -14,6 +14,7 @@ import {
 } from "../dictionary.js";
 import { rollBoss } from "../entities/Boss.js";
 import { upgradesList } from "../entityData/upgradelist.js";
+import { Consumable } from "../entities/Consumable.js";
 export class RenderUI {
   constructor(game) {
     this.game = game;
@@ -490,6 +491,16 @@ displayTempScore() {
           displayPrice: false,
           displayButtons: false,
         }),
+      );
+    });
+    consumableList.forEach((blueprint) => {
+      //console
+      const up = new Consumable(blueprint);
+      collection.appendChild(
+        this.displayUpgrades([up], {
+          displayPrice: false,
+          displayButtons: false,
+        })
       );
     });
   }

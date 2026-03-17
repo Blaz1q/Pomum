@@ -115,6 +115,18 @@ export class Tile {
 
         return g;
     }
+    triggerAnimation(game,time = 300){
+        console.log(this.x,this.y);
+        const domTile = document.querySelector(`[data-x="${this.x}"][data-y="${this.y}"]`);
+        const rendered = this.render(game);
+        domTile.replaceWith(rendered);
+        rendered.classList.add("triggered");
+        rendered.style.animationDuration = time + "ms";
+            rendered.classList.add("triggered");
+            setTimeout(() => {
+              rendered.classList.remove("triggered");
+            }, time);
+    }
     render(game){
         const Tile = this;
         const x = Tile.x;

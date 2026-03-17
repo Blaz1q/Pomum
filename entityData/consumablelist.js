@@ -635,13 +635,70 @@ const tarotCards = [
     },
     price: 4,
     image: "gwiazda",
-  } /*
+  },
     {
-        name: "Księżyc"
+        name: "Księżyc",
+        descriptionfn(){
+          return `Ulepsza od ${Style.Chance(`1 do 20`)} kafelków na ${Style.Chance(MODIFIERS.Silver)}`;
+        },
+        effect(game){
+          let usedCoords = new Set(); // Przechowujemy klucze tekstowe (np. "2,5")
+          let results = []; // Tablica wynikowa ze współrzędnymi
+          let randomnum = Math.floor(Math.random() * 20) + 1;
+          while (results.length < randomnum) {
+            let x = Math.floor(Math.random() * game.matrixsize);
+            let y = Math.floor(Math.random() * game.matrixsize);
+            let key = `${x},${y}`;
+
+            if (!usedCoords.has(key)) {
+              usedCoords.add(key);
+              results.push({ x, y });
+            }
+          }
+          results.forEach(coords => {
+            const tile = game.board[coords.x][coords.y];
+            tile.props.modifier = MODIFIERS.Silver;
+            tile.triggerAnimation(game);
+          });
+        },
+        canUse(game) {
+        return game.stage != STAGES.Shop && game.locked == false;
+      },
+      price: 4,
+      image: "moon",
     },
     {
-        name: "Słońce"
-    },
+        name: "Słońce",
+        descriptionfn(){
+          return `Ulepsza od ${Style.Chance(`1 do 20`)} kafelków na ${Style.Chance(MODIFIERS.Gold)}`;
+        },
+        effect(game){
+          let usedCoords = new Set(); // Przechowujemy klucze tekstowe (np. "2,5")
+          let results = []; // Tablica wynikowa ze współrzędnymi
+          let randomnum = Math.floor(Math.random() * 20) + 1;
+          while (results.length < randomnum) {
+            let x = Math.floor(Math.random() * game.matrixsize);
+            let y = Math.floor(Math.random() * game.matrixsize);
+            let key = `${x},${y}`;
+
+            if (!usedCoords.has(key)) {
+              usedCoords.add(key);
+              results.push({ x, y });
+            }
+          }
+          results.forEach(coords => {
+            const tile = game.board[coords.x][coords.y];
+            tile.props.modifier = MODIFIERS.Gold;
+            tile.triggerAnimation(game);
+          });
+        },
+        canUse(game) {
+        return game.stage != STAGES.Shop && game.locked == false;
+      },
+      price: 4,
+      image: "sun",
+    }
+    /*
     {
         name: "Sędzia"
     },

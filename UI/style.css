@@ -436,6 +436,10 @@ canvas#glcanvas {
 .game .right-panel #body div:hover {
   background: #ffe6a7;
 }
+.game .right-panel #body div.triggered {
+  animation: triggeredCard ease-in-out;
+  animation-duration: 0.3s;
+}
 .game .right-panel #shop {
   display: none;
   padding: 1rem;
