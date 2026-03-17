@@ -1,4 +1,4 @@
-import { consumableList } from "../entityData/consumablelist.js";
+import { consumableList, coupons } from "../entityData/consumablelist.js";
 import { Upgrade } from "../entities/Upgrade.js";
 import { animate, Animator } from "../loadshaders.js";
 import {
@@ -15,6 +15,7 @@ import {
 import { rollBoss } from "../entities/Boss.js";
 import { upgradesList } from "../entityData/upgradelist.js";
 import { Consumable } from "../entities/Consumable.js";
+import { Voucher } from "../entities/Voucher.js";
 export class RenderUI {
   constructor(game) {
     this.game = game;
@@ -503,6 +504,15 @@ displayTempScore() {
         })
       );
     });
+    coupons.forEach((blueprint)=> {
+      const up = new Voucher(blueprint);
+      collection.appendChild(
+        this.displayUpgrades([up], {
+          displayPrice: false,
+          displayButtons: false,
+        })
+      );
+    })
   }
   triggerBoss() {
     const bossContainer = document.getElementById("boss-container");
