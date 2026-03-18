@@ -1461,7 +1461,7 @@ export const upgradeBlueprints = [
     }),
     price: 5,
     ...UNCOMMON,
-    ...defaultimage
+    image: "wrozka"
   },
   {
     name: "Lody",
