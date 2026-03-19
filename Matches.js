@@ -1,6 +1,6 @@
 import { TYPES, GAME_TRIGGERS, Settings, MODIFIERS } from "./dictionary.js";
 import { Tile } from "./entities/Tile.js";
-
+import { Queue } from "./utils/Queue.js"
 let FADE_MS = Settings.FADE_MS;
 let MIN_FALL_MS = Settings.MIN_FALL_MS;
 export class Matches {
@@ -8,6 +8,8 @@ export class Matches {
         this.game = game;
         this.matrixsize = game.matrixsize;
         this.activeExplosions = [];
+        this.pendingMatches = [];
+        this.processed = true;
     }
     specialMatches(matches) {
         let special = [];
@@ -103,21 +105,34 @@ getNeighborsForSpecial(tile) {
     }
     async processMatches(matches) {
     // 1. Definiujemy punkty zapalne (to co przyszło z dopasowań + to co już wybucha)
+     if(!this.processed){
+        this.pendingMatches.push(...matches);
+        return;
+    } 
+    this.processed = false;
+    
     let seeds = [...matches];
     if (this.game.activeExplosions.length > 0) {
-        seeds.push(...this.game.activeExplosions);
+        seeds.push(this.game.activeExplosions);
     }
-
+    
     // 2. JEDNO wywołanie, które zajmie się całą rekurencją i reakcjami łańcuchowymi
     // collectAllImpactedTiles sam wywoła getNeighborsForSpecial, więc nie potrzebujemy triggerSpecial!
     let finalMatches = this.collectAllImpactedTiles(seeds);
-    
-    this.game.stats.setDestroyedTiles(finalMatches);
-    if (finalMatches.length === 0) {
-        await this.game.finishMatches();
-        return;
+    if(this.pendingMatches.length>0){
+        finalMatches.push(...this.pendingMatches);
+        this.pendingMatches = [];
     }
     
+    
+    
+    if (finalMatches.length === 0) {
+        await this.game.finishMatches();
+        this.processed = true;
+        return;
+    }
+   
+    this.game.stats.setDestroyedTiles(finalMatches);
     this.game.locked = true;
     
     // Nadpisujemy matches wynikiem z optymalnego zbierania
@@ -134,9 +149,15 @@ getNeighborsForSpecial(tile) {
     if (this.game.FALL_MS > MIN_FALL_MS) {
         this.game.FALL_MS -= 10;
     }
-
+    await this.processVisuals(matches);
     // 5. Animacja Fading i obsługa detonacji
-    requestAnimationFrame(() => {
+    this.processed = true;
+}
+    async processVisuals(matches){
+        console.log("visual:")
+        console.log(matches);
+        return new Promise(resolve => {
+        requestAnimationFrame(() => {
         for (const m of matches) {
             const idx = m.y * this.matrixsize + m.x;
             const cell = this.game.gameContainer.children[idx];
@@ -209,10 +230,11 @@ getNeighborsForSpecial(tile) {
             this.game.GameRenderer.displayTempScore();
             
             this.game.animateCollapse();
+            resolve();
         }, FADE_MS);
     });
-}
-
+     })
+    }
     triggerSpecial(tile, options = {}, collected = new Set()) {
         if (!tile) return;
         console.log("triggerSpecial");
