@@ -5,7 +5,13 @@ export class Sticker{
 
         // 2. Gwarancja, że this.props to zawsze obiekt
         this.props = rawProps || {};
+        if (props.effect) {
+            this.props.effect = props.effect;
+        }
 
+        if (props.remove) {
+            this.props.remove = props.remove;
+        }
         this.name = props.name
         this.descriptionfn = props.descriptionfn;
         this.url = "./images/stickers/";
@@ -19,5 +25,11 @@ export class Sticker{
         sticker.width=26;
         sticker.height=26;
         return sticker;
+    }
+    apply(upgrade){
+        console.log("applying:")
+        console.log(upgrade);
+        if(!this.props.effect) return;
+        this.props.effect.call(this,upgrade);
     }
 }

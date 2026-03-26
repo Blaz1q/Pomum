@@ -45,6 +45,9 @@ export class UpgradeBase {
   canBuy(game) {
     throw new Error("Method canBuy must be implemented.");
   }
+  canSell(game){
+    return true;
+  }
   hasMoney(game) {
     return this.price <= game.money + game.minMoney;
   }

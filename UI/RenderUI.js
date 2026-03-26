@@ -197,8 +197,12 @@ displayTempScore() {
     }
 }
   displayUpgradesCounter() {
+    let counter =0;
+    this.game.upgrades.forEach(upgrade => {
+        counter+=upgrade.slots;
+    });
     document.getElementById("upgrades-counter").innerHTML =
-      `(${this.game.upgrades.length}/${this.game.maxUpgrades})`;
+      `(${counter}/${this.game.maxUpgrades})`;
   }
   displayConsumablesCounter() {
     document.getElementById("consumables-counter").innerHTML =

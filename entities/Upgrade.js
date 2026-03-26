@@ -4,9 +4,13 @@ import { MODIFIERS,SCORE_ACTIONS,UPGRADE_STATES, } from "../dictionary.js";
 import { Consumable } from "./Consumable.js";
 import { Voucher } from "./Voucher.js";
 import { ConsumablePack } from "./ConsumablePack.js";
+import { Sticker } from "./Sticker.js";
+import { stickers } from "../entityData/stickerslist.js";
 export class Upgrade extends UpgradeBase {
   constructor(props = {}) {
     super(props);
+    this.slots = 1;
+    this.eternal = false;
     this.active = true;
     this.bought = false;
     this.stickers = []; //new Sticker(stickers[0]),new Sticker(stickers[1]),new Sticker(stickers[2]),new Sticker(stickers[3]),new Sticker(stickers[4])
@@ -55,9 +59,16 @@ export class Upgrade extends UpgradeBase {
     };
   }
   hasSpace(game) {
-    let space = game.upgrades.length < game.maxUpgrades || this.negative;
+    let counter =0;
+    game.upgrades.forEach(upgrade => {
+      counter+=upgrade.slots;
+    });
+    let space = counter+this.slots < game.maxUpgrades || this.negative;
 
     return space;
+  }
+  canSell(game){
+    return !this.eternal;
   }
   canBuy(game) {
     this.notEnoughMoney();
@@ -121,7 +132,7 @@ export class Upgrade extends UpgradeBase {
       copyUpgrade.modifier = source.modifier;
       copyUpgrade.type = source.type;
       copyUpgrade.priority = source.priority;
-      copryUpgrade.stickers = source.stickers;
+      copyUpgrade.stickers = source.stickers;
       return copyUpgrade;
     };
 
@@ -179,7 +190,9 @@ export class Upgrade extends UpgradeBase {
     //this.effect?.call(this, game); // this wewnątrz effect wskazuje na instancję
   }
   applyStickers(){
-
+    this.stickers.forEach(sticker => {
+      sticker.apply(this);
+    });
   }
   reset(){
     this.props?.reset?.call(this,game);

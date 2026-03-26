@@ -42,11 +42,12 @@ export class UpgradeRenderer {
     // Card inner
     const stickersContainer = document.createElement("div");
     stickersContainer.className = "sticker-container";
-    if(upgrade.stickers>0){
+    if(upgrade.stickers){
       upgrade.stickers.forEach(sticker => {
         stickersContainer.appendChild(sticker.render());
       });
     }
+    
     const cardInner = document.createElement("div");
     cardInner.className = "upgrade-inner";
     let classes = [];
@@ -251,6 +252,12 @@ export class UpgradeRenderer {
     btnSell.textContent = "Sprzedaj";
     btnSell.addEventListener("click", (e) => {
       e.stopPropagation();
+      if(!upgrade.canSell(game)){
+          game.GameRenderer.notEnoughSpace(
+            document.getElementById("player-upgrades-container"),
+          );
+          return false;
+      } 
       if (this.gameRenderer.game.sell(upgrade)) {
         //this.refreshBuyButtons();
         game.GameRenderer.fadeOutAndRemove(wrapper);
@@ -301,12 +308,17 @@ export class UpgradeRenderer {
     const btnBuyAndUse = allBtns.find(
       (b) => b.textContent.trim().toLowerCase() === "kup i użyj",
     );
+    const btnSell = allBtns.find(
+      (b) => b.textContent.trim().toLowerCase() === "sprzedaj",
+    );
     // Bezpieczne usuwanie klasy (używamy ?. aby uniknąć błędów, jeśli przycisk nie zostanie znaleziony)
     btnBuy?.classList.remove("disabled");
     btnUse?.classList.remove("disabled");
     btnBuyAndUse?.classList.remove("disabled");
+    btnSell?.classList.remove("disabled");
     const hasSpace = upgrade.hasSpace(game);
     const hasMoney = upgrade.hasMoney(game);
+    const canSell = upgrade.canSell(game);
     let canUse = true;
     if (upgrade instanceof Consumable) {
       canUse = upgrade.canUse(game);
@@ -324,6 +336,11 @@ export class UpgradeRenderer {
     if (btnUse) {
       if (!canUse) {
         btnUse.classList.add("disabled");
+      }
+    }
+    if(btnSell){
+      if(!canSell){
+        btnSell.classList.add("disabled");
       }
     }
   }
