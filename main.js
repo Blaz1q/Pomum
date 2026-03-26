@@ -527,7 +527,7 @@ export class Game {
             if (index == -1) return;
             console.log("SELLINNN");
             this.upgrades[index].sell(this);
-            this.upgrades.splice(index, 1);
+            // this.upgrades.splice(index, 1);
             this.GameRenderer.displayUpgradesCounter();
             this.emit(GAME_TRIGGERS.onUpgradesChanged);
         }

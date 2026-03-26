@@ -178,6 +178,9 @@ export class Upgrade extends UpgradeBase {
     this.props?.effect?.call(this, game);
     //this.effect?.call(this, game); // this wewnątrz effect wskazuje na instancję
   }
+  applyStickers(){
+
+  }
   reset(){
     this.props?.reset?.call(this,game);
     this.isExhausted = false;
@@ -199,6 +202,6 @@ export class Upgrade extends UpgradeBase {
     //this.remove.call(this, game); // this wewnątrz remove wskazuje na instancję
     this.removeSpecial(game);
     game.money += Math.floor(this.sellPrice);
-    this.upgrades.splice(index, 1);
+    game.upgrades.splice(index, 1);
   }
 }
