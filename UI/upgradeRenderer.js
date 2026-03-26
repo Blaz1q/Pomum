@@ -40,6 +40,12 @@ export class UpgradeRenderer {
     priceEl.textContent = `$${params.bought ? upgrade.sellPrice : upgrade.price}`;
 
     // Card inner
+    const stickersContainer = document.createElement("div");
+    stickersContainer.className = "sticker-container";
+
+    upgrade.stickers.forEach(sticker => {
+      stickersContainer.appendChild(sticker.render());
+    });
     const cardInner = document.createElement("div");
     cardInner.className = "upgrade-inner";
     let classes = [];
@@ -71,7 +77,7 @@ export class UpgradeRenderer {
       });
     }
     cardInner.style.backgroundImage = `url('${upgrade.image()}')`;
-
+    cardInner.appendChild(stickersContainer);
     // Card
 
     const card = document.createElement("div");

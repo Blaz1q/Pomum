@@ -637,12 +637,17 @@ canvas#glcanvas {
       background-position: center;
       background-repeat: no-repeat;
       display: flex;
-      align-items: flex-end;
       transition: filter 0.3s ease, transform 0.3s ease;;
       transform-origin: center center; /* scale from center */
       transition: filter 0.3s ease, transform 0.3s ease;
     }
-
+    .sticker-container {
+      margin: .7em;
+      display: flex;
+      flex-direction: column;
+      gap: .1em;
+      justify-content: space-evenly;
+    }
     &:hover {
       //animation-play-state: paused;
       animation: none;

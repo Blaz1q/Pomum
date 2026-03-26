@@ -66,6 +66,9 @@ export class UpgradeBase {
   apply(game) {
     throw new Error("Method apply must be implemented.");
   }
+  getIndex(game){
+    throw new Error("Method getIndex must be implemented.");
+  }
   sell(game) {
     throw new Error("Method sell must be implemented.");
   }

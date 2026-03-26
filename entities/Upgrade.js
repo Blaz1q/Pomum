@@ -9,6 +9,7 @@ export class Upgrade extends UpgradeBase {
     super(props);
     this.active = true;
     this.bought = false;
+    this.stickers = []; //new Sticker(stickers[0]),new Sticker(stickers[1]),new Sticker(stickers[2]),new Sticker(stickers[3]),new Sticker(stickers[4])
     this.negative = false;
     this.isReady = false;
     this.type = "Upgrade";
@@ -120,6 +121,7 @@ export class Upgrade extends UpgradeBase {
       copyUpgrade.modifier = source.modifier;
       copyUpgrade.type = source.type;
       copyUpgrade.priority = source.priority;
+      copryUpgrade.stickers = source.stickers;
       return copyUpgrade;
     };
 
@@ -171,7 +173,7 @@ export class Upgrade extends UpgradeBase {
       game.maxUpgrades += 1;
       game.GameRenderer.displayUpgradesCounter();
     }
-
+    this.applyStickers();
     this.addSpecial(game);
     this.props?.effect?.call(this, game);
     //this.effect?.call(this, game); // this wewnątrz effect wskazuje na instancję
@@ -181,18 +183,22 @@ export class Upgrade extends UpgradeBase {
     this.isExhausted = false;
   }
   remove(game){
-     this.bought = false;
+    this.bought = false;
     if (this.negative) {
       game.maxUpgrades -= 1;
       game.GameRenderer.displayUpgradesCounter();
     }
     this.props?.remove?.call(this, game);
   }
+  getIndex(game){
+    return game.upgrades.indexOf(this) ?? -1;
+  }
   sell(game) {
-    this.bought = false;
+    const index = this.getIndex(game);
     this.remove(game);
     //this.remove.call(this, game); // this wewnątrz remove wskazuje na instancję
     this.removeSpecial(game);
     game.money += Math.floor(this.sellPrice);
+    this.upgrades.splice(index, 1);
   }
 }

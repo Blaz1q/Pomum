@@ -616,10 +616,16 @@ canvas#glcanvas {
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
-  align-items: flex-end;
   transition: filter 0.3s ease, transform 0.3s ease;
   transform-origin: center center; /* scale from center */
   transition: filter 0.3s ease, transform 0.3s ease;
+}
+.upgrade-wrapper .upgrade-card .sticker-container, .boss-wrapper .upgrade-card .sticker-container {
+  margin: 0.7em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+  justify-content: space-evenly;
 }
 .upgrade-wrapper .upgrade-card:hover, .boss-wrapper .upgrade-card:hover {
   animation: none;
