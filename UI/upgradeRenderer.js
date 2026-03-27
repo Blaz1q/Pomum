@@ -117,11 +117,14 @@ export class UpgradeRenderer {
 
     // 3. Jeśli wrapper NIE był aktywny, to go podnosimy.
     // Jeśli BYŁ aktywny, to po prostu zostaje zresetowany (efekt zamknięcia).
+    let game = this.gameRenderer.game;
     if (!isAlreadyActive) {
       requestAnimationFrame(() => {
         wrapper.style.transition = "transform 0.05s ease-out";
         wrapper.style.transform = "translateY(-20px)";
         wrapper.classList.add("SelectedUpgrade");
+        
+        game.Audio.playSound("select.mp3")
         const buttonsContainer = wrapper.querySelector(".consumable-buttons");
 
         if (buttonsContainer) {
@@ -132,6 +135,8 @@ export class UpgradeRenderer {
         this.refreshAllButtons();
         // Pobieramy wszystkie przyciski wewnątrz kontenera do tablicy
       });
+    }else{
+      game.Audio.playSound("deselect.mp3")
     }
   }
   createBuyButton(params) {

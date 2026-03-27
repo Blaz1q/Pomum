@@ -113,7 +113,6 @@ getHandlers(upgrade,event){
                     const finaltiming = this.game.emitTimingMs;
                     upgrade.UpgradeRenderer.trigger(finaltiming - 50, state);
                     this.Audio.playSound("tick.mp3");
-                    
                     if (message) {
                         upgrade.UpgradeRenderer.createPopup(message, style,finaltiming-50);
                     }

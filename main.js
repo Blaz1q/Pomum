@@ -68,8 +68,8 @@ export class Game {
             new Tile({ icon: "🥥", type: TYPES.Fruit, image: 'coconut.png' }),
         ];
         this.special = [
-            new Tile({ icon: "🧨", type: TYPES.Dynamite, detonations: 2, percent: 1 }),
-            new Tile({ icon: "💣", type: TYPES.Bomb, detonations: 2, percent: 0.1 }),
+            new Tile({ icon: "🧨", type: TYPES.Dynamite, detonations: 1, percent: 1 }),
+            new Tile({ icon: "💣", type: TYPES.Bomb, detonations: 1, percent: 0.1 }),
         ];
         this.activeExplosions = [];
         this.equalizeChances();
