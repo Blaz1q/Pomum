@@ -9,105 +9,87 @@ export class UpgradeRenderer {
     let bought = params.bought ?? false;
     let displayPrice = params.displayPrice ?? true;
     let displayButtons = params.displayButtons ?? true;
+    
     upgrade.wrapper = document.createElement("div");
     const wrapper = upgrade.wrapper;
     const originalZ = wrapper.style.zIndex || 0;
 
     wrapper.addEventListener("mouseenter", () => (wrapper.style.zIndex = 500));
-    wrapper.addEventListener(
-      "mouseleave",
-      () => (wrapper.style.zIndex = originalZ),
-    );
+    wrapper.addEventListener("mouseleave", () => (wrapper.style.zIndex = originalZ));
+    
     if (displayButtons) {
-      wrapper.addEventListener("click", () =>
-        this.displayButtons(wrapper, upgrade),
-      );
+        wrapper.addEventListener("click", () => this.displayButtons(wrapper, upgrade));
     }
+
     wrapper.className = "upgrade-wrapper";
     wrapper.dataset.type = upgrade.type;
     if (bought) wrapper.classList.add("bought");
-    //console.log(upgrade.isReady);
-    if (upgrade.isReady) {
-      wrapper.classList.add("ready");
-    }
-    if (params.free) {
-      upgrade.price = 0;
+    if (upgrade.isReady) wrapper.classList.add("ready");
+    if (params.free) upgrade.price = 0;
+
+    // 1. Tło karty (To tutaj trafia obrazek i grayscale/invert)
+    const cardBackground = document.createElement("div");
+    cardBackground.className = "card-background";
+    cardBackground.style.backgroundImage = `url('${upgrade.image()}')`;
+
+    // 2. Kontener na naklejki (Osobno, by nie dziedziczyć filtrów)
+    const stickersContainer = document.createElement("div");
+    stickersContainer.className = "sticker-container";
+    if(upgrade.stickers){
+        upgrade.stickers.forEach(sticker => {
+            stickersContainer.appendChild(sticker.render());
+        });
     }
 
-    // Price above card
+    // Logika klas wizualnych
+    let classes = [];
+    if (upgrade.negative) classes.push("negative");
+    if (upgrade.modifier !== MODIFIERS.None) classes.push("holo");
+    if (upgrade?.active === false) classes.push("inactive");
+
+    // Nakładamy klasy na tło, a nie na cały kontener inner
+    classes.forEach(cls => cardBackground.classList.add(cls));
+
+    if (classes.length > 0) {
+        if (!bought) {
+            wrapper.classList.add("triggered");
+            const sound = upgrade.negative ? "foil_reverse.mp3" : "foil.mp3";
+            this.gameRenderer.game.Audio.playSound(sound);
+            this.gameRenderer.game.Audio.playSound("tick.mp3");
+
+            setTimeout(() => wrapper.classList.remove("triggered"), 300);
+        }
+    }
+
+    // 3. Montaż Card Inner
+    const cardInner = document.createElement("div");
+    cardInner.className = "upgrade-inner";
+    cardInner.appendChild(cardBackground); // Tło jako pierwszy potomek
+    cardInner.appendChild(stickersContainer); // Naklejki na wierzchu
+
+    // Reszta bez zmian...
+    const card = document.createElement("div");
+    card.className = "upgrade-card";
+    card.style.animationDelay = `-${Math.random() * 3}s`;
+    card.appendChild(cardInner);
+    this.gameRenderer.addParalax(card);
+
     const priceEl = document.createElement("div");
     priceEl.className = "upgrade-price";
     priceEl.textContent = `$${params.bought ? upgrade.sellPrice : upgrade.price}`;
 
-    // Card inner
-    const stickersContainer = document.createElement("div");
-    stickersContainer.className = "sticker-container";
-    if(upgrade.stickers){
-      upgrade.stickers.forEach(sticker => {
-        stickersContainer.appendChild(sticker.render());
-      });
-    }
-    
-    const cardInner = document.createElement("div");
-    cardInner.className = "upgrade-inner";
-    let classes = [];
-    if (upgrade.negative) {
-      classes.push("negative");
-    }
-    if (upgrade.modifier != MODIFIERS.None) {
-      classes.push("holo");
-    }
-    if (!bought && classes.length > 0) {
-      classes.forEach((element) => {
-        cardInner.classList.add(element);
-      });
-      wrapper.classList.add("triggered");
-      if (upgrade.negative) {
-        this.gameRenderer.game.Audio.playSound("foil_reverse.mp3");
-      } else {
-        this.gameRenderer.game.Audio.playSound("foil.mp3");
-      }
-      this.gameRenderer.game.Audio.playSound("tick.mp3");
-
-      setTimeout(
-        () => wrapper.classList.remove("triggered"),
-        300 + Math.floor(Math.random() * 20),
-      );
-    } else if (bought && classes.length > 0) {
-      classes.forEach((element) => {
-        cardInner.classList.add(element);
-      });
-    }
-    cardInner.style.backgroundImage = `url('${upgrade.image()}')`;
-    cardInner.appendChild(stickersContainer);
-    // Card
-
-    const card = document.createElement("div");
-    card.className = "upgrade-card";
-    card.style.animationDelay = `-${Math.random() * 3}s`;
-
-    card.appendChild(cardInner);
-    this.gameRenderer.addParalax(card);
-    // Description
     const desc = document.createElement("div");
     desc.className = "upgrade-desc";
     desc.innerHTML = this.createDescription();
+    wrapper.addEventListener("mouseenter", () => { desc.innerHTML = this.createDescription(); });
 
-    wrapper.addEventListener("mouseenter", () => {
-      desc.innerHTML = this.createDescription();
-    });
-
-    // Click handlers
-    if (displayPrice) {
-      wrapper.appendChild(priceEl);
-    }
+    if (displayPrice) wrapper.appendChild(priceEl);
     wrapper.appendChild(card);
     wrapper.appendChild(desc);
-    if (displayButtons) {
-      wrapper.appendChild(this.createButtons(params));
-    }
+    if (displayButtons) wrapper.appendChild(this.createButtons(params));
+
     return wrapper;
-  }
+}
   createDescription() {
     const upgrade = this.upgrade;
     let description = `<h1>${upgrade.name}</h1>`;

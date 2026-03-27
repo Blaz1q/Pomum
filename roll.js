@@ -1,9 +1,11 @@
-import { UPGRADE_RARITY, MODIFIERS } from "./dictionary.js";
+import { UPGRADE_RARITY, MODIFIERS, Settings, DIFFICULTY } from "./dictionary.js";
 import { consumablePacks,coupons } from "./entityData/consumablelist.js";
 import { ConsumablePack } from "./entities/ConsumablePack.js";
 import { Voucher } from "./entities/Voucher.js";
 import { upgradesList } from "./entityData/upgradelist.js";
 import { Upgrade } from "./entities/Upgrade.js";
+import { stickers } from "./entityData/stickerslist.js";
+import { Sticker } from "./entities/Sticker.js";
 
 
 export class Roll {
@@ -41,6 +43,16 @@ export class Roll {
         if (isSilver) modifier = MODIFIERS.Silver;
         if (isGold) modifier = MODIFIERS.Gold; // gold nadpisuje silver jeśli oba trafione
         return modifier;
+    }
+    Stickers(up,game){
+        if(Settings.DIFFICULTY==DIFFICULTY.NORMAL) return;
+        let result = [];
+        stickers.forEach(sticker => {
+            if(sticker.weight>Math.random())
+                result.push(new Sticker(sticker));
+        });
+        up.stickers = result;
+        up.applyStickers(game);
     }
     Vouchers(count = 1) {
         if (!coupons || coupons.length === 0) return [];

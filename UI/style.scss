@@ -40,6 +40,7 @@ body, html {
   color: #333;
   width: 98%;
   margin:auto;
+  user-select: none;
 }
 canvas#glcanvas {
   position: fixed;     /* stay fixed relative to viewport */
@@ -640,7 +641,19 @@ canvas#glcanvas {
       transition: filter 0.3s ease, transform 0.3s ease;;
       transform-origin: center center; /* scale from center */
       transition: filter 0.3s ease, transform 0.3s ease;
-    }
+
+    .card-background {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: -1; // Warstwa dolna
+        transition: filter 0.3s ease;
+      }
+    
+    
     .sticker-container {
       margin: .7em;
       display: flex;
@@ -648,6 +661,7 @@ canvas#glcanvas {
       gap: .1em;
       justify-content: space-evenly;
     }
+  }
     &:hover {
       //animation-play-state: paused;
       animation: none;
@@ -848,11 +862,17 @@ canvas#glcanvas {
 .negative{
   filter: invert(1);
 }
+.inactive{
+  filter: grayscale(1);
+}
 .holo{
   filter: url(#holo-map);
 }
 .holo.negative{
   filter: invert(1) url(#holo-map);
+}
+.holo.inactive{
+  filter: grayscale(1) url(#holo-map);
 }
 #upgrade-tiles {
   display: none; // hidden initially

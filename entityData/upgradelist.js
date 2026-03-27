@@ -1177,17 +1177,24 @@ export const upgradeBlueprints = [
       mult: 1,
       onRoundStart() {
         const neighbor = this.getRightNeighbor();
+        let destroyed = false;
+        let gained
         if (neighbor != null) {
-          const gained = neighbor.sellPrice
+          gained = neighbor.sellPrice;
           const index = game.upgrades.indexOf(neighbor);
-          this.props.mult += gained;
-          neighbor.props?.remove?.call(this, game);
-          game.upgrades.splice(index, 1);
-          game.GameRenderer.dissolveAndRemove(neighbor.wrapper, 1000);
+          destroyed = neighbor.remove(game);
+          if(destroyed){
+            this.props.mult += gained;
+            neighbor.destroy(game);
+            game.GameRenderer.dissolveAndRemove(neighbor.wrapper, 1000);
+          }
+          
 
           //game.GameRenderer.displayPlayerUpgrades();
-          return { state: UPGRADE_STATES.Active, message: `+${gained} Mult`, style: SCORE_ACTIONS.Info };
+          
         }
+        if(destroyed)
+          return { state: UPGRADE_STATES.Active, message: `+${gained} Mult`, style: SCORE_ACTIONS.Info };
         return { state: UPGRADE_STATES.Tried, message: `Failed`, style: SCORE_ACTIONS.Failed }
       },
       onScore() {

@@ -271,13 +271,13 @@ export const consumableUpgradeBlueprints = [
       const newUpgrade = Upgrade.Copy(copy);
       console.log(newUpgrade);
       game.upgrades.forEach((upgrade) => {
-        upgrade.remove(game);
+        if(upgrade!=copy){
+          upgrade.remove(game);
+          upgrade.destroy(game);
+        }
       });
-      game.upgrades = [];
-      game.upgrades.push(copy, newUpgrade);
-      game.upgrades.forEach(upgrade => {
-          upgrade.apply(game);
-      });
+      game.upgrades.push(newUpgrade);
+      newUpgrade.apply(game);
       game.GameRenderer.displayPlayerUpgrades();
       game.GameRenderer.displayUpgradesCounter();
     },
@@ -931,6 +931,19 @@ export const consumablePacks = [
       return `Znajdują się ${this.props.maxRoll} karty tarota. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
     },
     consumables: tarotCards,
+    price: 4,
+    props: {
+      maxSelect: 1,
+      maxRoll: 3,
+    },
+    image: "tarot_pack",
+  },
+  {
+    name: "Arcana Pack",
+    descriptionfn() {
+      return `Znajdują się ${this.props.maxRoll} karty tarota. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+    },
+    consumables: consumableUpgradeBlueprints,
     price: 4,
     props: {
       maxSelect: 1,

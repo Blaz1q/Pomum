@@ -63,7 +63,7 @@ export class Upgrade extends UpgradeBase {
     game.upgrades.forEach(upgrade => {
       counter+=upgrade.slots;
     });
-    let space = counter+this.slots < game.maxUpgrades || this.negative;
+    let space = counter+this.slots <= game.maxUpgrades || this.negative;
 
     return space;
   }
@@ -184,14 +184,17 @@ export class Upgrade extends UpgradeBase {
       game.maxUpgrades += 1;
       game.GameRenderer.displayUpgradesCounter();
     }
-    this.applyStickers();
+    //this.applyStickers();
     this.addSpecial(game);
     this.props?.effect?.call(this, game);
     //this.effect?.call(this, game); // this wewnątrz effect wskazuje na instancję
   }
-  applyStickers(){
+  deapply(game){
+    this.props?.remove?.call(this, game);
+  }
+  applyStickers(game){
     this.stickers.forEach(sticker => {
-      sticker.apply(this);
+      sticker.apply(this,game);
     });
   }
   reset(){
@@ -199,22 +202,32 @@ export class Upgrade extends UpgradeBase {
     this.isExhausted = false;
   }
   remove(game){
+    if(this.eternal) return false;
     this.bought = false;
     if (this.negative) {
       game.maxUpgrades -= 1;
       game.GameRenderer.displayUpgradesCounter();
     }
-    this.props?.remove?.call(this, game);
+    this.deapply(game);
+    //this.props?.remove?.call(this, game);
+    return true;
   }
   getIndex(game){
     return game.upgrades.indexOf(this) ?? -1;
   }
   sell(game) {
-    const index = this.getIndex(game);
+    
     this.remove(game);
     //this.remove.call(this, game); // this wewnątrz remove wskazuje na instancję
     this.removeSpecial(game);
     game.money += Math.floor(this.sellPrice);
+    this.destroy(game);
+  }
+  destroy(game){
+    if(this.eternal) return false;
+    const index = this.getIndex(game);
+    if(index==-1) return false;
     game.upgrades.splice(index, 1);
+    return true;
   }
 }

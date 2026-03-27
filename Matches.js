@@ -113,7 +113,7 @@ getNeighborsForSpecial(tile) {
     
     let seeds = [...matches];
     if (this.game.activeExplosions.length > 0) {
-        seeds.push(this.game.activeExplosions);
+        seeds.push(...this.game.activeExplosions);
     }
     
     // 2. JEDNO wywołanie, które zajmie się całą rekurencją i reakcjami łańcuchowymi

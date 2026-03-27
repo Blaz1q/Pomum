@@ -26,10 +26,12 @@ export class Sticker{
         sticker.height=26;
         return sticker;
     }
-    apply(upgrade){
+    apply(upgrade, game){
         console.log("applying:")
         console.log(upgrade);
+        this.props.upgrade = upgrade;
+        this.props.game = game;
         if(!this.props.effect) return;
-        this.props.effect.call(this,upgrade);
+        this.props.effect.call(this,upgrade,game);
     }
 }

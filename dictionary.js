@@ -53,6 +53,14 @@ export const UPGRADE_STATES = {
     Ready: 3,    // Upgrade is ready to do something
     Tried: 4     // Tried but failed.
 }
+export const DIFFICULTY = {
+    NORMAL: 1,
+    ETERNAL: 2,
+    HEAVY: 3,
+    BATTERY: 4,
+    PERISHABLE: 5,
+    RENTAL: 6
+}
 export const UPGRADE_RARITY = {
     Common: 20,
     Uncommon: 11,
@@ -111,6 +119,7 @@ export var Settings = {
     PLAY_SOUND: true,
     LOW_GRAPHICS: false,
     OLD_FRUITS: false,
+    DIFFICULTY: DIFFICULTY.NORMAL
 }
 export const GAMECOLORS = {
     warmOranges: {

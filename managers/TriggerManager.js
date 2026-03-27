@@ -45,7 +45,7 @@ export class TriggerManager {
         this.resetAll(event);
     }
 getHandlers(upgrade,event){
-    if (!upgrade || typeof upgrade !== "object" || upgrade.isExhausted) return null;
+    if (!upgrade || typeof upgrade !== "object" || upgrade.isExhausted ) return null;
 
             const handlerName = `on${event[0].toUpperCase()}${event.slice(1)}`;
             const mainHandler = typeof upgrade[handlerName] === "function"
@@ -55,7 +55,22 @@ getHandlers(upgrade,event){
             const specialHandler = (event === "score" && typeof upgrade.specialFunc === "function")
                 ? upgrade.specialFunc
                 : null;
-            const handlers = [mainHandler, specialHandler].filter(Boolean);
+
+            const stickerHandlers = (upgrade.stickers || [])
+                .map(sticker => {
+                    const fn = sticker.props?.[handlerName];
+                    if (typeof fn === "function") {
+                        return fn.bind(sticker.props); 
+                    }
+                    return null;
+                })
+                .filter(Boolean);
+            let handlers = [];
+            if(!upgrade.active){
+                handlers = [...stickerHandlers].filter(Boolean);
+                return handlers;
+            }
+            handlers = [mainHandler, specialHandler, ...stickerHandlers].filter(Boolean);
             return handlers;
 }
     async processHandlers(event, upgrade, payload) {
