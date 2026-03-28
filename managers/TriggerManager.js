@@ -14,6 +14,7 @@ export class TriggerManager {
         this.visualChain = Promise.resolve();
         this.activeScores = new Set(); 
         this.iterators = new Map();
+        this.pitch = 1;
     }
 
     async emit(event, payload) {
@@ -112,10 +113,18 @@ getHandlers(upgrade,event){
                     }
                     const finaltiming = this.game.emitTimingMs;
                     upgrade.UpgradeRenderer.trigger(finaltiming - 50, state);
-                    this.Audio.playSound("tick.mp3");
+                    if(message&&result?.style==SCORE_ACTIONS.Mult&&message[0]=='X'){
+                        this.Audio.playSound("xmult.mp3",this.pitch);
+                    }
+                    else if(result?.style==SCORE_ACTIONS.Mult){
+                        this.Audio.playSound("mult.mp3",this.pitch);
+                    }else{
+                        this.Audio.playSound("tick.mp3");
+                    }
                     if (message) {
                         upgrade.UpgradeRenderer.createPopup(message, style,finaltiming-50);
                     }
+                    this.pitch+=0.05;
                     return wait(finaltiming);
                 });
 
@@ -175,5 +184,6 @@ getHandlers(upgrade,event){
         this.activeScores.clear();
         // Resetujemy emitTimingMs do wartości domyślnej po zakończeniu serii
         this.game.emitTimingMs = Settings.EMIT_TIMING_MS; // Przykład: powrót do Settings.EMIT_TIMING_MS
+        this.pitch = 1;
     }
 }
