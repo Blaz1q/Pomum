@@ -1076,19 +1076,8 @@ function reroll() {
 function rerollBoosters() {
     game.rerollBoosters();
 }
-function showInfo() {
-    game.GameRenderer.displayTiles();
-    document.getElementById("info-container").style.display = "flex";
-}
-function hideInfo() {
-    document.getElementById("info-container").style.display = "none";
-}
-function showCollection() {
-    game.GameRenderer.displayCollection();
-}
-function hideCollection() {
-    document.getElementById("collection").classList.add("hidden");
-}
+
+
 function changeGameSpeed() {
     let val = document.getElementById("gameSpeed").value;
     val = parseInt(val);
@@ -1097,48 +1086,13 @@ function changeGameSpeed() {
     game.FALL_MS = val;
     game.emitTimingMs = val;
 }
-function toggleSound() {
-    let val = document.getElementById("VolumeButton").checked;
-    Settings.PLAY_SOUND = val;
-}
-function toggleDarkMode() {
-    let val = document.getElementById("darkToggle").checked;
-    Settings.DARK_MODE = val;
-    if (Settings.DARK_MODE) {
-        document.body.classList.remove("light");
-        document.body.classList.add("dark");
-    } else {
-        document.body.classList.remove("dark");
-        document.body.classList.add("light");
-    }
-    if (game.GameRenderer.currentColor) {
-        animate.animateColors(game.GameRenderer.currentColor, DURATIONS.ANIMATION_DURATION);
-    } else {
-        animate.animateColors(COLORS.magicPurples, DURATIONS.ANIMATION_DURATION);
-    }
-}
+
 function continueGame(){
     game.continue = true;
     game.endround();
     document.getElementById("game-won").style.display = "none";
 }
-function toggleLowGraphics(){
-    let val = document.getElementById("graphicsToggle").checked;
-    Settings.LOW_GRAPHICS = val;
-}
-function toggleOldFruits(){
-    let val = document.getElementById("oldFruits").checked;
-    Settings.OLD_FRUITS = val;
-}
-function showSettings() {
-    document.getElementById("darkToggle").checked = Settings.DARK_MODE;
-    document.getElementById("graphicsToggle").checked = Settings.LOW_GRAPHICS;
-    document.getElementById("oldFruits").checked = Settings.OLD_FRUITS;
-    document.getElementById("settingsPanel").style.display = "flex";
-}
-function hideSettings() {
-    document.getElementById("settingsPanel").style.display = "none";
-}
+
 const R = document.getElementById('funcR');
 const G = document.getElementById('funcG');
 const B = document.getElementById('funcB');
@@ -1153,31 +1107,28 @@ function animateholo() {
     requestAnimationFrame(animateholo);
 }
 animateholo();
-window.toggleOldFruits = toggleOldFruits;
-window.continueGame = continueGame;
-window.showSettings = showSettings;
-window.hideSettings = hideSettings;
-window.toggleDarkMode = toggleDarkMode;
-window.toggleLowGraphics = toggleLowGraphics;
-window.toggleSound = toggleSound;
+
 window.showMenu = showMenu;
 window.changeGameSpeed = changeGameSpeed;
 window.skip = skip;
 window.game = game;
-window.showInfo = showInfo;
-window.hideInfo = hideInfo;
+
 window.startRound = startRound;
+window.showMenu = showMenu;
+window.reroll = reroll;
+
+window.restartGame = restartGame;
+window.startGame = startGame;
+window.continueGame = continueGame;
+
 window.upgradesList = upgradesList;
 window.consumableList = consumableList;
-window.reroll = reroll;
-window.showCollection = showCollection;
-window.hideCollection = hideCollection;
+
+
 window.Upgrade = Upgrade;
 window.Consumable = Consumable;
 // window.rerollBoosters = rerollBoosters;
-window.restartGame = restartGame;
-window.startGame = startGame;
-window.showMenu = showMenu;
+
 window.Settings = Settings;
 window.Tile = Tile;
 window.Stats = Stats;

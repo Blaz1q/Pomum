@@ -11,6 +11,8 @@ import {
   GAME_TRIGGERS,
   UPGRADE_STATES,
   UPGRADE_RARITY_NAME,
+  Settings,
+  DIFFICULTY,
 } from "../dictionary.js";
 import { rollBoss } from "../entities/Boss.js";
 import { upgradesList } from "../entityData/upgradelist.js";
@@ -832,3 +834,95 @@ addParalax(card) {
     else rerollButton.classList.remove("disabled");
   }
 }
+function showCollection() {
+    game.GameRenderer.displayCollection();
+}
+function hideCollection() {
+    document.getElementById("collection").classList.add("hidden");
+}
+function toggleLowGraphics(){
+    let val = document.getElementById("graphicsToggle").checked;
+    Settings.LOW_GRAPHICS = val;
+}
+function toggleOldFruits(){
+    let val = document.getElementById("oldFruits").checked;
+    Settings.OLD_FRUITS = val;
+}
+function showSettings() {
+    document.getElementById("darkToggle").checked = Settings.DARK_MODE;
+    document.getElementById("graphicsToggle").checked = Settings.LOW_GRAPHICS;
+    document.getElementById("oldFruits").checked = Settings.OLD_FRUITS;
+    document.getElementById("settingsPanel").style.display = "flex";
+}
+function hideSettings() {
+    document.getElementById("settingsPanel").style.display = "none";
+}
+function toggleSound() {
+    let val = document.getElementById("VolumeButton").checked;
+    Settings.PLAY_SOUND = val;
+}
+function toggleDarkMode() {
+    let val = document.getElementById("darkToggle").checked;
+    Settings.DARK_MODE = val;
+    if (Settings.DARK_MODE) {
+        document.body.classList.remove("light");
+        document.body.classList.add("dark");
+    } else {
+        document.body.classList.remove("dark");
+        document.body.classList.add("light");
+    }
+    if (game.GameRenderer.currentColor) {
+        animate.animateColors(game.GameRenderer.currentColor, DURATIONS.ANIMATION_DURATION);
+    } else {
+        animate.animateColors(COLORS.magicPurples, DURATIONS.ANIMATION_DURATION);
+    }
+}
+function showInfo() {
+    game.GameRenderer.displayTiles();
+    document.getElementById("info-container").style.display = "flex";
+}
+function hideInfo() {
+    document.getElementById("info-container").style.display = "none";
+}
+
+// Zakładając, że Twoje Settings.DIFFICULTY przechowuje index (liczbę)
+function setdifficulty(action) {
+    // 1. Zamieniamy obiekt w tablicę, żeby móc operować na indeksach
+    const diffArray = Object.values(DIFFICULTY);
+    
+    // 2. Znajdujemy obecny indeks szukając obiektu, który ma to samo ID
+    let currentIndex = diffArray.findIndex(d => d.id === Settings.DIFFICULTY.id);
+    
+    // 3. Zmieniamy indeks (z zapętleniem)
+    if (action === '-') {
+        currentIndex = (currentIndex - 1 + diffArray.length) % diffArray.length;
+    } else {
+        currentIndex = (currentIndex + 1) % diffArray.length;
+    }
+    
+    // 4. Przypisujemy CAŁY obiekt z powrotem do Settings
+    Settings.DIFFICULTY = diffArray[currentIndex];
+    
+    // 5. Aktualizujemy UI
+    const label = document.getElementById("poziom_trudnosci");
+    if (label) {
+        label.innerText = Settings.DIFFICULTY.name;
+        
+        // Dodanie animacji "pop" (którą masz w SCSS) dla lepszego feedbacku
+        label.classList.remove('pop-anim');
+        void label.offsetWidth; // Magiczna linijka resetująca animację
+        label.classList.add('pop-anim');
+    }
+}
+
+window.toggleOldFruits = toggleOldFruits;
+window.showSettings = showSettings;
+window.hideSettings = hideSettings;
+window.toggleDarkMode = toggleDarkMode;
+window.toggleLowGraphics = toggleLowGraphics;
+window.toggleSound = toggleSound;
+window.showInfo = showInfo;
+window.hideInfo = hideInfo;
+window.showCollection = showCollection;
+window.hideCollection = hideCollection;
+window.setdifficulty = setdifficulty;

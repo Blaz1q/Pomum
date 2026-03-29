@@ -46,12 +46,21 @@ export class Roll {
     }
     Stickers(up,game){
         if(Settings.DIFFICULTY==DIFFICULTY.NORMAL) return;
+        let available = stickers.filter((sticker, index) => index < Settings.DIFFICULTY.id-1);
         let result = [];
-        stickers.forEach(sticker => {
-            if(sticker.weight>Math.random())
-                result.push(new Sticker(sticker));
+        available.forEach(sticker => {
+            if(sticker.weight>Math.random()){
+                const isBanned = result.some(alreadyAdded => 
+                    sticker?.banned?.includes(stickers.indexOf(alreadyAdded))
+                );
+                if(!isBanned) result.push(sticker);
+                }
         });
-        up.stickers = result;
+        let finalResult = [];
+        result.forEach(props => {
+            finalResult.push(new Sticker(props));
+        });
+        up.stickers = finalResult;
         up.applyStickers(game);
     }
     Vouchers(count = 1) {

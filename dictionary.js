@@ -54,12 +54,12 @@ export const UPGRADE_STATES = {
     Tried: 4     // Tried but failed.
 }
 export const DIFFICULTY = {
-    NORMAL: 1,
-    ETERNAL: 2,
-    HEAVY: 3,
-    BATTERY: 4,
-    PERISHABLE: 5,
-    RENTAL: 6
+    NORMAL: {name: "Normalny", id: 1},
+    ETERNAL: {name: "Wieczny", id: 2},
+    HEAVY: {name: "Ciężki", id: 3},
+    BATTERY: {name: "Bateria", id: 4},
+    PERISHABLE: {name: "Chwilowy", id: 5},
+    RENTAL: {name: "Wynajem", id: 6}
 }
 export const UPGRADE_RARITY = {
     Common: 20,

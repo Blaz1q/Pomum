@@ -22,8 +22,11 @@ export class Sticker{
     render(){
         const sticker = new Image();
         sticker.src = this.image();
-        sticker.width=26;
-        sticker.height=26;
+        sticker.width=28;
+        sticker.height=28;
+        const randomRotation = (Math.random() * 30) - 15;
+        sticker.style.transform = `rotate(${randomRotation}deg)`;
+        sticker.style.filter = 'drop-shadow(0 2px 1px rgba(0,0,0,0.3))';
         return sticker;
     }
     apply(upgrade, game){

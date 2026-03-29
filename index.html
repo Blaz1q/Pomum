@@ -42,8 +42,17 @@
 <div id="menu">
     <img class="logo" src="./images/pomumlogo.png" alt="Pomum" srcset="">
     <button id="startBtn" onclick="startGame()">Rozpocznij</button>
+    <div id="difficulty">
+      <label>Poziom trudności</label>
+      <div class="controls">
+        <button onclick="setdifficulty('-')">&lt;</button>
+        <label id="poziom_trudnosci">Normalny</label>
+        <button onclick="setdifficulty('+')">&gt;</button>
+      </div>
+    </div>
     <button onclick="showCollection()">Kolekcja</button>
     <button onclick="showSettings()">Ustawienia</button>
+    
     <div id="collection" class="hidden">
       <button onclick="hideCollection()">Zamknij</button>
       <div class="scroll"></div>
