@@ -62,24 +62,57 @@ export const DIFFICULTY = {
     RENTAL: {name: "Wynajem", id: 6}
 }
 export const UPGRADE_RARITY = {
-    Common: 20,
-    Uncommon: 11,
-    Rare: 6,
-    ConsumableCommon: 1,
-    ConsumableRare: 0.7,
-    PomumPackCommon: 1,
-    PomumPackRare: 0.5,
-}
-export const UPGRADE_RARITY_NAME = {
-    Common: { name: `Common`, display: `Common` },
-    Uncommon: { name: `Uncommon`, display: `Uncommon` },
-    Rare: { name: `Rare`, display: `Rare` },
-    ConsumableCommon: { name: `ConsumableCommon`, display: `Common` },
-    ConsumableRare: { name: `ConsumableRare`, display: `Rare` },
-    None: { name: 'none', display: 'none' },
-    PomumPackCommon: { name: `PomumPackCommon`, display: `none` },
-    PomumPackRare: { name: `PomumPackRare`, display: `none` }
-}
+    Common: { 
+        display: 'Common', 
+        weight: 20, 
+        class: 'common' 
+    },
+    Uncommon: { 
+        display: 'Uncommon', 
+        weight: 11, 
+        class: 'uncommon' 
+    },
+    Rare: { 
+        display: 'Rare', 
+        weight: 6, 
+        class: 'rare' 
+    },
+    ConsumableCommon: { 
+        display: 'Common', 
+        weight: 1, 
+        class: 'common' 
+    },
+    ConsumableRare: { 
+        display: 'Rare', 
+        weight: 0.7, 
+        class: 'rare' 
+    },
+    PomumPackCommon: { 
+        display: 'none', 
+        weight: 1, 
+        class: 'none' 
+    },
+    PomumPackRare: { 
+        display: 'none', 
+        weight: 0.5, 
+        class: 'none' 
+    },
+    None: { 
+        display: 'none', 
+        weight: 0, 
+        class: 'none' 
+    }
+};
+// export const UPGRADE_RARITY = {
+//     Common: { name: `Common`, display: `Common` },
+//     Uncommon: { name: `Uncommon`, display: `Uncommon` },
+//     Rare: { name: `Rare`, display: `Rare` },
+//     ConsumableCommon: { name: `ConsumableCommon`, display: `Common` },
+//     ConsumableRare: { name: `ConsumableRare`, display: `Rare` },
+//     None: { name: 'none', display: 'none' },
+//     PomumPackCommon: { name: `PomumPackCommon`, display: `none` },
+//     PomumPackRare: { name: `PomumPackRare`, display: `none` }
+// }
 export const COLORS = {
     boss: {
         light: ["#737373ff", "#888888ff", "#a3a3a3ff"],
@@ -160,19 +193,28 @@ export const GAMECOLORS = {
     }
 }
 export class Style {
+    static addClass(c,text){
+        return `<b class='${c}'>${text}</b>`
+    }
     static Mult(text) {
-        return `<b class='mult'>${text}</b>`;
+        return this.addClass('mult',text);
+    }
+    static XMult(text) {
+        return this.addClass('xmult',text);
     }
     static Score(text) {
-        return `<b class='score'>${text}</b>`;
+        return this.addClass('score',text);
+    }
+    static Moves(text) {  
+        return this.addClass('moves',text);
     }
     static Chance(text) {
-        return `<b class='chance'>${text}</b>`;
-    }
-    static Moves(text) {
-        return `<b class='moves'>${text}</b>`;
+        return this.addClass("chance",text);
     }
     static Money(text) {
-        return `<b class='money'>${text}</b>`;
+        return this.addClass('money',text);
+    }
+    static Highlight(text){
+        return this.addClass('highlight',text);
     }
 }

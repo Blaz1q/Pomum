@@ -85,13 +85,37 @@ canvas#glcanvas {
   font-family: "Segoe UI", sans-serif;
   color: light-dark(#333, #fff);
   text-align: center;
+  gap: 0.7em;
+}
+#menu button {
+  all: unset;
+  font-family: "Jersey 25", sans-serif;
+  cursor: pointer;
+  padding: 0.4rem 1rem;
+  font-size: 1.4rem;
+  color: #fff;
+  background-color: #e07272;
+  border-radius: 8px;
+  transition: all 0.1s ease;
+  box-shadow: inset 0 -3px 0px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+#menu button:hover {
+  transform: translateY(-2px);
+  background-color: rgb(231.3534883721, 147.4465116279, 147.4465116279);
+}
+#menu button:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3);
+}
+#menu .buttons {
+  display: flex;
+  gap: 0.3em;
 }
 #menu #difficulty {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.8rem;
-  margin-bottom: 1.5em;
   padding: 1.2rem;
   background: light-dark(rgba(255, 255, 255, 0.278), rgba(32, 32, 32, 0.278));
   border-radius: 15px;
@@ -104,7 +128,7 @@ canvas#glcanvas {
 #menu #difficulty > label:first-of-type {
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-size: 0.9rem;
+  font-size: 1.5rem;
   opacity: 0.7;
   color: light-dark(#333, #fff);
   border-bottom: 2px solid rgba(224, 114, 114, 0.3);
@@ -116,25 +140,6 @@ canvas#glcanvas {
   display: flex;
   align-items: center;
   gap: 1rem;
-}
-#menu #difficulty .controls button {
-  all: unset;
-  cursor: pointer;
-  padding: 0.4rem 1rem;
-  font-size: 1.4rem;
-  color: #fff;
-  background-color: #e07272;
-  border-radius: 8px;
-  transition: all 0.1s ease;
-  box-shadow: inset 0 -3px 0px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.2);
-}
-#menu #difficulty .controls button:hover {
-  transform: translateY(-2px);
-  background-color: rgb(231.3534883721, 147.4465116279, 147.4465116279);
-}
-#menu #difficulty .controls button:active {
-  transform: translateY(2px);
-  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3);
 }
 #menu #difficulty .controls #poziom_trudnosci {
   min-width: 140px;
@@ -150,21 +155,6 @@ canvas#glcanvas {
   font-size: 3rem;
   margin-bottom: 2rem;
   text-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-}
-#menu button {
-  margin: 0.5rem;
-  padding: 0.8rem 2rem;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  background: light-dark(#fff, #eae8f0);
-  color: #333;
-  transition: transform 0.2s, background 0.2s;
-}
-#menu button:hover {
-  transform: scale(1.05);
-  background: #ffe6a7;
 }
 #menu #collection {
   position: absolute;
@@ -231,7 +221,6 @@ canvas#glcanvas {
 }
 .game .left-panel .info .stats-table td {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
   padding: 0.4rem 0.5rem;
   color: #fff;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
@@ -245,6 +234,7 @@ canvas#glcanvas {
   letter-spacing: 0.5px;
 }
 .game .left-panel .info .stats-table td.button {
+  background-color: rgba(0, 0, 0, 0);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
   color: #fff;
   padding: 0;
@@ -257,23 +247,28 @@ canvas#glcanvas {
   letter-spacing: 0.5px;
 }
 .game .left-panel .info .stats-table td.button button {
-  width: 100%;
-  padding: 0.8rem 0.5rem;
-  border-radius: 12px;
-  border: 0;
-  color: white;
-  background-color: #e07272;
-  display: block;
+  all: unset;
+  font-family: "Jersey 25", sans-serif;
+  cursor: pointer;
+  padding: 0.4rem 1rem;
   font-size: 1.4rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.25);
+  color: #fff;
+  background-color: #e07272;
+  border-radius: 8px;
+  transition: all 0.1s ease;
+  box-shadow: inset 0 -3px 0px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 .game .left-panel .info .stats-table td.button button:hover {
-  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+  background-color: rgb(231.3534883721, 147.4465116279, 147.4465116279);
 }
 .game .left-panel .info .stats-table td.button button:active {
-  background-color: rgb(219.4040697674, 93.0959302326, 93.0959302326);
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3);
+}
+.game .left-panel .info .stats-table td.button button {
+  width: 100%;
+  padding: 1em 0;
 }
 .game .left-panel .info .stats-table td .value {
   border-radius: 12px;
@@ -520,23 +515,29 @@ canvas#glcanvas {
   margin-bottom: 1rem;
 }
 .game .right-panel #shop button.shopbutton {
+  all: unset;
+  font-family: "Jersey 25", sans-serif;
+  cursor: pointer;
+  padding: 0.4rem 1rem;
+  font-size: 1.4rem;
+  color: #fff;
+  background-color: #e07272;
+  border-radius: 8px;
+  transition: all 0.1s ease;
+  box-shadow: inset 0 -3px 0px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+.game .right-panel #shop button.shopbutton:hover {
+  transform: translateY(-2px);
+  background-color: rgb(231.3534883721, 147.4465116279, 147.4465116279);
+}
+.game .right-panel #shop button.shopbutton:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3);
+}
+.game .right-panel #shop button.shopbutton {
   width: 100%;
   flex: 1;
   padding: 3rem 0.5rem;
-  border-radius: 12px;
-  border: 0;
-  color: white;
-  background-color: #e07272;
-  display: block;
-  font-family: "Jersey 25", sans-serif;
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  box-shadow: inset 0 -5px 3px rgba(0, 0, 0, 0.25);
-}
-.game .right-panel #shop button.shopbutton:active {
-  box-shadow: inset 0 5px 3px rgba(0, 0, 0, 0.25);
-  background-color: rgb(219.4040697674, 93.0959302326, 93.0959302326);
 }
 .game .right-panel #shop button.shopbutton.disabled {
   background-color: #a98484;
@@ -577,6 +578,24 @@ canvas#glcanvas {
 /* Card */
 .logo {
   animation: skewLogo 6s infinite ease-in-out;
+}
+
+.pixel-corners, .tile .upgrade-desc .type, .tile .upgrade-desc .rarity, .tile .upgrade-desc .content, .tile .upgrade-desc, .upgrade-wrapper .upgrade-desc .type, .upgrade-wrapper .upgrade-desc .rarity, .boss-wrapper .upgrade-desc .type, .boss-wrapper .upgrade-desc .rarity, .upgrade-wrapper .upgrade-desc .content, .boss-wrapper .upgrade-desc .content, .upgrade-wrapper .upgrade-desc, .boss-wrapper .upgrade-desc, .game .left-panel .info .stats-table td:not(:has(button)) {
+  background: rgba(0, 0, 0, 0.96);
+  position: relative;
+  border: 3px solid rgba(0, 0, 0, 0);
+  clip-path: polygon(0 calc(100% - 12px), 3px calc(100% - 12px), 3px calc(100% - 6px), 6px calc(100% - 6px), 6px calc(100% - 3px), 12px calc(100% - 3px), 12px 100%, calc(100% - 12px) 100%, calc(100% - 12px) calc(100% - 3px), calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) calc(100% - 6px), calc(100% - 3px) calc(100% - 6px), calc(100% - 3px) calc(100% - 12px), 100% calc(100% - 12px), 100% 12px, calc(100% - 3px) 12px, calc(100% - 3px) 6px, calc(100% - 6px) 6px, calc(100% - 6px) 3px, calc(100% - 12px) 3px, calc(100% - 12px) 0, 12px 0, 12px 3px, 6px 3px, 6px 6px, 3px 6px, 3px 12px, 0 12px);
+}
+.pixel-corners:after, .tile .upgrade-desc .type:after, .tile .upgrade-desc .rarity:after, .tile .upgrade-desc .content:after, .tile .upgrade-desc:after, .upgrade-wrapper .upgrade-desc .type:after, .upgrade-wrapper .upgrade-desc .rarity:after, .boss-wrapper .upgrade-desc .type:after, .boss-wrapper .upgrade-desc .rarity:after, .upgrade-wrapper .upgrade-desc .content:after, .boss-wrapper .upgrade-desc .content:after, .upgrade-wrapper .upgrade-desc:after, .boss-wrapper .upgrade-desc:after, .game .left-panel .info .stats-table td:not(:has(button)):after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: -3px;
+  pointer-events: none;
+  display: block;
+  background: rgba(255, 255, 255, 0);
+  clip-path: polygon(0 calc(100% - 12px), 3px calc(100% - 12px), 3px calc(100% - 6px), 6px calc(100% - 6px), 6px calc(100% - 3px), 12px calc(100% - 3px), 12px 100%, calc(100% - 12px) 100%, calc(100% - 12px) calc(100% - 3px), calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) calc(100% - 6px), calc(100% - 3px) calc(100% - 6px), calc(100% - 3px) calc(100% - 12px), 100% calc(100% - 12px), 100% 12px, calc(100% - 3px) 12px, calc(100% - 3px) 6px, calc(100% - 6px) 6px, calc(100% - 6px) 3px, calc(100% - 12px) 3px, calc(100% - 12px) 0, 12px 0, 12px 3px, 6px 3px, 6px 6px, 3px 6px, 3px 12px, 0 12px, 0 50%, 3px 50%, 3px 12px, 6px 12px, 6px 6px, 12px 6px, 12px 3px, calc(100% - 12px) 3px, calc(100% - 12px) 6px, calc(100% - 6px) 6px, calc(100% - 6px) 12px, calc(100% - 3px) 12px, calc(100% - 3px) calc(100% - 12px), calc(100% - 6px) calc(100% - 12px), calc(100% - 6px) calc(100% - 6px), calc(100% - 12px) calc(100% - 6px), calc(100% - 12px) calc(100% - 3px), 12px calc(100% - 3px), 12px calc(100% - 6px), 6px calc(100% - 6px), 6px calc(100% - 12px), 3px calc(100% - 12px), 3px 50%, 0 50%);
+  z-index: -1;
 }
 
 .upgrade-wrapper, .boss-wrapper {
@@ -707,30 +726,107 @@ canvas#glcanvas {
   animation: bounce-hover 0.23s;
   transform: rotateX(0deg) scale(1.045) rotateY(0deg);
 }
+.upgrade-wrapper .upgrade-desc:after, .boss-wrapper .upgrade-desc:after {
+  background: white;
+}
 .upgrade-wrapper .upgrade-desc, .boss-wrapper .upgrade-desc {
   position: absolute;
-  left: -180px;
+  left: -220px;
   top: 50%;
   transform: translateY(-50%);
-  max-width: 180px;
-  min-width: 160px;
-  background: rgba(0, 0, 0, 0.911);
-  border: 0.3em solid gray;
+  width: 210px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 0.2em solid white;
   color: #fff;
-  padding: 0.5rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  text-align: center;
-  opacity: 0;
+  font-family: "Jersey 25", sans-serif;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
   pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
 }
-.upgrade-wrapper .upgrade-desc p, .boss-wrapper .upgrade-desc p {
-  font-size: 1.1rem;
+.upgrade-wrapper .upgrade-desc .title, .boss-wrapper .upgrade-desc .title {
+  font-size: 1.8rem;
+  padding: 10px 5px;
+  width: 100%;
+  text-align: center;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+}
+.upgrade-wrapper .upgrade-desc .content, .boss-wrapper .upgrade-desc .content {
+  background-color: #f8f8f3;
+  color: #222;
+  padding: 0 12px;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  font-weight: bold;
+  margin: 0 2px;
+}
+.upgrade-wrapper .upgrade-desc .content b, .boss-wrapper .upgrade-desc .content b {
+  font-weight: bolder;
+  display: inline-block;
+}
+.upgrade-wrapper .upgrade-desc .type, .upgrade-wrapper .upgrade-desc .rarity, .boss-wrapper .upgrade-desc .type, .boss-wrapper .upgrade-desc .rarity {
+  margin: 8px auto;
+  padding: 4px 15px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  background-color: #e5db1c;
+  color: #000;
+  letter-spacing: 1px;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+.upgrade-wrapper .upgrade-desc .type.common, .upgrade-wrapper .upgrade-desc .rarity.common, .boss-wrapper .upgrade-desc .type.common, .boss-wrapper .upgrade-desc .rarity.common {
+  color: white;
+  background-color: #0086ff;
+}
+.upgrade-wrapper .upgrade-desc .type.uncommon, .upgrade-wrapper .upgrade-desc .rarity.uncommon, .boss-wrapper .upgrade-desc .type.uncommon, .boss-wrapper .upgrade-desc .rarity.uncommon {
+  color: white;
+  background-color: #4cb33e;
+}
+.upgrade-wrapper .upgrade-desc .type.rare, .upgrade-wrapper .upgrade-desc .rarity.rare, .boss-wrapper .upgrade-desc .type.rare, .boss-wrapper .upgrade-desc .rarity.rare {
+  color: white;
+  background-color: #fe4d40;
+}
+.upgrade-wrapper .upgrade-desc.pos-left, .boss-wrapper .upgrade-desc.pos-left {
+  right: 110%;
+  top: 50%;
+  transform: translateY(-50%) scale(0.9);
+}
+.upgrade-wrapper .upgrade-desc.pos-right, .boss-wrapper .upgrade-desc.pos-right {
+  left: 110%;
+  top: 50%;
+  transform: translateY(-50%) scale(0.9);
+}
+.upgrade-wrapper .upgrade-desc.pos-center, .boss-wrapper .upgrade-desc.pos-center {
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+}
+.upgrade-wrapper .upgrade-desc.pos-center.pos-top, .boss-wrapper .upgrade-desc.pos-center.pos-top {
+  bottom: 110%;
+  top: auto;
+}
+.upgrade-wrapper .upgrade-desc.pos-center.pos-bottom, .boss-wrapper .upgrade-desc.pos-center.pos-bottom {
+  top: 110%;
+  bottom: auto;
+}
+.upgrade-wrapper .upgrade-desc.pos-top:not(.pos-center), .boss-wrapper .upgrade-desc.pos-top:not(.pos-center) {
+  top: auto;
+  bottom: 0;
+  transform: scale(0.9);
+}
+.upgrade-wrapper .upgrade-desc.pos-bottom:not(.pos-center), .boss-wrapper .upgrade-desc.pos-bottom:not(.pos-center) {
+  top: 0;
+  transform: scale(0.9);
 }
 .upgrade-wrapper:hover .upgrade-desc, .boss-wrapper:hover .upgrade-desc {
   opacity: 1;
+  transform: translateY(-50%) scale(1);
 }
 .upgrade-wrapper .upgrade-price, .boss-wrapper .upgrade-price {
   position: absolute;
@@ -845,43 +941,32 @@ canvas#glcanvas {
 
 .chance {
   white-space: nowrap;
-  background-color: #86b587;
-  border-radius: 0.2em;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
+  color: #3a7d3c;
 }
 
 .score {
   white-space: nowrap;
-  background-color: #72abe0;
-  border-radius: 0.2em;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
+  color: #72abe0;
 }
 
 .moves {
   white-space: nowrap;
-  background-color: #e4d147;
-  border-radius: 0.2em;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
+  color: #b6228f;
 }
 
 .mult {
   white-space: nowrap;
-  background-color: #e07272;
-  border-radius: 0.2em;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
+  color: #c23a3a;
 }
 
 .money {
   white-space: nowrap;
-  color: #151515;
-  background-color: #e5db1c;
-  border-radius: 0.2em;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
+  color: #b59a00;
+}
+
+.highlight {
+  white-space: nowrap;
+  color: #dfae19;
 }
 
 .upgradeinfo {
@@ -993,30 +1078,107 @@ canvas#glcanvas {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
   z-index: 100;
 }
+.tile .upgrade-desc:after {
+  background: white;
+}
 .tile .upgrade-desc {
   position: absolute;
-  right: 110%;
+  left: -220px;
   top: 50%;
   transform: translateY(-50%);
-  width: 180px;
-  background: rgba(0, 0, 0, 0.91);
-  border: 0.3em solid gray;
+  width: 210px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 0.2em solid white;
   color: #fff;
-  font-size: 0.75rem;
-  padding: 0.5rem;
-  border-radius: 6px;
-  opacity: 0;
+  font-family: "Jersey 25", sans-serif;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
   pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
 }
-.tile .upgrade-desc h1 {
-  font-size: 0.85rem;
-  margin: 0 0 0.3rem 0;
+.tile .upgrade-desc .title {
+  font-size: 1.8rem;
+  padding: 10px 5px;
+  width: 100%;
+  text-align: center;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+}
+.tile .upgrade-desc .content {
+  background-color: #f8f8f3;
+  color: #222;
+  padding: 0 12px;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  font-weight: bold;
+  margin: 0 2px;
+}
+.tile .upgrade-desc .content b {
+  font-weight: bolder;
+  display: inline-block;
+}
+.tile .upgrade-desc .type, .tile .upgrade-desc .rarity {
+  margin: 8px auto;
+  padding: 4px 15px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  background-color: #e5db1c;
+  color: #000;
+  letter-spacing: 1px;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+.tile .upgrade-desc .type.common, .tile .upgrade-desc .rarity.common {
+  color: white;
+  background-color: #0086ff;
+}
+.tile .upgrade-desc .type.uncommon, .tile .upgrade-desc .rarity.uncommon {
+  color: white;
+  background-color: #4cb33e;
+}
+.tile .upgrade-desc .type.rare, .tile .upgrade-desc .rarity.rare {
+  color: white;
+  background-color: #fe4d40;
+}
+.tile .upgrade-desc.pos-left {
+  right: 110%;
+  top: 50%;
+  transform: translateY(-50%) scale(0.9);
+}
+.tile .upgrade-desc.pos-right {
+  left: 110%;
+  top: 50%;
+  transform: translateY(-50%) scale(0.9);
+}
+.tile .upgrade-desc.pos-center {
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+}
+.tile .upgrade-desc.pos-center.pos-top {
+  bottom: 110%;
+  top: auto;
+}
+.tile .upgrade-desc.pos-center.pos-bottom {
+  top: 110%;
+  bottom: auto;
+}
+.tile .upgrade-desc.pos-top:not(.pos-center) {
+  top: auto;
+  bottom: 0;
+  transform: scale(0.9);
+}
+.tile .upgrade-desc.pos-bottom:not(.pos-center) {
+  top: 0;
+  transform: scale(0.9);
 }
 .tile .upgrade-desc p {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 1rem;
 }
 
 .volume-container {

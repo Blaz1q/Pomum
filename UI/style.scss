@@ -15,6 +15,18 @@ $mult: #e07272;
 $score: #72abe0;
 $moves: #e4d147;
 $money: #e5db1c;
+
+$desc-chance: #3a7d3c;  // Ciemniejsza, "leśna" zieleń
+$desc-mult:   #c23a3a;  // Głęboka czerwień (zamiast różu)
+$desc-score:  #2d6ca3;  // Mocny niebieski
+$desc-moves:  #b6228f;  // Musztardowy złoty (zwykły żółty znika na bieli)
+$desc-money:  #b59a00;  // Ciemne złoto
+$desc-highlight: #dfae19;
+
+$rarity-common:   #0086ff; // Żywy niebieski
+$rarity-uncommon: #4cb33e; // Balatrowa zieleń
+$rarity-rare:     #fe4d40; // Neonowa czerwień/pomarańcz
+
 $text-color-light: #333;
 $text-color-dark: #fff;
 $bg-color: rgba(255, 255, 255, 0.85);
@@ -25,6 +37,145 @@ $button-color: #fff;
 $button-color-dark: #eae8f0;
 $button-hover: #ffe6a7;
 $button-hover-dark: #a18787;
+
+@mixin cool-desc{
+  @extend .pixel-corners;
+  &:after{
+    background: white;
+  }
+  position: absolute;
+  left: -220px;
+  top: 50%;
+  transform: translateY(-50%); // Startujemy z lekkim pomniejszeniem
+  width: 210px;
+  background: rgba(0, 0, 0, 0.85); // Nieco lżejszy czarny dla głębi
+  border:.2em solid white;
+  color: #fff;
+  font-family: "Jersey 25", sans-serif;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding: 4px; // Ramka wokół białego pola
+
+  // 1. Tytuł na górze
+  .title {
+    font-size: 1.8rem;
+    padding: 10px 5px;
+    width: 100%;
+    text-align: center;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+  }
+
+  // 2. Białe pole opisu (Kluczowy element Balatro)
+  .content {
+    background-color: #f8f8f3;
+    color: #222; // Ciemny tekst na białym tle
+    @extend .pixel-corners;
+    padding: 0 12px;
+    font-size: 1.05rem;
+    line-height: 1.2;
+    font-weight: bold;
+    margin: 0 2px; // Mały odstęp od czarnej ramki
+    
+    b {
+      font-weight: bolder;
+      display: inline-block;
+    }
+
+  }
+
+  // 3. Etykieta rzadkości na dole
+  .type,.rarity {
+    @extend .pixel-corners;
+    margin: 8px auto; // Wyśrodkowanie etykiety
+    padding: 4px 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: $money; // Złoty/Żółty
+    color: #000;
+    letter-spacing: 1px;
+    width: fit-content; // Rozmiar dopasowany do tekstu
+    &.common {
+      color: white;
+      background-color: $rarity-common;
+    }
+
+    &.uncommon {
+      color: white;
+      background-color: $rarity-uncommon;
+    }
+
+    &.rare {
+      color: white;
+      background-color: $rarity-rare;
+    }
+  }
+  
+  &.pos-left {
+    right: 110%; // 10% odstępu od karty
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+  }
+
+  // Po prawej
+  &.pos-right {
+    left: 110%;
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+  }
+
+  // Nad kartą (jeśli po bokach brak miejsca)
+  &.pos-center {
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    
+    &.pos-top { bottom: 110%; top: auto; }
+    &.pos-bottom { top: 110%; bottom: auto; }
+  }
+
+  // Korekta pionowa (gdy ucina górę/dół przy bocznych tooltipach)
+  &.pos-top:not(.pos-center) {
+    top: auto;
+    bottom: 0;
+    transform: scale(0.9);
+  }
+
+  &.pos-bottom:not(.pos-center) {
+    top: 0;
+    transform: scale(0.9);
+  }
+
+}
+
+@mixin cool-button{
+      all: unset;
+      font-family: "Jersey 25", sans-serif;
+      cursor: pointer;
+      padding: 0.4rem 1rem;
+      font-size: 1.4rem;
+      color: #fff;
+      background-color: $mult;
+      border-radius: 8px;
+      transition: all 0.1s ease;
+      box-shadow: inset 0 -3px 0px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        transform: translateY(-2px);
+        background-color: lighten($mult, 8%);
+      }
+
+      &:active {
+        transform: translateY(2px);
+        box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3);
+      }
+    }
+
 :root {
   color-scheme: light dark;
 }
@@ -104,12 +255,19 @@ canvas#glcanvas {
   font-family: "Segoe UI", sans-serif;
   color: light-dark($text-color-light,$text-color-dark);
   text-align: center;
+  gap:.7em;
+  button {
+    @include cool-button;
+  }
+    .buttons{
+      display: flex;
+      gap: .3em;
+    }
   #difficulty {
   display: flex;
   flex-direction: column; // Ustawia label nad przyciskami
   align-items: center;
   gap: 0.8rem;
-  margin-bottom: 1.5em;
   padding: 1.2rem;
   background: light-dark($shop-bg-light, $shop-bg-dark);
   border-radius: 15px;
@@ -122,7 +280,7 @@ canvas#glcanvas {
   & > label:first-of-type {
     text-transform: uppercase;
     letter-spacing: 2px;
-    font-size: 0.9rem;
+    font-size: 1.5rem;
     opacity: 0.7;
     color: light-dark($text-color-light, $text-color-dark);
     border-bottom: 2px solid rgba($mult, 0.3); // Subtelna linia oddzielająca
@@ -135,28 +293,6 @@ canvas#glcanvas {
     display: flex;
     align-items: center;
     gap: 1rem;
-
-    button {
-      all: unset;
-      cursor: pointer;
-      padding: 0.4rem 1rem;
-      font-size: 1.4rem;
-      color: #fff;
-      background-color: $mult;
-      border-radius: 8px;
-      transition: all 0.1s ease;
-      box-shadow: inset 0 -3px 0px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.2);
-
-      &:hover {
-        transform: translateY(-2px);
-        background-color: lighten($mult, 8%);
-      }
-
-      &:active {
-        transform: translateY(2px);
-        box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3);
-      }
-    }
 
     #poziom_trudnosci {
       min-width: 140px;
@@ -178,22 +314,6 @@ canvas#glcanvas {
     text-shadow: 0 3px 6px rgba(0,0,0,0.2);
   }
 
-  button {
-    margin: 0.5rem;
-    padding: 0.8rem 2rem;
-    font-size: 1.2rem;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    background: light-dark($button-color,$button-color-dark) ;
-    color: #333;
-    transition: transform 0.2s, background 0.2s;
-
-    &:hover {
-      transform: scale(1.05);
-      background: #ffe6a7;
-    }
-  }
 #collection {
   position: absolute;
   width: 70%;
@@ -263,14 +383,17 @@ canvas#glcanvas {
   font-family: "Jersey 25", sans-serif;
   text-align: center;
   td {
+    &:not(:has(button)) {
+      @extend .pixel-corners;
+    }
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
     padding: 0.4rem 0.5rem;
     color: #fff;
     //box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
     transition: transform 0.1s ease, box-shadow 0.1s ease;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     .label {
+      
       display: block;
       font-size: 0.85rem;
       opacity: 0.8;
@@ -278,6 +401,7 @@ canvas#glcanvas {
       letter-spacing: 0.5px;
     }
     &.button{
+      background-color: #0000;
       transition: transform 0.1s ease, box-shadow 0.1s ease;
       color: #fff;
       padding: 0;
@@ -288,31 +412,19 @@ canvas#glcanvas {
       text-transform: uppercase;
       letter-spacing: 0.5px;
       }
-      button{
-        width: 100%;
-        padding: 0.8rem 0.5rem;
-        border-radius: 12px;
-        border: 0;
-        color: white;
-        background-color: $mult;
-        display: block;
-        font-size: 1.4rem;
-        font-weight: 700;
-        letter-spacing: 1px;
-        box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.25);
-      &:hover{
-        box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
-      }
-      &:active{
-        background-color: darken($color: $mult, $amount: 5);
-      }
-      }
+      button {
+      @include cool-button;
+      
+      width: 100%;
+      padding: 1em 0;
+    }
     }
     .value {
       border-radius: 12px;
       display: block;
       font-size: 1.4rem;
       font-weight: 700;
+      
       margin-top: 0.2rem;
       letter-spacing: 1px;
     }
@@ -556,23 +668,11 @@ canvas#glcanvas {
         margin-bottom: 1rem;
       }
       button.shopbutton {
+        @include cool-button;
         width: 100%;
         flex: 1;
         padding: 3rem 0.5rem;
-        border-radius: 12px;
-        border: 0;
-        color: white;
-        background-color: $mult;
-        display: block;
-          font-family: "Jersey 25", sans-serif;
-        font-size: 1.6rem;
-        font-weight: 700;
-        letter-spacing: 1px;
-        box-shadow: inset 0 -5px 3px rgba(0, 0, 0, 0.25);
-      &:active{
-        box-shadow: inset 0 5px 3px rgba(0, 0, 0, 0.25);
-        background-color: darken($color: $mult, $amount: 5);
-      }
+        
       &.disabled{
         background-color: #a98484;
         &:active{
@@ -613,6 +713,27 @@ canvas#glcanvas {
   animation: skewLogo 6s infinite ease-in-out;
 }
 @import url('https://fonts.googleapis.com/css2?family=Jersey+25&display=swap');
+  .pixel-corners {
+    // Twoje wymiary i tło
+    background: rgba(0, 0, 0, 0.96); 
+    position: relative;
+    border: 3px solid #0000; // Rezerwacja miejsca na ramkę
+    clip-path: polygon(0 calc(100% - 12px),3px calc(100% - 12px),3px calc(100% - 6px),6px calc(100% - 6px),6px calc(100% - 3px),12px calc(100% - 3px),12px 100%,calc(100% - 12px) 100%,calc(100% - 12px) calc(100% - 3px),calc(100% - 6px) calc(100% - 3px),calc(100% - 6px) calc(100% - 6px),calc(100% - 3px) calc(100% - 6px),calc(100% - 3px) calc(100% - 12px),100% calc(100% - 12px),100% 12px,calc(100% - 3px) 12px,calc(100% - 3px) 6px,calc(100% - 6px) 6px,calc(100% - 6px) 3px,calc(100% - 12px) 3px,calc(100% - 12px) 0,12px 0,12px 3px,6px 3px,6px 6px,3px 6px,3px 12px,0 12px);
+
+    // To tworzy tę białą, kanciastą ramkę
+    &:after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        margin: -3px; // Przesunięcie, aby "border" był na zewnątrz
+        pointer-events: none;
+        display: block;
+        background: #ffffff00; // Kolor ramki (możesz użyć $color-border)
+        // Ta długa lista punktów wycina "środek" ramki
+        clip-path: polygon(0 calc(100% - 12px),3px calc(100% - 12px),3px calc(100% - 6px),6px calc(100% - 6px),6px calc(100% - 3px),12px calc(100% - 3px),12px 100%,calc(100% - 12px) 100%,calc(100% - 12px) calc(100% - 3px),calc(100% - 6px) calc(100% - 3px),calc(100% - 6px) calc(100% - 6px),calc(100% - 3px) calc(100% - 6px),calc(100% - 3px) calc(100% - 12px),100% calc(100% - 12px),100% 12px,calc(100% - 3px) 12px,calc(100% - 3px) 6px,calc(100% - 6px) 6px,calc(100% - 6px) 3px,calc(100% - 12px) 3px,calc(100% - 12px) 0,12px 0,12px 3px,6px 3px,6px 6px,3px 6px,3px 12px,0 12px,0 50%,3px 50%,3px 12px,6px 12px,6px 6px,12px 6px,12px 3px,calc(100% - 12px) 3px,calc(100% - 12px) 6px,calc(100% - 6px) 6px,calc(100% - 6px) 12px,calc(100% - 3px) 12px,calc(100% - 3px) calc(100% - 12px),calc(100% - 6px) calc(100% - 12px),calc(100% - 6px) calc(100% - 6px),calc(100% - 12px) calc(100% - 6px),calc(100% - 12px) calc(100% - 3px),12px calc(100% - 3px),12px calc(100% - 6px),6px calc(100% - 6px),6px calc(100% - 12px),3px calc(100% - 12px),3px 50%,0 50%);
+        z-index: -1;
+    }
+}
 .upgrade-wrapper,.boss-wrapper {
   font-family: "Jersey 25", sans-serif;
   letter-spacing: 0.5px;
@@ -744,32 +865,17 @@ canvas#glcanvas {
     
   }
 
-  .upgrade-desc {
-    position: absolute;
-    left: -180px;
-    top: 50%;
-    transform: translateY(-50%);
-    max-width: 180px;
-    min-width: 160px;
-    background: rgba(0, 0, 0, 0.911);
-    border: .3em solid gray;
-    color: #fff;
-    padding: 0.5rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    text-align: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    z-index: 10;
-    p{
-      font-size: 1.1rem;
-    }
-  }
+.upgrade-desc {
+  @include cool-desc;
+}
 
-  &:hover .upgrade-desc {
-    opacity: 1;
-  }
+// Aktywacja hovera z efektem "pop"
+
+// Wyświetlanie
+&:hover .upgrade-desc {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
 
   .upgrade-price {
   position: absolute;
@@ -885,39 +991,27 @@ canvas#glcanvas {
 
 .chance{
   white-space: nowrap;
-  background-color: $chance;
-  border-radius: .2em;
-  padding-left: .2em;
-  padding-right: .2em;
+  color: $desc-chance;
 }
 .score{
   white-space: nowrap;
-  background-color: $score;
-  border-radius: .2em;
-  padding-left: .2em;
-  padding-right: .2em;
+  color: $score;
 }
 .moves{
   white-space: nowrap;
-  background-color: $moves;
-  border-radius: .2em;
-  padding-left: .2em;
-  padding-right: .2em;
+  color: $desc-moves;
 }
 .mult{
   white-space: nowrap;
-  background-color: $mult;
-  border-radius: .2em;
-  padding-left: .2em;
-  padding-right: .2em;
+  color: $desc-mult;
 }
 .money{
   white-space: nowrap;
-  color: #151515;
-  background-color: $money;
-  border-radius: .2em;
-  padding-left: .2em;
-  padding-right: .2em;
+  color: $desc-money;
+}
+.highlight{
+  white-space: nowrap;
+  color: $desc-highlight;
 }
 .upgradeinfo{
     white-space: nowrap;
@@ -1006,7 +1100,7 @@ canvas#glcanvas {
   z-index: 1;
   cursor: grab;
   border-radius: 10px;
-  background: light-dark($button-color,$button-color-dark);;
+  background: light-dark($button-color,$button-color-dark);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
@@ -1016,30 +1110,10 @@ canvas#glcanvas {
   }
 
   .upgrade-desc {
-    position: absolute;
-    right: 110%; // place on the left side of the tile
-    top: 50%;
-    transform: translateY(-50%);
-    width: 180px;
-    background: rgba(0,0,0,0.91);
-    border: 0.3em solid gray;
-    color: #fff;
-    font-size: 0.75rem;
-    padding: 0.5rem;
-    border-radius: 6px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    z-index: 200;
-
-    h1 {
-      font-size: 0.85rem;
-      margin: 0 0 0.3rem 0;
-    }
-
+    @include cool-desc;
     p {
       margin: 0;
-      font-size: 0.75rem;
+      font-size: 1rem;
     }
   }
 }

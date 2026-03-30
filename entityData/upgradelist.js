@@ -1,7 +1,7 @@
 console.log("Upgrade");
 import { Upgrade } from "../entities/Upgrade.js";
 import { Consumable } from "../entities/Consumable.js";
-import { GAME_TRIGGERS, MODIFIERS, PRIORITY, SCORE_ACTIONS, STAGES, TYPES, UPGRADE_RARITY, UPGRADE_RARITY_NAME, UPGRADE_STATES } from "../dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, PRIORITY, SCORE_ACTIONS, STAGES, TYPES, UPGRADE_RARITY, UPGRADE_STATES } from "../dictionary.js";
 import { Style } from "../dictionary.js";
 import { consumableList, consumableUpgradeBlueprints } from "./consumablelist.js";
 
@@ -9,9 +9,9 @@ import { consumableList, consumableUpgradeBlueprints } from "./consumablelist.js
 export const upgradesList = [];
 
 const defaultimage = { image: "default" };
-const COMMON = { rarity: UPGRADE_RARITY_NAME.Common };
-const UNCOMMON = { rarity: UPGRADE_RARITY_NAME.Uncommon };
-const RARE = { rarity: UPGRADE_RARITY_NAME.Rare };
+const COMMON = { rarity: UPGRADE_RARITY.Common };
+const UNCOMMON = { rarity: UPGRADE_RARITY.Uncommon };
+const RARE = { rarity: UPGRADE_RARITY.Rare };
 export const upgradeBlueprints = [
   {
     name: "AppleHater",
@@ -48,7 +48,7 @@ export const upgradeBlueprints = [
     name: "StockMarket",
     descriptionfn(game) {
       if (!this.props.randomfruit)
-        return `${Style.Chance("-100%")} dla losowego owoca, reszta dostanie równo podzielone procenty. zmienia się co rundę.`;
+        return `${Style.Chance("-100%")} ${Style.Highlight(`dla losowego owoca`)} , reszta dostanie równo podzielone procenty. ${Style.Highlight(`zmienia się co rundę.`)}`;
       return `${Style.Chance("-100%")} ${this.props.randomfruit.icon}, ${Style.Chance('+' + game.calcEqualize(this.props.previousPercent).toString() + "%")} reszta`;
     },
     props: () => ({
@@ -120,7 +120,7 @@ export const upgradeBlueprints = [
   {
     name: "tetris",
     descriptionfn: `${Style.Moves("+4 ruchy")}`,
-    rarity: UPGRADE_RARITY_NAME.Common,
+    rarity: UPGRADE_RARITY.Common,
     effect(game) {
       game.moves += 4;
       game.GameRenderer.displayMoves();

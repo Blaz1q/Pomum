@@ -3,14 +3,14 @@ import { UpgradeBase } from "./upgradeBase.js";
 import { Consumable } from "./Consumable.js";
 import { Tarot } from "./Tarot.js";
 import { Upgrade } from "./Upgrade.js";
-import { UPGRADE_RARITY_NAME } from "../dictionary.js";
+import { UPGRADE_RARITY } from "../dictionary.js";
 export class ConsumablePack extends UpgradeBase {
   constructor(props = {}) {
     super(props);
     this.consumables = props.consumables;
     this.url = "./images/boosters/";
     this.type = "ConsumablePack";
-    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.Common;
+    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.Common;
   }
   canBuy() {
     this.notEnoughMoney();

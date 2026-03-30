@@ -1,4 +1,4 @@
-import { UPGRADE_RARITY, MODIFIERS, Settings, DIFFICULTY } from "./dictionary.js";
+import { MODIFIERS, Settings, DIFFICULTY } from "./dictionary.js";
 import { consumablePacks,coupons } from "./entityData/consumablelist.js";
 import { ConsumablePack } from "./entities/ConsumablePack.js";
 import { Voucher } from "./entities/Voucher.js";
@@ -99,7 +99,7 @@ export class Roll {
     }
     weightedPick = (list, rng) => {
         const getWeight = item => {
-            return UPGRADE_RARITY[item.rarity?.name] ?? 1;
+            return item.rarity?.weight ?? 1;
         };
 
         const total = list.reduce((sum, item) => sum + getWeight(item), 0);

@@ -41,7 +41,7 @@
 
 <div id="menu">
     <img class="logo" src="./images/pomumlogo.png" alt="Pomum" srcset="">
-    <button id="startBtn" onclick="startGame()">Rozpocznij</button>
+    
     <div id="difficulty">
       <label>Poziom trudności</label>
       <div class="controls">
@@ -50,8 +50,11 @@
         <button onclick="setdifficulty('+')">&gt;</button>
       </div>
     </div>
-    <button onclick="showCollection()">Kolekcja</button>
-    <button onclick="showSettings()">Ustawienia</button>
+    <div class="buttons">
+      <button id="startBtn" onclick="startGame()">Rozpocznij</button>
+      <button onclick="showCollection()">Kolekcja</button>
+      <button onclick="showSettings()">Ustawienia</button>
+    </div>
     
     <div id="collection" class="hidden">
       <button onclick="hideCollection()">Zamknij</button>
@@ -109,10 +112,10 @@
           </tr>
           <tr>
               <td class="button">
-                <button class="label" onclick="showInfo()">Info</button>
+                <button class="label" onclick="showInfo()">Informacje</button>
               </td>
               <td class="button">
-                <button class="label" onclick="showSettings()">Ust.</button>
+                <button class="label" onclick="showSettings()">Ustawienia</button>
               </td>
           </tr>
         </table>

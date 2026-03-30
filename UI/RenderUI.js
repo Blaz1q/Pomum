@@ -10,7 +10,6 @@ import {
   MODIFIERS,
   GAME_TRIGGERS,
   UPGRADE_STATES,
-  UPGRADE_RARITY_NAME,
   Settings,
   DIFFICULTY,
 } from "../dictionary.js";
@@ -316,13 +315,21 @@ displayTempScore() {
   }
   displayTiles() {
     const tiles = this.game.fruits;
+    const special = this.game.special;
     const tileContainer = document.getElementById("tiles");
     tileContainer.innerHTML = "";
-
-    tiles.forEach((tile) => {
+    const alltiles = [...tiles,...special]; 
+    alltiles.forEach((tile) => {
       const wrapper = document.createElement("div");
       wrapper.classList.add("tile");
-      wrapper.textContent = tile.icon;
+      if(tile.imagename!="Unknown"){
+        let img = new Image();
+        img.src = tile.image;
+        wrapper.appendChild(img);
+      }else{
+        wrapper.textContent = tile.icon;
+      }
+      
       wrapper.style.position = "relative"; // needed for tooltip positioning
 
       // Tooltip element (like upgrade-desc)
@@ -573,7 +580,7 @@ displayTempScore() {
     // Description
     const desc = document.createElement("div");
     desc.className = "upgrade-desc";
-    desc.innerHTML = `<h1>${boss.name}</h1><p>${boss.description(this.game)}</p>`;
+    desc.innerHTML = `<div class='title'>${boss.name}</div><div class='content'>${boss.description(this.game)}</div>`;
     wrapper.appendChild(card);
     wrapper.appendChild(desc);
     return wrapper;

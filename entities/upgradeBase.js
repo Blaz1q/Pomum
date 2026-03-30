@@ -6,7 +6,6 @@ import {
   SCORE_ACTIONS,
   STAGES,
   UPGRADE_RARITY,
-  UPGRADE_RARITY_NAME,
   UPGRADE_STATES,
 } from "../dictionary.js";
 import { UpgradeRenderer } from "../UI/upgradeRenderer.js";

@@ -1,4 +1,4 @@
-import { MODIFIERS, UPGRADE_RARITY_NAME, Style, GAME_TRIGGERS, UPGRADE_STATES } from "../dictionary.js";
+import { MODIFIERS, UPGRADE_RARITY, Style, GAME_TRIGGERS, UPGRADE_STATES } from "../dictionary.js";
 export class UpgradeRenderer {
   constructor(upgrade, gameRenderer) {
     this.upgrade = upgrade;
@@ -81,7 +81,42 @@ export class UpgradeRenderer {
     const desc = document.createElement("div");
     desc.className = "upgrade-desc";
     desc.innerHTML = this.createDescription();
-    wrapper.addEventListener("mouseenter", () => { desc.innerHTML = this.createDescription(); });
+
+    
+    
+   wrapper.addEventListener("mouseenter", () => {
+    desc.innerHTML = this.createDescription();
+    
+    // 1. Pobierz dane o położeniu karty i oknie przeglądarki
+    const cardRect = wrapper.getBoundingClientRect();
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    // Zakładana szerokość/wysokość Twojego opisu (możesz też zmierzyć desc.offsetWidth)
+    const descWidth = desc.offsetWidth; 
+    const descHeight = desc.offsetHeight; 
+
+    // Resetujemy klasy pozycjonujące przed nowym obliczeniem
+    desc.classList.remove('pos-right', 'pos-left', 'pos-top', 'pos-bottom');
+
+    // --- LOGIKA POZIOMA (Lewo/Prawo) ---
+    // Jeśli po lewej stronie karty jest mniej miejsca niż szerokość opisu + margines
+    if (cardRect.left < descWidth + 20) {
+        desc.classList.add('pos-right'); // Pokaż po prawej stronie karty
+    } else {
+        desc.classList.add('pos-left');  // Domyślnie: po lewej stronie karty
+    }
+
+    // --- LOGIKA PIONOWA (Góra/Dół) ---
+    // Jeśli karta jest za blisko dolnej krawędzi ekranu
+    if (screenHeight - cardRect.bottom < 50) {
+        desc.classList.add('pos-top');    // Przylep dół opisu do dołu karty
+    } 
+    // Jeśli karta jest za blisko górnej krawędzi
+    else if (cardRect.top < 50) {
+        desc.classList.add('pos-bottom'); // Przylep górę opisu do góry karty
+    }
+});
 
     if (displayPrice) wrapper.appendChild(priceEl);
     wrapper.appendChild(card);
@@ -92,20 +127,42 @@ export class UpgradeRenderer {
 }
   createDescription() {
     const upgrade = this.upgrade;
-    let description = `<h1>${upgrade.name}</h1>`;
-    if (upgrade.negative == true) {
-      description += `<p>${Style.Chance("negative")}</p>`;
+    
+    // 1. Sekcja TYTUŁU
+    let html = `<div class="title">${upgrade.name}</div>`;
+    
+    // 2. Sekcja TREŚCI (Content) - zbieramy tu opis i dodatkowe efekty
+    html += `<div class="content">`;
+    
+    // Główny opis działania karty
+    html += `<p>${upgrade.description(this.gameRenderer.game)}</p>`;
+    
+    // Modyfikator (jeśli istnieje)
+    // Dodatkowy wiersz, jeśli karta jest negatywna
+    
+    
+    html += `</div>`; // Zamknięcie .content
+
+    // 3. Sekcja RZADKOŚCI / TYPU (Stopka na samym dole)
+    // Łączymy rzadkość i ewentualne inne tagi techniczne w jednej linii
+    if (upgrade.rarity != UPGRADE_RARITY.None) {
+        html += `<div class="rarity ${upgrade.rarity.class}">`;
+        html += `<span>${upgrade.rarity.display}</span>`;
+        
+        // Jeśli masz określony typ (np. Joker, Voucher), możesz go tu dodać:
+        // html += ` / <span class="type-tag">Joker</span>`;
+        
+        html += `</div>`;
     }
-    description += `<p>${upgrade.description(this.gameRenderer.game)}</p>`;
+    if (upgrade.negative === true) {
+        html += `<span class="type desc-negative">Negative</span>`;
+    }
     if (upgrade.modifier != MODIFIERS.None) {
-      description += `<p>${Style.Chance(upgrade.modifier)}</p>`;
-    }
-    if (upgrade.rarity != UPGRADE_RARITY_NAME.None) {
-      description += `<p>${Style.Money(upgrade.rarity.display)}</p>`;
+        html += `<span class="type ${upgrade.modifier}">${upgrade.modifier}</span>`;
     }
 
-    return description;
-  }
+    return html;
+}
   displayButtons() {
     // 1. Sprawdzamy, czy ten konkretny wrapper jest już "podniesiony"
     // Sprawdzamy styl inline lub (lepiej) konkretną wartość transformacji

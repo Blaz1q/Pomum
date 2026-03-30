@@ -1,12 +1,12 @@
 console.log("Voucher");
 import { UpgradeBase } from "./upgradeBase.js";
-import { UPGRADE_RARITY_NAME,SCORE_ACTIONS } from "../dictionary.js";
+import { UPGRADE_RARITY,SCORE_ACTIONS } from "../dictionary.js";
 export class Voucher extends UpgradeBase {
   constructor(props = {}) {
     super(props);
     this.type = "Voucher";
     this.url = "./images/vouchers/";
-    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
+    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.None;
   }
   apply(game) {
     this.bought = true;

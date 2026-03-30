@@ -6,7 +6,6 @@ import {
   GAME_TRIGGERS,
   MODIFIERS,
   UPGRADE_RARITY,
-  UPGRADE_RARITY_NAME,
   STAGES,
 } from "../dictionary.js";
 export const consumableList = [];
@@ -812,31 +811,31 @@ export const coupons = [
 consumableBlueprints.push(...consumableLvlUp, ...consumbaleEvil);
 consumbaleEvil.forEach((consumable) => {
   consumable.type = "Consumable";
-  consumable.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
+  consumable.rarity = UPGRADE_RARITY.ConsumableCommon;
 });
 consumableLvlUp.forEach((consumable) => {
   consumable.type = "Consumable";
-  consumable.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
+  consumable.rarity = UPGRADE_RARITY.ConsumableCommon;
 });
 consumableBlueprints.forEach((consumable) => {
   consumable.type = "Consumable";
-  consumable.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
+  consumable.rarity = UPGRADE_RARITY.ConsumableCommon;
 });
 consumableGoldBlueprints.forEach((consumable) => {
   consumable.type = "Consumable";
-  consumable.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
+  consumable.rarity = UPGRADE_RARITY.ConsumableCommon;
 });
 consumableSilverBlueprints.forEach((consumable) => {
   consumable.type = "Consumable";
-  consumable.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
+  consumable.rarity = UPGRADE_RARITY.ConsumableCommon;
 });
 consumableUpgradeBlueprints.forEach((consumable) => {
   consumable.type = "Consumable";
-  consumable.rarity = UPGRADE_RARITY_NAME.ConsumableRare;
+  consumable.rarity = UPGRADE_RARITY.ConsumableRare;
 });
 tarotCards.forEach((card) => {
   card.type = "Tarot";
-  card.rarity = UPGRADE_RARITY_NAME.ConsumableCommon;
+  card.rarity = UPGRADE_RARITY.ConsumableCommon;
 });
 pomumpackItems.push(...consumableBlueprints);
 consumableList.push(
