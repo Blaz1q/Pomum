@@ -939,6 +939,31 @@ canvas#glcanvas {
   transform: translateY(-50%);
 }
 
+.popup.chance {
+  white-space: nowrap;
+  background-color: #86b587;
+}
+.popup.score {
+  white-space: nowrap;
+  background-color: #72abe0;
+}
+.popup.moves {
+  white-space: nowrap;
+  background-color: #e4d147;
+}
+.popup.mult, .popup.xmult {
+  white-space: nowrap;
+  background-color: #e07272;
+}
+.popup.money {
+  white-space: nowrap;
+  background-color: #e5db1c;
+}
+.popup.upgradeinfo {
+  white-space: nowrap;
+  background-color: rgb(106, 0, 163);
+}
+
 .chance {
   white-space: nowrap;
   color: #3a7d3c;

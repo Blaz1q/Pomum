@@ -988,7 +988,32 @@ canvas#glcanvas {
     transform: translateY(-50%);
   }
 }
-
+.popup{
+  &.chance{
+  white-space: nowrap;
+  background-color: $chance;
+}
+&.score{
+  white-space: nowrap;
+  background-color: $score;
+}
+&.moves{
+  white-space: nowrap;
+  background-color: $moves;
+}
+&.mult,&.xmult{
+  white-space: nowrap;
+  background-color: $mult;
+}
+&.money{
+  white-space: nowrap;
+  background-color: $money;
+}
+&.upgradeinfo{
+    white-space: nowrap;
+  background-color: rgb(106, 0, 163);
+}
+}
 .chance{
   white-space: nowrap;
   color: $desc-chance;

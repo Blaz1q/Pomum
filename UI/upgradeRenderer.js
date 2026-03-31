@@ -400,6 +400,7 @@ export class UpgradeRenderer {
     // Create square (background)
     const square = document.createElement("div");
     square.className = "upgrade-popup-square";
+    square.classList.add("popup");
     square.classList.add(style);
     //console.log(style);
     square.style.transform = `rotate(${(Math.random() * 20 - 10).toFixed(2)}deg)`; // small random tilt
