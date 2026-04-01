@@ -3,27 +3,43 @@ export class UpgradeRenderer {
   constructor(upgrade, gameRenderer) {
     this.upgrade = upgrade;
     this.gameRenderer = gameRenderer;
+    this.isDragging = false;
+    this.dragStarted = false;
+    this.startX = 0;
+    this.startY = 0;
+    this.lastMouseX = 0;
+    this._mouseMoveHandler = (e) => this.onMouseMove(e);
+    this._mouseUpHandler = (e) => this.onMouseUp(e);
   }
   render(params) {
+    this.isDragging = false;
+    this.dragStarted = false;
+    this.startX = 0;
+    this.startY = 0;
+    this.lastMouseX = 0;
     const upgrade = this.upgrade;
-    let bought = params.bought ?? false;
+    this.bought = params.bought ?? false;
     let displayPrice = params.displayPrice ?? true;
     let displayButtons = params.displayButtons ?? true;
-    
+    upgrade.wrapper = null;
     upgrade.wrapper = document.createElement("div");
     const wrapper = upgrade.wrapper;
-    const originalZ = wrapper.style.zIndex || 0;
+    this.originalZ = wrapper.style.zIndex || 0;
 
     wrapper.addEventListener("mouseenter", () => (wrapper.style.zIndex = 500));
-    wrapper.addEventListener("mouseleave", () => (wrapper.style.zIndex = originalZ));
+    wrapper.addEventListener("mouseleave", () => (wrapper.style.zIndex = this.originalZ));
     
     if (displayButtons) {
-        wrapper.addEventListener("click", () => this.displayButtons(wrapper, upgrade));
+        wrapper.addEventListener("click", (e) => {
+            // Jeśli karta była przesunięta o więcej niż 5px, nie otwieraj menu
+            if (this.dragStarted) return; 
+            this.displayButtons();
+        });
     }
 
     wrapper.className = "upgrade-wrapper";
     wrapper.dataset.type = upgrade.type;
-    if (bought) wrapper.classList.add("bought");
+    if (this.bought) wrapper.classList.add("bought");
     if (upgrade.isReady) wrapper.classList.add("ready");
     if (params.free) upgrade.price = 0;
 
@@ -51,7 +67,7 @@ export class UpgradeRenderer {
     classes.forEach(cls => cardBackground.classList.add(cls));
 
     if (classes.length > 0) {
-        if (!bought) {
+        if (!this.bought) {
             wrapper.classList.add("triggered");
             const sound = upgrade.negative ? "foil_reverse.mp3" : "foil.mp3";
             this.gameRenderer.game.Audio.playSound(sound);
@@ -123,6 +139,19 @@ export class UpgradeRenderer {
     wrapper.appendChild(desc);
     if (displayButtons) wrapper.appendChild(this.createButtons(params));
 
+    this.dragThreshold = 5;
+      const onMouseDown = (e) => {
+            this.isDragging = true;
+            this.dragStarted = false;
+            this.startX = e.clientX;
+            this.startY = e.clientY;
+            this.lastMouseX = e.clientX;
+            
+            window.addEventListener("mousemove", this._mouseMoveHandler);
+            window.addEventListener("mouseup", this._mouseUpHandler);
+        };
+    wrapper.addEventListener("mousedown", onMouseDown);
+    
     return wrapper;
 }
   createDescription() {
@@ -163,7 +192,101 @@ export class UpgradeRenderer {
 
     return html;
 }
+        onMouseMove(e){
+            if (!this.isDragging) return;
+            const wrapper = this.upgrade.wrapper;
+            const deltaX = e.clientX - this.startX;
+            const deltaY = e.clientY - this.startY;
+
+            if (!this.dragStarted && (Math.abs(deltaX) > this.dragThreshold || Math.abs(deltaY) > this.dragThreshold)) {
+                wrapper.style.transition = "none";
+                this.dragStarted = true;
+                wrapper.classList.add("dragging");
+                wrapper.classList.remove("returning");
+                wrapper.style.zIndex = 1000;
+            }
+
+            if (this.dragStarted) {
+                const mouseVelocity = e.clientX - this.lastMouseX;
+                this.lastMouseX = e.clientX;
+                this.currentRotation = Math.max(Math.min(mouseVelocity * 0.5, 20), -20);
+                wrapper.style.transform = `translate(${deltaX}px, ${deltaY}px) rotateZ(${this.currentRotation}deg)`;
+
+                // Podświetlanie celu
+                const target = this.getCardUnderCursor(e.clientX, e.clientY);
+                document.querySelectorAll('.upgrade-wrapper').forEach(el => el.classList.remove('drag-over'));
+                if (target && target !== wrapper) target.classList.add('drag-over');
+            }
+        };
+  onMouseUp(e){
+        
+        if (!this.isDragging) return;
+        console.log(this);
+        const wrapper = this.upgrade.wrapper
+        const wasActuallyDragged = this.dragStarted;
+        this.isDragging = false;
+        this.dragStarted = false;
+        if (wasActuallyDragged) {
+            e.stopPropagation();
+            wrapper.classList.remove("dragging");
+
+            const container = wrapper.parentElement;
+            // Szukamy karty, która ma klasę drag-over
+            const targetWrapper = container?.querySelector('.drag-over');
+
+            if (targetWrapper && targetWrapper !== wrapper) {
+                // Usuwamy klasę podświetlenia
+                targetWrapper.classList.remove('drag-over');
+
+                const children = [...container.children];
+                const draggedIndex = children.indexOf(wrapper);
+                const targetIndex = children.indexOf(targetWrapper);
+
+                // 1. Snapshot dla animacji FLIP
+                const oldPositions = this.gameRenderer.getPositions(container);
+
+                // 2. Zamiana miejsc w DOM
+                if (draggedIndex < targetIndex) {
+                    container.insertBefore(wrapper, targetWrapper.nextSibling);
+                } else {
+                    container.insertBefore(wrapper, targetWrapper);
+                }
+
+                // 3. Reset stylów i odpalenie animacji reorder
+                wrapper.style.transform = "";
+                this.currentRotation = 0;
+                this.gameRenderer.animateReorder(oldPositions);
+
+                // 4. Aktualizacja logiki gry
+                if(this.bought){
+                  const movedUpgrade = this.gameRenderer.game.upgrades.splice(draggedIndex, 1)[0];
+                this.gameRenderer.game.upgrades.splice(targetIndex, 0, movedUpgrade);
+                this.gameRenderer.game.emit(GAME_TRIGGERS.onUpgradesChanged);
+                this.gameRenderer.displayUpgradesCounter();
+                }
+            } else {
+                // Brak celu -> Powrót z bouncem
+                const style = window.getComputedStyle(wrapper);
+                const matrix = new WebKitCSSMatrix(style.transform);
+                wrapper.style.setProperty('--drag-x', `${matrix.m41}px`);
+                wrapper.style.setProperty('--drag-y', `${matrix.m42}px`);
+                wrapper.style.setProperty('--last-tilt', `${this.currentRotation}deg`);
+               
+                wrapper.classList.add("returning");
+                setTimeout(() => {
+                    if (!this.isDragging) {
+                        wrapper.classList.remove("returning");
+                        wrapper.style.transform = "";
+                        wrapper.style.zIndex = this.originalZ;
+                    }
+                }, 400);
+            }
+              window.removeEventListener("mousemove", this._mouseMoveHandler);
+              window.removeEventListener("mouseup", this._mouseUpHandler);
+        }
+    };
   displayButtons() {
+    console.log("clicked");
     // 1. Sprawdzamy, czy ten konkretny wrapper jest już "podniesiony"
     // Sprawdzamy styl inline lub (lepiej) konkretną wartość transformacji
     const wrapper = this.upgrade.wrapper;
@@ -210,6 +333,7 @@ export class UpgradeRenderer {
       if (upgrade.canBuy(game) == false) {
         return false;
       }
+     // const shopWrapper = wrapper;
       success = game.buy(upgrade);
       console.log(success);
       if (success && params.origin && params.origin.type == "ConsumablePack") {
@@ -234,7 +358,7 @@ export class UpgradeRenderer {
         }else{
           game.GameRenderer.fadeOutAndRemove(wrapper);
         }
-        
+        //shopWrapper.remove();
       }
       //this.refreshBuyButtons();
     });
@@ -472,6 +596,27 @@ export class UpgradeRenderer {
         break;
     }
   }
+  getCardUnderCursor(clientX, clientY) {
+        const container = this.upgrade.wrapper.parentElement;
+        if (!container) return null;
+
+        const cards = [...container.querySelectorAll('.upgrade-wrapper:not(.dragging)')];
+        let closestCard = null;
+        let minDistance = Infinity;
+
+        cards.forEach(card => {
+            const rect = card.getBoundingClientRect();
+            const cardCenterX = rect.left + rect.width / 2;
+            const cardCenterY = rect.top + rect.height / 2;
+            const distance = Math.hypot(clientX - cardCenterX, clientY - cardCenterY);
+
+            if (distance < minDistance && distance < 180) { 
+                minDistance = distance;
+                closestCard = card;
+            }
+        });
+        return closestCard;
+    }
   update(params = { bought: true, origin: null }) {
 
     const upgrade = this.upgrade;
@@ -493,6 +638,7 @@ export class UpgradeRenderer {
     buttonsContainer.innerHTML = "";
   }
   applyDragEvents() {
+    /*
     const wrapper = this.upgrade.wrapper;
     wrapper.draggable = true;
 
@@ -556,5 +702,7 @@ export class UpgradeRenderer {
       this.gameRenderer.game.emit(GAME_TRIGGERS.onUpgradesChanged);
       this.gameRenderer.displayUpgradesCounter();
     });
+  */
   }
+    
 }

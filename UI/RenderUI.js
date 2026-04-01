@@ -26,8 +26,7 @@ export class RenderUI {
     this.scoreBox;
   }
   displayMoves() {
-    this.game.moveBox.innerHTML =
-      this.game.movescounter + "/" + this.game.moves;
+    this.game.moveBox.innerHTML = this.game.moves - this.game.movescounter;
   }
   displayMoney() {
     const moneyBox = this.moneyBox;
@@ -478,8 +477,11 @@ displayTempScore() {
     const fragment = this.displayUpgrades(this.game.upgrades, { bought: true });
 
     this.game.upgrades.forEach(upgrade => {
-      upgrade.UpgradeRenderer.applyDragEvents();
-    });
+      // Upewnij się, że każda karta dostaje SWÓJ własny render 
+      // i nie współdzieli stanu draga ze starą wersją ze sklepu
+      upgrade.UpgradeRenderer.isDragging = false;
+      upgrade.UpgradeRenderer.dragStarted = false;
+  });
     container.appendChild(fragment);
 
     // 3) animate from old → new

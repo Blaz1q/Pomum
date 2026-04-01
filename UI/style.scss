@@ -193,6 +193,10 @@ body, html {
   margin:auto;
   user-select: none;
 }
+html{
+  width: 100%;
+  overflow: hidden;
+}
 canvas#glcanvas {
   position: fixed;     /* stay fixed relative to viewport */
   top: 0;
@@ -744,13 +748,26 @@ canvas#glcanvas {
   z-index: 0;
   max-width: none;
   transition: transform 0.2s ease; // smooth movement
+  
   &.SelectedUpgrade {
     z-index: 9 !important; // !important upewni się, że przebije hover i z-index: 500 bossa
   }
   &.dragging {
-    opacity: 0.7;
+    transition: transform 0.05s linear;
+    pointer-events: none; 
+    // will-change: transform;
     cursor: grabbing;
+    z-index: 3000 !important;
+    .upgrade-desc{
+      opacity: 0;
+    }
   }
+  &.returning {
+    animation: spring-back 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+  &:active {
+    cursor: grabbing;
+}
   &.drag-over {
     outline: 2px dashed #00f;
   }
@@ -1356,4 +1373,21 @@ canvas#glcanvas {
     0%   { transform: scale(1); }
     20%  { transform: scale(1.25); }
     100% { transform: scale(1); }
+}
+@keyframes spring-back {
+  0% { 
+    transform: translate(var(--drag-x), var(--drag-y)) rotateZ(var(--last-tilt)); 
+  }
+  25% { 
+    transform: translate(calc(var(--drag-x) * -0.2), calc(var(--drag-y) * -0.2)) rotateZ(calc(var(--last-tilt) * -0.3)); 
+  }
+  50% { 
+    transform: translate(calc(var(--drag-x) * 0.1), calc(var(--drag-y) * 0.1)) rotateZ(calc(var(--last-tilt) * 0.15)); 
+  }
+  75% { 
+    transform: translate(calc(var(--drag-x) * -0.05), calc(var(--drag-y) * -0.05)) rotateZ(0deg); 
+  }
+  100% { 
+    transform: translate(0, 0) rotateZ(0deg); 
+  }
 }
