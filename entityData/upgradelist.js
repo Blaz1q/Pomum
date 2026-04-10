@@ -908,7 +908,7 @@ export const upgradeBlueprints = [
     }),
 
     price: 9,
-    ...defaultimage, ...COMMON
+    image: 'collector', ...COMMON
   },
   {
     name: "BOOM!!",
@@ -1217,7 +1217,7 @@ export const upgradeBlueprints = [
       }
     },
     price: 7,
-    ...defaultimage, ...COMMON
+    image: 'pozeracz', ...COMMON
   },
   {
     name: "Liczydło",
