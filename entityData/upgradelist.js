@@ -857,7 +857,7 @@ export const upgradeBlueprints = [
       }
     }),
     price: 10,
-    ...defaultimage, ...COMMON
+    image: 'jackpot', ...COMMON
   },
   {
     name: "Collector",
@@ -1259,7 +1259,7 @@ export const upgradeBlueprints = [
       },
     }),
     price: 10,
-    image: 'lvlup', ...RARE
+    image: '2020', ...RARE
 
   },
   {
