@@ -219,7 +219,7 @@ export const upgradeBlueprints = [
       }
     }),
     price: 5,
-    image: 'default', ...COMMON
+    image: 'pearlover', ...COMMON
   },
   {
     name: "pineapplelover",
@@ -231,7 +231,7 @@ export const upgradeBlueprints = [
     },
     price: 5,
 
-    image: 'default',
+    image: 'pineapplelover',
     ...COMMON,
     props: () => ({
       mult: 0,
@@ -296,7 +296,7 @@ export const upgradeBlueprints = [
       }
     }),
     price: 5,
-    image: 'default',
+    image: 'grapelover',
     ...COMMON
   },
   {
@@ -334,7 +334,7 @@ export const upgradeBlueprints = [
       }
     }),
     price: 5,
-    image: 'default',
+    image: 'coconutlover',
     ...COMMON
   },
   {
@@ -983,25 +983,16 @@ export const upgradeBlueprints = [
   {
     name: "Dice",
     descriptionfn(game) {
-      if (this.props.mult && this.props.mult != null) return `Co ruch dostaje się ${Style.Mult(`X1-6 Mult`)} (Obecnie ${Style.Mult('X' + this.props.mult + " Mult")})`;
       return `Co ruch dostaje się ${Style.Mult(`X1-6 Mult`)}`;
     },
     props: () => ({
-      mult: null,
-      onMove() {
-        this.props.mult = Math.floor(Math.random() * 6) + 1;
-        return UPGRADE_STATES.Failed;
-      },
-      onRoundEnd() {
-        this.props.mult = null;
-        return UPGRADE_STATES.Active;
-      },
       onScore() {
-        if (this.props.mult == 1) return UPGRADE_STATES.Failed;
-        game.mult *= this.props.mult;
+        const roll = Math.floor(Math.random() * 6) + 1;
+        if (roll == 1) return UPGRADE_STATES.Failed;
+        game.mult *= roll;
         game.mult = Math.round(game.mult * 100) / 100;
         game.GameRenderer.displayTempScore();
-        return { state: UPGRADE_STATES.Score, message: `X${this.props.mult} Mult`, style: SCORE_ACTIONS.Mult };
+        return { state: UPGRADE_STATES.Score, message: `X${roll} Mult`, style: SCORE_ACTIONS.Mult };
       },
     }),
 
