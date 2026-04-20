@@ -799,12 +799,12 @@ canvas#glcanvas {
   position: absolute;
   inset: 0;
   z-index: 5;
-  background-image: url("./images/icons/polychromev2.png");
+  background-image: url("../images/icons/polychromev2.png");
   background-size: 150% 200%;
   filter: hue-rotate(calc((var(--shine-x) + 10) * (var(--shine-y) + 10) * 0.067deg));
   mix-blend-mode: hue;
   -webkit-mask-image: var(--card-img);
-  mask-image: url(var(--card-img));
+  mask-image: var(--card-img);
   -webkit-mask-size: cover;
   mask-size: cover;
   opacity: 1;

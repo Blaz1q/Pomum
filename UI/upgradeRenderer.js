@@ -49,7 +49,7 @@ export class UpgradeRenderer {
     const imageUrl = upgrade.image();
     cardBackground.style.backgroundImage = `url('${imageUrl}')`;
     // Dodajemy zmienną dla maski:
-    cardBackground.style.setProperty('--card-img', `'${imageUrl}`);
+    cardBackground.style.setProperty('--card-img', `url('.${imageUrl}')`);
 
     // 2. Kontener na naklejki (Osobno, by nie dziedziczyć filtrów)
     const stickersContainer = document.createElement("div");
@@ -65,6 +65,7 @@ export class UpgradeRenderer {
     if (upgrade.negative) classes.push("negative");
     if (upgrade.modifier !== MODIFIERS.None){
       classes.push("holo");
+      classes.push("shine");
     }
     
     if (upgrade?.active === false) classes.push("inactive");
