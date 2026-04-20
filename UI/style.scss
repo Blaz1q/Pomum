@@ -1011,7 +1011,7 @@ canvas#glcanvas {
             z-index: 5;
 
             // TWOJA LOGIKA GRADIENTU
-            background-image: url('../images/icons/polychromev2.png');
+            background-image: url('./images/icons/polychromev2.png');
             background-size: 150% 200%;
             filter: hue-rotate(calc((var(--shine-x) + 10) * (var(--shine-y) + 10) * 0.067deg));
             //background-position: var(--shine-x, 50%) var(--shine-y, 50%);
