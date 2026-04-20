@@ -804,7 +804,7 @@ canvas#glcanvas {
   filter: hue-rotate(calc((var(--shine-x) + 10) * (var(--shine-y) + 10) * 0.067deg));
   mix-blend-mode: hue;
   -webkit-mask-image: var(--card-img);
-  mask-image: var(--card-img);
+  mask-image: url(var(--card-img));
   -webkit-mask-size: cover;
   mask-size: cover;
   opacity: 1;

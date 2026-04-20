@@ -49,12 +49,7 @@ export class UpgradeRenderer {
     const imageUrl = upgrade.image();
     cardBackground.style.backgroundImage = `url('${imageUrl}')`;
     // Dodajemy zmienną dla maski:
-
-// Upewniamy się, że ścieżka zaczyna się od images lub /images
-    const cleanPath = imageUrl.startsWith('./') ? imageUrl.substring(2) : imageUrl;
-    const finalPath = cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath;
-
-    cardBackground.style.setProperty('--card-img', `url("${finalPath}")`);
+    cardBackground.style.setProperty('--card-img', `'${imageUrl}`);
 
     // 2. Kontener na naklejki (Osobno, by nie dziedziczyć filtrów)
     const stickersContainer = document.createElement("div");

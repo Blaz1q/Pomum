@@ -1021,7 +1021,7 @@ canvas#glcanvas {
             // --- ROZWIĄZANIE PROBLEMU PRZEZROCZYSTOŚCI ---
             // Pobieramy obrazek karty jako maskę
             -webkit-mask-image: var(--card-img);
-            mask-image: var(--card-img);
+            mask-image: url(var(--card-img));
             -webkit-mask-size: cover;
             mask-size: cover;
             // --------------------------------------------
