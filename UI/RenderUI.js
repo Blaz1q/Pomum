@@ -652,7 +652,11 @@ addParalax(card) {
 
     const rotateY = ((x - halfWidth) / halfWidth) * 10;
     const rotateX = ((halfHeight - y) / halfHeight) * 15;
+    const shineX = (x / rect.width) * 100;
+      const shineY = (y / rect.height) * 100;
 
+      card.style.setProperty('--shine-x', `${shineX}`);
+      card.style.setProperty('--shine-y', `${shineY}`);
     card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     
     const shadowX = -((x - halfWidth) / halfWidth) * 10;
@@ -661,37 +665,41 @@ addParalax(card) {
   });
 
   card.addEventListener("mouseleave", () => {
-    // 1. Target the 0% Keyframe
-    const startX = "10deg";
-    const startY = "-15deg";
-    const startShadow = "4px 10px 0px rgba(0, 0, 0, 0.35)";
-
-    // 2. Apply a simple, clean transition
-    const duration = 1000; // ms
-    card.style.transition = `transform ${duration}ms ease-out, filter ${duration}ms ease-out`;
+    const duration = 1000;
     
-    // Trigger the movement
-    card.style.transform = `perspective(1000px) rotateX(${startX}) rotateY(${startY})`;
-    card.style.filter = `drop-shadow(${startShadow})`;
+    // Włączamy transition dla zmiennych i transformacji
+    card.style.transition = `
+        transform ${duration}ms ease-out, 
+        filter ${duration}ms ease-out, 
+        --shine-x ${duration}ms ease-out, 
+        --shine-y ${duration}ms ease-out
+    `;
+    
+    // Ustawiamy wartości docelowe (zgodne z 0% klatką animacji CSS)
+    card.style.setProperty('--shine-x', `0`);
+    card.style.setProperty('--shine-y', `0`);
+    card.style.transform = `perspective(1000px) rotateX(10deg) rotateY(-15deg)`;
+    card.style.filter = `drop-shadow(4px 10px 0px rgba(0, 0, 0, 0.35))`;
 
-    // 3. Clear the timeout if it exists (prevents animation overlaps)
     if (card.parallaxTimeout) clearTimeout(card.parallaxTimeout);
 
-    // 4. Wait for the transition, then hand over
     card.parallaxTimeout = setTimeout(() => {
-      // If the user isn't hovering anymore, start the idle sway
-      if (!card.matches(':hover')) {
-        card.style.transition = "none"; // Reset transitions
-        card.style.animation = "skewCard 6s infinite ease-in-out";
-        
-        // Final cleanup: remove inline styles so CSS can take over fully
-        setTimeout(() => {
-          card.style.transform = "";
-          card.style.filter = "";
-        }, 50);
-      }
+        if (!card.matches(':hover')) {
+            // Zdejmujemy transition, żeby animacja @keyframes mogła płynnie przejąć kontrolę
+            card.style.transition = "none"; 
+            card.style.animation = "skewCard 6s infinite ease-in-out";
+            
+            // Zamiast usuwać właściwości natychmiast, pozwalamy animacji nadpisać je naturalnie
+            // Jeśli shine-sync używa background-position, to nadpisze ono zmienne inline
+            // ALE: Twoja animacja CSS shine-sync powinna też używać tych samych zmiennych 
+            // lub po prostu usuwamy style po krótkiej chwili:
+            setTimeout(() => {
+                card.style.removeProperty('--shine-x');
+                card.style.removeProperty('--shine-y');
+            }, 50);
+        }
     }, duration);
-  });
+});
 }
   fadeInAndShow(wrapper, duration = 150) {
     if (!wrapper) return;

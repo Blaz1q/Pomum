@@ -46,7 +46,10 @@ export class UpgradeRenderer {
     // 1. Tło karty (To tutaj trafia obrazek i grayscale/invert)
     const cardBackground = document.createElement("div");
     cardBackground.className = "card-background";
-    cardBackground.style.backgroundImage = `url('${upgrade.image()}')`;
+    const imageUrl = upgrade.image();;
+    cardBackground.style.backgroundImage = `url('${imageUrl}')`;
+    // Dodajemy zmienną dla maski:
+    cardBackground.style.setProperty('--card-img', `url('.${imageUrl}')`);
 
     // 2. Kontener na naklejki (Osobno, by nie dziedziczyć filtrów)
     const stickersContainer = document.createElement("div");
@@ -60,9 +63,12 @@ export class UpgradeRenderer {
     // Logika klas wizualnych
     let classes = [];
     if (upgrade.negative) classes.push("negative");
-    if (upgrade.modifier !== MODIFIERS.None) classes.push("holo");
+    if (upgrade.modifier !== MODIFIERS.None){
+      classes.push("holo");
+    }
+    
     if (upgrade?.active === false) classes.push("inactive");
-
+    
     // Nakładamy klasy na tło, a nie na cały kontener inner
     classes.forEach(cls => cardBackground.classList.add(cls));
 
@@ -76,7 +82,9 @@ export class UpgradeRenderer {
             setTimeout(() => wrapper.classList.remove("triggered"), 300);
         }
     }
-
+    if(upgrade?.type=="ConsumablePack"||upgrade?.type=="Voucher"){
+      cardBackground.classList.add("metalic-shine")
+    }
     // 3. Montaż Card Inner
     const cardInner = document.createElement("div");
     cardInner.className = "upgrade-inner";

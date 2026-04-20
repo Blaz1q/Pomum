@@ -1,5 +1,15 @@
 @charset "UTF-8";
 @import url("https://fonts.googleapis.com/css2?family=Jersey+25&display=swap");
+@property --shine-x {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 50;
+}
+@property --shine-y {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 50;
+}
 :root {
   color-scheme: light dark;
 }
@@ -12,7 +22,8 @@
   color-scheme: dark;
 }
 
-body, html {
+body,
+html {
   margin: 0;
   font-family: "Segoe UI", Roboto, sans-serif;
   color: #333;
@@ -29,12 +40,14 @@ html {
 }
 
 canvas#glcanvas {
-  position: fixed; /* stay fixed relative to viewport */
+  position: fixed;
+  /* stay fixed relative to viewport */
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: -1; /* behind all other content */
+  z-index: -1;
+  /* behind all other content */
   display: block;
 }
 
@@ -167,7 +180,8 @@ canvas#glcanvas {
   height: 90%;
   background: light-dark(rgba(255, 255, 255, 0.85), rgba(32, 32, 32, 0.85));
   border-radius: 12px;
-  overflow: hidden; /* << pozwala tooltipom wychodzić */
+  overflow: hidden;
+  /* << pozwala tooltipom wychodzić */
   padding-left: 7em;
   padding-right: 7em;
   z-index: 6;
@@ -183,7 +197,8 @@ canvas#glcanvas {
 #menu #collection .scroll {
   height: calc(100% - 10em);
   z-index: 10;
-  overflow-y: scroll; /* << scroll tutaj */
+  overflow-y: scroll;
+  /* << scroll tutaj */
   overflow-x: hidden;
   display: flex;
   flex-wrap: wrap;
@@ -193,7 +208,8 @@ canvas#glcanvas {
   padding-right: 2em;
   justify-content: center;
 }
-#menu #collection .scroll .upgrade-wrapper .upgrade-desc { /* zamiast -180px */
+#menu #collection .scroll .upgrade-wrapper .upgrade-desc {
+  /* zamiast -180px */
   right: 0%;
   left: -20px;
   top: 20px;
@@ -206,14 +222,18 @@ canvas#glcanvas {
   margin: 0.4em;
   color: light-dark(#333, #fff);
 }
-.game .left-panel .location .round, .game .left-panel .location #boss-container {
+.game .left-panel .location .round,
+.game .left-panel .location #boss-container {
   display: flex;
   justify-content: center;
   text-align: center;
   align-items: center;
   flex-direction: column;
 }
-.game .left-panel .location .round h1, .game .left-panel .location .round h2, .game .left-panel .location #boss-container h1, .game .left-panel .location #boss-container h2 {
+.game .left-panel .location .round h1,
+.game .left-panel .location .round h2,
+.game .left-panel .location #boss-container h1,
+.game .left-panel .location #boss-container h2 {
   margin-block-start: 0.4em;
   margin-block-end: 0.4em;
 }
@@ -286,7 +306,8 @@ canvas#glcanvas {
 .game .left-panel .info .stats-table .roundscore {
   background-color: #72abe0;
 }
-.game .left-panel .info .stats-table .moves, .game .left-panel .info .stats-table .maxmoves {
+.game .left-panel .info .stats-table .moves,
+.game .left-panel .info .stats-table .maxmoves {
   background-color: #e4d147;
   color: #222;
 }
@@ -325,13 +346,15 @@ canvas#glcanvas {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
-.game .left-panel h2, .game .left-panel h1 {
+.game .left-panel h2,
+.game .left-panel h1 {
   font-size: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.game .left-panel h2 b, .game .left-panel h1 b {
+.game .left-panel h2 b,
+.game .left-panel h1 b {
   display: inline-block;
   max-width: 100px;
   text-align: right;
@@ -381,8 +404,10 @@ canvas#glcanvas {
 }
 .game .right-panel #player-upgrades .upgrade-group {
   display: flex;
-  flex-direction: column; /* container on top, label under */
-  align-items: stretch; /* children stretch full width */
+  flex-direction: column;
+  /* container on top, label under */
+  align-items: stretch;
+  /* children stretch full width */
   height: 100%;
 }
 .game .right-panel #player-upgrades .upgrade-group.upgrades {
@@ -392,8 +417,10 @@ canvas#glcanvas {
   flex: 1;
 }
 .game .right-panel #player-upgrades .upgrade-group label {
-  text-align: left; /* left-align text */
-  padding-left: 0.25rem; /* small inset so it doesn’t hug the edge */
+  text-align: left;
+  /* left-align text */
+  padding-left: 0.25rem;
+  /* small inset so it doesn’t hug the edge */
 }
 .game .right-panel #player-upgrades #player-upgrades-container,
 .game .right-panel #player-upgrades #player-consumables-container {
@@ -558,14 +585,18 @@ canvas#glcanvas {
   justify-content: space-around;
   gap: 0.5em;
 }
-.game .right-panel #shop #upgrades-container, .game .right-panel #shop #voucher-container, .game .right-panel #shop #boosterpack-container {
+.game .right-panel #shop #upgrades-container,
+.game .right-panel #shop #voucher-container,
+.game .right-panel #shop #boosterpack-container {
   display: flex;
   justify-content: center;
   margin: 1rem 0;
   margin-left: 1.5em;
   position: relative;
 }
-.game .right-panel #shop #upgrades-container .upgrade-wrapper, .game .right-panel #shop #voucher-container .upgrade-wrapper, .game .right-panel #shop #boosterpack-container .upgrade-wrapper {
+.game .right-panel #shop #upgrades-container .upgrade-wrapper,
+.game .right-panel #shop #voucher-container .upgrade-wrapper,
+.game .right-panel #shop #boosterpack-container .upgrade-wrapper {
   margin-right: 1.5em;
   transition: transform 0.2s ease-in-out;
 }
@@ -585,13 +616,25 @@ canvas#glcanvas {
   animation: skewLogo 6s infinite ease-in-out;
 }
 
-.pixel-corners, .tile .upgrade-desc .type, .tile .upgrade-desc .rarity, .tile .upgrade-desc .content, .tile .upgrade-desc, .upgrade-wrapper .upgrade-desc .type, .upgrade-wrapper .upgrade-desc .rarity, .boss-wrapper .upgrade-desc .type, .boss-wrapper .upgrade-desc .rarity, .upgrade-wrapper .upgrade-desc .content, .boss-wrapper .upgrade-desc .content, .upgrade-wrapper .upgrade-desc, .boss-wrapper .upgrade-desc, .game .left-panel .info .stats-table td:not(:has(button)) {
+.pixel-corners, .tile .upgrade-desc .type,
+.tile .upgrade-desc .rarity, .tile .upgrade-desc .content, .tile .upgrade-desc, .upgrade-wrapper .upgrade-desc .type,
+.upgrade-wrapper .upgrade-desc .rarity,
+.boss-wrapper .upgrade-desc .type,
+.boss-wrapper .upgrade-desc .rarity, .upgrade-wrapper .upgrade-desc .content,
+.boss-wrapper .upgrade-desc .content, .upgrade-wrapper .upgrade-desc,
+.boss-wrapper .upgrade-desc, .game .left-panel .info .stats-table td:not(:has(button)) {
   background: rgba(0, 0, 0, 0.96);
   position: relative;
   border: 3px solid rgba(0, 0, 0, 0);
   clip-path: polygon(0 calc(100% - 12px), 3px calc(100% - 12px), 3px calc(100% - 6px), 6px calc(100% - 6px), 6px calc(100% - 3px), 12px calc(100% - 3px), 12px 100%, calc(100% - 12px) 100%, calc(100% - 12px) calc(100% - 3px), calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) calc(100% - 6px), calc(100% - 3px) calc(100% - 6px), calc(100% - 3px) calc(100% - 12px), 100% calc(100% - 12px), 100% 12px, calc(100% - 3px) 12px, calc(100% - 3px) 6px, calc(100% - 6px) 6px, calc(100% - 6px) 3px, calc(100% - 12px) 3px, calc(100% - 12px) 0, 12px 0, 12px 3px, 6px 3px, 6px 6px, 3px 6px, 3px 12px, 0 12px);
 }
-.pixel-corners:after, .tile .upgrade-desc .type:after, .tile .upgrade-desc .rarity:after, .tile .upgrade-desc .content:after, .tile .upgrade-desc:after, .upgrade-wrapper .upgrade-desc .type:after, .upgrade-wrapper .upgrade-desc .rarity:after, .boss-wrapper .upgrade-desc .type:after, .boss-wrapper .upgrade-desc .rarity:after, .upgrade-wrapper .upgrade-desc .content:after, .boss-wrapper .upgrade-desc .content:after, .upgrade-wrapper .upgrade-desc:after, .boss-wrapper .upgrade-desc:after, .game .left-panel .info .stats-table td:not(:has(button)):after {
+.pixel-corners:after, .tile .upgrade-desc .type:after,
+.tile .upgrade-desc .rarity:after, .tile .upgrade-desc .content:after, .tile .upgrade-desc:after, .upgrade-wrapper .upgrade-desc .type:after,
+.upgrade-wrapper .upgrade-desc .rarity:after,
+.boss-wrapper .upgrade-desc .type:after,
+.boss-wrapper .upgrade-desc .rarity:after, .upgrade-wrapper .upgrade-desc .content:after,
+.boss-wrapper .upgrade-desc .content:after, .upgrade-wrapper .upgrade-desc:after,
+.boss-wrapper .upgrade-desc:after, .game .left-panel .info .stats-table td:not(:has(button)):after {
   content: "";
   position: absolute;
   inset: 0;
@@ -603,7 +646,8 @@ canvas#glcanvas {
   z-index: -1;
 }
 
-.upgrade-wrapper, .boss-wrapper {
+.upgrade-wrapper,
+.boss-wrapper {
   font-family: "Jersey 25", sans-serif;
   letter-spacing: 0.5px;
   position: relative;
@@ -614,35 +658,44 @@ canvas#glcanvas {
   max-width: none;
   transition: transform 0.2s ease;
 }
-.upgrade-wrapper.SelectedUpgrade, .boss-wrapper.SelectedUpgrade {
+.upgrade-wrapper.SelectedUpgrade,
+.boss-wrapper.SelectedUpgrade {
   z-index: 9 !important;
 }
-.upgrade-wrapper.dragging, .boss-wrapper.dragging {
+.upgrade-wrapper.dragging,
+.boss-wrapper.dragging {
   transition: transform 0.05s linear;
   pointer-events: none;
   cursor: grabbing;
   z-index: 3000 !important;
 }
-.upgrade-wrapper.dragging .upgrade-desc, .boss-wrapper.dragging .upgrade-desc {
+.upgrade-wrapper.dragging .upgrade-desc,
+.boss-wrapper.dragging .upgrade-desc {
   opacity: 0;
 }
-.upgrade-wrapper.returning, .boss-wrapper.returning {
+.upgrade-wrapper.returning,
+.boss-wrapper.returning {
   animation: spring-back 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
-.upgrade-wrapper:active, .boss-wrapper:active {
+.upgrade-wrapper:active,
+.boss-wrapper:active {
   cursor: grabbing;
 }
-.upgrade-wrapper.drag-over, .boss-wrapper.drag-over {
+.upgrade-wrapper.drag-over,
+.boss-wrapper.drag-over {
   outline: 2px dashed #00f;
 }
-.upgrade-wrapper.triggered, .boss-wrapper.triggered {
+.upgrade-wrapper.triggered,
+.boss-wrapper.triggered {
   animation: triggeredCard ease-in-out;
   animation-duration: 0.3s;
 }
-.upgrade-wrapper.ready .upgrade-inner, .boss-wrapper.ready .upgrade-inner {
+.upgrade-wrapper.ready .upgrade-inner,
+.boss-wrapper.ready .upgrade-inner {
   animation: readyCard 1s ease-in-out infinite;
 }
-.upgrade-wrapper .consumable-buttons, .boss-wrapper .consumable-buttons {
+.upgrade-wrapper .consumable-buttons,
+.boss-wrapper .consumable-buttons {
   position: absolute;
   top: 105%;
   left: 50%;
@@ -654,7 +707,8 @@ canvas#glcanvas {
   transition: opacity 0.3s ease, transform 0.3s ease;
   z-index: 20;
 }
-.upgrade-wrapper .consumable-buttons button, .boss-wrapper .consumable-buttons button {
+.upgrade-wrapper .consumable-buttons button,
+.boss-wrapper .consumable-buttons button {
   all: unset;
   padding: 0.6rem 1.5rem;
   white-space: nowrap;
@@ -666,39 +720,47 @@ canvas#glcanvas {
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
-.upgrade-wrapper .consumable-buttons button.disabled, .boss-wrapper .consumable-buttons button.disabled {
+.upgrade-wrapper .consumable-buttons button.disabled,
+.boss-wrapper .consumable-buttons button.disabled {
   background: #212121;
 }
-.upgrade-wrapper .consumable-buttons button.disabled:hover, .boss-wrapper .consumable-buttons button.disabled:hover {
+.upgrade-wrapper .consumable-buttons button.disabled:hover,
+.boss-wrapper .consumable-buttons button.disabled:hover {
   background: #171717;
 }
-.upgrade-wrapper .consumable-buttons button:hover, .boss-wrapper .consumable-buttons button:hover {
+.upgrade-wrapper .consumable-buttons button:hover,
+.boss-wrapper .consumable-buttons button:hover {
   background: #c0392b;
   transform: scale(1.05);
 }
-.upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
+.upgrade-wrapper .upgrade-card,
+.boss-wrapper .upgrade-card {
   width: 120px;
   height: 180px;
 }
 @media (max-width: 1024px) {
-  .upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
+  .upgrade-wrapper .upgrade-card,
+  .boss-wrapper .upgrade-card {
     width: 80px;
     height: 120px;
   }
 }
 @media (max-width: 800px) {
-  .upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
+  .upgrade-wrapper .upgrade-card,
+  .boss-wrapper .upgrade-card {
     width: 80px;
     height: 120px;
   }
 }
 @media (max-width: 600px) {
-  .upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
+  .upgrade-wrapper .upgrade-card,
+  .boss-wrapper .upgrade-card {
     width: 64px;
     height: 96px;
   }
 }
-.upgrade-wrapper .upgrade-card, .boss-wrapper .upgrade-card {
+.upgrade-wrapper .upgrade-card,
+.boss-wrapper .upgrade-card {
   position: relative;
   cursor: pointer;
   transform-style: preserve-3d;
@@ -707,7 +769,8 @@ canvas#glcanvas {
   transform: perspective(1000px) rotateX(10deg) rotateY(-15deg);
   z-index: 5;
 }
-.upgrade-wrapper .upgrade-card .upgrade-inner, .boss-wrapper .upgrade-card .upgrade-inner {
+.upgrade-wrapper .upgrade-card .upgrade-inner,
+.boss-wrapper .upgrade-card .upgrade-inner {
   width: 100%;
   height: 100%;
   background-size: contain;
@@ -715,10 +778,12 @@ canvas#glcanvas {
   background-repeat: no-repeat;
   display: flex;
   transition: filter 0.3s ease, transform 0.3s ease;
-  transform-origin: center center; /* scale from center */
+  transform-origin: center center;
+  /* scale from center */
   transition: filter 0.3s ease, transform 0.3s ease;
 }
-.upgrade-wrapper .upgrade-card .upgrade-inner .card-background, .boss-wrapper .upgrade-card .upgrade-inner .card-background {
+.upgrade-wrapper .upgrade-card .upgrade-inner .card-background,
+.boss-wrapper .upgrade-card .upgrade-inner .card-background {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -728,24 +793,63 @@ canvas#glcanvas {
   z-index: -1;
   transition: filter 0.3s ease;
 }
-.upgrade-wrapper .upgrade-card .upgrade-inner .sticker-container, .boss-wrapper .upgrade-card .upgrade-inner .sticker-container {
+.upgrade-wrapper .upgrade-card .upgrade-inner .card-background.shine::after,
+.boss-wrapper .upgrade-card .upgrade-inner .card-background.shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background-image: url("../images/icons/polychromev2.png");
+  background-size: 150% 200%;
+  filter: hue-rotate(calc((var(--shine-x) + 10) * (var(--shine-y) + 10) * 0.067deg));
+  mix-blend-mode: hue;
+  -webkit-mask-image: var(--card-img);
+  mask-image: var(--card-img);
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.upgrade-wrapper .upgrade-card .upgrade-inner .card-background.metalic-shine::after,
+.boss-wrapper .upgrade-card .upgrade-inner .card-background.metalic-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: linear-gradient(110deg, rgba(0, 0, 0, 0.1) 35%, rgba(255, 255, 255, 0.7) 45%, rgb(255, 255, 255) 50%, rgba(255, 255, 255, 0.7) 55%, rgba(0, 0, 0, 0.1) 65%);
+  background-size: 250% 250%;
+  background-position: calc(var(--shine-x) * 1%) calc(var(--shine-y) * 1%);
+  mix-blend-mode: color-dodge;
+  -webkit-mask-image: var(--card-img);
+  mask-image: var(--card-img);
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+.upgrade-wrapper .upgrade-card .upgrade-inner .sticker-container,
+.boss-wrapper .upgrade-card .upgrade-inner .sticker-container {
   margin: 0.7em;
   display: flex;
   flex-direction: column;
   gap: 0.1em;
   justify-content: space-evenly;
 }
-.upgrade-wrapper .upgrade-card:hover, .boss-wrapper .upgrade-card:hover {
+.upgrade-wrapper .upgrade-card:hover,
+.boss-wrapper .upgrade-card:hover {
   animation: none;
 }
-.upgrade-wrapper .upgrade-card:hover .upgrade-inner, .boss-wrapper .upgrade-card:hover .upgrade-inner {
+.upgrade-wrapper .upgrade-card:hover .upgrade-inner,
+.boss-wrapper .upgrade-card:hover .upgrade-inner {
   animation: bounce-hover 0.23s;
   transform: rotateX(0deg) scale(1.045) rotateY(0deg);
 }
-.upgrade-wrapper .upgrade-desc:after, .boss-wrapper .upgrade-desc:after {
+.upgrade-wrapper .upgrade-desc:after,
+.boss-wrapper .upgrade-desc:after {
   background: white;
 }
-.upgrade-wrapper .upgrade-desc, .boss-wrapper .upgrade-desc {
+.upgrade-wrapper .upgrade-desc,
+.boss-wrapper .upgrade-desc {
   position: absolute;
   left: -220px;
   top: 50%;
@@ -764,7 +868,8 @@ canvas#glcanvas {
   flex-direction: column;
   padding: 4px;
 }
-.upgrade-wrapper .upgrade-desc .title, .boss-wrapper .upgrade-desc .title {
+.upgrade-wrapper .upgrade-desc .title,
+.boss-wrapper .upgrade-desc .title {
   font-size: 1.8rem;
   padding: 10px 5px;
   width: 100%;
@@ -772,7 +877,8 @@ canvas#glcanvas {
   letter-spacing: 1px;
   text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
 }
-.upgrade-wrapper .upgrade-desc .content, .boss-wrapper .upgrade-desc .content {
+.upgrade-wrapper .upgrade-desc .content,
+.boss-wrapper .upgrade-desc .content {
   background-color: #f8f8f3;
   color: #222;
   padding: 0 12px;
@@ -781,11 +887,15 @@ canvas#glcanvas {
   font-weight: bold;
   margin: 0 2px;
 }
-.upgrade-wrapper .upgrade-desc .content b, .boss-wrapper .upgrade-desc .content b {
+.upgrade-wrapper .upgrade-desc .content b,
+.boss-wrapper .upgrade-desc .content b {
   font-weight: bolder;
   display: inline-block;
 }
-.upgrade-wrapper .upgrade-desc .type, .upgrade-wrapper .upgrade-desc .rarity, .boss-wrapper .upgrade-desc .type, .boss-wrapper .upgrade-desc .rarity {
+.upgrade-wrapper .upgrade-desc .type,
+.upgrade-wrapper .upgrade-desc .rarity,
+.boss-wrapper .upgrade-desc .type,
+.boss-wrapper .upgrade-desc .rarity {
   margin: 8px auto;
   padding: 4px 15px;
   font-size: 0.9rem;
@@ -797,54 +907,72 @@ canvas#glcanvas {
   width: -moz-fit-content;
   width: fit-content;
 }
-.upgrade-wrapper .upgrade-desc .type.common, .upgrade-wrapper .upgrade-desc .rarity.common, .boss-wrapper .upgrade-desc .type.common, .boss-wrapper .upgrade-desc .rarity.common {
+.upgrade-wrapper .upgrade-desc .type.common,
+.upgrade-wrapper .upgrade-desc .rarity.common,
+.boss-wrapper .upgrade-desc .type.common,
+.boss-wrapper .upgrade-desc .rarity.common {
   color: white;
   background-color: #0086ff;
 }
-.upgrade-wrapper .upgrade-desc .type.uncommon, .upgrade-wrapper .upgrade-desc .rarity.uncommon, .boss-wrapper .upgrade-desc .type.uncommon, .boss-wrapper .upgrade-desc .rarity.uncommon {
+.upgrade-wrapper .upgrade-desc .type.uncommon,
+.upgrade-wrapper .upgrade-desc .rarity.uncommon,
+.boss-wrapper .upgrade-desc .type.uncommon,
+.boss-wrapper .upgrade-desc .rarity.uncommon {
   color: white;
   background-color: #4cb33e;
 }
-.upgrade-wrapper .upgrade-desc .type.rare, .upgrade-wrapper .upgrade-desc .rarity.rare, .boss-wrapper .upgrade-desc .type.rare, .boss-wrapper .upgrade-desc .rarity.rare {
+.upgrade-wrapper .upgrade-desc .type.rare,
+.upgrade-wrapper .upgrade-desc .rarity.rare,
+.boss-wrapper .upgrade-desc .type.rare,
+.boss-wrapper .upgrade-desc .rarity.rare {
   color: white;
   background-color: #fe4d40;
 }
-.upgrade-wrapper .upgrade-desc.pos-left, .boss-wrapper .upgrade-desc.pos-left {
+.upgrade-wrapper .upgrade-desc.pos-left,
+.boss-wrapper .upgrade-desc.pos-left {
   right: 110%;
   top: 50%;
   transform: translateY(-50%) scale(0.9);
 }
-.upgrade-wrapper .upgrade-desc.pos-right, .boss-wrapper .upgrade-desc.pos-right {
+.upgrade-wrapper .upgrade-desc.pos-right,
+.boss-wrapper .upgrade-desc.pos-right {
   left: 110%;
   top: 50%;
   transform: translateY(-50%) scale(0.9);
 }
-.upgrade-wrapper .upgrade-desc.pos-center, .boss-wrapper .upgrade-desc.pos-center {
+.upgrade-wrapper .upgrade-desc.pos-center,
+.boss-wrapper .upgrade-desc.pos-center {
   left: 50%;
   transform: translateX(-50%) scale(0.9);
 }
-.upgrade-wrapper .upgrade-desc.pos-center.pos-top, .boss-wrapper .upgrade-desc.pos-center.pos-top {
+.upgrade-wrapper .upgrade-desc.pos-center.pos-top,
+.boss-wrapper .upgrade-desc.pos-center.pos-top {
   bottom: 110%;
   top: auto;
 }
-.upgrade-wrapper .upgrade-desc.pos-center.pos-bottom, .boss-wrapper .upgrade-desc.pos-center.pos-bottom {
+.upgrade-wrapper .upgrade-desc.pos-center.pos-bottom,
+.boss-wrapper .upgrade-desc.pos-center.pos-bottom {
   top: 110%;
   bottom: auto;
 }
-.upgrade-wrapper .upgrade-desc.pos-top:not(.pos-center), .boss-wrapper .upgrade-desc.pos-top:not(.pos-center) {
+.upgrade-wrapper .upgrade-desc.pos-top:not(.pos-center),
+.boss-wrapper .upgrade-desc.pos-top:not(.pos-center) {
   top: auto;
   bottom: 0;
   transform: scale(0.9);
 }
-.upgrade-wrapper .upgrade-desc.pos-bottom:not(.pos-center), .boss-wrapper .upgrade-desc.pos-bottom:not(.pos-center) {
+.upgrade-wrapper .upgrade-desc.pos-bottom:not(.pos-center),
+.boss-wrapper .upgrade-desc.pos-bottom:not(.pos-center) {
   top: 0;
   transform: scale(0.9);
 }
-.upgrade-wrapper:hover .upgrade-desc, .boss-wrapper:hover .upgrade-desc {
+.upgrade-wrapper:hover .upgrade-desc,
+.boss-wrapper:hover .upgrade-desc {
   opacity: 1;
   transform: translateY(-50%) scale(1);
 }
-.upgrade-wrapper .upgrade-price, .boss-wrapper .upgrade-price {
+.upgrade-wrapper .upgrade-price,
+.boss-wrapper .upgrade-price {
   position: absolute;
   background: gold;
   color: #000;
@@ -854,26 +982,37 @@ canvas#glcanvas {
   border-radius: 4px;
   font-size: 0.85rem;
   font-weight: bold;
-  opacity: 1; /* ukryta domyślnie */
+  opacity: 1;
+  /* ukryta domyślnie */
   transition: opacity 0.3s ease, transform 0.3s ease;
-  pointer-events: none; /* żeby nie blokowało hovera */
-  transform: translateY(-20px); /* lekko niżej na start */
+  pointer-events: none;
+  /* żeby nie blokowało hovera */
+  transform: translateY(-20px);
+  /* lekko niżej na start */
   z-index: 15;
 }
-.upgrade-wrapper:hover .upgrade-price, .boss-wrapper:hover .upgrade-price {
+.upgrade-wrapper:hover .upgrade-price,
+.boss-wrapper:hover .upgrade-price {
   opacity: 1;
-  transform: translateY(-30px); /* płynnie do góry */
+  transform: translateY(-30px);
+  /* płynnie do góry */
 }
-.upgrade-wrapper.bought .upgrade-price, .boss-wrapper.bought .upgrade-price {
+.upgrade-wrapper.bought .upgrade-price,
+.boss-wrapper.bought .upgrade-price {
   transform: translateY(-15px);
   opacity: 0;
 }
-.upgrade-wrapper.bought:hover .upgrade-price, .boss-wrapper.bought:hover .upgrade-price {
+.upgrade-wrapper.bought:hover .upgrade-price,
+.boss-wrapper.bought:hover .upgrade-price {
   opacity: 1;
-  transform: translateY(-15px); /* płynnie do góry */
+  transform: translateY(-15px);
+  /* płynnie do góry */
 }
 
-#game-won, #game-over, #info-container, #settingsPanel {
+#game-won,
+#game-over,
+#info-container,
+#settingsPanel {
   position: fixed;
   top: 0;
   left: 0;
@@ -886,23 +1025,35 @@ canvas#glcanvas {
   align-items: center;
   z-index: 999;
 }
-#game-won .game-over-content, #game-over .game-over-content, #info-container .game-over-content, #settingsPanel .game-over-content {
+#game-won .game-over-content,
+#game-over .game-over-content,
+#info-container .game-over-content,
+#settingsPanel .game-over-content {
   background: light-dark(rgba(255, 255, 255, 0.85), rgba(32, 32, 32, 0.85));
   padding: 2rem 3rem;
   border-radius: 15px;
   text-align: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
-#game-won .game-over-content .game-over h1, #game-over .game-over-content .game-over h1, #info-container .game-over-content .game-over h1, #settingsPanel .game-over-content .game-over h1 {
+#game-won .game-over-content .game-over h1,
+#game-over .game-over-content .game-over h1,
+#info-container .game-over-content .game-over h1,
+#settingsPanel .game-over-content .game-over h1 {
   margin: 0 0 1rem;
   font-size: 2.5rem;
   color: #c0392b;
 }
-#game-won .game-over-content .game-over p, #game-over .game-over-content .game-over p, #info-container .game-over-content .game-over p, #settingsPanel .game-over-content .game-over p {
+#game-won .game-over-content .game-over p,
+#game-over .game-over-content .game-over p,
+#info-container .game-over-content .game-over p,
+#settingsPanel .game-over-content .game-over p {
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
 }
-#game-won .game-over-content button, #game-over .game-over-content button, #info-container .game-over-content button, #settingsPanel .game-over-content button {
+#game-won .game-over-content button,
+#game-over .game-over-content button,
+#info-container .game-over-content button,
+#settingsPanel .game-over-content button {
   margin: 0.5rem;
   padding: 0.7rem 1.5rem;
   border: none;
@@ -914,7 +1065,10 @@ canvas#glcanvas {
   color: #fff;
   transition: background 0.2s;
 }
-#game-won .game-over-content button:hover, #game-over .game-over-content button:hover, #info-container .game-over-content button:hover, #settingsPanel .game-over-content button:hover {
+#game-won .game-over-content button:hover,
+#game-over .game-over-content button:hover,
+#info-container .game-over-content button:hover,
+#settingsPanel .game-over-content button:hover {
   background: #e74c3c;
 }
 
@@ -1064,7 +1218,8 @@ canvas#glcanvas {
   max-width: 900px;
   width: 90%;
 }
-#upgrade-tiles .container #tiles, #upgrade-tiles .container #consumables-container {
+#upgrade-tiles .container #tiles,
+#upgrade-tiles .container #consumables-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -1072,21 +1227,25 @@ canvas#glcanvas {
   min-height: 180px;
 }
 @media (max-width: 1024px) {
-  #upgrade-tiles .container #tiles, #upgrade-tiles .container #consumables-container {
+  #upgrade-tiles .container #tiles,
+  #upgrade-tiles .container #consumables-container {
     min-height: 120px;
   }
 }
 @media (max-width: 800px) {
-  #upgrade-tiles .container #tiles, #upgrade-tiles .container #consumables-container {
+  #upgrade-tiles .container #tiles,
+  #upgrade-tiles .container #consumables-container {
     min-height: 120px;
   }
 }
 @media (max-width: 600px) {
-  #upgrade-tiles .container #tiles, #upgrade-tiles .container #consumables-container {
+  #upgrade-tiles .container #tiles,
+  #upgrade-tiles .container #consumables-container {
     min-height: 96px;
   }
 }
-#upgrade-tiles .container #tiles, #upgrade-tiles .container #consumables-container {
+#upgrade-tiles .container #tiles,
+#upgrade-tiles .container #consumables-container {
   margin-bottom: 1rem;
   padding-bottom: 4em;
 }
@@ -1162,7 +1321,8 @@ canvas#glcanvas {
   font-weight: bolder;
   display: inline-block;
 }
-.tile .upgrade-desc .type, .tile .upgrade-desc .rarity {
+.tile .upgrade-desc .type,
+.tile .upgrade-desc .rarity {
   margin: 8px auto;
   padding: 4px 15px;
   font-size: 0.9rem;
@@ -1174,15 +1334,18 @@ canvas#glcanvas {
   width: -moz-fit-content;
   width: fit-content;
 }
-.tile .upgrade-desc .type.common, .tile .upgrade-desc .rarity.common {
+.tile .upgrade-desc .type.common,
+.tile .upgrade-desc .rarity.common {
   color: white;
   background-color: #0086ff;
 }
-.tile .upgrade-desc .type.uncommon, .tile .upgrade-desc .rarity.uncommon {
+.tile .upgrade-desc .type.uncommon,
+.tile .upgrade-desc .rarity.uncommon {
   color: white;
   background-color: #4cb33e;
 }
-.tile .upgrade-desc .type.rare, .tile .upgrade-desc .rarity.rare {
+.tile .upgrade-desc .type.rare,
+.tile .upgrade-desc .rarity.rare {
   color: white;
   background-color: #fe4d40;
 }
@@ -1224,20 +1387,24 @@ canvas#glcanvas {
 
 .volume-container {
   position: absolute;
-  width: 64px; /* Szerokość Twojej ikony */
-  height: 64px; /* Wysokość Twojej ikony */
+  width: 64px;
+  /* Szerokość Twojej ikony */
+  height: 64px;
+  /* Wysokość Twojej ikony */
   right: 10px;
   bottom: 10px;
 }
 
 #VolumeButton {
   position: absolute;
-  opacity: 0; /* Ukrywamy wizualnie checkbox, ale on tam jest */
+  opacity: 0;
+  /* Ukrywamy wizualnie checkbox, ale on tam jest */
   width: 100%;
   height: 100%;
   margin: 0;
   cursor: pointer;
-  z-index: 2; /* Checkbox jest "nad" labelem, żeby łatwiej było go kliknąć */
+  z-index: 2;
+  /* Checkbox jest "nad" labelem, żeby łatwiej było go kliknąć */
 }
 
 .VolumeLabel {
@@ -1368,18 +1535,30 @@ canvas#glcanvas {
   0%, 100% {
     transform: perspective(1000px) rotateX(10deg) rotateY(-15deg);
     filter: drop-shadow(4px 10px 0px rgba(0, 0, 0, 0.35));
+    /* Karta wychylona w lewo-dół -> światło w prawym górnym rogu */
+    --shine-x: 0;
+    --shine-y: 0;
   }
   25% {
     transform: perspective(1000px) rotateX(-10deg) rotateY(-15deg);
     filter: drop-shadow(4px -4px 0px rgba(0, 0, 0, 0.35));
+    /* Karta wychylona w lewo-góra -> światło w prawym dolnym rogu */
+    --shine-x: 0;
+    --shine-y: 100;
   }
   50% {
     transform: perspective(1000px) rotateX(-10deg) rotateY(15deg);
     filter: drop-shadow(-4px -4px 0px rgba(0, 0, 0, 0.35));
+    /* Karta wychylona w prawo-góra -> światło w lewym dolnym rogu */
+    --shine-x: 100;
+    --shine-y: 100;
   }
   75% {
     transform: perspective(1000px) rotateX(10deg) rotateY(15deg);
     filter: drop-shadow(-4px 10px 0px rgba(0, 0, 0, 0.35));
+    /* Karta wychylona w prawo-dół -> światło w lewym górnym rogu */
+    --shine-x: 100;
+    --shine-y: 0;
   }
 }
 @keyframes holoShift {
@@ -1396,7 +1575,8 @@ canvas#glcanvas {
 .upgrade-popup-container {
   position: absolute;
   left: 50%;
-  bottom: -30px; /* appears just below the card */
+  bottom: -30px;
+  /* appears just below the card */
   transform: translateX(-50%);
   opacity: 0;
   pointer-events: none;
@@ -1437,23 +1617,28 @@ canvas#glcanvas {
     animation-timing-function: ease-out;
   }
   20% {
-    transform: scale(1.065); /* Lekki wznios i powiększenie */
+    transform: scale(1.065);
+    /* Lekki wznios i powiększenie */
     animation-timing-function: ease-in;
   }
   40% {
-    transform: scale(1.01); /* Opadanie i lekkie spłaszczenie */
+    transform: scale(1.01);
+    /* Opadanie i lekkie spłaszczenie */
     animation-timing-function: ease-out;
   }
   60% {
-    transform: scale(1.05); /* Mniejsze odbicie w górę */
+    transform: scale(1.05);
+    /* Mniejsze odbicie w górę */
     animation-timing-function: ease-in;
   }
   80% {
-    transform: scale(1.01); /* Prawie powrót, lekkie uniesienie */
+    transform: scale(1.01);
+    /* Prawie powrót, lekkie uniesienie */
     animation-timing-function: ease-out;
   }
   100% {
-    transform: scale(1.045); /* Pozycja końcowa hovera - lekko uniesiona */
+    transform: scale(1.045);
+    /* Pozycja końcowa hovera - lekko uniesiona */
   }
 }
 @keyframes popBounce {
