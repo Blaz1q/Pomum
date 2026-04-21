@@ -1039,13 +1039,9 @@ canvas#glcanvas {
             z-index: 5;
 
             // TWOJA LOGIKA GRADIENTU
-            background: linear-gradient(110deg,
-                rgba(0, 0, 0, 0.1) 35%,
-                rgba(255, 255, 255, 0.7) 45%, // Jasny refleks
-                rgba(255, 255, 255, 1) 50%, // "Hot spot" - środek błysku
-                rgba(255, 255, 255, 0.7) 55%, // Jasny refleks
-                rgba(0, 0, 0, 0.1) 65%);
-            background-size: 250% 250%;
+            background: url('../images/icons/shine4.png'), url('../images/icons/polychromev2.png');
+            ;
+            background-size: 300% 300%;
             background-position: calc(var(--shine-x) * 1%) calc(var(--shine-y) * 1%);
             //background-position: var(--shine-x, 50%) var(--shine-y, 50%);
             // Mieszanie całości z kartą pod spodem:
@@ -1058,9 +1054,63 @@ canvas#glcanvas {
             -webkit-mask-size: cover;
             mask-size: cover;
             // --------------------------------------------
-            opacity: 0.5;
+            opacity: 0.3;
             transition: opacity 0.3s ease;
 
+          }
+        }
+
+        &.booster-foil {
+          // 1. DELIKATNY EFEKT KOLORYSTYCZNY (TŁO)
+          &::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+
+            background-image: url('../images/icons/booster-holo.png');
+            background-size: 100% 100%;
+
+            // Dynamika kolorów
+            filter: hue-rotate(calc((var(--shine-x) + 10) * (var(--shine-y) + 10) * 0.067deg)) brightness(0.8);
+
+            // 'hue' zachowuje teksturę karty, zmieniając tylko barwy
+            mix-blend-mode: hue;
+
+            // BARDZO NISKIE OPACITY dla delikatności
+            opacity: 0.2;
+
+            -webkit-mask-image: var(--card-img);
+            mask-image: var(--card-img);
+            mask-size: cover;
+            pointer-events: none;
+          }
+
+          // 2. MOCNY METALICZNY BŁYSK (REFLEKSY)
+          &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+
+            background: url('../images/icons/shine4.png');
+            background-size: 250% 250%;
+
+            // Śledzenie myszki/gyroskopu
+            background-position: calc(var(--shine-x) * 1%) calc(var(--shine-y) * 1%);
+
+            // 'color-dodge' to standard przy kartach kolekcjonerskich - daje efekt "świecenia"
+            mix-blend-mode: color-dodge;
+
+            // Wyższe opacity dla refleksu
+            opacity: 0.2;
+
+            -webkit-mask-image: var(--card-img);
+            mask-image: var(--card-img);
+            mask-size: cover;
+            pointer-events: none;
+
+            transition: opacity 0.3s ease;
           }
         }
       }

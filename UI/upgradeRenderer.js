@@ -83,8 +83,13 @@ export class UpgradeRenderer {
             setTimeout(() => wrapper.classList.remove("triggered"), 300);
         }
     }
-    if(upgrade?.type=="ConsumablePack"||upgrade?.type=="Voucher"){
-      cardBackground.classList.add("metalic-shine")
+    switch(upgrade?.type){
+      case "ConsumablePack":
+        cardBackground.classList.add("booster-foil");
+        break;
+      case "Voucher":
+        cardBackground.classList.add("metalic-shine");
+        break;
     }
     // 3. Montaż Card Inner
     const cardInner = document.createElement("div");

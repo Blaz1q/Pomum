@@ -816,15 +816,50 @@ canvas#glcanvas {
   position: absolute;
   inset: 0;
   z-index: 5;
-  background: linear-gradient(110deg, rgba(0, 0, 0, 0.1) 35%, rgba(255, 255, 255, 0.7) 45%, rgb(255, 255, 255) 50%, rgba(255, 255, 255, 0.7) 55%, rgba(0, 0, 0, 0.1) 65%);
-  background-size: 250% 250%;
+  background: url("../images/icons/shine4.png"), url("../images/icons/polychromev2.png");
+  background-size: 300% 300%;
   background-position: calc(var(--shine-x) * 1%) calc(var(--shine-y) * 1%);
   mix-blend-mode: color-dodge;
   -webkit-mask-image: var(--card-img);
   mask-image: var(--card-img);
   -webkit-mask-size: cover;
   mask-size: cover;
-  opacity: 0.5;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+.upgrade-wrapper .upgrade-card .upgrade-inner .card-background.booster-foil::before,
+.boss-wrapper .upgrade-card .upgrade-inner .card-background.booster-foil::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background-image: url("../images/icons/booster-holo.png");
+  background-size: 100% 100%;
+  filter: hue-rotate(calc((var(--shine-x) + 10) * (var(--shine-y) + 10) * 0.067deg)) brightness(0.8);
+  mix-blend-mode: hue;
+  opacity: 0.2;
+  -webkit-mask-image: var(--card-img);
+  mask-image: var(--card-img);
+  -webkit-mask-size: cover;
+          mask-size: cover;
+  pointer-events: none;
+}
+.upgrade-wrapper .upgrade-card .upgrade-inner .card-background.booster-foil::after,
+.boss-wrapper .upgrade-card .upgrade-inner .card-background.booster-foil::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: url("../images/icons/shine4.png");
+  background-size: 250% 250%;
+  background-position: calc(var(--shine-x) * 1%) calc(var(--shine-y) * 1%);
+  mix-blend-mode: color-dodge;
+  opacity: 0.2;
+  -webkit-mask-image: var(--card-img);
+  mask-image: var(--card-img);
+  -webkit-mask-size: cover;
+          mask-size: cover;
+  pointer-events: none;
   transition: opacity 0.3s ease;
 }
 .upgrade-wrapper .upgrade-card .upgrade-inner .sticker-container,
