@@ -434,6 +434,7 @@ canvas#glcanvas {
   background: light-dark(rgba(255, 255, 255, 0.278), rgba(32, 32, 32, 0.278));
   transition: background 0.1s;
   min-height: 180px;
+  text-align: center;
 }
 @media (max-width: 1024px) {
   .game .right-panel #player-upgrades #player-upgrades-container,
@@ -827,6 +828,32 @@ canvas#glcanvas {
   opacity: 0.3;
   transition: opacity 0.3s ease;
 }
+.upgrade-wrapper .upgrade-card .upgrade-inner .card-background.chip-foil,
+.boss-wrapper .upgrade-card .upgrade-inner .card-background.chip-foil {
+  overflow: hidden;
+  -webkit-mask-image: var(--card-img);
+  mask-image: var(--card-img);
+  -webkit-mask-size: cover;
+  mask-size: cover;
+}
+.upgrade-wrapper .upgrade-card .upgrade-inner .card-background.chip-foil::after,
+.boss-wrapper .upgrade-card .upgrade-inner .card-background.chip-foil::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: 5;
+  background-image: url("../images/icons/chip.png");
+  background-repeat: repeat;
+  background-size: 300px 300px;
+  background-position: center;
+  transform: rotate(calc(var(--shine-x) * 0.4deg + var(--shine-y) * 0.4deg));
+  mix-blend-mode: normal;
+  opacity: 0.4;
+  pointer-events: none;
+}
 .upgrade-wrapper .upgrade-card .upgrade-inner .card-background.booster-foil::before,
 .boss-wrapper .upgrade-card .upgrade-inner .card-background.booster-foil::before {
   content: "";
@@ -963,6 +990,13 @@ canvas#glcanvas {
   color: white;
   background-color: #fe4d40;
 }
+.upgrade-wrapper .upgrade-desc .type.desc-negative,
+.upgrade-wrapper .upgrade-desc .rarity.desc-negative,
+.boss-wrapper .upgrade-desc .type.desc-negative,
+.boss-wrapper .upgrade-desc .rarity.desc-negative {
+  color: black;
+  background-color: #00d0ff;
+}
 .upgrade-wrapper .upgrade-desc.pos-left,
 .boss-wrapper .upgrade-desc.pos-left {
   right: 110%;
@@ -1000,6 +1034,10 @@ canvas#glcanvas {
 .boss-wrapper .upgrade-desc.pos-bottom:not(.pos-center) {
   top: 0;
   transform: scale(0.9);
+}
+.upgrade-wrapper .upgrade-desc,
+.boss-wrapper .upgrade-desc {
+  text-align: center;
 }
 .upgrade-wrapper:hover .upgrade-desc,
 .boss-wrapper:hover .upgrade-desc {
@@ -1383,6 +1421,11 @@ canvas#glcanvas {
 .tile .upgrade-desc .rarity.rare {
   color: white;
   background-color: #fe4d40;
+}
+.tile .upgrade-desc .type.desc-negative,
+.tile .upgrade-desc .rarity.desc-negative {
+  color: black;
+  background-color: #00d0ff;
 }
 .tile .upgrade-desc.pos-left {
   right: 110%;

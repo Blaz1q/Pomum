@@ -18,6 +18,7 @@ import { upgradesList } from "../entityData/upgradelist.js";
 import { Consumable } from "../entities/Consumable.js";
 import { Voucher } from "../entities/Voucher.js";
 import { ConsumablePack } from "../entities/ConsumablePack.js";
+import { animateWave, initBalatroEffect } from "../utils/animate_text.js";
 export class RenderUI {
   constructor(game) {
     this.game = game;
@@ -65,9 +66,14 @@ export class RenderUI {
       };
 
       requestAnimationFrame(animate);
+      setTimeout(() => {
+        initBalatroEffect(document.getElementById("money"));
+      },300);
     };
 
     animateNumber(moneyBox, start, end);
+
+    
   }
   updateMoney(ammount) {
     let moneyContainer = document.getElementsByClassName("moneycontainer")[0];
@@ -246,6 +252,7 @@ displayTempScore() {
   displayBoosterAmmount() {
     document.getElementById("booster-amount").innerHTML =
       "Wybierz swoje karty. Pozostało: " + this.game.BuysFromBoosterLeft;
+      animateWave(document.getElementById("booster-amount"));
   }
   showMenu() {
     document.getElementById("menu").style.display = "flex";
@@ -930,6 +937,7 @@ function setdifficulty(action) {
         void label.offsetWidth; // Magiczna linijka resetująca animację
         label.classList.add('pop-anim');
     }
+    animateWave(document.getElementById("poziom_trudnosci"));
 }
 
 window.toggleOldFruits = toggleOldFruits;

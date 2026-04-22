@@ -955,7 +955,7 @@ export const upgradeBlueprints = [
       },
       onMove(payload) {
         const matches = payload.matches;
-        //if (game.consumables.length >= game.maxConsumables) return UPGRADE_STATES.Failed;
+        if (game.consumables.length >= game.maxConsumables) return UPGRADE_STATES.Failed;
         if (this.props.tried == true) return UPGRADE_STATES.Failed;
         console.log(matches);
         let match = matches.filter(m => m.type === TYPES.Fruit);

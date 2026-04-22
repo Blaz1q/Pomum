@@ -1,4 +1,5 @@
 import { MODIFIERS, UPGRADE_RARITY, Style, GAME_TRIGGERS, UPGRADE_STATES } from "../dictionary.js";
+import { initBalatroEffect } from "../utils/animate_text.js";
 export class UpgradeRenderer {
   constructor(upgrade, gameRenderer) {
     this.upgrade = upgrade;
@@ -28,13 +29,13 @@ export class UpgradeRenderer {
 
     wrapper.addEventListener("mouseenter", () => (wrapper.style.zIndex = 500));
     wrapper.addEventListener("mouseleave", () => (wrapper.style.zIndex = this.originalZ));
-    
+
     if (displayButtons) {
-        wrapper.addEventListener("click", (e) => {
-            // Jeśli karta była przesunięta o więcej niż 5px, nie otwieraj menu
-            if (this.dragStarted) return; 
-            this.displayButtons();
-        });
+      wrapper.addEventListener("click", (e) => {
+        // Jeśli karta była przesunięta o więcej niż 5px, nie otwieraj menu
+        if (this.dragStarted) return;
+        this.displayButtons();
+      });
     }
 
     wrapper.className = "upgrade-wrapper";
@@ -54,36 +55,38 @@ export class UpgradeRenderer {
     // 2. Kontener na naklejki (Osobno, by nie dziedziczyć filtrów)
     const stickersContainer = document.createElement("div");
     stickersContainer.className = "sticker-container";
-    if(upgrade.stickers){
-        upgrade.stickers.forEach(sticker => {
-            stickersContainer.appendChild(sticker.render());
-        });
+    if (upgrade.stickers) {
+      upgrade.stickers.forEach(sticker => {
+        stickersContainer.appendChild(sticker.render());
+      });
     }
 
     // Logika klas wizualnych
     let classes = [];
     if (upgrade.negative) classes.push("negative");
-    if (upgrade.modifier !== MODIFIERS.None){
+    if (upgrade.modifier == MODIFIERS.Chip) {
+      classes.push("chip-foil");
+    }
+    else if (upgrade.modifier == MODIFIERS.Mult) {
       classes.push("holo");
       classes.push("shine");
     }
-    
     if (upgrade?.active === false) classes.push("inactive");
-    
+
     // Nakładamy klasy na tło, a nie na cały kontener inner
     classes.forEach(cls => cardBackground.classList.add(cls));
 
     if (classes.length > 0) {
-        if (!this.bought) {
-            wrapper.classList.add("triggered");
-            const sound = upgrade.negative ? "foil_reverse.mp3" : "foil.mp3";
-            this.gameRenderer.game.Audio.playSound(sound);
-            this.gameRenderer.game.Audio.playSound("tick.mp3");
+      if (!this.bought) {
+        wrapper.classList.add("triggered");
+        const sound = upgrade.negative ? "foil_reverse.mp3" : "foil.mp3";
+        this.gameRenderer.game.Audio.playSound(sound);
+        this.gameRenderer.game.Audio.playSound("tick.mp3");
 
-            setTimeout(() => wrapper.classList.remove("triggered"), 300);
-        }
+        setTimeout(() => wrapper.classList.remove("triggered"), 300);
+      }
     }
-    switch(upgrade?.type){
+    switch (upgrade?.type) {
       case "ConsumablePack":
         cardBackground.classList.add("booster-foil");
         break;
@@ -110,43 +113,44 @@ export class UpgradeRenderer {
 
     const desc = document.createElement("div");
     desc.className = "upgrade-desc";
-    desc.innerHTML = this.createDescription();
+    desc.appendChild(this.createDescription());
 
-    
-    
-   wrapper.addEventListener("mouseenter", () => {
-    desc.innerHTML = this.createDescription();
-    
-    // 1. Pobierz dane o położeniu karty i oknie przeglądarki
-    const cardRect = wrapper.getBoundingClientRect();
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
 
-    // Zakładana szerokość/wysokość Twojego opisu (możesz też zmierzyć desc.offsetWidth)
-    const descWidth = desc.offsetWidth; 
-    const descHeight = desc.offsetHeight; 
 
-    // Resetujemy klasy pozycjonujące przed nowym obliczeniem
-    desc.classList.remove('pos-right', 'pos-left', 'pos-top', 'pos-bottom');
+    wrapper.addEventListener("mouseenter", () => {
+      desc.innerHTML = "";
+      desc.appendChild(this.createDescription());
 
-    // --- LOGIKA POZIOMA (Lewo/Prawo) ---
-    // Jeśli po lewej stronie karty jest mniej miejsca niż szerokość opisu + margines
-    if (cardRect.left < descWidth + 20) {
+      // 1. Pobierz dane o położeniu karty i oknie przeglądarki
+      const cardRect = wrapper.getBoundingClientRect();
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+
+      // Zakładana szerokość/wysokość Twojego opisu (możesz też zmierzyć desc.offsetWidth)
+      const descWidth = desc.offsetWidth;
+      const descHeight = desc.offsetHeight;
+
+      // Resetujemy klasy pozycjonujące przed nowym obliczeniem
+      desc.classList.remove('pos-right', 'pos-left', 'pos-top', 'pos-bottom');
+
+      // --- LOGIKA POZIOMA (Lewo/Prawo) ---
+      // Jeśli po lewej stronie karty jest mniej miejsca niż szerokość opisu + margines
+      if (cardRect.left < descWidth + 20) {
         desc.classList.add('pos-right'); // Pokaż po prawej stronie karty
-    } else {
+      } else {
         desc.classList.add('pos-left');  // Domyślnie: po lewej stronie karty
-    }
+      }
 
-    // --- LOGIKA PIONOWA (Góra/Dół) ---
-    // Jeśli karta jest za blisko dolnej krawędzi ekranu
-    if (screenHeight - cardRect.bottom < 50) {
+      // --- LOGIKA PIONOWA (Góra/Dół) ---
+      // Jeśli karta jest za blisko dolnej krawędzi ekranu
+      if (screenHeight - cardRect.bottom < 50) {
         desc.classList.add('pos-top');    // Przylep dół opisu do dołu karty
-    } 
-    // Jeśli karta jest za blisko górnej krawędzi
-    else if (cardRect.top < 50) {
+      }
+      // Jeśli karta jest za blisko górnej krawędzi
+      else if (cardRect.top < 50) {
         desc.classList.add('pos-bottom'); // Przylep górę opisu do góry karty
-    }
-});
+      }
+    });
 
     if (displayPrice) wrapper.appendChild(priceEl);
     wrapper.appendChild(card);
@@ -154,151 +158,178 @@ export class UpgradeRenderer {
     if (displayButtons) wrapper.appendChild(this.createButtons(params));
 
     this.dragThreshold = 5;
-      const onMouseDown = (e) => {
-            this.isDragging = true;
-            this.dragStarted = false;
-            this.startX = e.clientX;
-            this.startY = e.clientY;
-            this.lastMouseX = e.clientX;
-            
-            window.addEventListener("mousemove", this._mouseMoveHandler);
-            window.addEventListener("mouseup", this._mouseUpHandler);
-        };
+    const onMouseDown = (e) => {
+      this.isDragging = true;
+      this.dragStarted = false;
+      this.startX = e.clientX;
+      this.startY = e.clientY;
+      this.lastMouseX = e.clientX;
+
+      window.addEventListener("mousemove", this._mouseMoveHandler);
+      window.addEventListener("mouseup", this._mouseUpHandler);
+    };
     wrapper.addEventListener("mousedown", onMouseDown);
-    
+
     return wrapper;
-}
+  }
   createDescription() {
     const upgrade = this.upgrade;
-    
+
+    // Tworzymy główny kontener
+    const container = document.createElement('div');
+    container.className = 'description-wrapper';
+
     // 1. Sekcja TYTUŁU
-    let html = `<div class="title">${upgrade.name}</div>`;
-    
-    // 2. Sekcja TREŚCI (Content) - zbieramy tu opis i dodatkowe efekty
-    html += `<div class="content">`;
-    
-    // Główny opis działania karty
-    html += `<p>${upgrade.description(this.gameRenderer.game)}</p>`;
-    
-    // Modyfikator (jeśli istnieje)
-    // Dodatkowy wiersz, jeśli karta jest negatywna
-    
-    
-    html += `</div>`; // Zamknięcie .content
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = upgrade.name;
+    container.appendChild(title);
 
-    // 3. Sekcja RZADKOŚCI / TYPU (Stopka na samym dole)
-    // Łączymy rzadkość i ewentualne inne tagi techniczne w jednej linii
-    if (upgrade.rarity != UPGRADE_RARITY.None) {
-        html += `<div class="rarity ${upgrade.rarity.class}">`;
-        html += `<span>${upgrade.rarity.display}</span>`;
-        
-        // Jeśli masz określony typ (np. Joker, Voucher), możesz go tu dodać:
-        // html += ` / <span class="type-tag">Joker</span>`;
-        
-        html += `</div>`;
+    // Inicjujemy animację od razu (bo element już istnieje w pamięci)
+    initBalatroEffect(title);
+
+    // 2. Sekcja TREŚCI
+    const content = document.createElement('div');
+    content.className = 'content';
+
+    const descP = document.createElement('p');
+    // Wstrzykujemy Twój HTML z tagami <b>
+    descP.innerHTML = upgrade.description(this.gameRenderer.game);
+
+    // ZBIERAMY WSZYSTKIE ELEMENTY DO ANIMACJI
+    // Szukamy <b>, <span>, <i> i innych tagów, które mogą być w opisie
+
+    content.appendChild(descP);
+    container.appendChild(content);
+
+    // 3. Sekcja STOPKI (Footer)
+    const footer = document.createElement('div');
+    footer.className = 'footer';
+
+    // Rzadkość
+    if (upgrade.rarity !== UPGRADE_RARITY.None) {
+      const rarityDiv = document.createElement('div');
+      rarityDiv.className = `rarity ${upgrade.rarity.class}`;
+      rarityDiv.textContent = upgrade.rarity.display;
+
+      footer.appendChild(rarityDiv);
     }
+
+    // Negatywność
     if (upgrade.negative === true) {
-        html += `<span class="type desc-negative">Negative</span>`;
+      const negSpan = document.createElement('div');
+      negSpan.className = 'type desc-negative';
+      negSpan.textContent = 'Negative';
+
+      footer.appendChild(negSpan);
     }
-    if (upgrade.modifier != MODIFIERS.None) {
-        html += `<span class="type ${upgrade.modifier}">${upgrade.modifier}</span>`;
+
+    // Modyfikator
+    if (upgrade.modifier !== MODIFIERS.None) {
+      const modSpan = document.createElement('div');
+      modSpan.className = `type ${upgrade.modifier}`;
+      modSpan.textContent = upgrade.modifier;
+
+      footer.appendChild(modSpan);
     }
 
-    return html;
-}
-        onMouseMove(e){
-            if (!this.isDragging) return;
-            const wrapper = this.upgrade.wrapper;
-            const deltaX = e.clientX - this.startX;
-            const deltaY = e.clientY - this.startY;
+    container.appendChild(footer);
 
-            if (!this.dragStarted && (Math.abs(deltaX) > this.dragThreshold || Math.abs(deltaY) > this.dragThreshold)) {
-                wrapper.style.transition = "none";
-                this.dragStarted = true;
-                wrapper.classList.add("dragging");
-                wrapper.classList.remove("returning");
-                wrapper.style.zIndex = 1000;
-            }
+    return container; // Zwracamy obiekt DOM, a nie string!
+  }
+  onMouseMove(e) {
+    if (!this.isDragging) return;
+    const wrapper = this.upgrade.wrapper;
+    const deltaX = e.clientX - this.startX;
+    const deltaY = e.clientY - this.startY;
 
-            if (this.dragStarted) {
-                const mouseVelocity = e.clientX - this.lastMouseX;
-                this.lastMouseX = e.clientX;
-                this.currentRotation = Math.max(Math.min(mouseVelocity * 0.5, 20), -20);
-                wrapper.style.transform = `translate(${deltaX}px, ${deltaY}px) rotateZ(${this.currentRotation}deg)`;
+    if (!this.dragStarted && (Math.abs(deltaX) > this.dragThreshold || Math.abs(deltaY) > this.dragThreshold)) {
+      wrapper.style.transition = "none";
+      this.dragStarted = true;
+      wrapper.classList.add("dragging");
+      wrapper.classList.remove("returning");
+      wrapper.style.zIndex = 1000;
+    }
 
-                // Podświetlanie celu
-                const target = this.getCardUnderCursor(e.clientX, e.clientY);
-                document.querySelectorAll('.upgrade-wrapper').forEach(el => el.classList.remove('drag-over'));
-                if (target && target !== wrapper) target.classList.add('drag-over');
-            }
-        };
-  onMouseUp(e){
-        
-        if (!this.isDragging) return;
-        console.log(this);
-        const wrapper = this.upgrade.wrapper
-        const wasActuallyDragged = this.dragStarted;
-        this.isDragging = false;
-        this.dragStarted = false;
-        if (wasActuallyDragged) {
-            e.stopPropagation();
-            wrapper.classList.remove("dragging");
+    if (this.dragStarted) {
+      const mouseVelocity = e.clientX - this.lastMouseX;
+      this.lastMouseX = e.clientX;
+      this.currentRotation = Math.max(Math.min(mouseVelocity * 0.5, 20), -20);
+      wrapper.style.transform = `translate(${deltaX}px, ${deltaY}px) rotateZ(${this.currentRotation}deg)`;
 
-            const container = wrapper.parentElement;
-            // Szukamy karty, która ma klasę drag-over
-            const targetWrapper = container?.querySelector('.drag-over');
+      // Podświetlanie celu
+      const target = this.getCardUnderCursor(e.clientX, e.clientY);
+      document.querySelectorAll('.upgrade-wrapper').forEach(el => el.classList.remove('drag-over'));
+      if (target && target !== wrapper) target.classList.add('drag-over');
+    }
+  };
+  onMouseUp(e) {
 
-            if (targetWrapper && targetWrapper !== wrapper) {
-                // Usuwamy klasę podświetlenia
-                targetWrapper.classList.remove('drag-over');
+    if (!this.isDragging) return;
+    console.log(this);
+    const wrapper = this.upgrade.wrapper
+    const wasActuallyDragged = this.dragStarted;
+    this.isDragging = false;
+    this.dragStarted = false;
+    if (wasActuallyDragged) {
+      e.stopPropagation();
+      wrapper.classList.remove("dragging");
 
-                const children = [...container.children];
-                const draggedIndex = children.indexOf(wrapper);
-                const targetIndex = children.indexOf(targetWrapper);
+      const container = wrapper.parentElement;
+      // Szukamy karty, która ma klasę drag-over
+      const targetWrapper = container?.querySelector('.drag-over');
 
-                // 1. Snapshot dla animacji FLIP
-                const oldPositions = this.gameRenderer.getPositions(container);
+      if (targetWrapper && targetWrapper !== wrapper) {
+        // Usuwamy klasę podświetlenia
+        targetWrapper.classList.remove('drag-over');
 
-                // 2. Zamiana miejsc w DOM
-                if (draggedIndex < targetIndex) {
-                    container.insertBefore(wrapper, targetWrapper.nextSibling);
-                } else {
-                    container.insertBefore(wrapper, targetWrapper);
-                }
+        const children = [...container.children];
+        const draggedIndex = children.indexOf(wrapper);
+        const targetIndex = children.indexOf(targetWrapper);
 
-                // 3. Reset stylów i odpalenie animacji reorder
-                wrapper.style.transform = "";
-                this.currentRotation = 0;
-                this.gameRenderer.animateReorder(oldPositions);
+        // 1. Snapshot dla animacji FLIP
+        const oldPositions = this.gameRenderer.getPositions(container);
 
-                // 4. Aktualizacja logiki gry
-                if(this.bought){
-                  const movedUpgrade = this.gameRenderer.game.upgrades.splice(draggedIndex, 1)[0];
-                this.gameRenderer.game.upgrades.splice(targetIndex, 0, movedUpgrade);
-                this.gameRenderer.game.emit(GAME_TRIGGERS.onUpgradesChanged);
-                this.gameRenderer.displayUpgradesCounter();
-                }
-            } else {
-                // Brak celu -> Powrót z bouncem
-                const style = window.getComputedStyle(wrapper);
-                const matrix = new WebKitCSSMatrix(style.transform);
-                wrapper.style.setProperty('--drag-x', `${matrix.m41}px`);
-                wrapper.style.setProperty('--drag-y', `${matrix.m42}px`);
-                wrapper.style.setProperty('--last-tilt', `${this.currentRotation}deg`);
-               
-                wrapper.classList.add("returning");
-                setTimeout(() => {
-                    if (!this.isDragging) {
-                        wrapper.classList.remove("returning");
-                        wrapper.style.transform = "";
-                        wrapper.style.zIndex = this.originalZ;
-                    }
-                }, 400);
-            }
-              window.removeEventListener("mousemove", this._mouseMoveHandler);
-              window.removeEventListener("mouseup", this._mouseUpHandler);
+        // 2. Zamiana miejsc w DOM
+        if (draggedIndex < targetIndex) {
+          container.insertBefore(wrapper, targetWrapper.nextSibling);
+        } else {
+          container.insertBefore(wrapper, targetWrapper);
         }
-    };
+
+        // 3. Reset stylów i odpalenie animacji reorder
+        wrapper.style.transform = "";
+        this.currentRotation = 0;
+        this.gameRenderer.animateReorder(oldPositions);
+
+        // 4. Aktualizacja logiki gry
+        if (this.bought) {
+          const movedUpgrade = this.gameRenderer.game.upgrades.splice(draggedIndex, 1)[0];
+          this.gameRenderer.game.upgrades.splice(targetIndex, 0, movedUpgrade);
+          this.gameRenderer.game.emit(GAME_TRIGGERS.onUpgradesChanged);
+          this.gameRenderer.displayUpgradesCounter();
+        }
+      } else {
+        // Brak celu -> Powrót z bouncem
+        const style = window.getComputedStyle(wrapper);
+        const matrix = new WebKitCSSMatrix(style.transform);
+        wrapper.style.setProperty('--drag-x', `${matrix.m41}px`);
+        wrapper.style.setProperty('--drag-y', `${matrix.m42}px`);
+        wrapper.style.setProperty('--last-tilt', `${this.currentRotation}deg`);
+
+        wrapper.classList.add("returning");
+        setTimeout(() => {
+          if (!this.isDragging) {
+            wrapper.classList.remove("returning");
+            wrapper.style.transform = "";
+            wrapper.style.zIndex = this.originalZ;
+          }
+        }, 400);
+      }
+      window.removeEventListener("mousemove", this._mouseMoveHandler);
+      window.removeEventListener("mouseup", this._mouseUpHandler);
+    }
+  };
   displayButtons() {
     console.log("clicked");
     // 1. Sprawdzamy, czy ten konkretny wrapper jest już "podniesiony"
@@ -317,7 +348,7 @@ export class UpgradeRenderer {
         wrapper.style.transition = "transform 0.05s ease-out";
         wrapper.style.transform = "translateY(-20px)";
         wrapper.classList.add("SelectedUpgrade");
-        
+
         game.Audio.playSound("select.mp3")
         const buttonsContainer = wrapper.querySelector(".consumable-buttons");
 
@@ -329,7 +360,7 @@ export class UpgradeRenderer {
         this.refreshAllButtons();
         // Pobieramy wszystkie przyciski wewnątrz kontenera do tablicy
       });
-    }else{
+    } else {
       game.Audio.playSound("deselect.mp3")
     }
   }
@@ -347,7 +378,7 @@ export class UpgradeRenderer {
       if (upgrade.canBuy(game) == false) {
         return false;
       }
-     // const shopWrapper = wrapper;
+      // const shopWrapper = wrapper;
       success = game.buy(upgrade);
       console.log(success);
       if (success && params.origin && params.origin.type == "ConsumablePack") {
@@ -366,10 +397,10 @@ export class UpgradeRenderer {
         return;
       }
       if (success) {
-        if(upgrade.type=="Voucher"){
+        if (upgrade.type == "Voucher") {
           this.removeButtons();
           game.GameRenderer.dissolveAndRemove(wrapper, 1000);
-        }else{
+        } else {
           game.GameRenderer.fadeOutAndRemove(wrapper);
         }
         //shopWrapper.remove();
@@ -434,12 +465,12 @@ export class UpgradeRenderer {
     btnSell.textContent = "Sprzedaj";
     btnSell.addEventListener("click", (e) => {
       e.stopPropagation();
-      if(!upgrade.canSell(game)){
-          game.GameRenderer.notEnoughSpace(
-            document.getElementById("player-upgrades-container"),
-          );
-          return false;
-      } 
+      if (!upgrade.canSell(game)) {
+        game.GameRenderer.notEnoughSpace(
+          document.getElementById("player-upgrades-container"),
+        );
+        return false;
+      }
       if (this.gameRenderer.game.sell(upgrade)) {
         //this.refreshBuyButtons();
         game.GameRenderer.fadeOutAndRemove(wrapper);
@@ -520,13 +551,13 @@ export class UpgradeRenderer {
         btnUse.classList.add("disabled");
       }
     }
-    if(btnSell){
-      if(!canSell){
+    if (btnSell) {
+      if (!canSell) {
         btnSell.classList.add("disabled");
       }
     }
   }
-  createPopup(text, style = "mult",duration = 400) {
+  createPopup(text, style = "mult", duration = 400) {
     const targetElement = this.upgrade.wrapper;
     if (!targetElement) return;
     //console.log("adding!!");
@@ -563,7 +594,7 @@ export class UpgradeRenderer {
     // Fade out & remove
     setTimeout(() => {
       popup.style.opacity = "0";
-      setTimeout(() => popup.remove(), duration-50);
+      setTimeout(() => popup.remove(), duration - 50);
     }, duration);
   }
   trigger(time, action = UPGRADE_STATES.Active) {
@@ -576,7 +607,7 @@ export class UpgradeRenderer {
     let upgradecard = upgrade.wrapper;
     //let upgradecard = this.getPlayerUpgrades(index);
     const descElement = upgradecard.querySelector(".upgrade-desc");
-    descElement.innerHTML = this.createDescription();
+    descElement.appendChild(this.createDescription());
 
     const upgradePrice = upgradecard.querySelector(".upgrade-price");
     upgradePrice.innerHTML = "$" + upgrade.sellPrice;
@@ -611,26 +642,26 @@ export class UpgradeRenderer {
     }
   }
   getCardUnderCursor(clientX, clientY) {
-        const container = this.upgrade.wrapper.parentElement;
-        if (!container) return null;
+    const container = this.upgrade.wrapper.parentElement;
+    if (!container) return null;
 
-        const cards = [...container.querySelectorAll('.upgrade-wrapper:not(.dragging)')];
-        let closestCard = null;
-        let minDistance = Infinity;
+    const cards = [...container.querySelectorAll('.upgrade-wrapper:not(.dragging)')];
+    let closestCard = null;
+    let minDistance = Infinity;
 
-        cards.forEach(card => {
-            const rect = card.getBoundingClientRect();
-            const cardCenterX = rect.left + rect.width / 2;
-            const cardCenterY = rect.top + rect.height / 2;
-            const distance = Math.hypot(clientX - cardCenterX, clientY - cardCenterY);
+    cards.forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const cardCenterX = rect.left + rect.width / 2;
+      const cardCenterY = rect.top + rect.height / 2;
+      const distance = Math.hypot(clientX - cardCenterX, clientY - cardCenterY);
 
-            if (distance < minDistance && distance < 180) { 
-                minDistance = distance;
-                closestCard = card;
-            }
-        });
-        return closestCard;
-    }
+      if (distance < minDistance && distance < 180) {
+        minDistance = distance;
+        closestCard = card;
+      }
+    });
+    return closestCard;
+  }
   update(params = { bought: true, origin: null }) {
 
     const upgrade = this.upgrade;
@@ -646,7 +677,7 @@ export class UpgradeRenderer {
     this.trigger(300);
     this.gameRenderer.game.Audio.playSound("tick.mp3");
   }
-  removeButtons(){
+  removeButtons() {
     const wrapper = this.upgrade.wrapper;
     const buttonsContainer = wrapper.querySelector(".consumable-buttons");
     buttonsContainer.innerHTML = "";
@@ -718,5 +749,5 @@ export class UpgradeRenderer {
     });
   */
   }
-    
+
 }

@@ -133,6 +133,10 @@ $button-hover-dark: #a18787;
       color: white;
       background-color: $rarity-rare;
     }
+    &.desc-negative {
+      color: black;
+      background-color: #00d0ff
+    }
   }
 
   &.pos-left {
@@ -652,6 +656,7 @@ canvas#glcanvas {
         background: light-dark($shop-bg-light, $shop-bg-dark);
         transition: background 0.1s;
         min-height: $cardHeight;
+        text-align: center;
 
         @media (max-width: 1024px) {
           min-height: $cardHeight-sm;
@@ -1059,7 +1064,44 @@ canvas#glcanvas {
 
           }
         }
+        &.chip-foil {
+  overflow: hidden; // To upewnia się, że nic nie wyjdzie poza ramkę
+  
+  // NAKŁADAMY MASKĘ TUTAJ (na całą kartę)
+  // Dzięki temu wszystko, co jest wewnątrz (w tym ::after), 
+  // będzie docięte do kształtu karty.
+  -webkit-mask-image: var(--card-img);
+  mask-image: var(--card-img);
+  -webkit-mask-size: cover;
+  mask-size: cover;
 
+  &::after {
+    content: "";
+    position: absolute;
+    
+    // Tworzymy duży kwadrat z zapasem na rotację, 
+    // aby rogi tła nie "wchodziły" w kadr
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    z-index: 5;
+
+    // GRAFIKA: 300x300px bez rozciągania
+    background-image: url('../images/icons/chip.png');
+    background-repeat: repeat; // Powtarza wzór 300x300 płynnie
+    background-size: 300px 300px; // Sztywne wymiary oryginału
+    
+    // POZYCJONOWANIE I ROTACJA
+    // Center sprawia, że środek obrotu jest na środku karty
+    background-position: center; 
+    transform: rotate(calc(var(--shine-x) * 0.4deg + var(--shine-y) * 0.4deg));
+    
+    mix-blend-mode:normal; // Twój wybrany tryb
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
         &.booster-foil {
           // 1. DELIKATNY EFEKT KOLORYSTYCZNY (TŁO)
           &::before {
@@ -1141,6 +1183,7 @@ canvas#glcanvas {
 
   .upgrade-desc {
     @include cool-desc;
+    text-align: center;
   }
 
   // Aktywacja hovera z efektem "pop"

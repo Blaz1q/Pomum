@@ -18,6 +18,7 @@ import { Stats } from "./utils/Stats.js";
 import { Queue } from "./utils/Queue.js"
 
 import { TriggerManager } from "./managers/TriggerManager.js";
+import { animateWave, initBalatroEffect } from "./utils/animate_text.js";
 
 const CELL_PX = 50;
 let FADE_MS = Settings.FADE_MS;
@@ -1107,7 +1108,7 @@ function animateholo() {
     requestAnimationFrame(animateholo);
 }
 animateholo();
-
+animateWave(document.getElementById("poziom_trudnosci"));
 window.showMenu = showMenu;
 window.changeGameSpeed = changeGameSpeed;
 window.skip = skip;
