@@ -1619,14 +1619,32 @@ export const upgradeBlueprints = [
   image: "demencja",
   price: 4,
   priority: PRIORITY.REPEAT
-}
-  /*
-  {
-    name: "",
-    descriptionfn(game){
-      //ulepszenie które retriggeruje coś ale jeszcze nie wiem
+},
+{
+  name: "Żyletka",
+  descriptionfn: `Losowy rząd zostaje zniszczony przy pierwszym ruchu.`,
+  props: () => ({
+    used: false,
+    onMove(payload) {
+      if (this.props.used) return UPGRADE_STATES.Failed;
+      this.props.used = true;
+
+      const row = Math.floor(Math.random() * game.board.length);
+      const tiles = game.board[row];
+
+      tiles.forEach(tile => payload.matches.push(tile));
+
+      return { state: UPGRADE_STATES.Active, message: "SLICE!", style: SCORE_ACTIONS.Info };
+    },
+    onRoundEnd() {
+      this.props.used = false;
+      return UPGRADE_STATES.Active;
     }
-  }*/
+  }),
+  price: 6,
+  image: 'razor',
+  ...UNCOMMON
+}
 ];
 
 
