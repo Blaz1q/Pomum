@@ -1,6 +1,28 @@
-import { animate,stagger } from 'https://esm.sh/animejs';
+import { animate,stagger } from '../libs/animejs/index.js';
 
 
+export function fadeInAndBalatro(element){
+    if (!element) return;
+    fadeIn(element).then(()=>{
+        initBalatroEffect(element)
+    });
+}
+
+export function fadeIn(element){
+    if (!element) return;
+    prepareElement(element);
+    
+    const chars = element.querySelectorAll('.char');
+
+    return animate(chars, {
+        // Definiujemy pełny cykl góra -> dół -> powrót
+        // Kluczem jest brak wartości 0 w środku, co eliminowało "czkawkę"
+        opacity: [0,1],
+        easing: 'linear',
+        duration: 100,
+        delay: stagger(25)
+    });
+}
 export function animateWave(element) {
     if (!element) return;
     prepareElement(element);

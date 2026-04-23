@@ -1,5 +1,5 @@
 import { MODIFIERS, UPGRADE_RARITY, Style, GAME_TRIGGERS, UPGRADE_STATES } from "../dictionary.js";
-import { initBalatroEffect } from "../utils/animate_text.js";
+import { fadeInAndBalatro, initBalatroEffect } from "../utils/animate_text.js";
 export class UpgradeRenderer {
   constructor(upgrade, gameRenderer) {
     this.upgrade = upgrade;
@@ -186,7 +186,7 @@ export class UpgradeRenderer {
     container.appendChild(title);
 
     // Inicjujemy animację od razu (bo element już istnieje w pamięci)
-    initBalatroEffect(title);
+    fadeInAndBalatro(title);
 
     // 2. Sekcja TREŚCI
     const content = document.createElement('div');

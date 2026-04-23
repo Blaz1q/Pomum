@@ -955,8 +955,9 @@ export const upgradeBlueprints = [
       },
       onMove(payload) {
         const matches = payload.matches;
-        if (game.consumables.length >= game.maxConsumables) return UPGRADE_STATES.Failed;
         if (this.props.tried == true) return UPGRADE_STATES.Failed;
+        this.props.tried = true;
+        if (game.consumables.length >= game.maxConsumables) return { state: UPGRADE_STATES.Tried, message: `Brak miejsca!`, style: SCORE_ACTIONS.Info };
         console.log(matches);
         let match = matches.filter(m => m.type === TYPES.Fruit);
         const firstFruit = match[0] ?? null; //fix this
@@ -968,7 +969,6 @@ export const upgradeBlueprints = [
         game.Audio.playSound('pop.mp3');
         game.GameRenderer.displayPlayerConsumables();
         game.GameRenderer.displayConsumablesCounter();
-        this.props.tried = true;
         return UPGRADE_STATES.Active;
       },
       onRoundEnd() {
