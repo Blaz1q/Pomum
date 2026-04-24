@@ -849,7 +849,7 @@ export const consumablePacks = [
   {
     name: "Pomumpack",
     descriptionfn() {
-      return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+      return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },
     consumables: pomumpackItems,
     price: 4,
@@ -862,7 +862,7 @@ export const consumablePacks = [
   {
     name: "Poumpack BIG",
     descriptionfn() {
-      return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+      return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },
     consumables: pomumpackItems,
     price: 6,
@@ -875,7 +875,7 @@ export const consumablePacks = [
   {
     name: "Poumpack MEGA",
     descriptionfn() {
-      return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+      return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },
     consumables: pomumpackItems,
     price: 8,
@@ -888,7 +888,7 @@ export const consumablePacks = [
   {
     name: "Pomumpack GOLD",
     descriptionfn() {
-      return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+      return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },
     consumables: consumableGoldBlueprints,
     price: 4,
@@ -901,7 +901,7 @@ export const consumablePacks = [
   {
     name: "Pomumpack SILVER",
     descriptionfn() {
-      return `Znajdują się ${this.props.maxRoll} karty ulepszeń kafelków. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+      return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },
     consumables: consumableSilverBlueprints,
     price: 4,
@@ -914,7 +914,7 @@ export const consumablePacks = [
   {
     name: "Pomumpack Upgrade",
     descriptionfn() {
-      return `Znajdują się ${this.props.maxRoll} karty ulepszeń. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+      return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('ulepszeń')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },
     consumables: upgradesList,
     price: 4,
@@ -926,8 +926,9 @@ export const consumablePacks = [
   },
   {
     name: "Tarot Pack",
+
     descriptionfn() {
-      return `Znajdują się ${this.props.maxRoll} karty tarota. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+      return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('tarota')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },
     consumables: tarotCards,
     price: 4,
@@ -940,7 +941,7 @@ export const consumablePacks = [
   {
     name: "Arcana Pack",
     descriptionfn() {
-      return `Znajdują się ${this.props.maxRoll} karty tarota. Możesz wybrać maksymalnie ${this.props.maxSelect}`;
+      return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('arcana')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },
     consumables: consumableUpgradeBlueprints,
     price: 4,
@@ -948,6 +949,7 @@ export const consumablePacks = [
       maxSelect: 1,
       maxRoll: 3,
     },
-    image: "tarot_pack",
+    image: "arcana_pack",
+    rarity: UPGRADE_RARITY.PomumPackRare
   }
 ];

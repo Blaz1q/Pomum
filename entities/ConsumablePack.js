@@ -10,7 +10,7 @@ export class ConsumablePack extends UpgradeBase {
     this.consumables = props.consumables;
     this.url = "./images/boosters/";
     this.type = "ConsumablePack";
-    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.Common;
+    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.PomumPackCommon;
   }
   canBuy() {
     this.notEnoughMoney();

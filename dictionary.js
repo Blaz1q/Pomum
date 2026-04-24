@@ -88,14 +88,14 @@ export const UPGRADE_RARITY = {
         class: 'rare' 
     },
     PomumPackCommon: { 
-        display: 'none', 
+        display: 'Common', 
         weight: 1, 
-        class: 'none' 
+        class: 'common' 
     },
     PomumPackRare: { 
-        display: 'none', 
-        weight: 0.5, 
-        class: 'none' 
+        display: 'Rare', 
+        weight: 0.4, 
+        class: 'rare' 
     },
     None: { 
         display: 'none', 
