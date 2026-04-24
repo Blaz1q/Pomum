@@ -607,6 +607,7 @@ export class UpgradeRenderer {
     let upgradecard = upgrade.wrapper;
     //let upgradecard = this.getPlayerUpgrades(index);
     const descElement = upgradecard.querySelector(".upgrade-desc");
+    descElement.innerHTML="";
     descElement.appendChild(this.createDescription());
 
     const upgradePrice = upgradecard.querySelector(".upgrade-price");
