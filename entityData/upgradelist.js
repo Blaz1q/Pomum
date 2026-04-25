@@ -96,7 +96,7 @@ export const upgradeBlueprints = [
 
   {
     name: "Bomber",
-    descriptionfn: `${Style.Score("+250 punktów")} za ruch, ${Style.Moves("-2 ruchy")}`,
+    descriptionfn: `${Style.Score("+250 pkt")} za ruch, ${Style.Moves("-2 ruchy")}`,
     effect(game) {
       game.moves -= 2;
       game.GameRenderer.displayMoves();
@@ -417,8 +417,11 @@ export const upgradeBlueprints = [
   {
     name: "GrapeInterest",
     descriptionfn(game) {
-      if (!this.props.isactive) return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+10 pkt")}`;
-      return `Każda ${game.fruits[3].icon} daje ${Style.Score("+5 pkt")}, na końcu rundy zyskuje kolejne ${Style.Score("+10 pkt")} (Obecnie ${Style.Score(`+${this.props.value} pkt`)}, ${Style.Score(`+${this.props.score} pkt do wyniku`)})`;
+      let wynik = "";      
+      if(this.props.score){
+        wynik = ` (Obecnie ${Style.Score(`+${this.props.score} pkt`)})`;
+      }
+      return `Każda ${game.fruits[3].icon} daje ${Style.Score(`+${this.props.value ?? 5} pkt`)}, na końcu rundy ulepsza się o ${Style.Score("+10 pkt")}.`+wynik;
     },
     props: () => ({
       value: 5,
@@ -458,8 +461,8 @@ export const upgradeBlueprints = [
   {
     name: "ChainReaction",
     descriptionfn(game) {
-      if (this.score && this.score > 0) return `Każda kaskada daje dodatkowe ${Style.Score("+30 punktów")}, (obecnie ${Style.Score(`+${this.props.score}`)})`;
-      return `Każda kaskada daje dodatkowe ${Style.Score("+30 punktów")}`;
+      if (this.score && this.score > 0) return `Każda kaskada daje dodatkowe ${Style.Score("+30 pkt")}, (obecnie ${Style.Score(`+${this.props.score}`)})`;
+      return `Każda kaskada daje dodatkowe ${Style.Score("+30 pkt")}`;
     },
     props: () => ({
       score: 0,
@@ -484,11 +487,11 @@ export const upgradeBlueprints = [
   {
     name: "Battlepass",
     descriptionfn(game) {
-      if (!this.props.isactive) return `${Style.Mult("+1 mult")}. na końcu rundy dostaje ${Style.Mult("+1 mult")}`;
-      return `${Style.Mult("+1 mult")}. na końcu rundy dostaje ${Style.Mult("+1 mult")}. obecnie ${Style.Mult("+" + this.props.mult + " mult")}`;
+      const mult = this.props.mult ?? 3;
+      return `Na końcu rundy dostaje ${Style.Mult("+1 mult")}. (obecnie ${Style.Mult("+" + this.props.mult + " mult")})`;
     },
     props: () => ({
-      mult: 1,
+      mult: 3,
       isactive: true,
       onScore() {
         game.mult += this.props.mult;
@@ -553,29 +556,21 @@ export const upgradeBlueprints = [
   {
     name: "Robber",
     descriptionfn(game) {
-      if (this.props.sellPriceMult !== 0 && this.bought) {
-        return `Daje + Mult ceny sprzedaży wszystkich kupionych ulepszeń. (Obecnie ${Style.Mult(`+${this.props.sellPriceMult} mult`)})`;
-      }
-      return `Daje + Mult ceny sprzedaży wszystkich kupionych ulepszeń.`;
+      return `Daje ${Style.Mult('mult')} za ${Style.Highlight('cenę sprzedaży')} wszystkich kupionych ulepszeń. (Obecnie ${Style.Mult(`+${this.props.calcMult()} mult`)}).`;
     },
     props: () => ({
-      sellPriceMult: 0,
-      onRoundStart() {
+      calcMult(){
         let x = 0;
         game.upgrades.forEach(upgrade => {
           x += upgrade.sellPrice;
         });
-        this.props.sellPriceMult = x;
-        return UPGRADE_STATES.Active;
-      },
-      onRoundEnd() {
-        this.sellPriceMult = 0;
-        return UPGRADE_STATES.Failed;
+        return x;
       },
       onScore() {
-        game.mult += this.props.sellPriceMult;
+        const mult = this.props.calcMult();
+        game.mult += mult;
         game.GameRenderer.displayTempScore();
-        return { state: UPGRADE_STATES.Score, message: `+${this.props.sellPriceMult} Mult`, style: SCORE_ACTIONS.Mult };
+        return { state: UPGRADE_STATES.Score, message: `+${mult} Mult`, style: SCORE_ACTIONS.Mult };
       },
     }),
 
@@ -730,8 +725,8 @@ export const upgradeBlueprints = [
   {
     name: "Money Maker",
     descriptionfn(game) {
-      if (this.bought) return `co kaskadę daje 3x punkty za trzymane $. (obecnie ${Style.Score(`+${game.money * 3} pkt co kaskadę`)}, ${Style.Score(`+${this.props.score} pkt`)})`;
-      return `co kaskadę daje 3x punkty za trzymane $. (obecnie ${Style.Score(`+${game.money * 3} pkt co kaskadę`)})`;
+      if (this.bought) return `Co kaskadę daje ${Style.Score('+3X pkt')} ${Style.Highlight('za posiadane')} ${Style.Money('$')}. (obecnie ${Style.Score(`+${game.money * 3} pkt`)} co kaskadę, ${Style.Score(`+${this.props.score} pkt`)})`;
+      return `Co kaskadę daje ${Style.Score('+3X pkt')} ${Style.Highlight('za posiadane')} ${Style.Money('$')}. (obecnie ${Style.Score(`+${game.money * 3} pkt`)} co kaskadę)`;
     },
     props: () => ({
       score: 0,
@@ -1162,7 +1157,7 @@ export const upgradeBlueprints = [
     name: "Pożeracz",
     descriptionfn(game) {
       var mult = this.props.mult ?? 1;
-      return `Na początku rundy niszczy ulepszenie po prawej stronie i zyskuje ${Style.Mult(`+ Mult`)} ceny sprzedaży ulepszenia. (Obecnie ${Style.Mult(`+${mult} Mult`)})`;
+      return `Na początku rundy niszczy ulepszenie ${Style.Highlight('po swojej prawej stronie')} i zyskuje ${Style.Mult(`mult`)} ${Style.Highlight('2X ceny sprzedaży')} ulepszenia. (Obecnie ${Style.Mult(`+${mult} Mult`)})`;
     },
     props: () => ({
       mult: 1,
@@ -1171,7 +1166,7 @@ export const upgradeBlueprints = [
         let destroyed = false;
         let gained
         if (neighbor != null) {
-          gained = neighbor.sellPrice;
+          gained = neighbor.sellPrice*2;
           const index = game.upgrades.indexOf(neighbor);
           destroyed = neighbor.remove(game);
           if(destroyed){
