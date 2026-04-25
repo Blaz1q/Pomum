@@ -347,14 +347,33 @@ export class Game {
         return Math.round((this.moves - this.movescounter) / 1.2);
     }
     calcRoundScore() {
-        let bonus = 0;
-        if (this.level > 1) {
-            bonus += Math.floor(Math.pow(1.5, this.level));
+        // 1. Obliczamy wartość bazową dla 20. rundy (punkt styku)
+        const scoreAtRound20 = Math.pow(1.5, 20) * 350 + (Math.pow(1.5, this.level) * 1000);
+        
+        let score = 0;
+
+        if (this.round <= 20) {
+            // Normalny wzrost do 20 rundy
+            score = Math.pow(1.5, this.round) * 350 + (this.level > 1 ? Math.pow(1.5, this.level) * 1000 : 0);
+        } else {
+            // Gwałtowny wzrost: startujemy z poziomu 20. rundy i mnożymy
+            const delta = this.round - 20;
+            const deltalvl = this.level - 4;
+            // Zmniejszyłem podstawę do 160, ponieważ teraz mnożymy to przez milion (wynik z 20 rundy).
+            // To da nam ok. 10^50 w 40. rundzie.
+            score = scoreAtRound20 * Math.pow(10, delta*deltalvl);
         }
-        if (this.level > 20) {
-            bonus += Math.floor(Math.pow(this.level * this.round, this.round));
-        }
-        return Math.floor(Math.pow(1.5, this.round) * 350) + bonus * 1000;
+
+        // Zaokrąglanie (uwaga: 1+this.level przy poziomie 50 da 51 cyfr znaczących, 
+        // co wyłączy zaokrąglanie, bo JS ma tylko 15-17 cyfr precyzji. 
+        // Proponuję stałe 3 lub 4 dla "ładnego" wyglądu).
+        return this.roundToSignificant(score, Math.min(1+this.level,3));
+    }
+
+    roundToSignificant(number, digits) {
+        if (number === 0 || !isFinite(number)) return number;
+        const multiplier = Math.pow(10, Math.floor(Math.log10(number)) - (digits - 1));
+        return Math.round(number / multiplier) * multiplier;
     }
     createElement(Tile) {
         return Tile.render(this);
