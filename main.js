@@ -641,15 +641,24 @@ export class Game {
     fill() {
         this.board = Array.from({ length: this.matrixsize }, () => Array(this.matrixsize).fill(null));
         this.boardarray = [];
+
         for (let y = 0; y < this.matrixsize; y++) {
             for (let x = 0; x < this.matrixsize; x++) {
                 let fruit;
                 do {
                     fruit = this.randomTile(x, y);
                 } while (
-                    (x >= 2 && this.board[y][x - 1] && this.board[y][x - 2] && this.board[y][x - 1].icon === fruit.icon && this.board[y][x - 2].icon === fruit.icon) ||
-                    (y >= 2 && this.board[y - 1][x] && this.board[y - 2][x] && this.board[y - 1][x].icon === fruit.icon && this.board[y - 2][x].icon === fruit.icon)
+                    // Sprawdzanie linii poziomej (3 w rzędzie)
+                    (x >= 2 && this.board[y][x - 1]?.icon === fruit.icon && this.board[y][x - 2]?.icon === fruit.icon) ||
+                    // Sprawdzanie linii pionowej (3 w rzędzie)
+                    (y >= 2 && this.board[y - 1][x]?.icon === fruit.icon && this.board[y - 2][x]?.icon === fruit.icon) ||
+                    // Sprawdzanie kwadratu 2x2 (lewy górny róg względem obecnego x,y)
+                    (x >= 1 && y >= 1 && 
+                    this.board[y][x - 1]?.icon === fruit.icon && 
+                    this.board[y - 1][x]?.icon === fruit.icon && 
+                    this.board[y - 1][x - 1]?.icon === fruit.icon)
                 );
+                
                 this.board[y][x] = fruit;
                 this.boardarray.push(this.board[y][x]);
             }

@@ -522,7 +522,7 @@ const tarotCards = [
   {
     name: "Kochankowie",
     descriptionfn(game) {
-      return `Cofa ${Style.Moves('2 ruchy')}`;
+      return `${Style.Moves('+2 ruchy')}`;
     },
     effect(game) {
       game.movescounter -= 2;

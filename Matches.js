@@ -354,6 +354,34 @@ getNeighborsForSpecial(tile) {
             }
             checkLine(column);
         }
+            for (let y = 0; y < size - 1; y++) {
+            for (let x = 0; x < size - 1; x++) {
+                const topLeft = board[y][x];
+                const topRight = board[y][x + 1];
+                const bottomLeft = board[y + 1][x];
+                const bottomRight = board[y + 1][x + 1];
+
+                // Sprawdzamy, czy wszystkie 4 istnieją i są owocami
+                if (topLeft && topRight && bottomLeft && bottomRight &&
+                    topLeft.type === TYPES.Fruit &&
+                    topRight.type === TYPES.Fruit &&
+                    bottomLeft.type === TYPES.Fruit &&
+                    bottomRight.type === TYPES.Fruit) {
+
+                    // Sprawdzamy, czy wszystkie mają tę samą ikonę
+                    const icon = topLeft.icon;
+                    if (topRight.icon === icon && 
+                        bottomLeft.icon === icon && 
+                        bottomRight.icon === icon) {
+                        
+                        matchedTiles.add(topLeft);
+                        matchedTiles.add(topRight);
+                        matchedTiles.add(bottomLeft);
+                        matchedTiles.add(bottomRight);
+                    }
+                }
+            }
+        }
 
         // Set automatycznie dba o unikalność referencji obiektów, 
         // więc nie potrzebujemy ręcznej deduplikacji po kluczu `${x},${y}`.
