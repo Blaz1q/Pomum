@@ -1209,7 +1209,7 @@ export const upgradeBlueprints = [
     name: "Liczydło",
     descriptionfn(game) {
       var mult = this.props.mult ?? 1;
-      return `Co 15 zniszczonych owoców ${Style.Mult(`+1 Mult`)}. (Obecnie ${Style.Mult(`${mult} Mult`)})`;
+      return `Co 15 zniszczonych owoców ${Style.Mult(`+1 Mult`)}. (Obecnie ${Style.Mult(`+${mult} Mult`)})`;
     },
     props: () => ({
       mult: 1,
