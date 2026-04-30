@@ -524,6 +524,7 @@ export class Game {
             this.emit(GAME_TRIGGERS.onUpgradesChanged);
         } else if (upgrade instanceof Consumable) {
             if (upgrade.negative) this.maxConsumables += 1;
+            upgrade.bought = true;
             this.consumables.push(upgrade);
             this.GameRenderer.displayPlayerConsumables();
         }

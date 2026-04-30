@@ -431,11 +431,14 @@ const tarotCards = [
         return `Daje ostatnią użytą kartę tarota. (Ostania: ${ostatnia})`;
       },
         canUse(){
-            return game.stats.usedTarots!=0&&game.stats.lastUsedTarot?.name != this.name;
+            let extra = this.bought ? 1 : 0;
+            console.log(extra);
+            return game.stats.usedTarots!=0&&game.stats.lastUsedTarot?.name!=this.name&&game.consumables.length < game.maxConsumables+extra;
         },
         effect(){
           const used_blueprint = tarotCards.filter((tarot) => tarot.name==game.stats?.lastUsedTarot?.name);
           let newTarot = new Tarot(used_blueprint[0]);
+          newTarot.bought = true;
           game.consumables.push(newTarot);
           game.GameRenderer.displayPlayerConsumables();
           game.GameRenderer.displayConsumablesCounter();
@@ -484,17 +487,31 @@ const tarotCards = [
             return `Daje 2 losowe karty tarota. (Musi mieć miejsce)`;
         },
         canUse(){
-            return game.consumables.length!=game.maxConsumables;
+            let extra = this.bought ? 1 : 0;
+            return game.consumables.length<game.maxConsumables+extra;
         },
         effect(game){
-          let i=0;
-          while(game.consumables.length<game.maxConsumables&&i<2){
-            const filter = tarotCards.filter((tarot) => tarot.name!=this.name);
-            const picked = Math.floor(Math.random() * filter.length);
-            const tarot = filter[picked];
-            const newTarot = new Tarot(tarot);
-            game.consumables.push(newTarot);
-            i++;
+          console.log(game.consumables.length);
+          let extra = this.bought ? 1 : 0;
+          console.log(extra)
+          const currentMax = game.maxConsumables + (extra);
+          
+          // 2. Liczymy, ile faktycznie możemy dodać kart (max 2, ale nie więcej niż wolne sloty)
+          const availableSlots = currentMax - game.consumables.length;
+          const cardsToAdd = Math.min(2, Math.max(0, availableSlots));
+          
+          // 3. Dodajemy karty
+          for (let i = 0; i < cardsToAdd; i++) {
+            const filter = tarotCards.filter((tarot) => tarot.name !== this.name);
+            
+            if (filter.length > 0&&game.consumables.length < currentMax) {
+              const picked = Math.floor(Math.random() * filter.length);
+              const tarotTemplate = filter[picked];
+              
+              const newTarot = new Tarot(tarotTemplate);
+              newTarot.bought = true;
+              game.consumables.push(newTarot);
+            }
           }
           game.GameRenderer.displayPlayerConsumables();
           game.GameRenderer.displayConsumablesCounter();

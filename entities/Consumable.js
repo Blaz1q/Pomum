@@ -8,9 +8,9 @@ export class Consumable extends UpgradeBase {
     this.url = "./images/consumables/";
     this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
     this.negative = false;
+    this.bought = false;
   }
   apply(game) {
-    this.bought = true;
     console.log(this);
     if (this.negative == true) {
       game.maxConsumables -= 1;
