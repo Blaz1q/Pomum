@@ -483,8 +483,8 @@ export class Game {
     useConsumable(upgrade) {
         if (upgrade instanceof Consumable && upgrade.canUse(this)) {
             this.GameRenderer.resetAllUpgrades();
-            this.stats.updateTarot(upgrade);
             upgrade.apply(this);
+            this.stats.updateTarot(upgrade);
             this.emit(GAME_TRIGGERS.onConsumableUse, upgrade);
             const idx = this.consumables.indexOf(upgrade);
             if (idx !== -1) {
@@ -500,11 +500,11 @@ export class Game {
         //if(this.stage!==STAGES.Shop) return false;
         if (upgrade instanceof Consumable && !upgrade.canUse(this)) return false;
         if (this.money + this.minMoney < upgrade.price) return false;
-        this.stats.updateTarot(upgrade);
         this.Audio.playSound('buy.mp3');
         this.money -= upgrade.price;
         this.GameRenderer.updateMoney(-upgrade.price);
         upgrade.apply(this);
+        this.stats.updateTarot(upgrade);
         this.GameRenderer.resetAllUpgrades();
         this.emit(GAME_TRIGGERS.onConsumableUse, upgrade);
         //this.GameRenderer.displayMoney();

@@ -8,6 +8,8 @@ import {
   UPGRADE_RARITY,
   STAGES,
 } from "../dictionary.js";
+import { Stats } from "../utils/Stats.js";
+import { Tarot } from "../entities/Tarot.js";
 export const consumableList = [];
 const pomumpackItems = [];
 function desc(fruit) {
@@ -419,20 +421,28 @@ const consumableGoldBlueprints = [
   },
 ];
 const tarotCards = [
-  /*{
+  {
       name: "Głupiec",
       descriptionfn(game){
-        return `Daje ostatnią użytą kartę.`
+        let ostatnia="Brak";
+        if(game.stats.lastUsedTarot?.name){
+          ostatnia=game.stats.lastUsedTarot.name;
+        }
+        return `Daje ostatnią użytą kartę tarota. (Ostania: ${ostatnia})`;
       },
         canUse(){
-            return true;
+            return game.stats.usedTarots!=0&&game.stats.lastUsedTarot?.name != this.name;
         },
         effect(){
-
+          const used_blueprint = tarotCards.filter((tarot) => tarot.name==game.stats?.lastUsedTarot?.name);
+          let newTarot = new Tarot(used_blueprint[0]);
+          game.consumables.push(newTarot);
+          game.GameRenderer.displayPlayerConsumables();
+          game.GameRenderer.displayConsumablesCounter();
         },
       price: 4,
-      image: 'default',
-    },*/
+      image: 'tarot_default',
+    },
   {
     name: "Mag",
     descriptionfn(game) {
@@ -447,6 +457,7 @@ const tarotCards = [
       let temp = game.fruits[index].percent;
       game.fruits[index].percent = game.fruits[index2].percent;
       game.fruits[index2].percent = temp;
+      this.message = { text: `${game.fruits[index].icon}🔁${game.fruits[index2].icon}`, style: SCORE_ACTIONS.Money };
     },
     price: 4,
     image: "magician",
@@ -466,12 +477,31 @@ const tarotCards = [
             return `Zmienia 10 kafelków na losowe ulepszone kafelki.`;
         }
     },
+    */
     {
         name: "Arcykapłan",
         descriptionfn(game){
-            return `Daje 2 losowe karty tarota.`
-        }
-    },*/
+            return `Daje 2 losowe karty tarota. (Musi mieć miejsce)`;
+        },
+        canUse(){
+            return game.consumables.length!=game.maxConsumables;
+        },
+        effect(game){
+          let i=0;
+          while(game.consumables.length<game.maxConsumables&&i<2){
+            const filter = tarotCards.filter((tarot) => tarot.name!=this.name);
+            const picked = Math.floor(Math.random() * filter.length);
+            const tarot = filter[picked];
+            const newTarot = new Tarot(tarot);
+            game.consumables.push(newTarot);
+            i++;
+          }
+          game.GameRenderer.displayPlayerConsumables();
+          game.GameRenderer.displayConsumablesCounter();
+        },
+        price: 4,
+        image: "magician",
+    },
   {
     name: "Kochankowie",
     descriptionfn(game) {
