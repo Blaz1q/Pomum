@@ -54,12 +54,12 @@ export const UPGRADE_STATES = {
     Tried: 4     // Tried but failed.
 }
 export const DIFFICULTY = {
-    NORMAL: {name: "Normalny", id: 1},
-    ETERNAL: {name: "Wieczny", id: 2},
-    HEAVY: {name: "Ciężki", id: 3},
-    BATTERY: {name: "Bateria", id: 4},
-    PERISHABLE: {name: "Chwilowy", id: 5},
-    RENTAL: {name: "Wynajem", id: 6}
+    NORMAL: {name: "ui.normal", id: 1},
+    ETERNAL: {name: "ui.eternal", id: 2},
+    HEAVY: {name: "ui.heavy", id: 3},
+    BATTERY: {name: "ui.battery", id: 4},
+    PERISHABLE: {name: "ui.perishable", id: 5},
+    RENTAL: {name: "ui.rental", id: 6}
 }
 export const LANGUAGE = {
     PL: "PL-pl",
@@ -156,6 +156,7 @@ export var Settings = {
     PLAY_SOUND: true,
     LOW_GRAPHICS: false,
     OLD_FRUITS: false,
+    LANGUAGE: LANGUAGE.PL,
     DIFFICULTY: DIFFICULTY.NORMAL
 }
 export const GAMECOLORS = {

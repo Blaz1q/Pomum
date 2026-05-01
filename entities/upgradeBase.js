@@ -80,7 +80,7 @@ export class UpgradeBase {
     const translationEntry = this.translation(game);
     console.log(translationEntry);
     if (translationEntry && typeof translationEntry.description === 'function') {
-      return translationEntry.description(this);
+      return translationEntry.description(game,this);
     }
     if(translationEntry){
       return translationEntry.description;

@@ -303,7 +303,7 @@ export class UpgradeRenderer {
         this.gameRenderer.animateReorder(oldPositions);
 
         // 4. Aktualizacja logiki gry
-        if (this.bought&&this.type == "Upgrade") {
+        if (this.upgrade.bought&&this.upgrade.type == "Upgrade") {
           const movedUpgrade = this.gameRenderer.game.upgrades.splice(draggedIndex, 1)[0];
           this.gameRenderer.game.upgrades.splice(targetIndex, 0, movedUpgrade);
           this.gameRenderer.game.emit(GAME_TRIGGERS.onUpgradesChanged);

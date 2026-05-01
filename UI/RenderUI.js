@@ -12,6 +12,7 @@ import {
   UPGRADE_STATES,
   Settings,
   DIFFICULTY,
+  LANGUAGE,
 } from "../dictionary.js";
 import { rollBoss } from "../entities/Boss.js";
 import { upgradesList } from "../entityData/upgradelist.js";
@@ -19,6 +20,7 @@ import { Consumable } from "../entities/Consumable.js";
 import { Voucher } from "../entities/Voucher.js";
 import { ConsumablePack } from "../entities/ConsumablePack.js";
 import { animateWave, initBalatroEffect } from "../utils/animate_text.js";
+import { changeLanguage, t } from "../entityData/translations.js";
 export class RenderUI {
   constructor(game) {
     this.game = game;
@@ -930,7 +932,7 @@ function setdifficulty(action) {
     // 5. Aktualizujemy UI
     const label = document.getElementById("poziom_trudnosci");
     if (label) {
-        label.innerText = Settings.DIFFICULTY.name;
+        label.innerText = t(Settings.DIFFICULTY.name,Settings.LANGUAGE);
         
         // Dodanie animacji "pop" (którą masz w SCSS) dla lepszego feedbacku
         label.classList.remove('pop-anim');
@@ -939,6 +941,16 @@ function setdifficulty(action) {
     }
     animateWave(document.getElementById("poziom_trudnosci"));
 }
+function changeLang(){
+    if(Settings.LANGUAGE == LANGUAGE.PL){
+        Settings.LANGUAGE = LANGUAGE.EN;
+    }
+    else{
+        Settings.LANGUAGE = LANGUAGE.PL;
+    }
+    changeLanguage();
+}
+window.changelang = changeLang;
 window.toggleOldFruits = toggleOldFruits;
 window.showSettings = showSettings;
 window.hideSettings = hideSettings;
