@@ -61,6 +61,10 @@ export const DIFFICULTY = {
     PERISHABLE: {name: "Chwilowy", id: 5},
     RENTAL: {name: "Wynajem", id: 6}
 }
+export const LANGUAGE = {
+    PL: "PL-pl",
+    EN: "EN-en"
+}
 export const UPGRADE_RARITY = {
     Common: { 
         display: 'Common', 

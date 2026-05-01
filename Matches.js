@@ -354,7 +354,7 @@ getNeighborsForSpecial(tile) {
             }
             checkLine(column);
         }
-            for (let y = 0; y < size - 1; y++) {
+        for (let y = 0; y < size - 1; y++) {
             for (let x = 0; x < size - 1; x++) {
                 const topLeft = board[y][x];
                 const topRight = board[y][x + 1];
@@ -434,7 +434,29 @@ getNeighborsForSpecial(tile) {
         return Object.values(byRow).some(c => c >= 5) ||
             Object.values(byCol).some(c => c >= 5);
     }
+    isSquare(matches) {
+        // Kwadrat 2x2 to minimum 4 płytki
+        if (matches.length < 4) return false;
 
+        // Tworzymy zestaw unikalnych kluczy "x,y" dla szybkiego wyszukiwania (O(1))
+        const coords = new Set(matches.map(m => `${m.x},${m.y}`));
+
+        for (let m of matches) {
+            const x = m.x;
+            const y = m.y;
+
+            // Sprawdzamy, czy m jest lewym-górnym rogiem kwadratu
+            const hasTopRight = coords.has(`${x + 1},${y}`);
+            const hasBottomLeft = coords.has(`${x},${y + 1}`);
+            const hasBottomRight = coords.has(`${x + 1},${y + 1}`);
+
+            if (hasTopRight && hasBottomLeft && hasBottomRight) {
+                return true;
+            }
+        }
+
+        return false;
+    }
     isLShape(matches) {
         if (matches.length < 5) return false;
 

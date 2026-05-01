@@ -939,7 +939,6 @@ function setdifficulty(action) {
     }
     animateWave(document.getElementById("poziom_trudnosci"));
 }
-
 window.toggleOldFruits = toggleOldFruits;
 window.showSettings = showSettings;
 window.hideSettings = hideSettings;

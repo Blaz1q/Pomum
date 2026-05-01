@@ -1,6 +1,7 @@
 console.log("UpgradeBase");
 import {
   GAME_TRIGGERS,
+  LANGUAGE,
   MODIFIERS,
   PRIORITY,
   SCORE_ACTIONS,
@@ -8,6 +9,7 @@ import {
   UPGRADE_RARITY,
   UPGRADE_STATES,
 } from "../dictionary.js";
+import { translations } from "../entityData/translations.js";
 import { UpgradeRenderer } from "../UI/upgradeRenderer.js";
 
 export class UpgradeBase {
@@ -40,6 +42,14 @@ export class UpgradeBase {
       return `${this.url}${props.image ? props.image.toLowerCase() : this.name?.toLowerCase()}.png`;
     };
     this.UpgradeRenderer = null;
+    this.id = props.id || props.name?.toLowerCase();
+  }
+  getname(game){
+    const translationEntry = this.translation(game);
+    if(translationEntry){
+      return translationEntry.name;
+    }
+    return this.name || "Missing name";
   }
   canBuy(game) {
     throw new Error("Method canBuy must be implemented.");
@@ -59,11 +69,26 @@ export class UpgradeBase {
   hasSpace(game) {
     throw new Error("Method hasSpace must be implemented.");
   }
+  translation(game){
+    const lang = game.lang || LANGUAGE.PL;
+    return translations[lang]?.upgrades?.[this.id];
+  }
   description(game) {
+    // console.log(lang);
+    // console.log(translations);
+    // console.log(this.id);
+    const translationEntry = this.translation(game);
+    console.log(translationEntry);
+    if (translationEntry && typeof translationEntry.description === 'function') {
+      return translationEntry.description(this);
+    }
+    if(translationEntry){
+      return translationEntry.description;
+    }
     if (typeof this.descriptionfn === "function") {
       return this.descriptionfn.call(this, game);
     }
-    return this.descriptionfn;
+    return this.descriptionfn || "Missing description";
   }
   apply(game) {
     throw new Error("Method apply must be implemented.");

@@ -509,6 +509,7 @@ export const upgradeBlueprints = [
   },
 
   {
+    id: "highfive",
     name: "High Five",
     descriptionfn: `Gdy zrobi się piątke, ${Style.Mult("X2 mult")}`,
     props: () => ({
@@ -538,7 +539,7 @@ export const upgradeBlueprints = [
 
   {
     name: "broke",
-    descriptionfn: `Jeżeli ma się mniej niż $6, ${Style.Score("+250 punktów")}`,
+    descriptionfn: `Jeżeli ma się mniej niż ${Style.Money('$6')}, ${Style.Score("+250 punktów")}`,
     props: () => ({
       onScore() {
         let hasMoney = game.money < 6;

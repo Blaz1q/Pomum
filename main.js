@@ -8,7 +8,7 @@ import { upgradesList } from "./entityData/upgradelist.js";
 
 import { Audio } from "./utils/sound.js";
 import { Tile } from "./entities/Tile.js";
-import { GAME_TRIGGERS, TYPES, MODIFIERS, STAGES, UPGRADE_STATES, SCORE_ACTIONS, UPGRADE_RARITY, Settings, COLORS, DURATIONS } from "./dictionary.js";
+import { GAME_TRIGGERS, TYPES, MODIFIERS, STAGES, UPGRADE_STATES, SCORE_ACTIONS, UPGRADE_RARITY, Settings, COLORS, DURATIONS, LANGUAGE } from "./dictionary.js";
 import { RenderUI } from "./UI/RenderUI.js";
 import { Animator, animate } from "./loadshaders.js";
 import { cyrb128, getRandomString, sfc32 } from "./random.js";
@@ -61,6 +61,7 @@ export class Game {
         this.scoreBox = document.getElementById("score");
         this.tempscoreBox = document.getElementById("tempscore");
         this.multBox = document.getElementById("mult");
+        this.lang = LANGUAGE.PL;
         this.fruits = [
             new Tile({ icon: "🍎", type: TYPES.Fruit, image: 'apple.png' }),
             new Tile({ icon: "🍐", type: TYPES.Fruit, image: 'pear.png' }),
@@ -1122,6 +1123,14 @@ function continueGame(){
     game.endround();
     document.getElementById("game-won").style.display = "none";
 }
+function changeLang(){
+    if(game.lang == LANGUAGE.PL){
+        game.lang = LANGUAGE.EN;
+    }
+    else{
+        game.lang = LANGUAGE.PL;
+    }
+}
 
 const R = document.getElementById('funcR');
 const G = document.getElementById('funcG');
@@ -1150,7 +1159,7 @@ window.reroll = reroll;
 window.restartGame = restartGame;
 window.startGame = startGame;
 window.continueGame = continueGame;
-
+window.changelang = changeLang;
 window.upgradesList = upgradesList;
 window.consumableList = consumableList;
 

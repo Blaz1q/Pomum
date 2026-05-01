@@ -172,12 +172,6 @@ export class Upgrade extends UpgradeBase {
     }
     return buildCopy(source);
   }
-  description(game) {
-    if (typeof this.descriptionfn === "function") {
-      return this.descriptionfn.call(this, game);
-    }
-    return this.descriptionfn;
-  }
   apply(game) {
     this.bought = true;
     if (this.negative == true) {
