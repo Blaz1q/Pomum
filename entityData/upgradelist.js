@@ -78,6 +78,7 @@ export const upgradeBlueprints = [
       }
     },
     price: 8,
+    image: "stockmarket",
     ...UNCOMMON
   },
 
@@ -91,6 +92,7 @@ export const upgradeBlueprints = [
       game.special[0].percent -= 2;
     },
     price: 2,
+    image: "boom",
     ...COMMON
   },
 
@@ -144,6 +146,7 @@ export const upgradeBlueprints = [
       },
     }),
     price: 4,
+    image: "mult",
     ...COMMON
   },
 
@@ -481,6 +484,7 @@ export const upgradeBlueprints = [
       }
     }),
     price: 4,
+    image: "chainreaction",
     ...COMMON
   },
 
@@ -907,6 +911,7 @@ export const upgradeBlueprints = [
     image: 'collector', ...COMMON
   },
   {
+    id: "boom_double",
     name: "BOOM!!",
     descriptionfn(game) {
       return `${Style.Chance(`+1%`)} dla ${game.special[1].icon}`;
@@ -922,6 +927,7 @@ export const upgradeBlueprints = [
     image: 'boom', ...COMMON
   },
   {
+    id: "boom_question",
     name: "Boom?",
     descriptionfn(game) {
       return `${game.special[0].icon} i ${game.special[1].icon} detonują się 1 raz więcej.`;
@@ -1155,6 +1161,7 @@ export const upgradeBlueprints = [
     image: "critical_hit", ...COMMON
   },
   {
+    id: "pozeracz",
     name: "Pożeracz",
     descriptionfn(game) {
       var mult = this.props.mult ?? 1;
@@ -1207,6 +1214,7 @@ export const upgradeBlueprints = [
     image: 'pozeracz', ...COMMON
   },
   {
+    id: "liczydlo",
     name: "Liczydło",
     descriptionfn(game) {
       var mult = this.props.mult ?? 1;
@@ -1237,6 +1245,7 @@ export const upgradeBlueprints = [
 
   },
   {
+    id: "2020",
     name: "20/20",
     descriptionfn(game) {
       return `Wszystkie ulepszenia kafelków aktywują się dwukrotnie`;
@@ -1345,6 +1354,7 @@ export const upgradeBlueprints = [
     ...COMMON
   },
   {
+    id: "goraczka",
     name: "Gorączka",
     descriptionfn(game) {
       return `Daje ${Style.Mult('10-20 Mult')}. ${Style.Chance(`1 na 10`)}, że zniknie na końcu rundy.`;
@@ -1441,6 +1451,7 @@ export const upgradeBlueprints = [
     image: 'credit'
   },
   {
+    id: "wrozka",
     name: "Wróżka",
     descriptionfn(game){
       return `Za każdą użytą kartę tarota w grze ${Style.Mult(`+1 Mult`)}. (Obecnie ${Style.Mult(`+${game.stats.usedTarots} Mult`)})`;
@@ -1617,6 +1628,7 @@ export const upgradeBlueprints = [
   priority: PRIORITY.REPEAT
 },
 {
+  id: "razor",
   name: "Żyletka",
   descriptionfn: `Losowy rząd zostaje zniszczony przy pierwszym ruchu.`,
   props: () => ({

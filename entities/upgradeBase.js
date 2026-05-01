@@ -5,6 +5,7 @@ import {
   MODIFIERS,
   PRIORITY,
   SCORE_ACTIONS,
+  Settings,
   STAGES,
   UPGRADE_RARITY,
   UPGRADE_STATES,
@@ -39,17 +40,20 @@ export class UpgradeBase {
     this.wrapper = null;
     this.priority = props.priority ?? PRIORITY.NORMAL;
     this.image = () => {
-      return `${this.url}${props.image ? props.image.toLowerCase() : this.name?.toLowerCase()}.png`;
+      return `${this.url}${props.image ? props.image.toLowerCase() : this._name?.toLowerCase()}.png`;
     };
     this.UpgradeRenderer = null;
-    this.id = props.id || props.name?.toLowerCase();
+    this.id = props.id || props.name?.toLowerCase().replace(/\s/g,'');
   }
-  getname(game){
-    const translationEntry = this.translation(game);
+  set name(value){
+    this._name = value;
+  }
+  get name(){
+    const translationEntry = this.translation();
     if(translationEntry){
       return translationEntry.name;
     }
-    return this.name || "Missing name";
+    return this._name || "Missing name";
   }
   canBuy(game) {
     throw new Error("Method canBuy must be implemented.");
@@ -69,8 +73,8 @@ export class UpgradeBase {
   hasSpace(game) {
     throw new Error("Method hasSpace must be implemented.");
   }
-  translation(game){
-    const lang = game.lang || LANGUAGE.PL;
+  translation(){
+    const lang = Settings.LANGUAGE || LANGUAGE.PL;
     return translations[lang]?.upgrades?.[this.id];
   }
   description(game) {
@@ -78,9 +82,9 @@ export class UpgradeBase {
     // console.log(translations);
     // console.log(this.id);
     const translationEntry = this.translation(game);
-    console.log(translationEntry);
+    //console.log(translationEntry);
     if (translationEntry && typeof translationEntry.description === 'function') {
-      return translationEntry.description(game,this);
+      return translationEntry.description({game: game,upgrade: this});
     }
     if(translationEntry){
       return translationEntry.description;

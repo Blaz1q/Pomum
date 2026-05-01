@@ -182,7 +182,7 @@ export class UpgradeRenderer {
     // 1. Sekcja TYTUŁU
     const title = document.createElement('div');
     title.className = 'title';
-    title.textContent = upgrade.getname(this.gameRenderer.game);
+    title.textContent = upgrade.name;
     container.appendChild(title);
 
     // Inicjujemy animację od razu (bo element już istnieje w pamięci)
