@@ -19,6 +19,7 @@ import { Queue } from "./utils/Queue.js"
 
 import { TriggerManager } from "./managers/TriggerManager.js";
 import { animateWave, initBalatroEffect } from "./utils/animate_text.js";
+import { changeLanguage } from "./entityData/translations.js";
 
 const CELL_PX = 50;
 let FADE_MS = Settings.FADE_MS;
@@ -1130,6 +1131,7 @@ function changeLang(){
     else{
         game.lang = LANGUAGE.PL;
     }
+    changeLanguage(game);
 }
 
 const R = document.getElementById('funcR');

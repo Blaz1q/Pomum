@@ -46,22 +46,22 @@
     <img class="logo" src="./images/pomumlogo.png" alt="Pomum" srcset="">
     
     <div id="difficulty">
-      <label>Poziom trudności</label>
+      <label data-i18n="ui.difficulty">Poziom trudności</label>
       <div class="controls">
         <button onclick="setdifficulty('-')">&lt;</button>
-        <label id="poziom_trudnosci">Normalny</label>
+        <label data-i18n="ui.normal" data-animate="wave" id="poziom_trudnosci">Normalny</label>
         <button onclick="setdifficulty('+')">&gt;</button>
       </div>
     </div>
     <div class="buttons">
-      <button id="startBtn" onclick="startGame()">Rozpocznij</button>
-      <button onclick="showCollection()">Kolekcja</button>
-      <button onclick="showSettings()">Ustawienia</button>
+      <button data-i18n="ui.startGame" id="startBtn" onclick="startGame()">Rozpocznij</button>
+      <button data-i18n="ui.collection" onclick="showCollection()">Kolekcja</button>
+      <button data-i18n="ui.settings" onclick="showSettings()">Ustawienia</button>
       <button onclick="changelang()"><img src="./images/icons/translate.png" width=32 height=32></button>
     </div>
     
     <div id="collection" class="hidden">
-      <button onclick="hideCollection()">Zamknij</button>
+      <button data-i18n="ui.close" onclick="hideCollection()">Zamknij</button>
       <div class="scroll"></div>
     </div>
   </div>
@@ -79,31 +79,31 @@
         <table class="stats-table">
           <tr>
             <td class="roundscore" colspan="2">
-              <span class="label">Zdobądź</span>
+              <span data-i18n="ui.getAtLeast" class="label">Zdobądź</span>
               <span id="roundscore" class="value">0</span>
             </td>
           </tr>
 
           <tr>
             <td class="moves">
-              <span class="label">Ruchy</span>
+              <span data-i18n="ui.moves" class="label">Ruchy</span>
               <span id="moves" class="value">0 / 10</span>
             </td>
             <td class="roundlevel">
-              <span class="label">Runda</span>
+              <span data-i18n="ui.round" class="label">Runda</span>
               <span id="round" class="value">1 / 1</span>
             </td>
           </tr>
 
           <tr>
             <td class="score" colspan="2">
-              <span class="label">Twój wynik</span>
+              <span data-i18n="ui.yourScore" class="label">Twój wynik</span>
               <span id="score" class="value">0</span>
             </td>
           </tr>
           <tr>
              <td colspan="2" class="playerscore">
-              <span class="label">Wynik</span>
+              <span data-i18n="ui.score" class="label">Wynik</span>
                 <section class="calcscore">
                   <span id="tempscore">0</span> x <span id="mult">1</span>
                 </section>
@@ -116,10 +116,10 @@
           </tr>
           <tr>
               <td class="button">
-                <button class="label" onclick="showInfo()">Informacje</button>
+                <button data-i18n="ui.info" class="label" onclick="showInfo()">Informacje</button>
               </td>
               <td class="button">
-                <button class="label" onclick="showSettings()">Ustawienia</button>
+                <button data-i18n="ui.settings" class="label" onclick="showSettings()">Ustawienia</button>
               </td>
           </tr>
         </table>
@@ -200,7 +200,7 @@
   <div id="settingsPanel">
     <div id="settingsPanel-content">
       <button onclick="hideSettings()" class="closePopup">&times</button>
-      <h2>Ustawienia</h2>
+      <h2 data-i18n="ui.settings">Ustawienia</h2>
       <label>
         Rozmiar kafelków
         <input disabled type="range" min="20" step="5" max="100" />
@@ -225,6 +225,7 @@
         <input onclick="toggleOldFruits()" type="checkbox" id="oldFruits">
         Stare owoce
       </label>
+      <button onclick="changelang()"><img src="./images/icons/translate.png" width=32 height=32></button>
     </div>
     </div>
   <canvas id="glcanvas"></canvas>

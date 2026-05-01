@@ -1,7 +1,20 @@
-import { Style,LANGUAGE } from "../dictionary.js";
+import { Style,LANGUAGE, DIFFICULTY } from "../dictionary.js";
 
 export const translations = {
     [LANGUAGE.PL]: {
+        ui:{
+            startGame: "Rozpocznij",
+            collection: "Kolekcja",
+            settings: "Ustawienia",
+            difficulty: "Poziom trudności",
+            normal: "Normalny",
+            getAtLeast: "Zdobądź",
+            score: "Wynik",
+            yourScore: "Twój wynik",
+            round: "runda",
+            moves: "ruchy",
+            info: "Informacje"
+        },
         upgrades: {
             battlepass:{
                 name: "Battlepass",
@@ -22,6 +35,19 @@ export const translations = {
         }
     },
     [LANGUAGE.EN]: {
+        ui:{
+            startGame: "Start Game",
+            collection: "Collection",
+            settings: "Settings",
+            difficulty: "Difficulty",
+            normal: "Normal",
+            getAtLeast: "Get at least",
+            score: "Score",
+            yourScore: "Your score",
+            round: "round",
+            moves: "moves",
+            info: "Info"
+        },
         upgrades: {
             battlepass:{
                 name: "Battlepass",
@@ -41,4 +67,28 @@ export const translations = {
             }
         }
     }
+}
+export const t = (path, lang, data = null) => {
+    // Rozbijamy ścieżkę 'ui.buy' na ['ui', 'buy'] i szukamy w obiekcie
+    const keys = path.split('.');
+    let translation = translations[lang];
+
+    for (const key of keys) {
+        if (translation[key]) {
+            translation = translation[key];
+        } else {
+            return path; // Zwraca ścieżkę, jeśli tłumaczenie nie istnieje (ułatwia debugowanie)
+        }
+    }
+
+    // Jeśli tłumaczenie jest funkcją (jak w Twoich opisach), wywołujemy ją z danymi
+    return typeof translation === 'function' ? translation(data) : translation;
+};
+export function changeLanguage(game){
+    const elements = document.querySelectorAll('[data-i18n]');
+
+    elements.forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.innerHTML = t(key, game.lang);
+    });
 }
