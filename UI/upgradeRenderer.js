@@ -1,4 +1,5 @@
-import { MODIFIERS, UPGRADE_RARITY, Style, GAME_TRIGGERS, UPGRADE_STATES } from "../dictionary.js";
+import { MODIFIERS, UPGRADE_RARITY, Style, GAME_TRIGGERS, UPGRADE_STATES, Settings } from "../dictionary.js";
+import { t } from "../entityData/translations.js";
 import { fadeInAndBalatro, initBalatroEffect } from "../utils/animate_text.js";
 export class UpgradeRenderer {
   constructor(upgrade, gameRenderer) {
@@ -369,7 +370,8 @@ export class UpgradeRenderer {
     const wrapper = upgrade.wrapper;
     let game = this.gameRenderer.game;
     const btnBuy = document.createElement("button");
-    btnBuy.textContent = "Kup";
+    btnBuy.dataset.i18n = "ui.buy";
+    btnBuy.textContent =  t(btnBuy.dataset.i18n,Settings.LANGUAGE);
     btnBuy.addEventListener("click", (e) => {
       e.stopPropagation();
       console.log(game);
@@ -412,7 +414,8 @@ export class UpgradeRenderer {
   createUseButton() {
     const upgrade = this.upgrade;
     const btnUse = document.createElement("button");
-    btnUse.textContent = "Użyj";
+    btnUse.dataset.i18n = "ui.use";
+    btnUse.textContent =  t(btnUse.dataset.i18n,Settings.LANGUAGE);
     btnUse.addEventListener("click", (e) => {
       e.stopPropagation();
       console.log("using");
@@ -426,7 +429,8 @@ export class UpgradeRenderer {
     const upgrade = this.upgrade;
     const wrapper = upgrade.wrapper;
     const btnBuyUse = document.createElement("button");
-    btnBuyUse.textContent = "Kup i Użyj";
+    btnBuyUse.dataset.i18n = "ui.buyanduse";
+    btnBuyUse.textContent =  t(btnBuyUse.dataset.i18n,Settings.LANGUAGE);
     btnBuyUse.addEventListener("click", (e) => {
       e.stopPropagation();
       console.log("using");
@@ -462,7 +466,8 @@ export class UpgradeRenderer {
     const upgrade = this.upgrade;
     const wrapper = upgrade.wrapper;
     const btnSell = document.createElement("button");
-    btnSell.textContent = "Sprzedaj";
+    btnSell.dataset.i18n = "ui.sell";
+    btnSell.textContent =  t(btnSell.dataset.i18n,Settings.LANGUAGE);
     btnSell.addEventListener("click", (e) => {
       e.stopPropagation();
       if (!upgrade.canSell(game)) {

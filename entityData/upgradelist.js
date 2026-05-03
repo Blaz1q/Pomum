@@ -1035,7 +1035,7 @@ export const upgradeBlueprints = [
         let neighbor = game.upgrades[nextIdx];
 
         // Szukamy pierwszego ulepszenia, które nie jest Lustrem
-        while (neighbor && neighbor.name === "Mirror") {
+        while (neighbor && neighbor._name === "Mirror") {
           nextIdx++;
           neighbor = game.upgrades[nextIdx];
           // Zabezpieczenie przed pętlą (choć przy kierunku w prawo mało prawdopodobne)
@@ -1046,7 +1046,7 @@ export const upgradeBlueprints = [
 
       this.syncMirror = () => {
         const neighbor = this.getUltimateNeighbor();
-        const isBanned = neighbor && this.banned.includes(neighbor.name);
+        const isBanned = neighbor && this.banned.includes(neighbor._name);
 
         // Jeśli cel jest ten sam, nie przeliczaj (optymalizacja)
         if (neighbor === this.mirroredUpgrade) return;
@@ -1107,7 +1107,7 @@ export const upgradeBlueprints = [
 
     price: 8,
     image: "brokenmirror",
-    ...RARE,
+    ...COMMON,
   },
   {
     name: "Adrenaline",

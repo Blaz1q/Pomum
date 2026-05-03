@@ -149,8 +149,8 @@
       <div id="shop">
         
         <div id="shop-buttons-container">
-          <button class="shopbutton" onclick="reroll()">Odśwież sklep ($4)</button>
-          <button class="shopbutton" onclick="startRound()">Kontynuuj</button>
+          <button class="shopbutton" data-i18n="ui.reroll_shop" onclick="reroll()">Odśwież sklep ($4)</button>
+          <button class="shopbutton" data-i18n="ui.continue" onclick="startRound()">Kontynuuj</button>
         </div>
         <div id="upgrades-container"></div>
         <div id="boosterpack-container"></div>
@@ -161,25 +161,25 @@
         <div class="container">
                 <p id="booster-amount">Wybierz karty</p>
                 <div id="consumables-container"></div>
-                <button class="upgradetiles" onclick="skip()">Kontynuuj</button>
+                <button class="upgradetiles" data-i18n="ui.continue" onclick="skip()">Kontynuuj</button>
             </div>
       </div>
     </div>
   </div>
   <div id="game-won">
     <div class="game-over-content">
-      <h1 class="game-over">Wygrana!</h1>
+      <h1 data-i18n="ui.win" class="game-over">Wygrana!</h1>
       <p class="game-over">Seed: <b class="seed"></b></p>
       <div class="stats"></div>
-      <button onclick="restartGame()">Nowa gra</button>
+      <button data-i18n="ui.new_game" onclick="restartGame()">Nowa gra</button>
       <button onclick="showMenu()">Menu</button>
-      <button onclick="continueGame()">Kontynuuj</button>
+      <button data-i18n="ui.continue" onclick="continueGame()">Kontynuuj</button>
       
     </div>
   </div>
   <div id="game-over">
     <div class="game-over-content">
-      <h1 class="game-over">Koniec gry</h1>
+      <h1 class="game-over" data-i18n="ui.game_over">Koniec gry</h1>
       <p class="game-over">Runda: <span id="final-score">0</span></p>
       <p class="game-over">Seed: <b class="seed"></b></p>
       <div class="stats"></div>
@@ -191,7 +191,7 @@
   <div id="info-container">
     <div class="game-over-content">
       <div id="tiles"></div>
-      <button onclick="hideInfo()">Zamknij</button>
+      <button data-i18n="ui.close" onclick="hideInfo()">Zamknij</button>
       <!--
         tutaj informacje o owocach
       -->

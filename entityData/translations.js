@@ -9,6 +9,11 @@ import {
 export const translations = {
   [LANGUAGE.PL]: {
     ui: {
+      reroll_shop: (data) => `Odświerz sklep ($${data?.game.shoproll ?? 4})`,
+      buy: "Kup",
+      use: "Użyj",
+      sell: "Sprzedaj",
+      buyanduse: "Kup i użyj",
       startGame: "Rozpocznij",
       collection: "Kolekcja",
       settings: "Ustawienia",
@@ -26,6 +31,13 @@ export const translations = {
       moves: "ruchy",
       info: "Informacje",
       close: "Zamknij",
+      continue: "Kontynuuj",
+      game_over: "Koniec gry",
+      win: "Wygrana!",
+      new_game: "Nowa gra",
+    },
+    consumables: {
+
     },
     upgrades: {
       applehater: {
@@ -387,6 +399,11 @@ export const translations = {
   },
   [LANGUAGE.EN]: {
     ui: {
+      reroll_shop: (data) => `Reroll shop ($${data?.game.shoproll ?? 4})`,
+      buy: "Buy",
+      use: "Use",
+      sell: "Sell",
+      buyanduse: "Buy and use",
       startGame: "Start Game",
       collection: "Collection",
       settings: "Settings",
@@ -404,6 +421,10 @@ export const translations = {
       moves: "moves",
       info: "Info",
       close: "Close",
+      continue: "Continue",
+      game_over: "Game over",
+      win: "You win!",
+      new_game: "New game",
     },
     upgrades: {
       applehater: {
@@ -777,11 +798,11 @@ export const t = (path, lang, data = null) => {
   // Jeśli tłumaczenie jest funkcją (jak w Twoich opisach), wywołujemy ją z danymi
   return typeof translation === "function" ? translation(data) : translation;
 };
-export function changeLanguage() {
+export function changeLanguage(data = null) {
   const elements = document.querySelectorAll("[data-i18n]");
 
   elements.forEach((el) => {
     const key = el.getAttribute("data-i18n");
-    el.innerHTML = t(key, Settings.LANGUAGE);
+    el.innerHTML = t(key, Settings.LANGUAGE,data);
   });
 }

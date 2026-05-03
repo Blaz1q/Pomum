@@ -62,6 +62,7 @@ export class Game {
         this.scoreBox = document.getElementById("score");
         this.tempscoreBox = document.getElementById("tempscore");
         this.multBox = document.getElementById("mult");
+        this.shoproll = 4;
         this.fruits = [
             new Tile({ icon: "🍎", type: TYPES.Fruit, image: 'apple.png' }),
             new Tile({ icon: "🍐", type: TYPES.Fruit, image: 'pear.png' }),
@@ -256,14 +257,15 @@ export class Game {
         this.moveBox.innerHTML = this.movescounter + "/" + this.moves;
     }
     rerollUpgrades() {
-        if (this.money + this.minMoney < 4) {
+        if (this.money + this.minMoney < game.shoproll) {
             this.GameRenderer.notEnoughMoney();
             return;
         }
-        this.money -= 4;
+        this.money -= game.shoproll;
         this.Audio.playSound('buy.mp3');
         this.GameRenderer.displayUpgradesInShop();
-        this.GameRenderer.updateMoney(-4);
+        this.GameRenderer.updateMoney(-game.shoproll);
+        game.shoproll+=1;
         this.GameRenderer.updateRerollButton();
     }
     rerollBoosters() {
@@ -284,6 +286,7 @@ export class Game {
             this.gamewon();
             return;
         }
+        game.shoproll = 4;
         let addmoney = 0;
         this.GameRenderer.displayUpgradesCounter();
         this.GameRenderer.displayMoves();

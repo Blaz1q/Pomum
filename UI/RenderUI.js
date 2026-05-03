@@ -20,7 +20,7 @@ import { Consumable } from "../entities/Consumable.js";
 import { Voucher } from "../entities/Voucher.js";
 import { ConsumablePack } from "../entities/ConsumablePack.js";
 import { animateWave, initBalatroEffect } from "../utils/animate_text.js";
-import { changeLanguage, t } from "../entityData/translations.js";
+import { translations,changeLanguage, t } from "../entityData/translations.js";
 export class RenderUI {
   constructor(game) {
     this.game = game;
@@ -855,7 +855,8 @@ addParalax(card) {
   }
   updateRerollButton() {
     const rerollButton = document.querySelectorAll(".shopbutton")[0];
-    const isTooExpensive = this.game.money + this.game.minMoney < 4;
+    rerollButton.textContent = t("ui.reroll_shop",Settings.LANGUAGE,{game: this.game});
+    const isTooExpensive = this.game.money + this.game.minMoney < this.game.shoproll;
     if (isTooExpensive) rerollButton.classList.add("disabled");
     else rerollButton.classList.remove("disabled");
   }
@@ -948,7 +949,7 @@ function changeLang(){
     else{
         Settings.LANGUAGE = LANGUAGE.PL;
     }
-    changeLanguage();
+    changeLanguage({game: game});
 }
 window.changelang = changeLang;
 window.toggleOldFruits = toggleOldFruits;
@@ -962,3 +963,4 @@ window.hideInfo = hideInfo;
 window.showCollection = showCollection;
 window.hideCollection = hideCollection;
 window.setdifficulty = setdifficulty;
+window.translations = translations;

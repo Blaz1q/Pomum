@@ -106,7 +106,7 @@ export class Upgrade extends UpgradeBase {
         case "ConsumablePack":
           return new ConsumablePack(upgrade);
         default:
-          const copyBp = upgradesList.find((up) => up.name === source.name);
+          const copyBp = upgradesList.find((up) => up.name === source._name);
           if (!copyBp) return null;
           copyUpgrade = new Upgrade(copyBp);
       }
