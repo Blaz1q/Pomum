@@ -341,7 +341,7 @@ export const consumableUpgradeBlueprints = [
         money += upgrade.sellPrice;
       });
       if (money > 40) money = 40;
-      game.money += 40;
+      game.money += money;
       game.GameRenderer.updateMoney(money);
     },
     price: 8,
@@ -802,8 +802,7 @@ export const coupons = [
     return `Zwiększa miejsce na ulepszenia w sklepie o 1. (Obecnie ${Style.Chance(current)} -> ${Style.Chance(current + 1)})`;
   },
   effect(game) {
-    game.overstock = true;
-    game.shopSize = (game.shopSize || 3) + 1; // przykład aktualizacji stanu
+    game.shopSize+=1;
   },
   price: 10,
   image: "overstock",

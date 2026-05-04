@@ -240,6 +240,7 @@ export class UpgradeRenderer {
   }
   onMouseMove(e) {
     if (!this.isDragging) return;
+    this.gameRenderer.resetAllUpgrades();
     const wrapper = this.upgrade.wrapper;
     const deltaX = e.clientX - this.startX;
     const deltaY = e.clientY - this.startY;
@@ -332,6 +333,7 @@ export class UpgradeRenderer {
     }
   };
   displayButtons() {
+    if(this.isDragging) return;
     console.log("clicked");
     // 1. Sprawdzamy, czy ten konkretny wrapper jest już "podniesiony"
     // Sprawdzamy styl inline lub (lepiej) konkretną wartość transformacji

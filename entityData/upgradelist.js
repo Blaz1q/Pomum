@@ -1657,10 +1657,11 @@ export const upgradeBlueprints = [
 {
   name: "Bezsenność",
   descriptionfn(game) {
-    return `${Style.Chance("1 na 2")} że po otwarciu ${Style.Highlight('Boostera')} dostanie się ${Style.Highlight('Kartę tarota')}`
+    return `${Style.Chance("1 na 2")} że po otwarciu ${Style.Highlight('Boostera')} dostanie się ${Style.Highlight('Kartę tarota')} (Jeśli jest miejsce)`;
   },
   props: () => ({
     onBoosterBuy(payload){
+      if(game.consumables.length>=game.maxConsumables) return UPGRADE_STATES.Failed;
       if(Math.random()<0.5){
         return UPGRADE_STATES.Failed;  
       }

@@ -1,11 +1,14 @@
 import { MODIFIERS, Settings, DIFFICULTY } from "./dictionary.js";
-import { consumablePacks,coupons } from "./entityData/consumablelist.js";
+import { consumableList, consumablePacks, coupons } from "./entityData/consumablelist.js";
 import { ConsumablePack } from "./entities/ConsumablePack.js";
 import { Voucher } from "./entities/Voucher.js";
 import { upgradesList } from "./entityData/upgradelist.js";
 import { Upgrade } from "./entities/Upgrade.js";
 import { stickers } from "./entityData/stickerslist.js";
 import { Sticker } from "./entities/Sticker.js";
+import { Consumable } from "./entities/Consumable.js";
+import { createEntity } from "./utils/UpgradeFactory.js";
+import { Tarot } from "./entities/Tarot.js";
 
 
 export class Roll {
@@ -32,6 +35,71 @@ export class Roll {
             }
         }
     }
+    _drawFromPool(pool, count, factoryFn) {
+        const results = [];
+        const poolCopy = [...pool]; // Kopia, aby nie losować dwa razy tego samego
+
+        for (let i = 0; i < count && poolCopy.length > 0; i++) {
+            const entry = this.weightedPick(poolCopy, this.game.shopRand.bind(this));
+            
+            // Usuwamy z kopii puli, żeby uniknąć duplikatów w jednym losowaniu
+            const idx = poolCopy.indexOf(entry);
+            if (idx >= 0) poolCopy.splice(idx, 1);
+
+            // Używamy przekazanej funkcji, aby stworzyć konkretny obiekt (Upgrade/Consumable)
+            results.push(factoryFn(entry));
+        }
+        return results;
+    }
+    Shop(count = 3) {
+        if (this.overstock) count += 1;
+
+        // 1. Przygotuj pulę (filtry)
+        let upPool = this.game.upgradeDedupe ? 
+            upgradesList.filter(up => !this.game.upgrades.some(u => u._name === up.name)) : upgradesList;
+        
+        let conPool = this.game.upgradeDedupe ? 
+            consumableList.filter(c => !this.game.consumables.some(pc => pc._name === c.name)) : consumableList;
+
+        const fullPool = [...upPool, ...conPool];
+
+        // 2. Losuj używając logiki fabrykującej
+        return this._drawFromPool(fullPool, count, (entry) => {
+            if (entry.type === "Upgrade") {
+                const up = new Upgrade(entry);
+                this.Modifier(up);
+                this.Stickers(up, this);
+                return up;
+            } else if (entry.type === "Tarot") {
+                return new Tarot(entry);
+            }
+            return new Consumable(entry);
+        });
+    }
+    Upgrades(count = 3) {
+        let available = upgradesList;
+        if (this.upgradeDedupe) {
+            available = available.filter(up => !this.game.upgrades.some(u => u._name === up.name));
+        }
+
+        return this._drawFromPool(available, count, (entry) => {
+            const up = new Upgrade(entry);
+            this.Modifier(up);
+            this.Stickers(up, this);
+            return up;
+        });
+    }
+
+    Consumables(count = 3) {
+        let available = consumableList;
+        if (this.upgradeDedupe) {
+            available = available.filter(c => !this.game.consumables.some(pc => pc._name === c.name));
+        }
+
+        return this._drawFromPool(available, count, (entry) => {
+            return createEntity(entry);
+        });
+    }
     tileModifier(tile) {
         let modifier = MODIFIERS.None;
         const goldChance = tile.props.upgrade.goldchance ?? 0;
@@ -44,17 +112,18 @@ export class Roll {
         if (isGold) modifier = MODIFIERS.Gold; // gold nadpisuje silver jeśli oba trafione
         return modifier;
     }
-    Stickers(up,game){
-        if(Settings.DIFFICULTY==DIFFICULTY.NORMAL) return;
-        let available = stickers.filter((sticker, index) => index < Settings.DIFFICULTY.id-1);
+    Stickers(up) {
+        const game = this.game;
+        if (Settings.DIFFICULTY == DIFFICULTY.NORMAL) return;
+        let available = stickers.filter((sticker, index) => index < Settings.DIFFICULTY.id - 1);
         let result = [];
         available.forEach(sticker => {
-            if(sticker.weight>Math.random()){
-                const isBanned = result.some(alreadyAdded => 
+            if (sticker.weight > Math.random()) {
+                const isBanned = result.some(alreadyAdded =>
                     sticker?.banned?.includes(stickers.indexOf(alreadyAdded))
                 );
-                if(!isBanned) result.push(sticker);
-                }
+                if (!isBanned) result.push(sticker);
+            }
         });
         let finalResult = [];
         result.forEach(props => {
@@ -75,11 +144,11 @@ export class Roll {
         if (available.length === 0) return []; // player owns all vouchers
 
         const result = [];
-        for(let n =0; n<count; n++){
-            const item  = this.weightedPick(available, this.game.voucherRand.bind(this));
+        for (let n = 0; n < count; n++) {
+            const item = this.weightedPick(available, this.game.voucherRand.bind(this));
             let coupon = new Voucher(item);
             result.push(coupon);
-        
+
         }
         return result;
     }

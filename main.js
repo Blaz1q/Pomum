@@ -93,6 +93,7 @@ export class Game {
         this.nextBoss = null;
         this.BuysFromBoosterLeft = 0;
         this.overstock = false;
+        this.shopSize = 3;
         this.upgradeDedupe = true;
         this.bonusPercentage = {
             negative: 0,
@@ -192,66 +193,8 @@ export class Game {
             }
         }
     }
-    rollUpgrades(count = 3) {
-        if (this.overstock) {
-            count += 1;
-        }
-        // build upgrade pool with optional dedupe
-        let available = upgradesList;
-        if (this.upgradeDedupe) {
-            available = upgradesList.filter(up =>
-                !this.upgrades.some(u => u.name === up.name)
-            );
-        }
-
-        // build consumable pool with optional dedupe
-        let consumablePool = consumableList;
-        if (this.upgradeDedupe) {
-            consumablePool = consumablePool.filter(c =>
-                !this.consumables.some(pc => pc.name === c.name)
-            );
-        }
-
-        // combine both into one unified rolling pool
-        const pool = [...available, ...consumablePool];
-
-        // copy so we can remove taken items (no duplicates)
-        const poolCopy = [...pool];
-        const picked = [];
-
-        for (let i = 0; i < count && poolCopy.length > 0; i++) {
-            const entry = this.roll.weightedPick(poolCopy, this.shopRand.bind(this));
-
-            // remove from pool
-            const idx = poolCopy.indexOf(entry);
-            if (idx >= 0) poolCopy.splice(idx, 1);
-
-            // create Upgrade or Consumable instance
-            if (entry.type == "Upgrade") {
-                // it's an upgrade
-                const up = new Upgrade(
-                    entry
-                );
-                // negative / modifier rolling
-                this.roll.Modifier(up);
-                //sticker rolling;
-                this.roll.Stickers(up,this);
-                picked.push(up);
-            } else if (entry.type == "Consumable") {
-                // it's a consumable
-                picked.push(
-                    new Consumable(
-                        entry
-                    )
-                );
-            } else if (entry.type == "Tarot") {
-                picked.push(
-                    new Tarot(entry)
-                );
-            }
-        }
-
-        return picked;
+    rollUpgrades() {
+        return this.roll.Shop(this.shopSize);
     }
     displayMoves() {
         this.moveBox.innerHTML = this.movescounter + "/" + this.moves;

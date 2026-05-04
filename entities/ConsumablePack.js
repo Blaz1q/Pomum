@@ -27,10 +27,10 @@ export class ConsumablePack extends UpgradeBase {
     // Optional dedupe: exclude ones already owned
     if (game.upgradeDedupe) {
       available = available.filter(
-        (c) => !game.consumables.some((pc) => pc.name === c.name),
+        (c) => !game.consumables.some((pc) => pc._name === c.name),
       );
       available = available.filter(
-        (c) => !game.upgrades.some((pu) => pu.name === c.name),
+        (c) => !game.upgrades.some((pu) => pu._name === c.name),
       );
     }
 
