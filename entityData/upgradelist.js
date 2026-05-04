@@ -4,6 +4,7 @@ import { Consumable } from "../entities/Consumable.js";
 import { GAME_TRIGGERS, MODIFIERS, PRIORITY, SCORE_ACTIONS, STAGES, TYPES, UPGRADE_RARITY, UPGRADE_STATES } from "../dictionary.js";
 import { Style } from "../dictionary.js";
 import { consumableList, consumableUpgradeBlueprints } from "./consumablelist.js";
+import { Tarot } from "../entities/Tarot.js";
 
 
 export const upgradesList = [];
@@ -1107,7 +1108,7 @@ export const upgradeBlueprints = [
 
     price: 8,
     image: "brokenmirror",
-    ...COMMON,
+    ...RARE,
   },
   {
     name: "Adrenaline",
@@ -1652,6 +1653,30 @@ export const upgradeBlueprints = [
   price: 6,
   image: 'razor',
   ...UNCOMMON
+},
+{
+  name: "Bezsenność",
+  descriptionfn(game) {
+    return `${Style.Chance("1 na 2")} że po otwarciu ${Style.Highlight('Boostera')} dostanie się ${Style.Highlight('Kartę tarota')}`
+  },
+  props: () => ({
+    onBoosterBuy(payload){
+      if(Math.random()<0.5){
+        return UPGRADE_STATES.Failed;  
+      }
+      const tarots = consumableList.filter((up)=>up.type=="Tarot");
+      const picked = Math.floor(Math.random() * tarots.length);
+      const newTarot = new Tarot(tarots[picked]);
+      newTarot.bought = true;
+      game.consumables.push(newTarot);
+      game.GameRenderer.displayPlayerConsumables();
+      game.GameRenderer.displayConsumablesCounter();
+      return UPGRADE_STATES.Active;
+    }
+  }),
+  ...defaultimage,
+  price: 4,
+  ...COMMON
 }
 ];
 

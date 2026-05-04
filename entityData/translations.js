@@ -37,6 +37,12 @@ export const translations = {
       new_game: "Nowa gra",
     },
     consumables: {
+      
+    },
+    boosters: {
+
+    },
+    vouchers: {
 
     },
     upgrades: {
@@ -425,6 +431,15 @@ export const translations = {
       game_over: "Game over",
       win: "You win!",
       new_game: "New game",
+    },
+    consumables: {
+      
+    },
+    boosters: {
+
+    },
+    vouchers: {
+
     },
     upgrades: {
       applehater: {
