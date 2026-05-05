@@ -1,6 +1,6 @@
 console.log("Consumable");
 import { UpgradeBase } from "./upgradeBase.js";
-import { SCORE_ACTIONS } from "../dictionary.js";
+import { LANGUAGE, SCORE_ACTIONS, Settings } from "../dictionary.js";
 export class Consumable extends UpgradeBase {
   constructor(props = {}) {
     super(props);
@@ -23,6 +23,10 @@ export class Consumable extends UpgradeBase {
       this.UpgradeRenderer.createPopup("Użyto!", SCORE_ACTIONS.Info);
     }
   }
+  translation(){
+      const lang = Settings.LANGUAGE || LANGUAGE.PL;
+      return translations[lang]?.consumables?.[this.id];
+    }
   hasSpace(game) {
     let space = game.consumables.length < game.maxConsumables || this.negative;
 

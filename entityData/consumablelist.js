@@ -24,6 +24,7 @@ const consumbaleEvil = [];
 consumableLvlUp.push(
   {
     name: "Jabłko",
+    id: "apple",
     descriptionfn(game) {
       return desc(game.fruits[0]);
     },
@@ -38,6 +39,7 @@ consumableLvlUp.push(
   },
   {
     name: "Gruszka",
+    id: "pear",
     descriptionfn(game) {
       return desc(game.fruits[1]);
     },
@@ -52,6 +54,7 @@ consumableLvlUp.push(
   },
   {
     name: "Ananas",
+    id: "pineapple",
     descriptionfn(game) {
       return desc(game.fruits[2]);
     },
@@ -66,6 +69,7 @@ consumableLvlUp.push(
   },
   {
     name: "Winogron",
+    id: "grape",
     descriptionfn(game) {
       return desc(game.fruits[3]);
     },
@@ -80,6 +84,7 @@ consumableLvlUp.push(
   },
   {
     name: "Kokos",
+    id: "coconut",
     descriptionfn(game) {
       return desc(game.fruits[4]);
     },
@@ -96,6 +101,7 @@ consumableLvlUp.push(
 consumbaleEvil.push(
   {
     name: "EVIL Jabłko",
+    id: "evil_apple",
     descriptionfn(game) {
       return evildesc(game.fruits[0], game);
     },
@@ -110,6 +116,7 @@ consumbaleEvil.push(
   },
   {
     name: "EVIL Gruszka",
+    id: "evil_pear",
     descriptionfn(game) {
       return evildesc(game.fruits[1], game);
     },
@@ -124,6 +131,7 @@ consumbaleEvil.push(
   },
   {
     name: "EVIL Winogron",
+    id: "evil_grape",
     descriptionfn(game) {
       return evildesc(game.fruits[3], game);
     },
@@ -138,6 +146,7 @@ consumbaleEvil.push(
   },
   {
     name: "EVIL Ananas",
+    id: "evil_pineapple",
     descriptionfn(game) {
       return evildesc(game.fruits[2], game);
     },
@@ -152,6 +161,7 @@ consumbaleEvil.push(
   },
   {
     name: "EVIL Kokos",
+    id: "evil_coconut",
     descriptionfn(game) {
       return evildesc(game.fruits[4], game);
     },
@@ -167,6 +177,7 @@ consumbaleEvil.push(
 );
 const consumableSilverBlueprints = [
   {
+    id: "silver_apple",
     name: "Silver Jabłko",
     descriptionfn(game) {
       return silverDesc(game.fruits[0]);
@@ -182,6 +193,7 @@ const consumableSilverBlueprints = [
   },
   {
     name: "Silver Gruszka",
+    id: "silver_pear",
     descriptionfn(game) {
       return silverDesc(game.fruits[1]);
     },
@@ -196,6 +208,7 @@ const consumableSilverBlueprints = [
   },
   {
     name: "Silver Winogron",
+    id: "silver_grape",
     descriptionfn(game) {
       return silverDesc(game.fruits[3]);
     },
@@ -210,6 +223,7 @@ const consumableSilverBlueprints = [
   },
   {
     name: "Silver Ananas",
+    id: "silver_pineapple",
     descriptionfn(game) {
       return silverDesc(game.fruits[2]);
     },
@@ -224,6 +238,7 @@ const consumableSilverBlueprints = [
   },
   {
     name: "Silver Kokos",
+    id: "silver_coconut",
     descriptionfn(game) {
       return silverDesc(game.fruits[4]);
     },
@@ -351,6 +366,7 @@ export const consumableUpgradeBlueprints = [
 const consumableGoldBlueprints = [
   {
     name: "Gold Jabłko",
+    id: "gold_apple",
     descriptionfn(game) {
       return goldDesc(game.fruits[0]);
     },
@@ -365,6 +381,7 @@ const consumableGoldBlueprints = [
   },
   {
     name: "Gold Gruszka",
+    id: "gold_pear",
     descriptionfn(game) {
       return goldDesc(game.fruits[1]);
     },
@@ -379,6 +396,7 @@ const consumableGoldBlueprints = [
   },
   {
     name: "Gold Winogron",
+    id: "gold_grape",
     descriptionfn(game) {
       return goldDesc(game.fruits[3]);
     },
@@ -393,6 +411,7 @@ const consumableGoldBlueprints = [
   },
   {
     name: "Gold Ananas",
+    id: "gold_pineapple",
     descriptionfn(game) {
       return goldDesc(game.fruits[2]);
     },
@@ -407,6 +426,7 @@ const consumableGoldBlueprints = [
   },
   {
     name: "Gold Kokos",
+    id: "gold_coconut",
     descriptionfn(game) {
       return goldDesc(game.fruits[4]);
     },
@@ -423,6 +443,7 @@ const consumableGoldBlueprints = [
 const tarotCards = [
   {
       name: "Głupiec",
+      id: "the_fool",
       descriptionfn(game){
         let ostatnia="Brak";
         if(game.stats.lastUsedTarot?.name){
@@ -448,6 +469,7 @@ const tarotCards = [
     },
   {
     name: "Mag",
+    id: "the_magician",
     descriptionfn(game) {
       return `Zamienia szanse 2 losowych owoców.`;
     },
@@ -483,6 +505,7 @@ const tarotCards = [
     */
     {
         name: "Arcykapłan",
+        id: "the_hierophant",
         descriptionfn(game){
             return `Daje 2 losowe karty tarota. (Musi mieć miejsce)`;
         },
@@ -521,6 +544,7 @@ const tarotCards = [
     },
   {
     name: "Kochankowie",
+    id: "the_lovers",
     descriptionfn(game) {
       return `${Style.Moves('+2 ruchy')}`;
     },
@@ -539,6 +563,7 @@ const tarotCards = [
     },*/
   {
     name: "Siła",
+    id: "strength",
     descriptionfn(game) {
       return `Po użyciu daje ${Style.Mult("+10 Mult")}`;
     },
@@ -560,6 +585,7 @@ const tarotCards = [
     },*/,
   {
     name: "Fortuna",
+    id: "wheel_of_fortune",
     descriptionfn(game) {
       return `${Style.Chance("1 na 4")} że ulepszenie dostaje bonusowe ${Style.Chance(MODIFIERS.Chip)}, lub ${Style.Chance(MODIFIERS.Mult)}`;
     },
@@ -593,6 +619,7 @@ const tarotCards = [
     },*/
   {
     name: "Szubieniczyk",
+    id: "the_hanged_man",
     descriptionfn(game) {
       return `Niszczy 10 losowych kafelków na planszy.`;
     },
@@ -638,6 +665,7 @@ const tarotCards = [
     },
     */ {
     name: "Wieża",
+    id: "the_tower",
     descriptionfn(game) {
       return `${Style.Chance(`1 na 5`)} na losowanie szans wszystkich owoców.`;
     },
@@ -661,6 +689,7 @@ const tarotCards = [
   },
   {
     name: "Gwiazda",
+    id: "the_star",
     descriptionfn(game) {
       return `Niszczy losowy rząd i kolumnę na planszy.`;
     },
@@ -684,6 +713,7 @@ const tarotCards = [
   },
     {
         name: "Księżyc",
+        id: "the_moon",
         descriptionfn(){
           return `Ulepsza od ${Style.Chance(`1 do 20`)} kafelków na ${Style.Chance(MODIFIERS.Silver)}`;
         },
@@ -715,6 +745,7 @@ const tarotCards = [
     },
     {
         name: "Słońce",
+        id: "the_sun",
         descriptionfn(){
           return `Ulepsza od ${Style.Chance(`1 do 20`)} kafelków na ${Style.Chance(MODIFIERS.Gold)}`;
         },

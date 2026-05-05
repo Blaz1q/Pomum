@@ -4,7 +4,9 @@ import {
   DIFFICULTY,
   Settings,
   STAGES,
+  MODIFIERS,
 } from "../dictionary.js";
+
 
 export const translations = {
   [LANGUAGE.PL]: {
@@ -37,7 +39,192 @@ export const translations = {
       new_game: "Nowa gra",
     },
     consumables: {
-      
+      apple: {
+        name: "Jabłko",
+        description: (data) => {
+          const fruit = data.game.fruits[0];
+          return `daje ${Style.Score("+2 punkty")}, ${Style.Mult("+0.4 mult")} do ${fruit.icon}, obecnie ${Style.Score("+" + fruit.props.upgrade.score + " punktów")}, ${Style.Mult("+" + fruit.props.upgrade.mult + " mult")}`;
+        },
+      },
+      pear: {
+        name: "Gruszka",
+        description: (data) => {
+          const fruit = data.game.fruits[1];
+          return `daje ${Style.Score("+2 punkty")}, ${Style.Mult("+0.4 mult")} do ${fruit.icon}, obecnie ${Style.Score("+" + fruit.props.upgrade.score + " punktów")}, ${Style.Mult("+" + fruit.props.upgrade.mult + " mult")}`;
+        },
+      },
+      pineapple: {
+        name: "Ananas",
+        description: (data) => {
+          const fruit = data.game.fruits[2];
+          return `daje ${Style.Score("+2 punkty")}, ${Style.Mult("+0.4 mult")} do ${fruit.icon}, obecnie ${Style.Score("+" + fruit.props.upgrade.score + " punktów")}, ${Style.Mult("+" + fruit.props.upgrade.mult + " mult")}`;
+        },
+      },
+      grape: {
+        name: "Winogron",
+        description: (data) => {
+          const fruit = data.game.fruits[3];
+          return `daje ${Style.Score("+2 punkty")}, ${Style.Mult("+0.4 mult")} do ${fruit.icon}, obecnie ${Style.Score("+" + fruit.props.upgrade.score + " punktów")}, ${Style.Mult("+" + fruit.props.upgrade.mult + " mult")}`;
+        },
+      },
+      coconut: {
+        name: "Kokos",
+        description: (data) => {
+          const fruit = data.game.fruits[4];
+          return `daje ${Style.Score("+2 punkty")}, ${Style.Mult("+0.4 mult")} do ${fruit.icon}, obecnie ${Style.Score("+" + fruit.props.upgrade.score + " punktów")}, ${Style.Mult("+" + fruit.props.upgrade.mult + " mult")}`;
+        },
+      },
+      evil_apple: {
+    name: "EVIL Jabłko",
+    description: (data) => {
+      const fruit = data.game.fruits[0];
+      if (fruit.props.percent - 5 <= 0) return `${Style.Chance("-" + fruit.props.percent + "%")} ${Style.Chance(`+${data.game.calcEqualize(fruit.props.percent)}%`)} reszta`;
+      return `${Style.Chance("-5%")} dla ${fruit.icon} ${Style.Chance("+1.25%")} reszta`;
+    }
+  },
+  evil_pear: {
+    name: "EVIL Gruszka",
+    description: (data) => {
+      const fruit = data.game.fruits[1];
+      if (fruit.props.percent - 5 <= 0) return `${Style.Chance("-" + fruit.props.percent + "%")} ${Style.Chance(`+${data.game.calcEqualize(fruit.props.percent)}%`)} reszta`;
+      return `${Style.Chance("-5%")} dla ${fruit.icon} ${Style.Chance("+1.25%")} reszta`;
+    }
+  },
+  evil_pineapple: {
+    name: "EVIL Ananas",
+    description: (data) => {
+      const fruit = data.game.fruits[2];
+      if (fruit.props.percent - 5 <= 0) return `${Style.Chance("-" + fruit.props.percent + "%")} ${Style.Chance(`+${data.game.calcEqualize(fruit.props.percent)}%`)} reszta`;
+      return `${Style.Chance("-5%")} dla ${fruit.icon} ${Style.Chance("+1.25%")} reszta`;
+    }
+  },
+  evil_grape: {
+    name: "EVIL Winogron",
+    description: (data) => {
+      const fruit = data.game.fruits[3];
+      if (fruit.props.percent - 5 <= 0) return `${Style.Chance("-" + fruit.props.percent + "%")} ${Style.Chance(`+${data.game.calcEqualize(fruit.props.percent)}%`)} reszta`;
+      return `${Style.Chance("-5%")} dla ${fruit.icon} ${Style.Chance("+1.25%")} reszta`;
+    }
+  },
+  evil_coconut: {
+    name: "EVIL Kokos",
+    description: (data) => {
+      const fruit = data.game.fruits[4];
+      if (fruit.props.percent - 5 <= 0) return `${Style.Chance("-" + fruit.props.percent + "%")} ${Style.Chance(`+${data.game.calcEqualize(fruit.props.percent)}%`)} reszta`;
+      return `${Style.Chance("-5%")} dla ${fruit.icon} ${Style.Chance("+1.25%")} reszta`;
+    }
+  },
+
+  // --- SILVER VARIANTS ---
+  silver_apple: {
+    name: "Silver Jabłko",
+    description: (data) => `${Style.Chance("+1%")} szansa na Silver dla ${data.game.fruits[0].icon}`
+  },
+  silver_pear: {
+    name: "Silver Gruszka",
+    description: (data) => `${Style.Chance("+1%")} szansa na Silver dla ${data.game.fruits[1].icon}`
+  },
+  silver_pineapple: {
+    name: "Silver Ananas",
+    description: (data) => `${Style.Chance("+1%")} szansa na Silver dla ${data.game.fruits[2].icon}`
+  },
+  silver_grape: {
+    name: "Silver Winogron",
+    description: (data) => `${Style.Chance("+1%")} szansa na Silver dla ${data.game.fruits[3].icon}`
+  },
+  silver_coconut: {
+    name: "Silver Kokos",
+    description: (data) => `${Style.Chance("+1%")} szansa na Silver dla ${data.game.fruits[4].icon}`
+  },
+
+  // --- GOLD VARIANTS ---
+  gold_apple: {
+    name: "Gold Jabłko",
+    description: (data) => `${Style.Chance("+1%")} szansa na Gold dla ${data.game.fruits[0].icon}`
+  },
+  gold_pear: {
+    name: "Gold Gruszka",
+    description: (data) => `${Style.Chance("+1%")} szansa na Gold dla ${data.game.fruits[1].icon}`
+  },
+  gold_pineapple: {
+    name: "Gold Ananas",
+    description: (data) => `${Style.Chance("+1%")} szansa na Gold dla ${data.game.fruits[2].icon}`
+  },
+  gold_grape: {
+    name: "Gold Winogron",
+    description: (data) => `${Style.Chance("+1%")} szansa na Gold dla ${data.game.fruits[3].icon}`
+  },
+  gold_coconut: {
+    name: "Gold Kokos",
+    description: (data) => `${Style.Chance("+1%")} szansa na Gold dla ${data.game.fruits[4].icon}`
+  },
+  negative: {
+    name: "Negatyw",
+    description: (data) => "Losowe ulepszenie staje się negatywne.",
+  },
+  copy: {
+    name: "Kopia",
+    description: (data) => "Kopiuje losowe ulepszenie i usuwa całą resztę.",
+  },
+  thunder: {
+    name: "Piorun",
+    description: (data) => "Daje 4 losowe ulepszenia owoców (mogą się powtarzać).",
+  },
+  foiled: {
+    name: "Foliowanie",
+    description: (data) => `Losowe ulepszenie otrzymuje bonusowe ${Style.Chance(MODIFIERS.Chip)} lub ${Style.Chance(MODIFIERS.Mult)}.`,
+  },
+  fire: {
+    name: "Ogień",
+    description: (data) => `Daje gotówkę równą cenie sprzedaży wszystkich posiadanych ulepszeń (Max ${Style.Money("$40")}).`,
+  },
+  the_fool: {
+    name: "Głupiec",
+    description: (data) => {
+      const last = data.game.stats.lastUsedTarot?.name || "Brak";
+      return `Daje ostatnią użytą kartę tarota. (Ostatnia: ${last})`;
+    },
+  },
+  the_magician: {
+    name: "Mag",
+    description: (data) => "Zamienia szanse 2 losowych owoców miejscami.",
+  },
+  the_hierophant: {
+    name: "Arcykapłan",
+    description: (data) => "Daje 2 losowe karty tarota (wymaga wolnego miejsca).",
+  },
+  the_lovers: {
+    name: "Kochankowie",
+    description: (data) => `${Style.Moves("+2 ruchy")}`,
+  },
+  strength: {
+    name: "Siła",
+    description: (data) => `Po użyciu daje ${Style.Mult("+10 Mult")}.`,
+  },
+  wheel_of_fortune: {
+    name: "Koło Fortuny",
+    description: (data) => `${Style.Chance("1 na 4")} szansy, że ulepszenie otrzyma bonusowe ${Style.Chance(MODIFIERS.Chip)} lub ${Style.Chance(MODIFIERS.Mult)}.`,
+  },
+  the_hanged_man: {
+    name: "Wisielec",
+    description: (data) => "Niszczy 10 losowych kafelków na planszy.",
+  },
+  the_tower: {
+    name: "Wieża",
+    description: (data) => `${Style.Chance("1 na 5")} szansy na całkowite przelosowanie szans wszystkich owoców.`,
+  },
+  the_star: {
+    name: "Gwiazda",
+    description: (data) => "Niszczy losowy rząd i kolumnę na planszy.",
+  },
+  the_moon: {
+    name: "Księżyc",
+    description: (data) => `Ulepsza od ${Style.Chance("1 do 20")} kafelków na ${Style.Chance(MODIFIERS.Silver)}.`,
+  },
+  the_sun: {
+    name: "Słońce",
+    description: (data) => `Ulepsza od ${Style.Chance("1 do 20")} kafelków na ${Style.Chance(MODIFIERS.Gold)}.`,
+  },
     },
     boosters: {
 
@@ -100,7 +287,7 @@ export const translations = {
           const desc = `${Style.Mult("+1 mult")} za każde ${data.game.fruits[0].icon} na kaskadę.`;
           return data.upgrade.props.mult !== 0
             ? desc +
-                ` (Obecnie ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
+            ` (Obecnie ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
             : desc;
         },
       },
@@ -110,7 +297,7 @@ export const translations = {
           const desc = `${Style.Mult("+1 mult")} za każde ${data.game.fruits[1].icon} na kaskadę.`;
           return data.upgrade.props.mult !== 0
             ? desc +
-                ` (Obecnie ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
+            ` (Obecnie ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
             : desc;
         },
       },
@@ -120,7 +307,7 @@ export const translations = {
           const desc = `${Style.Mult("+1 mult")} za każde ${data.game.fruits[2].icon} na kaskadę.`;
           return data.upgrade.props.mult !== 0
             ? desc +
-                ` (Obecnie ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
+            ` (Obecnie ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
             : desc;
         },
       },
@@ -130,7 +317,7 @@ export const translations = {
           const desc = `${Style.Mult("+1 mult")} za każde ${data.game.fruits[3].icon} na kaskadę.`;
           return data.upgrade.props.mult !== 0
             ? desc +
-                ` (Obecnie ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
+            ` (Obecnie ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
             : desc;
         },
       },
@@ -140,7 +327,7 @@ export const translations = {
           const desc = `${Style.Mult("+1 mult")} za każde ${data.game.fruits[4].icon} na kaskadę.`;
           return data.upgrade.props.mult !== 0
             ? desc +
-                ` (Obecnie ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
+            ` (Obecnie ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
             : desc;
         },
       },
@@ -182,7 +369,7 @@ export const translations = {
           const desc = `Każda kaskada daje dodatkowe ${Style.Score("+30 pkt")}`;
           return data.upgrade.props.score && data.upgrade.props.score > 0
             ? desc +
-                `, (obecnie ${Style.Score(`+${data.upgrade.props.score}`)})`
+            `, (obecnie ${Style.Score(`+${data.upgrade.props.score}`)})`
             : desc;
         },
       },
@@ -433,7 +620,192 @@ export const translations = {
       new_game: "New game",
     },
     consumables: {
-      
+      apple: {
+        name: "Apple",
+        description: (data) => {
+          const fruit = data.game.fruits[0];
+          return `gives ${Style.Score("+2 points")}, ${Style.Mult("+0.4 mult")} to ${fruit.icon}, currently ${Style.Score("+" + fruit.props.upgrade.score + " points")}, ${Style.Mult("+" + fruit.props.upgrade.mult + " mult")}`;
+        },
+      },
+      pear: {
+        name: "Pear",
+        description: (data) => {
+          const fruit = data.game.fruits[1];
+          return `gives ${Style.Score("+2 points")}, ${Style.Mult("+0.4 mult")} to ${fruit.icon}, currently ${Style.Score("+" + fruit.props.upgrade.score + " points")}, ${Style.Mult("+" + fruit.props.upgrade.mult + " mult")}`;
+        },
+      },
+      pineapple: {
+        name: "Pineapple",
+        description: (data) => {
+          const fruit = data.game.fruits[2];
+          return `gives ${Style.Score("+2 points")}, ${Style.Mult("+0.4 mult")} to ${fruit.icon}, currently ${Style.Score("+" + fruit.props.upgrade.score + " points")}, ${Style.Mult("+" + fruit.props.upgrade.mult + " mult")}`;
+        },
+      },
+      grape: {
+        name: "Grapes",
+        description: (data) => {
+          const fruit = data.game.fruits[3];
+          return `gives ${Style.Score("+2 points")}, ${Style.Mult("+0.4 mult")} to ${fruit.icon}, currently ${Style.Score("+" + fruit.props.upgrade.score + " points")}, ${Style.Mult("+" + fruit.props.upgrade.mult + " mult")}`;
+        },
+      },
+      coconut: {
+        name: "Coconut",
+        description: (data) => {
+          const fruit = data.game.fruits[4];
+          return `gives ${Style.Score("+2 points")}, ${Style.Mult("+0.4 mult")} to ${fruit.icon}, currently ${Style.Score("+" + fruit.props.upgrade.score + " points")}, ${Style.Mult("+" + fruit.props.upgrade.mult + " mult")}`;
+        },
+      },
+      evil_apple: {
+    name: "EVIL Apple",
+    description: (data) => {
+      const fruit = data.game.fruits[0];
+      if (fruit.props.percent - 5 <= 0) return `${Style.Chance("-" + fruit.props.percent + "%")} ${Style.Chance(`+${data.game.calcEqualize(fruit.props.percent)}%`)} to others`;
+      return `${Style.Chance("-5%")} for ${fruit.icon} ${Style.Chance("+1.25%")} to others`;
+    }
+  },
+  evil_pear: {
+    name: "EVIL Pear",
+    description: (data) => {
+      const fruit = data.game.fruits[1];
+      if (fruit.props.percent - 5 <= 0) return `${Style.Chance("-" + fruit.props.percent + "%")} ${Style.Chance(`+${data.game.calcEqualize(fruit.props.percent)}%`)} to others`;
+      return `${Style.Chance("-5%")} for ${fruit.icon} ${Style.Chance("+1.25%")} to others`;
+    }
+  },
+  evil_pineapple: {
+    name: "EVIL Pineapple",
+    description: (data) => {
+      const fruit = data.game.fruits[2];
+      if (fruit.props.percent - 5 <= 0) return `${Style.Chance("-" + fruit.props.percent + "%")} ${Style.Chance(`+${data.game.calcEqualize(fruit.props.percent)}%`)} to others`;
+      return `${Style.Chance("-5%")} for ${fruit.icon} ${Style.Chance("+1.25%")} to others`;
+    }
+  },
+  evil_grape: {
+    name: "EVIL Grapes",
+    description: (data) => {
+      const fruit = data.game.fruits[3];
+      if (fruit.props.percent - 5 <= 0) return `${Style.Chance("-" + fruit.props.percent + "%")} ${Style.Chance(`+${data.game.calcEqualize(fruit.props.percent)}%`)} to others`;
+      return `${Style.Chance("-5%")} for ${fruit.icon} ${Style.Chance("+1.25%")} to others`;
+    }
+  },
+  evil_coconut: {
+    name: "EVIL Coconut",
+    description: (data) => {
+      const fruit = data.game.fruits[4];
+      if (fruit.props.percent - 5 <= 0) return `${Style.Chance("-" + fruit.props.percent + "%")} ${Style.Chance(`+${data.game.calcEqualize(fruit.props.percent)}%`)} to others`;
+      return `${Style.Chance("-5%")} for ${fruit.icon} ${Style.Chance("+1.25%")} to others`;
+    }
+  },
+
+  // --- SILVER VARIANTS ---
+  silver_apple: {
+    name: "Silver Apple",
+    description: (data) => `${Style.Chance("+1%")} Silver chance for ${data.game.fruits[0].icon}`
+  },
+  silver_pear: {
+    name: "Silver Pear",
+    description: (data) => `${Style.Chance("+1%")} Silver chance for ${data.game.fruits[1].icon}`
+  },
+  silver_pineapple: {
+    name: "Silver Pineapple",
+    description: (data) => `${Style.Chance("+1%")} Silver chance for ${data.game.fruits[2].icon}`
+  },
+  silver_grape: {
+    name: "Silver Grapes",
+    description: (data) => `${Style.Chance("+1%")} Silver chance for ${data.game.fruits[3].icon}`
+  },
+  silver_coconut: {
+    name: "Silver Coconut",
+    description: (data) => `${Style.Chance("+1%")} Silver chance for ${data.game.fruits[4].icon}`
+  },
+
+  // --- GOLD VARIANTS ---
+  gold_apple: {
+    name: "Gold Apple",
+    description: (data) => `${Style.Chance("+1%")} Gold chance for ${data.game.fruits[0].icon}`
+  },
+  gold_pear: {
+    name: "Gold Pear",
+    description: (data) => `${Style.Chance("+1%")} Gold chance for ${data.game.fruits[1].icon}`
+  },
+  gold_pineapple: {
+    name: "Gold Pineapple",
+    description: (data) => `${Style.Chance("+1%")} Gold chance for ${data.game.fruits[2].icon}`
+  },
+  gold_grape: {
+    name: "Gold Grapes",
+    description: (data) => `${Style.Chance("+1%")} Gold chance for ${data.game.fruits[3].icon}`
+  },
+  gold_coconut: {
+    name: "Gold Coconut",
+    description: (data) => `${Style.Chance("+1%")} Gold chance for ${data.game.fruits[4].icon}`
+  },
+  negative: {
+    name: "Negative",
+    description: (data) => "A random upgrade becomes negative.",
+  },
+  copy: {
+    name: "Copy",
+    description: (data) => "Copies a random upgrade and removes the rest.",
+  },
+  thunder: {
+    name: "Thunder",
+    description: (data) => "Gives 4 random fruit upgrades (can repeat).",
+  },
+  foiled: {
+    name: "Foiled",
+    description: (data) => `Random upgrade gets a bonus ${Style.Chance(MODIFIERS.Chip)} or ${Style.Chance(MODIFIERS.Mult)}.`,
+  },
+  fire: {
+    name: "Fire",
+    description: (data) => `Gives the sell price of all owned upgrades (Max ${Style.Money("$40")}).`,
+  },
+  the_fool: {
+    name: "The Fool",
+    description: (data) => {
+      const last = data.game.stats.lastUsedTarot?.name || "None";
+      return `Gives the last used tarot card. (Last: ${last})`;
+    },
+  },
+  the_magician: {
+    name: "The Magician",
+    description: (data) => "Swaps the spawn chances of 2 random fruits.",
+  },
+  the_hierophant: {
+    name: "The Hierophant",
+    description: (data) => "Gives 2 random tarot cards (requires empty slots).",
+  },
+  the_lovers: {
+    name: "The Lovers",
+    description: (data) => `${Style.Moves("+2 moves")}`,
+  },
+  strength: {
+    name: "Strength",
+    description: (data) => `Gives ${Style.Mult("+10 Mult")} when used.`,
+  },
+  wheel_of_fortune: {
+    name: "Wheel of Fortune",
+    description: (data) => `${Style.Chance("1 in 4")} chance for an upgrade to get bonus ${Style.Chance(MODIFIERS.Chip)} or ${Style.Chance(MODIFIERS.Mult)}.`,
+  },
+  the_hanged_man: {
+    name: "The Hanged Man",
+    description: (data) => "Destroys 10 random tiles on the board.",
+  },
+  the_tower: {
+    name: "The Tower",
+    description: (data) => `${Style.Chance("1 in 5")} chance to reroll chances for all fruits.`,
+  },
+  the_star: {
+    name: "The Star",
+    description: (data) => "Destroys a random row and column on the board.",
+  },
+  the_moon: {
+    name: "The Moon",
+    description: (data) => `Upgrades ${Style.Chance("1 to 20")} tiles to ${Style.Chance(MODIFIERS.Silver)}.`,
+  },
+  the_sun: {
+    name: "The Sun",
+    description: (data) => `Upgrades ${Style.Chance("1 to 20")} tiles to ${Style.Chance(MODIFIERS.Gold)}.`,
+  },
     },
     boosters: {
 
@@ -496,7 +868,7 @@ export const translations = {
           const desc = `${Style.Mult("+1 mult")} for each ${data.game.fruits[0].icon} in a cascade.`;
           return data.upgrade.props.mult !== 0
             ? desc +
-                ` (Currently ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
+            ` (Currently ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
             : desc;
         },
       },
@@ -506,7 +878,7 @@ export const translations = {
           const desc = `${Style.Mult("+1 mult")} for each ${data.game.fruits[1].icon} in a cascade.`;
           return data.upgrade.props.mult !== 0
             ? desc +
-                ` (Currently ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
+            ` (Currently ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
             : desc;
         },
       },
@@ -516,7 +888,7 @@ export const translations = {
           const desc = `${Style.Mult("+1 mult")} for each ${data.game.fruits[2].icon} in a cascade.`;
           return data.upgrade.props.mult !== 0
             ? desc +
-                ` (Currently ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
+            ` (Currently ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
             : desc;
         },
       },
@@ -526,7 +898,7 @@ export const translations = {
           const desc = `${Style.Mult("+1 mult")} for each ${data.game.fruits[3].icon} in a cascade.`;
           return data.upgrade.props.mult !== 0
             ? desc +
-                ` (Currently ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
+            ` (Currently ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
             : desc;
         },
       },
@@ -536,7 +908,7 @@ export const translations = {
           const desc = `${Style.Mult("+1 mult")} for each ${data.game.fruits[4].icon} in a cascade.`;
           return data.upgrade.props.mult !== 0
             ? desc +
-                ` (Currently ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
+            ` (Currently ${Style.Mult(`+${data.upgrade.props.mult} mult`)})`
             : desc;
         },
       },
@@ -578,7 +950,7 @@ export const translations = {
           const desc = `Each cascade gives an additional ${Style.Score("+30 pts")}`;
           return data.upgrade.props.score && data.upgrade.props.score > 0
             ? desc +
-                `, (currently ${Style.Score(`+${data.upgrade.props.score}`)})`
+            `, (currently ${Style.Score(`+${data.upgrade.props.score}`)})`
             : desc;
         },
       },
@@ -818,6 +1190,6 @@ export function changeLanguage(data = null) {
 
   elements.forEach((el) => {
     const key = el.getAttribute("data-i18n");
-    el.innerHTML = t(key, Settings.LANGUAGE,data);
+    el.innerHTML = t(key, Settings.LANGUAGE, data);
   });
 }
