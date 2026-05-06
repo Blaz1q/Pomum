@@ -10,6 +10,7 @@ export class UpgradeRenderer {
     this.startX = 0;
     this.startY = 0;
     this.lastMouseX = 0;
+    this.dragThreshold = 5;
     this._mouseMoveHandler = (e) => this.onMouseMove(e);
     this._mouseUpHandler = (e) => this.onMouseUp(e);
   }
@@ -158,7 +159,7 @@ export class UpgradeRenderer {
     wrapper.appendChild(desc);
     if (displayButtons) wrapper.appendChild(this.createButtons(params));
 
-    this.dragThreshold = 5;
+    
     const onMouseDown = (e) => {
       this.isDragging = true;
       this.dragStarted = false;

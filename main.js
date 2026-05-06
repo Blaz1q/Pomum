@@ -235,7 +235,7 @@ export class Game {
         this.GameRenderer.displayMoves();
         if (this.stage == STAGES.Boss) {
             addmoney += this.nextBoss.moneyreward;
-            this.nextBoss.revert(this);
+            this.nextBoss.remove(this);
             this.bosses.push(this.nextBoss);
             this.nextBoss = null;
             this.GameRenderer.displayBossInGame();

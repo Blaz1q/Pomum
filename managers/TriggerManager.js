@@ -1,4 +1,4 @@
-import { UPGRADE_STATES, SCORE_ACTIONS, PRIORITY, Settings } from "../dictionary.js";
+import { UPGRADE_STATES, SCORE_ACTIONS, PRIORITY, Settings, STAGES } from "../dictionary.js";
 import { PriorityQueue } from "../utils/PriorityQueue.js";
 import { Queue } from "../utils/Queue.js";
 import { GAME_TRIGGERS } from "../dictionary.js";
@@ -25,7 +25,9 @@ export class TriggerManager {
         // 1. Dodajemy bazowe karty wg priorytetów
         for (const [key, value] of Object.entries(PRIORITY)) {
             const priorityUpgrades = this.game.upgrades.filter(u => u.priority === value);
-            console.log(priorityUpgrades);
+            if (this.game.stage === STAGES.Boss && this.game.nextBoss && this.game.nextBoss.priority === value) {
+                priorityUpgrades.push(this.game.nextBoss);
+            }
             this.addToQueue(priorityUpgrades, event, payload);
         }
         
@@ -35,7 +37,7 @@ export class TriggerManager {
             console.log(upgrade.name+" "+event);
             // Mechanizm EXHAUSTED (opcjonalny bezpiecznik)
             if (upgrade.isExhausted) continue;
-
+            
             await this.processHandlers(event, upgrade, payload);
         }
 
@@ -46,7 +48,7 @@ export class TriggerManager {
         this.resetAll(event);
     }
 getHandlers(upgrade,event){
-    if (!upgrade || typeof upgrade !== "object" || upgrade.isExhausted ) return null;
+    if (!upgrade || typeof upgrade !== "object" || upgrade.isExhausted ) return null;  
 
             const handlerName = `on${event[0].toUpperCase()}${event.slice(1)}`;
             const mainHandler = typeof upgrade[handlerName] === "function"
@@ -78,6 +80,7 @@ getHandlers(upgrade,event){
         const wait = ms => new Promise(r => setTimeout(r, ms));
         const handlers = this.getHandlers(upgrade, event); 
         const queue = this.handleQueues(event);
+        console.log(queue);
         if (!handlers || handlers.length === 0) return;
 
         // 1. Zarządzanie iteracjami na poziomie KARTY + EVENTU
@@ -161,7 +164,7 @@ getHandlers(upgrade,event){
         for (const upgrade of upgrades) {
             
             const handlers = this.getHandlers(upgrade, event); 
-
+            console.log(handlers);
             if (handlers&&handlers.length > 0) {
                 queue.enqueue({ upgrade, event, payload },upgrade.priority);
             }

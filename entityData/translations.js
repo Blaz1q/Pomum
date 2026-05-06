@@ -226,25 +226,62 @@ export const translations = {
         description: (data) => `Ulepsza od ${Style.Chance("1 do 20")} kafelków na ${Style.Chance(MODIFIERS.Gold)}.`,
       },
     },
+    bosses: {
+      snake: {
+        name: "Wąż",
+        description: (data) => `Wszystkie ${data.game.fruits[0].icon} nie dają punktów.`,
+      },
+      bear: {
+        name: "Niedźwiedź",
+        description: (data) => `Wszystkie ${data.game.fruits[1].icon} nie dają punktów.`,
+      },
+      starfish: {
+        name: "Rozgwiazda",
+        description: (data) => `Wszystkie ${data.game.fruits[2].icon} nie dają punktów.`,
+      },
+      vine: {
+        name: "Winorośl",
+        description: (data) => `Wszystkie ${data.game.fruits[3].icon} nie dają punktów.`,
+      },
+      crab: {
+        name: "Krab",
+        description: (data) => `Wszystkie ${data.game.fruits[4].icon} nie dają punktów.`,
+      },
+      wave: {
+        name: "Fala",
+        description: (data) => {
+          const fruit = data.upgrade.props.chosenFruit;
+          return fruit ? `Najczęstszy owoc (${fruit.icon}) nie daje punktów.` : `Najczęstszy owoc nie daje punktów.`;
+        },
+      },
+      needle: {
+        name: "Igła",
+        description: (data) => "Masz o 3 ruchy mniej w tej rundzie.",
+      },
+      ruler: {
+        name: "Władca",
+        description: (data) => `Zmniejsza ${Style.Mult("mult")} i ${Style.Score("punkty")} o ${Style.Highlight('10%')}.`,
+      },
+    },
     boosters: {
       pomumpack: {
         name: "Pomum pack",
         description: (data) => `Znajdują się ${Style.Highlight(data.upgrade.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(data.upgrade.props.maxSelect)}`
       },
       pomumpackbig: {
-        name: "Pomum pack BIG",
+        name: "BIG Pomum pack",
         description: (data) => `Znajdują się ${Style.Highlight(data.upgrade.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(data.upgrade.props.maxSelect)}`
       },
       pomumpackmega: {
-        name: "Pomum pack MEGA",
+        name: "MEGA Pomum pack",
         description: (data) => `Znajdują się ${Style.Highlight(data.upgrade.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(data.upgrade.props.maxSelect)}`
       },
       pomumpackgold: {
-        name: "Pomum pack GOLD",
+        name: "GOLD Pomum pack",
         description: (data) => `Znajdują się ${Style.Highlight(data.upgrade.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(data.upgrade.props.maxSelect)}`
       },
       pomumpacksilver: {
-        name: "Pomum pack SILVER",
+        name: "SILVER Pomum pack",
         description: (data) => `Znajdują się ${Style.Highlight(data.upgrade.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(data.upgrade.props.maxSelect)}`
       },
       upgradepack: {
@@ -261,33 +298,33 @@ export const translations = {
       }
     },
     vouchers: {
-    upgrade_plus: {
-      name: "+1 Slot",
-      description: (data) => `Zwiększa miejsce na ulepszenia o 1. (Obecnie ${Style.Chance(data.game.maxUpgrades)} -> ${Style.Chance(data.game.maxUpgrades + 1)})`,
-    },
-    overstock: {
-      name: "Nadmiar",
-      description: (data) => {
-        const current = data.game.shopSize || 3;
-        return `Zwiększa miejsce na ulepszenia w sklepie o 1. (Obecnie ${Style.Chance(current)} -> ${Style.Chance(current + 1)})`;
+      upgrade_plus: {
+        name: "+1 Slot",
+        description: (data) => `Zwiększa miejsce na ulepszenia o 1. (Obecnie ${Style.Chance(data.game.maxUpgrades)} -> ${Style.Chance(data.game.maxUpgrades + 1)})`,
       },
-    },
-    passage: {
-      name: "Przejście",
-      description: (data) => `Zwiększa możliwe ruchy w rundzie o ${Style.Moves("+1 ruch")}`,
-    },
-    power: {
-      name: "Moc",
-      description: (data) => `Ulepszone karty pojawiają się ${Style.Chance("X2")} częściej`,
-    },
-    salad: {
-      name: "Sałatka",
-      description: (data) => `Zwiększa miejsce na ulepszenia kafelków o 1. (Obecnie ${Style.Chance(data.game.maxConsumables)} -> ${Style.Chance(data.game.maxConsumables + 1)})`,
-    },
-    booster: {
-      name: "Doładowanie",
-      description: (data) => `Zwiększa miejsce na Booster Packi w sklepie o 1. (Obecnie ${Style.Chance(data.game.maxBoosters)} -> ${Style.Chance(data.game.maxBoosters + 1)})`,
-    },
+      overstock: {
+        name: "Nadmiar",
+        description: (data) => {
+          const current = data.game.shopSize || 3;
+          return `Zwiększa miejsce na ulepszenia w sklepie o 1. (Obecnie ${Style.Chance(current)} -> ${Style.Chance(current + 1)})`;
+        },
+      },
+      passage: {
+        name: "Przejście",
+        description: (data) => `Zwiększa możliwe ruchy w rundzie o ${Style.Moves("+1 ruch")}`,
+      },
+      power: {
+        name: "Moc",
+        description: (data) => `Ulepszone karty pojawiają się ${Style.Chance("X2")} częściej`,
+      },
+      salad: {
+        name: "Sałatka",
+        description: (data) => `Zwiększa miejsce na ulepszenia kafelków o 1. (Obecnie ${Style.Chance(data.game.maxConsumables)} -> ${Style.Chance(data.game.maxConsumables + 1)})`,
+      },
+      booster: {
+        name: "Doładowanie",
+        description: (data) => `Zwiększa miejsce na Booster Packi w sklepie o 1. (Obecnie ${Style.Chance(data.game.maxBoosters)} -> ${Style.Chance(data.game.maxBoosters + 1)})`,
+      },
     },
     upgrades: {
       hallucination: {
@@ -680,6 +717,43 @@ export const translations = {
       win: "You win!",
       new_game: "New game",
     },
+    bosses: {
+      snake: {
+        name: "The Snake",
+        description: (data) => `All ${data.game.fruits[0].icon} give no points.`,
+      },
+      bear: {
+        name: "The Bear",
+        description: (data) => `All ${data.game.fruits[1].icon} give no points.`,
+      },
+      starfish: {
+        name: "The Starfish",
+        description: (data) => `All ${data.game.fruits[2].icon} give no points.`,
+      },
+      vine: {
+        name: "The Vine",
+        description: (data) => `All ${data.game.fruits[3].icon} give no points.`,
+      },
+      crab: {
+        name: "The Crab",
+        description: (data) => `All ${data.game.fruits[4].icon} give no points.`,
+      },
+      wave: {
+        name: "The Wave",
+        description: (data) => {
+          const fruit = data.upgrade.props.chosenFruit;
+          return fruit ? `Most common fruit (${fruit.icon}) gives no points.` : `Most common fruit gives no points.`;
+        },
+      },
+      needle: {
+        name: "The Needle",
+        description: (data) => "3 fewer moves this round.",
+      },
+      ruler: {
+        name: "The Ruler",
+        description: (data) => `Reduces ${Style.Mult("mult")} and ${Style.Score("score")} by ${Style.Highlight('10%')}.`,
+      },
+    },
     consumables: {
       apple: {
         name: "Apple",
@@ -932,7 +1006,7 @@ export const translations = {
       },
     },
     upgrades: {
-       hallucination: {
+      hallucination: {
         name: "Hallucination",
         description: `${Style.Chance("1 in 2")} chance when opening ${Style.Highlight('Booster packs')} for creating ${Style.Highlight('Tarot card')} (Must have room)`
       },

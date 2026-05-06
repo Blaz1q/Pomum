@@ -11,7 +11,6 @@ export const GAME_TRIGGERS = {
     onRetrigger: 'Retrigger',
     onReset: 'Reset',
     onBoosterBuy: 'BoosterBuy'
-
 };
 export const TYPES = {
     Fruit: "fruit",
@@ -22,6 +21,7 @@ export const PRIORITY = {
     REPEAT: 0,
     NORMAL: 1,
     RETRIGGER: 2,
+    BOSS: 3
 }
 export const MODIFIERS = {
     None: "none",

@@ -577,24 +577,10 @@ displayTempScore() {
   }
   displayBoss(boss) {
     console.log(boss);
-    const wrapper = document.createElement("div");
-    wrapper.className = "boss-wrapper";
-    const cardInner = document.createElement("div");
-    cardInner.className = "upgrade-inner";
-    cardInner.style.backgroundImage = `url('${boss.image}')`;
-
-    const card = document.createElement("div");
-    card.className = "upgrade-card";
-    card.style.animationDelay = `-${Math.random() * 3}s`;
-    card.appendChild(cardInner);
-    this.addParalax(card);
-    // Description
-    const desc = document.createElement("div");
-    desc.className = "upgrade-desc";
-    desc.innerHTML = `<div class='title'>${boss.name}</div><div class='content'>${boss.description(this.game)}</div>`;
-    wrapper.appendChild(card);
-    wrapper.appendChild(desc);
-    return wrapper;
+    if(!boss.UpgradeRenderer){
+      boss.initRenderer(this.game);
+    }
+    return boss.UpgradeRenderer.render({ bought: false,displayPrice: false, origin: null });
   }
 
   displayUpgrades(upgrades, params = { bought: false, origin: null }) {

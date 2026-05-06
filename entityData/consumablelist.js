@@ -941,7 +941,7 @@ export const consumablePacks = [
     image: "pomumpack", // Dodane domyślne wartości
   },
   {
-    name: "Poumpack BIG",
+    name: "Pomumpack BIG",
     descriptionfn() {
       return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },
@@ -954,7 +954,7 @@ export const consumablePacks = [
     image: "pomumpackbig",
   },
   {
-    name: "Poumpack MEGA",
+    name: "Pomumpack MEGA",
     descriptionfn() {
       return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('ulepszeń kafelków')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },

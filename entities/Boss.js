@@ -1,25 +1,29 @@
 console.log("Boss");
-export class Boss {
-    constructor(name, description, effect, remove, props = {}) {
-        this.name = name;
-        this.descriptionfn = description;
-        this.effect = effect;
-        this.remove = remove;
+import { LANGUAGE, PRIORITY, SCORE_ACTIONS, Settings, Style, UPGRADE_STATES } from "../dictionary.js";
+import { BossRenderer } from "../UI/bossRenderer.js";
+import { UpgradeBase } from "./upgradeBase.js";
+export class Boss extends UpgradeBase {
+
+    constructor(props = {}) {
+        super(props);
+        this.type = "Boss";
+        this.url = "./images/bosses/";
+        this.active = true;
         this.moneyreward = props.moneyreward ?? 5;
-        this.props = props;
-        this.image = `./images/bosses/${props.image ? props.image.toLowerCase() : 'default'}.png`
+        this.priority = PRIORITY.BOSS;
     }
-    description(game) {
-        if (typeof this.descriptionfn === "function") {
-            return this.descriptionfn.call(this, game);
-        }
-        return this.descriptionfn;
+    translation() {
+        const lang = Settings.LANGUAGE || LANGUAGE.PL;
+        return translations[lang]?.bosses?.[this.id];
     }
     apply(game) {
-        this.effect.call(this, game); // this wewnątrz effect wskazuje na instancję
+        this.props?.effect?.call(this, game); // this wewnątrz effect wskazuje na instancję
     }
-    revert(game) {
-        this.remove.call(this, game);
+    remove(game) {
+        this.props?.remove?.call(this, game);
+    }
+    initRenderer(game) {
+        this.UpgradeRenderer = new BossRenderer(this, game.GameRenderer);
     }
 }
 const BossBlueprints = [
@@ -31,10 +35,10 @@ const BossBlueprints = [
         effect(game) {
             game.fruits[0].props.debuffed = true;
         },
-        revert(game) {
+        remove(game) {
             game.fruits[0].props.debuffed = false;
         },
-        props: { image: 'snake' }
+        image: 'snake'
     },
     {
         name: "Bear",
@@ -44,10 +48,10 @@ const BossBlueprints = [
         effect(game) {
             game.fruits[1].props.debuffed = true;
         },
-        revert(game) {
+        remove(game) {
             game.fruits[1].props.debuffed = false;
         },
-        props: { image: 'bear' }
+        image: 'bear'
     },
     {
         name: "Starfish",
@@ -57,10 +61,10 @@ const BossBlueprints = [
         effect(game) {
             game.fruits[2].props.debuffed = true;
         },
-        revert(game) {
+        remove(game) {
             game.fruits[2].props.debuffed = false;
         },
-        props: { image: 'starfish' }
+        image: 'starfish'
     },
     {
         name: "Vine",
@@ -70,10 +74,10 @@ const BossBlueprints = [
         effect(game) {
             game.fruits[3].props.debuffed = true;
         },
-        revert(game) {
+        remove(game) {
             game.fruits[3].props.debuffed = false;
         },
-        props: { image: 'vine' }
+        image: 'vine'
     },
     {
         name: "Crab",
@@ -83,10 +87,10 @@ const BossBlueprints = [
         effect(game) {
             game.fruits[4].props.debuffed = true;
         },
-        revert(game) {
+        remove(game) {
             game.fruits[4].props.debuffed = false;
         },
-        props: { image: 'crab' }
+        image: 'crab'
     },
     {
         name: "Wave",
@@ -100,11 +104,11 @@ const BossBlueprints = [
             this.props.chosenFruit = fruit;
             fruit.props.debuffed = true;
         },
-        revert(game) {
+        remove(game) {
             this.props.chosenFruit.props.debuffed = false;
             this.props.chosenFruit = null;
         },
-        props: { image: 'wave' }
+        image: 'wave'
     },
     {
         name: "Needle",
@@ -116,12 +120,39 @@ const BossBlueprints = [
             game.moves -= this.props.removedMoves;
             game.GameRenderer.displayMoves();
         },
-        revert(game) {
+        remove(game) {
             game.moves += this.props.removedMoves;
             game.GameRenderer.displayMoves();
         },
-        props: { moneyreward: 12 }
+        moneyreward: 12,
+        image: 'default'
+    },
+    {
+        name: "Ruler",
+        descriptionfn(game) {
+            return `Zmiejsza ${Style.Mult("mult")} i ${Style.Score("punkty")} o ${Style.Highlight('10%')}`
+        },
+        props: () => ({
+            onScore() {
+                game.mult *= 0.9;
+                game.score *= 0.9;
+                game.GameRenderer.displayTempScore();
+                return { state: UPGRADE_STATES.Score, message: "-10%", style: SCORE_ACTIONS.Info };
+            },
+        }),
+        image: 'default'
     }
+    // {
+    //     name: "window",
+    //     descriptionfn(game){
+    //         return `Kafelki na ${Style.Highlight("ścianach planszy")} nie dają punktów`;
+    //     },
+    //     props: () => ({
+    //         onSpawn(){
+                
+    //         }
+    //     })
+    // }
 ];
 export function rollBoss(game) {
     // Filter out bosses already in the game
@@ -144,12 +175,6 @@ export function rollBoss(game) {
 
     // Pick first boss from shuffled pool
     const blueprint = pool[0];
-    return new Boss(
-        blueprint.name,
-        blueprint.descriptionfn,
-        blueprint.effect,
-        blueprint.revert,
-        blueprint.props
-    );
+    return new Boss(blueprint);
 
 }
