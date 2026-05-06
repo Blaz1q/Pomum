@@ -157,7 +157,7 @@ const BossBlueprints = [
 export function rollBoss(game) {
     // Filter out bosses already in the game
     let available = BossBlueprints.filter(c =>
-        !game.bosses.some(boss => boss.name === c.name)
+        !game.bosses.some(boss => boss._name === c.name)
     );
 
     // If no unused bosses left, fall back to full pool
