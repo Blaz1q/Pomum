@@ -135,7 +135,7 @@ const BossBlueprints = [
         props: () => ({
             onScore() {
                 game.mult *= 0.9;
-                game.score *= 0.9;
+                game.tempscore *= 0.9;
                 game.GameRenderer.displayTempScore();
                 return { state: UPGRADE_STATES.Score, message: "-10%", style: SCORE_ACTIONS.Info };
             },
