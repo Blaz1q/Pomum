@@ -1,6 +1,6 @@
 console.log("Voucher");
 import { UpgradeBase } from "./upgradeBase.js";
-import { UPGRADE_RARITY,SCORE_ACTIONS } from "../dictionary.js";
+import { UPGRADE_RARITY,SCORE_ACTIONS, Settings, LANGUAGE } from "../dictionary.js";
 export class Voucher extends UpgradeBase {
   constructor(props = {}) {
     super(props);
@@ -8,6 +8,10 @@ export class Voucher extends UpgradeBase {
     this.url = "./images/vouchers/";
     this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.None;
   }
+  translation(){
+      const lang = Settings.LANGUAGE || LANGUAGE.PL;
+      return translations[lang]?.vouchers?.[this.id];
+    }
   apply(game) {
     this.bought = true;
     this.props.effect.call(this, game);

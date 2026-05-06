@@ -3,7 +3,7 @@ import { UpgradeBase } from "./upgradeBase.js";
 import { Consumable } from "./Consumable.js";
 import { Tarot } from "./Tarot.js";
 import { Upgrade } from "./Upgrade.js";
-import { UPGRADE_RARITY } from "../dictionary.js";
+import { LANGUAGE, Settings, UPGRADE_RARITY } from "../dictionary.js";
 export class ConsumablePack extends UpgradeBase {
   constructor(props = {}) {
     super(props);
@@ -19,6 +19,10 @@ export class ConsumablePack extends UpgradeBase {
   hasSpace() {
     return true;
   }
+  translation(){
+      const lang = Settings.LANGUAGE || LANGUAGE.PL;
+      return translations[lang]?.boosters?.[this.id];
+    }
   roll(game) {
     // Start with all available consumables
     let count = this.props.maxRoll;

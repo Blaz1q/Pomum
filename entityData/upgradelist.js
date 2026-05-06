@@ -1655,7 +1655,7 @@ export const upgradeBlueprints = [
   ...UNCOMMON
 },
 {
-  name: "Bezsenność",
+  name: "Hallucination",
   descriptionfn(game) {
     return `${Style.Chance("1 na 2")} że po otwarciu ${Style.Highlight('Boostera')} dostanie się ${Style.Highlight('Kartę tarota')} (Jeśli jest miejsce)`;
   },

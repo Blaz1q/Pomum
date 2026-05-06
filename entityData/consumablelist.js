@@ -814,6 +814,7 @@ function evilfunc(game, fruit) {
 export const coupons = [
   {
    name: "+1",
+   id: "upgrade_plus",
     descriptionfn(game) {
       return `Zwiększa miejsce na ulepszenia o 1. (Obecnie ${Style.Chance(game.maxUpgrades)} -> ${Style.Chance(game.maxUpgrades + 1)})`;
     },
@@ -840,6 +841,7 @@ export const coupons = [
 },
 {
   name: "Przejście",
+  id: "passage",
   descriptionfn(game) {
     return `Zwiększa możliwe ruchy w rundzie o ${Style.Moves(`+1 ruch`)}`;
   },
@@ -852,6 +854,7 @@ export const coupons = [
 },
 {
   name: "Moc",
+  id: "power",
   descriptionfn(game) {
     return `Ulepszone karty pojawiają się ${Style.Chance(`X2`)} częściej`;
   },
@@ -863,6 +866,7 @@ export const coupons = [
 },
 {
   name: "Sałatka",
+  id: "salad",
   descriptionfn(game) {
     return `Zwiększa miejsce na ulepszenia kafelków o 1. (Obecnie ${Style.Chance(game.maxConsumables)} -> ${Style.Chance(game.maxConsumables + 1)})`;
   },
@@ -956,7 +960,7 @@ export const consumablePacks = [
     },
     consumables: pomumpackItems,
     price: 8,
-    props: {
+    props: { 
       maxSelect: 2,
       maxRoll: 5,
     },
@@ -989,7 +993,7 @@ export const consumablePacks = [
     image: "pomumpack_silver",
   },
   {
-    name: "Pomumpack Upgrade",
+    name: "Upgradepack",
     descriptionfn() {
       return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('ulepszeń')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },
@@ -1016,9 +1020,9 @@ export const consumablePacks = [
     image: "tarot_pack",
   },
   {
-    name: "Arcana Pack",
+    name: "Pact Pack",
     descriptionfn() {
-      return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('arcana')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
+      return `Znajdują się ${Style.Highlight(this.props.maxRoll)} karty ${Style.Highlight('paktu')}. Możesz wybrać maksymalnie ${Style.Highlight(this.props.maxSelect)}`;
     },
     consumables: consumableUpgradeBlueprints,
     price: 4,
