@@ -43,6 +43,20 @@ export const translations = {
       defaultdesc: "Zdobądź punkty aby przejść dalej!",
       chooseyourcards: (data) => `Wybierz swoje karty. Pozostało: ${data.game.BuysFromBoosterLeft}`
     },
+    modifiers: {
+      [MODIFIERS.Chip]: {
+        name: "Chip",
+        description: `Daje ${Style.Score('+50 pkt')} przy zliczaniu.`
+      },
+      [MODIFIERS.Negative]: {
+        name: "Negatyw",
+        description: `Nie zajmuje miejsca.`
+      },
+      [MODIFIERS.Mult]: {
+        name: "Polychrome",
+        description: `Daje ${Style.Mult('X1.5 Mult')} przy zliczaniu.`
+      }
+    },
     consumables: {
       apple: {
         name: "Jabłko",
@@ -165,7 +179,7 @@ export const translations = {
       },
       negative: {
         name: "Negatyw",
-        description: (data) => "Losowe ulepszenie staje się negatywne.",
+        description: (data) => `Losowe ulepszenie staje się ${Style.Chance("Negatywne")}. (Ulepszenie nie zajmuje miejsca)`,
       },
       copy: {
         name: "Kopia",
@@ -177,7 +191,7 @@ export const translations = {
       },
       foiled: {
         name: "Foliowanie",
-        description: (data) => `Losowe ulepszenie otrzymuje bonusowe ${Style.Chance(MODIFIERS.Chip)} lub ${Style.Chance(MODIFIERS.Mult)}.`,
+        description: (data) => `Losowe ulepszenie otrzymuje bonusowe ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Chip].name)} lub ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Mult].name)}.`,
       },
       fire: {
         name: "Ogień",
@@ -730,6 +744,20 @@ export const translations = {
       pts: "pts",
       chooseyourcards: (data) => `Choose your cards. Cards left: ${data.game.BuysFromBoosterLeft}`
     },
+    modifiers: {
+      [MODIFIERS.Chip]: {
+        name: "Chip",
+        description: `Gives ${Style.Score('+50 pts')} when scoring.`
+      },
+      [MODIFIERS.Negative]: {
+        name: "Negative",
+        description: `Doesn't take up space.`
+      },
+      [MODIFIERS.Mult]: {
+        name: "Polychrome",
+        description: `Gives ${Style.Mult('X1.5 Mult')} when scoring.`
+      }
+    },
     bosses: {
       snake: {
         name: "The Snake",
@@ -889,7 +917,7 @@ export const translations = {
       },
       negative: {
         name: "Negative",
-        description: (data) => "A random upgrade becomes negative.",
+        description: (data) => "A random upgrade becomes negative. (upgrade doesn't take up space)",
       },
       copy: {
         name: "Copy",
@@ -901,7 +929,7 @@ export const translations = {
       },
       foiled: {
         name: "Foiled",
-        description: (data) => `Random upgrade gets a bonus ${Style.Chance(MODIFIERS.Chip)} or ${Style.Chance(MODIFIERS.Mult)}.`,
+        description: (data) => `Random upgrade gets a bonus ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Chip].name)} or ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Mult].name)}.`,
       },
       fire: {
         name: "Fire",

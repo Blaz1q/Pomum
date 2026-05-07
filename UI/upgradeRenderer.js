@@ -222,8 +222,14 @@ export class UpgradeRenderer {
       const negSpan = document.createElement('div');
       negSpan.className = 'type desc-negative';
       negSpan.textContent = 'Negative';
-
+      const descModifier = document.createElement('p');
+      // Wstrzykujemy Twój HTML z tagami <b>
+      descModifier.className = "content";
+      descModifier.innerHTML = t(`modifiers.negative.description`,Settings.LANGUAGE);
+      descModifier.dataset.i18n = `modifiers.negative.description`;
+      footer.appendChild(descModifier);
       footer.appendChild(negSpan);
+      
     }
 
     // Modyfikator
@@ -231,8 +237,15 @@ export class UpgradeRenderer {
       const modSpan = document.createElement('div');
       modSpan.className = `type ${upgrade.modifier}`;
       modSpan.textContent = upgrade.modifier;
-
+      modSpan.dataset.i18n = `modifiers.${upgrade.modifier}.name`;
+      const descModifier = document.createElement('p');
+      // Wstrzykujemy Twój HTML z tagami <b>
+      descModifier.className = "content";
+      descModifier.innerHTML = t(`modifiers.${upgrade.modifier}.description`,Settings.LANGUAGE);
+      descModifier.dataset.i18n = `modifiers.${upgrade.modifier}.description`;
+      footer.appendChild(descModifier);
       footer.appendChild(modSpan);
+      
     }
 
     container.appendChild(footer);
