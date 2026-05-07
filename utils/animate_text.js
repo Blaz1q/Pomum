@@ -1,4 +1,4 @@
-import { animate,stagger } from '../libs/animejs/index.js';
+import { animate,stagger,splitText } from '../libs/animejs/index.js';
 
 
 export function fadeInAndBalatro(element){
@@ -7,12 +7,21 @@ export function fadeInAndBalatro(element){
         initBalatroEffect(element)
     });
 }
-
+export function scaleText(element){
+    if (!element) return;
+    const { chars } = splitText(element, {chars: true,});
+    return animate(chars, {
+        // Definiujemy pełny cykl góra -> dół -> powrót
+        // Kluczem jest brak wartości 0 w środku, co eliminowało "czkawkę"
+        scale: [2,1],
+        easing: 'linear',
+        duration: 150,
+        delay: stagger(10)
+    });
+}
 export function fadeIn(element){
     if (!element) return;
-    prepareElement(element);
-    
-    const chars = element.querySelectorAll('.char');
+    const { chars } = splitText(element, {chars: true,});
 
     return animate(chars, {
         // Definiujemy pełny cykl góra -> dół -> powrót
@@ -25,9 +34,8 @@ export function fadeIn(element){
 }
 export function animateWave(element) {
     if (!element) return;
-    prepareElement(element);
     
-    const chars = element.querySelectorAll('.char');
+    const { chars } = splitText(element, {chars: true,});
 
     animate(chars, {
         // Definiujemy pełny cykl góra -> dół -> powrót
@@ -40,25 +48,10 @@ export function animateWave(element) {
         delay: stagger(100)
     });
 }
-function prepareElement(element){
-    if (!element) return;
-
-    let text = element.textContent;
-    
-    // Logika pakowania w słowa i litery
-    element.innerHTML = text.split(/(\s+)/).map(word => {
-        if (word.trim().length === 0) return word; // Spacje zwracamy bez zmian
-        return `<span class="word" style="display:inline-block; white-space:nowrap;">${
-            word.split("").map(char => `<span class="char" style="display:inline-block">${char}</span>`).join("")
-        }</span>`;
-    }).join("");
-}
 export function initBalatroEffect(element) {
     if (!element) return;
 
-    prepareElement(element);
-
-    const chars = element.querySelectorAll('.char');
+    const { chars } = splitText(element, {chars: true,});
     
     animate(chars, {
             // Skok w górę i powrót

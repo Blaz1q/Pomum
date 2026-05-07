@@ -19,7 +19,7 @@ import { upgradesList } from "../entityData/upgradelist.js";
 import { Consumable } from "../entities/Consumable.js";
 import { Voucher } from "../entities/Voucher.js";
 import { ConsumablePack } from "../entities/ConsumablePack.js";
-import { animateWave, initBalatroEffect } from "../utils/animate_text.js";
+import { animateWave, initBalatroEffect, scaleText } from "../utils/animate_text.js";
 import { translations,changeLanguage, t } from "../entityData/translations.js";
 export class RenderUI {
   constructor(game) {
@@ -37,6 +37,7 @@ export class RenderUI {
     const start = this.prevMoney ?? 0;
     const end = this.game.money;
     this.prevMoney = end;
+    if(start==end) return;
     const formatMoney = (val) => {
         const isNegative = val < 0;
         const absoluteValue = Math.abs(val);
@@ -113,7 +114,22 @@ export class RenderUI {
     }, 400);
   }
   displayRound() {
-    this.game.roundBox.innerHTML = this.game.round;
+    const title = document.getElementById("round-title");
+    const desc = document.getElementById("debuff-desc");
+    if(this.game.stage!=STAGES.Boss){
+      title.innerHTML = t("ui.round",Settings.LANGUAGE)+" "+this.game.round;
+      desc.innerHTML = "";
+    }
+    else{
+      title.innerHTML = this.game.nextBoss.name;
+      desc.innerHTML =  this.game.nextBoss.description(this.game);
+      
+    }
+    
+    this.game.roundBox.innerHTML = this.game.round+" / 20";
+    initBalatroEffect(title);
+    initBalatroEffect(desc);
+    initBalatroEffect(this.game.roundBox);
   }
   formatNumber(num) {
     if (num < 1e9) {
@@ -175,33 +191,30 @@ displayTempScore() {
     const multBox = this.game.multBox;
 
     const newScore = this.game.tempscore;
-    let newMult = this.game.mult;
-    newMult = Math.round(newMult * 100) / 100;
+    const newMult = Math.round(this.game.mult * 100) / 100;
     this.game.mult = newMult;
 
-    // Get current text before updating
-    const oldScoreStr = scoreBox.innerHTML;
-    const oldMultStr = multBox.innerHTML;
+    // 1. Formatujemy nowe wartości
+    const formattedScore = this.formatNumber(newScore).toString();
+    const formattedMult = (newMult >= 1e6 ? this.formatNumber(newMult) : newMult).toString();
 
-    // Format the new values
-    const formattedScore = this.formatNumber(newScore);
-    const formattedMult = newMult >= 1e6 ? this.formatNumber(newMult) : newMult;
+    // 2. PORÓWNANIE: Używamy dataset, aby przechowywać "czystą" wartość bez tagów span
+    // scoreBox.dataset.lastValue to nasz własny "podręczny" schowek
+    const scoreChanged = scoreBox.dataset.lastValue !== formattedScore;
+    const multChanged = multBox.dataset.lastValue !== formattedMult;
 
-    scoreBox.innerHTML = formattedScore;
-    multBox.innerHTML = formattedMult;
-
-    const addPopAnimation = (element) => {
-        element.classList.remove("pop-anim");
-        void element.offsetWidth;
-        element.classList.add("pop-anim");
-    };
-
-    if (oldScoreStr !== formattedScore.toString()) {
-        addPopAnimation(scoreBox);
+    if (scoreChanged) {
+        // Zapisujemy nową czystą wartość do schowka
+        scoreBox.dataset.lastValue = formattedScore;
+        // Wstawiamy czysty tekst (to usunie stare spany przed ponownym splitText)
+        scoreBox.textContent = formattedScore; 
+        scaleText(scoreBox);
     }
 
-    if (oldMultStr !== formattedMult.toString()) {
-        addPopAnimation(multBox);
+    if (multChanged) {
+        multBox.dataset.lastValue = formattedMult;
+        multBox.textContent = formattedMult;
+        scaleText(multBox);
     }
 }
   displayUpgradesCounter() {
@@ -935,6 +948,7 @@ function changeLang(){
     else{
         Settings.LANGUAGE = LANGUAGE.PL;
     }
+    game.GameRenderer.displayRound();
     changeLanguage({game: game});
 }
 window.changelang = changeLang;

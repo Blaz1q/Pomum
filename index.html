@@ -68,63 +68,51 @@
   <div class="game" style="display: none;">
     <!-- Left panel: stats -->
     <div class="left-panel">
-      <div class="location">
-        <div class="round">
-          <h2 id="opis">Zdobądź punkty aby przejść dalej</h2>
-          <h1>Rundy do Bossa: <b id="bosscounter">4</b></h1>
-        </div>
-        <div id="boss-container"></div>
-      </div>
-      <div class="info">
-        <table class="stats-table">
-          <tr>
-            <td class="roundscore" colspan="2">
-              <span data-i18n="ui.getAtLeast" class="label">Zdobądź</span>
-              <span id="roundscore" class="value">0</span>
-            </td>
-          </tr>
+  <div class="round-title" id="round-title">Runda 1</div>
 
-          <tr>
-            <td class="moves">
-              <span data-i18n="ui.moves" class="label">Ruchy</span>
-              <span id="moves" class="value">0 / 10</span>
-            </td>
-            <td class="roundlevel">
-              <span data-i18n="ui.round" class="label">Runda</span>
-              <span id="round" class="value">1 / 1</span>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="score" colspan="2">
-              <span data-i18n="ui.yourScore" class="label">Twój wynik</span>
-              <span id="score" class="value">0</span>
-            </td>
-          </tr>
-          <tr>
-             <td colspan="2" class="playerscore">
-              <span data-i18n="ui.score" class="label">Wynik</span>
-                <section class="calcscore">
-                  <span id="tempscore">0</span> x <span id="mult">1</span>
-                </section>
-             </td>
-          </tr>
-          <tr>
-            <td class="moneycontainer" colspan="2">
-              <span id="money" class="value">$2</span>
-            </td>
-          </tr>
-          <tr>
-              <td class="button">
-                <button data-i18n="ui.info" class="label" onclick="showInfo()">Informacje</button>
-              </td>
-              <td class="button">
-                <button data-i18n="ui.settings" class="label" onclick="showSettings()">Ustawienia</button>
-              </td>
-          </tr>
-        </table>
-        
+  <div class="round-container">
+    <p id="debuff-desc">Wszystkie jabłka nie dają punktów</p>
+    <div class="row">
+      <div id="boss-container">
       </div>
+      <div class="scoreatleast pixel"> <b data-i18n="ui.getAtLeast">Zdobądź conajmniej</b> <b id="roundscore"></b> <b data-i18n="ui.points">punktów</b> </div>
+    </div>
+    <b id="bosscounter" style="display:none;">4</b>
+  </div>
+    <div class="yourscore pixel">
+    <span data-i18n="ui.yourScore" class="label">punkty</span>
+    <span id="score" class="value">0</span>
+  </div>
+
+  <div class="player-score pixel">
+    <h1 data-i18n="ui.score">Wynik:</h1>
+    <section class="calcscore">
+      <span id="tempscore" class="pixel">0</span>
+      <span class="multiply-sign">X</span>
+      <span id="mult" class="pixel">1</span>
+    </section>
+  </div>
+
+  <div class="row">
+    <div class="movesbox pixel">
+      <span data-i18n="ui.moves" class="label">Ruchy</span>
+      <span id="moves" class="value">9</span>
+    </div>
+    <div class="roundlevel pixel">
+      <span data-i18n="ui.round" class="label">Runda</span>
+      <span id="round" class="value">4/20</span>
+    </div>
+  </div>
+
+  <div class="moneycontainer pixel">
+    <span id="money" class="value">$13</span>
+  </div>
+
+  <div class="row">
+    <button data-i18n="ui.info" class="btn-action" onclick="showInfo()">Informacje</button>
+    <button data-i18n="ui.settings" class="btn-action" onclick="showSettings()">Ustawienia</button>
+  </div>
+  
     </div>
 
     <!-- Right panel: upgrades, game, shop -->

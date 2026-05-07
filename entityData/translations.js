@@ -26,7 +26,7 @@ export const translations = {
       battery: "Bateria",
       rental: "Wynajem",
       heavy: "Ciężki",
-      getAtLeast: "Zdobądź",
+      getAtLeast: "Zdobądź conajmniej",
       score: "Wynik",
       yourScore: "Twój wynik",
       round: "runda",
@@ -37,6 +37,7 @@ export const translations = {
       game_over: "Koniec gry",
       win: "Wygrana!",
       new_game: "Nowa gra",
+      points: "punktów"
     },
     consumables: {
       apple: {
@@ -716,6 +717,7 @@ export const translations = {
       game_over: "Game over",
       win: "You win!",
       new_game: "New game",
+      points: "points"
     },
     bosses: {
       snake: {

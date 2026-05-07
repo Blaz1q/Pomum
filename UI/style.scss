@@ -421,190 +421,159 @@ canvas#glcanvas {
   color: light-dark($text-color-light, $text-color-dark);
 
   .left-panel {
-    .location {
+  font-family: "Jersey 25", sans-serif;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 300px;
+  gap: 0.6rem;
+  padding: 0.8rem;
+  
+  // Dynamiczne tło i kolor tekstu panelu
+  background: light-dark($bg-color, $bg-color-dark);
+  color: light-dark(#333, #fff); 
+  
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-      .round,
-      #boss-container {
-        display: flex;
-        justify-content: center;
-        text-align: center;
-        align-items: center;
-        flex-direction: column;
+  // Nagłówki i kontenery rundy
+  .round-title, .round-container {
+    // W trybie jasnym delikatny ciemny szary, w ciemnym półprzezroczysty czarny
+    background: light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.3));
+    padding: 8px;
+    border-radius: 10px;
+    text-align: center;
+    text-transform: uppercase;
+    color: light-dark(#000, #fff);
+  }
 
-        h1,
-        h2 {
-          margin-block-start: 0.4em;
-          margin-block-end: 0.4em;
-        }
+  .round-title { font-size: 1.8rem; }
+  .round-container { 
+    font-size: 1.1rem;
+    text-transform: none;
+
+    .scoreatleast {
+      // Dynamiczna zmiana kolorów dla wyróżnionej kwoty
+      color: light-dark(#000,#fff ); 
+      background-color: light-dark(#fff,#0e0f12);
+      font-weight: bold;
+      padding: 2px 4px;
+    }
+    
+    #roundscore {
+      font-size: 2.5rem;
+      color: $mult;
+    }
+  }
+
+  .pixel {
+    &:not(:has(button)) {
+      @extend .pixel-corners;
+    }
+    padding: 1rem 1rem;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .label {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+    .value {
+      font-size: 2rem;
+      text-transform: uppercase;
+      opacity: 0.9;
+      font-weight: bold;
+      // Delikatniejszy cień w trybie jasnym
+      text-shadow: light-dark(1px 1px rgba(0,0,0,0.1), 2px 2px rgba(0,0,0,0.2));
+    }
+
+    // Kolory boksów - dopasowanie kontrastu tekstu
+    &.movesbox { 
+      background-color: $moves; 
+      color: #000; 
+    }
+    &.roundlevel { 
+      background-color: $chance; 
+      color: #fff; 
+    }
+    &.moneycontainer { 
+      background: $money; 
+      color: #000;
+      font-size: 1.8rem;
+      font-weight: bold;
+      transition: background 200ms ease-out;
+      &.earned {
+        background-color: #62e51c;
+      transition: background 0s;
+      }
+
+      &.lost {
+        background-color: #e5521c;
+        transition: background 0s;
       }
     }
-
-    .info {
-      .stats-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0.6rem;
-        font-family: "Jersey 25", sans-serif;
-        text-align: center;
-
-        td {
-          &:not(:has(button)) {
-            @extend .pixel-corners;
-          }
-
-          background: rgba(255, 255, 255, 0.1);
-          padding: 0.4rem 0.5rem;
-          color: #fff;
-          //box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
-          transition: transform 0.1s ease,
-          box-shadow 0.1s ease;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-
-          .label {
-
-            display: block;
-            font-size: 0.85rem;
-            opacity: 0.8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-          }
-
-          &.button {
-            background-color: #0000;
-            transition: transform 0.1s ease, box-shadow 0.1s ease;
-            color: #fff;
-            padding: 0;
-
-            .label {
-              display: block;
-              font-size: 0.85rem;
-              opacity: 0.8;
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-            }
-
-            button {
-              @include cool-button;
-
-              width: 100%;
-              padding: 1em 0;
-            }
-          }
-
-          .value {
-            border-radius: 12px;
-            display: block;
-            font-size: 1.4rem;
-            font-weight: 700;
-
-            margin-top: 0.2rem;
-            letter-spacing: 1px;
-          }
-        }
-
-        // Color coding by type
-        .roundscore {
-          background-color: $score;
-        }
-
-        .moves,
-        .maxmoves {
-          background-color: $moves;
-          color: #222;
-        }
-
-        .score {
-          background-color: $mult;
-        }
-
-        .roundlevel {
-          background-color: $chance;
-        }
-
-        .playerscore {
-          color: #222;
-          background-color: #ffb35d;
-        }
-
-        .moneycontainer {
-          &.earned {
-            background-color: #62e51c;
-            transition: background 0s;
-          }
-
-          &.lost {
-            background-color: #e5521c;
-            transition: background 0s;
-          }
-
-          transition: background 200ms ease-out;
-          padding: 0.8rem 0.5rem;
-          background-color: $money;
-          color: #222;
-        }
-      }
-    }
-
-    div {
-      margin-bottom: 1em;
-    }
-
-    flex: 0 0 200px;
-    gap: 0.6rem;
-    padding: 0.8rem;
-    background: light-dark($bg-color, $bg-color-dark);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-    h2,
-    h1 {
-      font-size: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      b {
-        display: inline-block;
-        max-width: 100px;
-        text-align: right;
-        padding: 0.2em 0.5em;
-        border-radius: 0.4em;
-        background: rgba(0, 0, 0, 0.05);
-        font-variant-numeric: tabular-nums;
-      }
-    }
-
-    h1 {
+    &.yourscore { 
+      background-color: $score; 
+      color: #fff;
       font-size: 1.2rem;
-      margin-bottom: 0.2rem;
     }
 
-    .calcscore {
-      font-size: 1rem;
-      display: flex;
-      justify-content: space-evenly;
-      gap: 0.4rem;
-      color: black;
+    &.player-score {
+      box-shadow: none;
+      background: light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.3));
+      padding: 0;
 
-      span {
-        padding: 0.35em 0.7em;
-        min-width: 45px;
-        text-align: center;
-        font-weight: 600;
-        border-radius: 0.8em;
-        color: #fff;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      }
+      .calcscore {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
 
-      #tempscore {
-        background-color: $score;
-      }
+        #tempscore, #mult {
+          display: block;
+          flex: 1;
+          font-size: 3rem;
+          padding: 10px;
+          height: 50px;
+          color: #fff; // Zakładając, że $score i $mult są ciemnymi kolorami
+        }
 
-      #mult {
-        background-color: $mult;
+        #tempscore { background-color: $score; text-align: right; }
+        #mult { background-color: $mult; text-align: left; }
+
+        .multiply-sign {
+          color: $mult;
+          font-size: 2rem;
+          font-weight: bold;
+        }
       }
     }
   }
+
+  .row {
+    display: flex;
+    gap: 0.6rem;
+    
+    > div, > button {
+      flex: 1;
+    }
+  }
+
+  button {
+    @include cool-button;
+    width: 100%;
+    padding: 0.8rem 0;
+    font-family: "Jersey 25", sans-serif;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    text-align: center;
+    // Buttony zazwyczaj mają własną logikę w mixinie, 
+    // ale możesz tu dodać light-dark jeśli nie są responsywne
+  }
+}
 
 
   .right-panel {
@@ -1297,8 +1266,8 @@ canvas#glcanvas {
   z-index: 500;
 
   .upgrade-card {
-    width: $cardWidth;
-    height: $cardWidth;
+    width: $cardWidth*0.8;
+    height: $cardWidth*0.8;;
 
     @media (max-width: 1024px) {
       width: $cardWidth-sm;
