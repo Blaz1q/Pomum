@@ -40,6 +40,11 @@ export const translations = {
       new_game: "Nowa gra",
       points: "punktów",
       pts: "pkt",
+      tilepoints: "Punkty",
+      chance: "Szansa",
+      goldchance: "Szansa na Gold",
+      silverchance: "Szansa na Silver",
+      mult: "Mnożnik",
       defaultdesc: "Zdobądź punkty aby przejść dalej!",
       chooseyourcards: (data) => `Wybierz swoje karty. Pozostało: ${data.game.BuysFromBoosterLeft}`
     },
@@ -742,7 +747,12 @@ export const translations = {
       points: "points",
       defaultdesc: "Collect points to advance!",
       pts: "pts",
-      chooseyourcards: (data) => `Choose your cards. Cards left: ${data.game.BuysFromBoosterLeft}`
+      chooseyourcards: (data) => `Choose your cards. Cards left: ${data.game.BuysFromBoosterLeft}`,
+      chance: "Chance",
+      goldchance: "Gold chanse",
+      silverchance: "Silver chance",
+      mult: "Multiplier",
+      tilepoints: "Points",
     },
     modifiers: {
       [MODIFIERS.Chip]: {

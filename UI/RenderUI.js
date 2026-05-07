@@ -362,11 +362,11 @@ displayTempScore() {
       wrapper.addEventListener("mouseenter", () => {
         desc.innerHTML = `
                 <p><b>Level:</b> ${tile.props?.upgrade?.level ?? "-"}</p>
-                <p><span class="chance">Szansa:</span> ${tile.percent ?? 0}</p>
-                <p><span class="mult">Mult:</span> ${tile.props?.upgrade?.mult ?? 0}</p>
-                <p><span class="score">Punkty:</span> ${tile.props?.upgrade?.score ?? 0}</p>
-                <p><span class="chance">Gold Chance:</span> ${tile.props?.upgrade?.goldchance ?? 0}%</p>
-                <p><span class="chance">Silver Chance:</span> ${tile.props?.upgrade?.silverchance ?? 0}%</p>
+                <p><span data-i18n="ui.chance" class="chance">${t("ui.chance",Settings.LANGUAGE)}:</span> ${tile.percent ?? 0}</p>
+                <p><span data-i18n="ui.mult" class="mult">${t("ui.mult",Settings.LANGUAGE)}:</span> ${tile.props?.upgrade?.mult ?? 0}</p>
+                <p><span data-i18n="ui.tilepoints" class="score">${t("ui.tilepoints",Settings.LANGUAGE)}:</span> ${tile.props?.upgrade?.score ?? 0}</p>
+                <p><span data-i18n="ui.goldchance" class="chance">${t("ui.goldchance",Settings.LANGUAGE)}:</span> ${tile.props?.upgrade?.goldchance ?? 0}%</p>
+                <p><span data-i18n="ui.silverchance" class="chance">${t("ui.silverchance",Settings.LANGUAGE)}:</span> ${tile.props?.upgrade?.silverchance ?? 0}%</p>
             `;
         desc.style.opacity = "1";
       });

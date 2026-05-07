@@ -557,7 +557,8 @@ export const upgradeBlueprints = [
       },
     }),
     price: 6,
-    ...defaultimage, ...COMMON
+    image: "broke",
+     ...COMMON
   },
 
   {
@@ -1676,7 +1677,7 @@ export const upgradeBlueprints = [
       return UPGRADE_STATES.Active;
     }
   }),
-  ...defaultimage,
+  image: 'hallucination',
   price: 4,
   ...COMMON
 }
