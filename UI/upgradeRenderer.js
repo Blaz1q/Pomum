@@ -521,16 +521,16 @@ export class UpgradeRenderer {
 
     // Szukamy konkretnych przycisków na podstawie ich tekstu (trim() usuwa zbędne spacje)
     const btnBuy = allBtns.find(
-      (b) => b.textContent.trim().toLowerCase() === "kup",
+      (b) => b.textContent.trim().toLowerCase() === t("ui.buy",Settings.LANGUAGE).toLowerCase(),
     );
     const btnUse = allBtns.find(
-      (b) => b.textContent.trim().toLowerCase() === "użyj",
+      (b) => b.textContent.trim().toLowerCase() === t("ui.use",Settings.LANGUAGE).toLowerCase(),
     );
     const btnBuyAndUse = allBtns.find(
-      (b) => b.textContent.trim().toLowerCase() === "kup i użyj",
+      (b) => b.textContent.trim().toLowerCase() === t("ui.buyanduse",Settings.LANGUAGE).toLowerCase(),
     );
     const btnSell = allBtns.find(
-      (b) => b.textContent.trim().toLowerCase() === "sprzedaj",
+      (b) => b.textContent.trim().toLowerCase() === t("ui.sell",Settings.LANGUAGE).toLowerCase(),
     );
     // Bezpieczne usuwanie klasy (używamy ?. aby uniknąć błędów, jeśli przycisk nie zostanie znaleziony)
     btnBuy?.classList.remove("disabled");
