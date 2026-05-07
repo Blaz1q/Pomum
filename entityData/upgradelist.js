@@ -1,10 +1,11 @@
 console.log("Upgrade");
 import { Upgrade } from "../entities/Upgrade.js";
 import { Consumable } from "../entities/Consumable.js";
-import { GAME_TRIGGERS, MODIFIERS, PRIORITY, SCORE_ACTIONS, STAGES, TYPES, UPGRADE_RARITY, UPGRADE_STATES } from "../dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, PRIORITY, SCORE_ACTIONS, Settings, STAGES, TYPES, UPGRADE_RARITY, UPGRADE_STATES } from "../dictionary.js";
 import { Style } from "../dictionary.js";
 import { consumableList, consumableUpgradeBlueprints } from "./consumablelist.js";
 import { Tarot } from "../entities/Tarot.js";
+import { t } from "./translations.js";
 
 
 export const upgradesList = [];
@@ -33,7 +34,7 @@ export const upgradeBlueprints = [
           game.tempscore += this.props.score;
           game.GameRenderer.displayTempScore();
           const gained = this.props.score;
-          return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
+          return { state: UPGRADE_STATES.Score, message: `+${gained} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
         }
         return UPGRADE_STATES.Failed;
       },
@@ -447,7 +448,7 @@ export const upgradeBlueprints = [
         const gained = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
+        return { state: UPGRADE_STATES.Score, message: `+${gained} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
       reset(){
         this.props.score = 0;
@@ -472,13 +473,13 @@ export const upgradeBlueprints = [
       score: 0,
       onMatch() {
         this.props.score += 30;
-        return { state: UPGRADE_STATES.Active, message: `+30 pkt`, style: SCORE_ACTIONS.Score };
+        return { state: UPGRADE_STATES.Active, message: `+30 `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
       onScore() {
         let messagescore = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        return { state: UPGRADE_STATES.Score, message: `+${messagescore} pkt`, style: SCORE_ACTIONS.Score };
+        return { state: UPGRADE_STATES.Score, message: `+${messagescore} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
       reset(){
         this.props.score = 0;
@@ -744,7 +745,7 @@ export const upgradeBlueprints = [
         const gained = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
+        return { state: UPGRADE_STATES.Score, message: `+${gained} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
       reset(){
         this.props.score = 0;
@@ -811,7 +812,7 @@ export const upgradeBlueprints = [
         const gained = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
+        return { state: UPGRADE_STATES.Score, message: `+${gained} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
       reset(){
         this.props.score = 0;
@@ -897,7 +898,7 @@ export const upgradeBlueprints = [
         const gained = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
+        return { state: UPGRADE_STATES.Score, message: `+${gained} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
       reset(){
                 this.props.score = 0;
@@ -960,7 +961,7 @@ export const upgradeBlueprints = [
         const matches = payload.matches;
         if (this.props.tried == true) return UPGRADE_STATES.Failed;
         this.props.tried = true;
-        if (game.consumables.length >= game.maxConsumables) return { state: UPGRADE_STATES.Tried, message: `Brak miejsca!`, style: SCORE_ACTIONS.Info };
+        if (game.consumables.length >= game.maxConsumables) return { state: UPGRADE_STATES.Tried, message: `nospace`, style: SCORE_ACTIONS.Info, translation: true};
         console.log(matches);
         let match = matches.filter(m => m.type === TYPES.Fruit);
         const firstFruit = match[0] ?? null; //fix this
@@ -1310,7 +1311,7 @@ export const upgradeBlueprints = [
       onMatch() {
         this.props.add += 20;
         this.props.score += this.props.add;
-        return { state: UPGRADE_STATES.Active, message: `+${this.props.add} pkt`, style: SCORE_ACTIONS.Score };
+        return { state: UPGRADE_STATES.Active, message: `+${this.props.add} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
       onScore() {
         if (this.score <= 0) return UPGRADE_STATES.Failed;
@@ -1319,7 +1320,7 @@ export const upgradeBlueprints = [
         game.GameRenderer.displayTempScore();
         // this.props.add = 0;
         // this.props.score = 0;
-        return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
+        return { state: UPGRADE_STATES.Score, message: `+${gained} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
       reset(){
         this.props.add = 0;
@@ -1348,7 +1349,7 @@ export const upgradeBlueprints = [
         const gained = this.props.score;
         game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
-        return { state: UPGRADE_STATES.Score, message: `+${gained} pkt`, style: SCORE_ACTIONS.Score };
+        return { state: UPGRADE_STATES.Score, message: `+${gained} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
     }),
     price: 4,
@@ -1478,12 +1479,12 @@ export const upgradeBlueprints = [
       score: 500,
       onRoundEnd(){
         this.props.score -= 20;
-        return { state: UPGRADE_STATES.Active, message: `-20 pkt`, style: SCORE_ACTIONS.Score };
+        return { state: UPGRADE_STATES.Active, message: `-20 `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
       onScore(){
         game.score += this.props.score;
         game.GameRenderer.displayTempScore();
-        return { state: UPGRADE_STATES.Score, message: `+${this.props.score} pkt`, style: SCORE_ACTIONS.Score };
+        return { state: UPGRADE_STATES.Score, message: `+${this.props.score} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       }
     }),
     price: 5,

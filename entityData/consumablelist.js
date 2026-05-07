@@ -10,6 +10,7 @@ import {
 } from "../dictionary.js";
 import { Stats } from "../utils/Stats.js";
 import { Tarot } from "../entities/Tarot.js";
+import { transformsExecRgx } from "../libs/animejs/core/consts.js";
 export const consumableList = [];
 const pomumpackItems = [];
 function desc(fruit) {
@@ -605,7 +606,7 @@ const tarotCards = [
       upgrade.addSpecial(game);
       upgrade.UpgradeRenderer.update();
       //game.GameRenderer.updateUpgrade(index);
-      this.message = { text: "Sukces!", style: SCORE_ACTIONS.Money };
+      this.message = { text: "popups.success", style: SCORE_ACTIONS.Money, translation: true };
       //this.UpgradeRenderer.createPopup("Sukces!",SCORE_ACTIONS.Money);
     },
     canUse(game) {
@@ -681,7 +682,7 @@ const tarotCards = [
         fruit.props.percent = result;
         percent -= result;
       });
-      this.message = { text: "Sukces!", style: SCORE_ACTIONS.Money };
+      this.message = { text: "popups.success", style: SCORE_ACTIONS.Money, translation: true };
       //this.UpgradeRenderer.createPopup("Sukces!",SCORE_ACTIONS.Money);
     },
     price: 4,

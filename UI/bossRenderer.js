@@ -216,21 +216,52 @@ export class BossRenderer {
   };
 
   // Popup dla bossa (np. gdy jego efekt się aktywuje)
-  createPopup(text, style = "mult", duration = 400) {
+  createPopup(text,props = {style:"mult", duration: 400, translation: false } ) {
+    console.log(text);
+    console.log(props);
+    const style = props.style;
+    const duration = props?.duration ?? 400;
+    const translation = props.translation;
     const targetElement = this.upgrade.wrapper;
     if (!targetElement) return;
+    //console.log("adding!!");
+    //console.log(text);
+    // Create popup container (relative to card)
     const popup = document.createElement("div");
     popup.className = "upgrade-popup-container";
+
+    // Create square (background)
     const square = document.createElement("div");
-    square.className = "upgrade-popup-square popup " + style;
-    square.style.transform = `rotate(${(Math.random() * 20 - 10).toFixed(2)}deg)`;
+    square.className = "upgrade-popup-square";
+    square.classList.add("popup");
+    square.classList.add(style);
+    //console.log(style);
+    square.style.transform = `rotate(${(Math.random() * 20 - 10).toFixed(2)}deg)`; // small random tilt
+
+    // Create text
     const label = document.createElement("div");
     label.className = "upgrade-popup-text";
     label.textContent = text;
+    if(translation==true){
+      const finaltext = t(text,Settings.LANGUAGE,{up: this.upgrade});
+      console.log(finaltext)
+      label.textContent = finaltext;
+    }
+    
+
+    // Assemble
     popup.appendChild(square);
     popup.appendChild(label);
+
+    // Add directly inside the upgrade card’s container
     targetElement.appendChild(popup);
-    requestAnimationFrame(() => popup.style.opacity = "1");
+
+    // Animate in
+    requestAnimationFrame(() => {
+      popup.style.opacity = "1";
+    });
+
+    // Fade out & remove
     setTimeout(() => {
       popup.style.opacity = "0";
       setTimeout(() => popup.remove(), duration - 50);

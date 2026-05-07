@@ -6,6 +6,7 @@ import {
   STAGES,
   MODIFIERS,
 } from "../dictionary.js";
+import { animateWave } from "../utils/animate_text.js";
 
 
 export const translations = {
@@ -37,7 +38,10 @@ export const translations = {
       game_over: "Koniec gry",
       win: "Wygrana!",
       new_game: "Nowa gra",
-      points: "punktów"
+      points: "punktów",
+      pts: "pkt",
+      defaultdesc: "Zdobądź punkty aby przejść dalej!",
+      chooseyourcards: (data) => `Wybierz swoje karty. Pozostało: ${data.game.BuysFromBoosterLeft}`
     },
     consumables: {
       apple: {
@@ -688,6 +692,10 @@ export const translations = {
         description: "Losowy rząd zostaje zniszczony przy pierwszym ruchu.",
       },
     },
+    popups: {
+      used: "Użyto!",
+      success: "Sukces!"
+    }
   },
   [LANGUAGE.EN]: {
     ui: {
@@ -717,7 +725,10 @@ export const translations = {
       game_over: "Game over",
       win: "You win!",
       new_game: "New game",
-      points: "points"
+      points: "points",
+      defaultdesc: "Collect points to advance!",
+      pts: "pts",
+      chooseyourcards: (data) => `Choose your cards. Cards left: ${data.game.BuysFromBoosterLeft}`
     },
     bosses: {
       snake: {
@@ -1365,6 +1376,10 @@ export const translations = {
         description: "A random row is destroyed on the first move.",
       },
     },
+    popups: {
+      used: "Used!",
+      success: "Success!"
+    }
   },
 };
 export const t = (path, lang, data = null) => {
@@ -1388,6 +1403,17 @@ export function changeLanguage(data = null) {
 
   elements.forEach((el) => {
     const key = el.getAttribute("data-i18n");
+    const anim = el.getAttribute("data-animate") ?? null;
+    
     el.innerHTML = t(key, Settings.LANGUAGE, data);
+    if(anim){
+      switch(anim){
+        case "wave":
+          {
+            animateWave(el);
+          } 
+          break;  
+      }
+    }
   });
 }

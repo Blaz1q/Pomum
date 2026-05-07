@@ -118,7 +118,7 @@ export class RenderUI {
     const desc = document.getElementById("debuff-desc");
     if(this.game.stage!=STAGES.Boss){
       title.innerHTML = t("ui.round",Settings.LANGUAGE)+" "+this.game.round;
-      desc.innerHTML = "";
+      desc.innerHTML = t("ui.defaultdesc",Settings.LANGUAGE);
     }
     else{
       title.innerHTML = this.game.nextBoss.name;
@@ -265,8 +265,7 @@ displayTempScore() {
     this.hideShop();
   }
   displayBoosterAmmount() {
-    document.getElementById("booster-amount").innerHTML =
-      "Wybierz swoje karty. Pozostało: " + this.game.BuysFromBoosterLeft;
+    document.getElementById("booster-amount").innerHTML = t("ui.chooseyourcards",Settings.LANGUAGE,{game:this.game});
       animateWave(document.getElementById("booster-amount"));
   }
   showMenu() {

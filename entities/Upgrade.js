@@ -1,11 +1,12 @@
 console.log("Upgrade");
 import { UpgradeBase } from "./upgradeBase.js";
-import { MODIFIERS,SCORE_ACTIONS,UPGRADE_STATES, } from "../dictionary.js";
+import { MODIFIERS,SCORE_ACTIONS,Settings,UPGRADE_STATES, } from "../dictionary.js";
 import { Consumable } from "./Consumable.js";
 import { Voucher } from "./Voucher.js";
 import { ConsumablePack } from "./ConsumablePack.js";
 import { Sticker } from "./Sticker.js";
 import { stickers } from "../entityData/stickerslist.js";
+import { t } from "../entityData/translations.js";
 export class Upgrade extends UpgradeBase {
   constructor(props = {}) {
     super(props);
@@ -44,7 +45,7 @@ export class Upgrade extends UpgradeBase {
     game.GameRenderer.displayTempScore();
     return {
       state: UPGRADE_STATES.Score,
-      message: `+50 pkt`,
+      message: `+50 `+ t("ui.pts",Settings.LANGUAGE),
       style: SCORE_ACTIONS.Score,
     };
   }

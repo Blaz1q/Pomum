@@ -16,9 +16,9 @@ export class Voucher extends UpgradeBase {
     this.bought = true;
     this.props.effect.call(this, game);
     if (this.message) {
-      this.UpgradeRenderer.createPopup(this.message.text, this.message.style);
+      this.UpgradeRenderer.createPopup(this.message.text, {style: this.message.style, translation: this.message?.translation ?? false});
     } else {
-      this.UpgradeRenderer.createPopup("Użyto!", SCORE_ACTIONS.Info);
+      this.UpgradeRenderer.createPopup("popups.used", {style:SCORE_ACTIONS.Info, translation: true});
     }
     //this.effect?.call(this, game); // this wewnątrz effect wskazuje na instancję
   }

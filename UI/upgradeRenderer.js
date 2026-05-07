@@ -565,7 +565,12 @@ export class UpgradeRenderer {
       }
     }
   }
-  createPopup(text, style = "mult", duration = 400) {
+  createPopup(text,props = {style:"mult", duration: 400, translation: false } ) {
+    console.log(text);
+    console.log(props);
+    const style = props.style;
+    const duration = props?.duration ?? 400;
+    const translation = props.translation;
     const targetElement = this.upgrade.wrapper;
     if (!targetElement) return;
     //console.log("adding!!");
@@ -586,6 +591,12 @@ export class UpgradeRenderer {
     const label = document.createElement("div");
     label.className = "upgrade-popup-text";
     label.textContent = text;
+    if(translation==true){
+      const finaltext = t(text,Settings.LANGUAGE,{up: this.upgrade});
+      console.log(finaltext)
+      label.textContent = finaltext;
+    }
+    
 
     // Assemble
     popup.appendChild(square);

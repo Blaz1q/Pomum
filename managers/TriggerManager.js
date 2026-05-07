@@ -108,6 +108,7 @@ getHandlers(upgrade,event){
             
             let message = result?.message ?? null;
             let style = result?.style ?? SCORE_ACTIONS.Mult;
+            let translation = result?.translation ?? false;
 
             if (state && state !== UPGRADE_STATES.Failed) {
                 this.visualChain = this.visualChain.then(() => {
@@ -125,7 +126,7 @@ getHandlers(upgrade,event){
                         this.Audio.playSound("tick.mp3");
                     }
                     if (message) {
-                        upgrade.UpgradeRenderer.createPopup(message, style,finaltiming-50);
+                        upgrade.UpgradeRenderer.createPopup(message, {style: style, duration: finaltiming-50, translation: translation});
                     }
                     this.pitch+=0.05;
                     return wait(finaltiming);
