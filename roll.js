@@ -136,7 +136,7 @@ export class Roll {
         if (!coupons || coupons.length === 0) return [];
 
         // Get names of already owned vouchers
-        const ownedNames = new Set(this.game.coupons.map(v => v.name));
+        const ownedNames = new Set(this.game.coupons.map(v => v._name));
 
         // Filter out owned vouchers
         const available = coupons.filter(v => !ownedNames.has(v.name));

@@ -713,7 +713,8 @@ export const translations = {
     },
     popups: {
       used: "Użyto!",
-      success: "Sukces!"
+      success: "Sukces!",
+      cantuse: "Nie można użyć."
     }
   },
   [LANGUAGE.EN]: {
@@ -1416,7 +1417,8 @@ export const translations = {
     },
     popups: {
       used: "Used!",
-      success: "Success!"
+      success: "Success!",
+      cantuse: "Can't be used."
     }
   },
 };

@@ -1258,12 +1258,12 @@ export const upgradeBlueprints = [
         if (!consumable) {
           return UPGRADE_STATES.Failed;
         }
-        if (consumableUpgradeBlueprints.some(b => b.name === consumable.name)) {
-          return { state: UPGRADE_STATES.Tried, message: `Nie można skopiować`, style: SCORE_ACTIONS.Failed }
+        if (consumableUpgradeBlueprints.some(b => b.name === consumable._name)) {
+          return { state: UPGRADE_STATES.Tried, message: `popups.cantuse`, style: SCORE_ACTIONS.Failed, translation: true }
         }
         consumable.negative = false;
         consumable.apply(game);
-        return { state: UPGRADE_STATES.Active, message: `Użyto!`, style: SCORE_ACTIONS.Info }
+        return { state: UPGRADE_STATES.Active, message: `used`, style: SCORE_ACTIONS.Info, translation: true }
       },
     }),
     price: 10,
