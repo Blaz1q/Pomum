@@ -44,8 +44,8 @@
 
 <div id="menu">
     <img class="logo" src="./images/pomumlogo.png" alt="Pomum" srcset="">
-    
-    <div id="difficulty">
+    <div class="row">
+      <div id="difficulty">
       <label data-i18n="ui.difficulty">Poziom trudności</label>
       <div class="controls">
         <button onclick="setdifficulty('-')">&lt;</button>
@@ -53,6 +53,15 @@
         <button onclick="setdifficulty('+')">&gt;</button>
       </div>
     </div>
+    <div class="username">
+    <label data-i18n="ui.yourusername" for="username">Podaj swój nick aby zapisać swój wynik!</label>
+      <input type="text" name="username" id="username" placeholder="Croco" maxlength="20" />
+      <!-- Tutaj wskoczy informacja dla gracza -->
+      <div id="nick-status" style="font-size: 0.8em; margin-top: 5px; min-height: 1em;"></div>
+    </div>
+    </div>
+    
+    
     <div class="buttons">
       <button data-i18n="ui.startGame" id="startBtn" onclick="startGame()">Rozpocznij</button>
       <button data-i18n="ui.collection" onclick="showCollection()">Kolekcja</button>

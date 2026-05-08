@@ -20,6 +20,7 @@ import { Queue } from "./utils/Queue.js"
 import { TriggerManager } from "./managers/TriggerManager.js";
 import { animateWave, initBalatroEffect } from "./utils/animate_text.js";
 import { changeLanguage } from "./entityData/translations.js";
+import { checkNickname, getLeaderboard,saveScore } from "./utils/leaderboard.js"
 
 const CELL_PX = 50;
 let FADE_MS = Settings.FADE_MS;
@@ -221,6 +222,7 @@ export class Game {
         this.GameRenderer.gameWon();
     }
     gameover() {
+        submitScore();
         this.GameRenderer.gameOver();
     }
     endround() {
@@ -1071,7 +1073,32 @@ function continueGame(){
     document.getElementById("game-won").style.display = "none";
 }
 
+const usernameInput = document.getElementById('username');
+const statusDiv = document.getElementById('nick-status');
+let typingTimer;
 
+usernameInput.addEventListener('input', () => {
+    clearTimeout(typingTimer);
+    const nick = usernameInput.value.trim();
+
+    if (nick.length < 3) {
+        statusDiv.textContent = "Nick jest za krótki...";
+        statusDiv.style.color = "orange";
+        return;
+    }
+    typingTimer = setTimeout(async () => {
+        statusDiv.textContent = "Sprawdzanie...";
+        statusDiv.style.color = "gray";
+    checkNickname();}, 500);
+});
+window.addEventListener('DOMContentLoaded', () => {
+    const savedNick = localStorage.getItem('lastNickname');
+    const usernameInput = document.getElementById('username');
+    
+    if (savedNick && usernameInput) {
+        usernameInput.value = savedNick;
+    }
+});
 const R = document.getElementById('funcR');
 const G = document.getElementById('funcG');
 const B = document.getElementById('funcB');
@@ -1085,8 +1112,21 @@ function animateholo() {
     B.setAttribute('tableValues', `${hue.toFixed(2)} 0 1`);
     requestAnimationFrame(animateholo);
 }
+async function submitScore(){
+    const usernameInput = document.getElementById('username').value;
+    if(usernameInput){
+        return saveScore(usernameInput,game);
+    }
+}
+async function getDataFromDB(){
+    return getLeaderboard();
+}
 animateholo();
 animateWave(document.getElementById("poziom_trudnosci"));
+
+window.submitScore = submitScore;
+window.getDataFromDB = getDataFromDB;
+
 window.showMenu = showMenu;
 window.changeGameSpeed = changeGameSpeed;
 window.skip = skip;

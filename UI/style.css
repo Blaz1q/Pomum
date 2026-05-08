@@ -129,6 +129,58 @@ canvas#glcanvas {
   display: flex;
   gap: 0.3em;
 }
+#menu .row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+}
+#menu .username {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1.2rem;
+  background: light-dark(rgba(255, 255, 255, 0.278), rgba(32, 32, 32, 0.278));
+  border-radius: 15px;
+  font-family: "Jersey 25", sans-serif;
+  width: -moz-fit-content;
+  width: fit-content;
+  border: 2px solid rgba(224, 114, 114, 0.2);
+}
+#menu .username label {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 1.2rem;
+  opacity: 0.8;
+  color: light-dark(#333, #fff);
+}
+#menu .username input[type=text] {
+  background: rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(224, 114, 114, 0.3);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-family: "Jersey 25", sans-serif;
+  font-size: 1.4rem;
+  color: light-dark(#333, #fff);
+  text-align: center;
+  transition: all 0.2s ease;
+  outline: none;
+}
+#menu .username input[type=text]::-moz-placeholder {
+  color: light-dark(#333, #fff);
+  opacity: 0.4;
+}
+#menu .username input[type=text]::placeholder {
+  color: light-dark(#333, #fff);
+  opacity: 0.4;
+}
+#menu .username input[type=text]:focus {
+  border-color: #e07272;
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 10px rgba(224, 114, 114, 0.3);
+  transform: scale(1.02);
+}
 #menu #difficulty {
   display: flex;
   flex-direction: column;

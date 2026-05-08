@@ -46,7 +46,8 @@ export const translations = {
       silverchance: "Szansa na Silver",
       mult: "Mnożnik",
       defaultdesc: "Zdobądź punkty aby przejść dalej!",
-      chooseyourcards: (data) => `Wybierz swoje karty. Pozostało: ${data.game.BuysFromBoosterLeft}`
+      chooseyourcards: (data) => `Wybierz swoje karty. Pozostało: ${data.game.BuysFromBoosterLeft}`,
+      yourusername: "Podaj swój nick aby zapisać swój wynik!"
     },
     modifiers: {
       [MODIFIERS.Chip]: {
@@ -754,6 +755,7 @@ export const translations = {
       silverchance: "Silver chance",
       mult: "Multiplier",
       tilepoints: "Points",
+      yourusername: "Enter your name to submit your score!"
     },
     modifiers: {
       [MODIFIERS.Chip]: {

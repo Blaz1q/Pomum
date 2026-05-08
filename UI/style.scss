@@ -310,7 +310,57 @@ canvas#glcanvas {
     display: flex;
     gap: .3em;
   }
+  .row{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6em;
+  }
+  .username {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1.2rem;
+    background: light-dark($shop-bg-light, $shop-bg-dark);
+    border-radius: 15px;
+    font-family: "Jersey 25", sans-serif; // Spójność z #difficulty
+    width: fit-content;
+    border: 2px solid rgba($mult, 0.2); // Subtelna ramka w kolorze akcentu
 
+    label {
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 1.2rem;
+      opacity: 0.8;
+      color: light-dark($text-color-light, $text-color-dark);
+    }
+
+    input[type="text"] {
+      background: rgba(0, 0, 0, 0.15);
+      border: 2px solid rgba($mult, 0.3);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: "Jersey 25", sans-serif;
+      font-size: 1.4rem;
+      color: light-dark($text-color-light, $text-color-dark);
+      text-align: center;
+      transition: all 0.2s ease;
+      outline: none;
+
+      &::placeholder {
+        color: light-dark($text-color-light, $text-color-dark);
+        opacity: 0.4;
+      }
+
+      &:focus {
+        border-color: $mult; // Używamy Twojej zmiennej koloru
+        background: rgba(0, 0, 0, 0.25);
+        box-shadow: 0 0 10px rgba($mult, 0.3);
+        transform: scale(1.02);
+      }
+    }
+  }
   #difficulty {
     display: flex;
     flex-direction: column; // Ustawia label nad przyciskami
