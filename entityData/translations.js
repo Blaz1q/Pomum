@@ -47,7 +47,16 @@ export const translations = {
       mult: "Mnożnik",
       defaultdesc: "Zdobądź punkty aby przejść dalej!",
       chooseyourcards: (data) => `Wybierz swoje karty. Pozostało: ${data.game.BuysFromBoosterLeft}`,
-      yourusername: "Podaj swój nick aby zapisać swój wynik!"
+      yourusername: "Podaj swój nick aby zapisać swój wynik!",
+      nicktooshort: "Nick jest za krótki...",
+      checking: "Sprawdzanie..."
+    },
+    server : {
+      allowed: "Dozwolone!",
+      notallowed: "Niedozwolone!",
+      toosmalltoobig: "Nick jest zbyt krótki lub zbyt długi! (3-20)",
+      error: "Błąd!",
+      success: "Sukces!"
     },
     modifiers: {
       [MODIFIERS.Chip]: {
@@ -755,7 +764,16 @@ export const translations = {
       silverchance: "Silver chance",
       mult: "Multiplier",
       tilepoints: "Points",
-      yourusername: "Enter your name to submit your score!"
+      yourusername: "Enter your name to submit your score!",
+      nicktooshort: "Nick is too short...",
+      checking: "Checking..."
+    },
+    server : {
+      allowed: "Allowed!",
+      notallowed: "Not allowed!",
+      toosmalltoobig: "Username is too small or too big! (3-20)",
+      error: "error",
+      success: "success"
     },
     modifiers: {
       [MODIFIERS.Chip]: {

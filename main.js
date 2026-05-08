@@ -20,7 +20,8 @@ import { Queue } from "./utils/Queue.js"
 import { TriggerManager } from "./managers/TriggerManager.js";
 import { animateWave, initBalatroEffect } from "./utils/animate_text.js";
 import { changeLanguage } from "./entityData/translations.js";
-import { checkNickname, getLeaderboard,saveScore } from "./utils/leaderboard.js"
+import { checkNickname, getLeaderboard,saveScore } from "./utils/leaderboard.js";
+import { t } from "./entityData/translations.js";
 
 const CELL_PX = 50;
 let FADE_MS = Settings.FADE_MS;
@@ -1082,12 +1083,12 @@ usernameInput.addEventListener('input', () => {
     const nick = usernameInput.value.trim();
 
     if (nick.length < 3) {
-        statusDiv.textContent = "Nick jest za krótki...";
+        statusDiv.textContent = t("ui.nicktooshort",Settings.LANGUAGE);
         statusDiv.style.color = "orange";
         return;
     }
     typingTimer = setTimeout(async () => {
-        statusDiv.textContent = "Sprawdzanie...";
+        statusDiv.textContent = t("ui.checking",Settings.LANGUAGE);
         statusDiv.style.color = "gray";
     checkNickname();}, 500);
 });
@@ -1103,10 +1104,10 @@ const R = document.getElementById('funcR');
 const G = document.getElementById('funcG');
 const B = document.getElementById('funcB');
 
-let t = 0;
+let time = 0;
 function animateholo() {
-    t += 0.02;
-    const hue = Math.sin(t) * 0.5 + 0.5;
+    time += 0.02;
+    const hue = Math.sin(time) * 0.5 + 0.5;
     R.setAttribute('tableValues', `0 ${hue.toFixed(2)} 1`);
     G.setAttribute('tableValues', `0 ${(1 - hue).toFixed(2)} 1`);
     B.setAttribute('tableValues', `${hue.toFixed(2)} 0 1`);

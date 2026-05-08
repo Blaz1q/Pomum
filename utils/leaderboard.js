@@ -1,3 +1,6 @@
+import { Settings } from "../dictionary.js";
+import { t } from "../entityData/translations.js";
+
 const API_URL = "https://pomumdb.7m.pl/index.php";
 
 export async function saveScore(nick, game) {
@@ -44,18 +47,21 @@ export async function checkNickname() {
     const result = await response.json();
 
     if (result.available) {
-      statusDiv.textContent = "✅ " + result.msg;
+      statusDiv.dataset.i18n = "server."+result.msg,Settings;
+      statusDiv.textContent = "✅ " + t("server."+result.msg,Settings.LANGUAGE);
       statusDiv.style.color = "lightgreen";
       usernameInput.style.borderColor = "lightgreen";
       localStorage.setItem('lastNickname', usernameInput.value.trim());
     } else {
-      statusDiv.textContent = "❌ " + result.msg;
+      statusDiv.dataset.i18n = "server."+result.msg,Settings;
+      statusDiv.textContent = "❌ " + t("server."+result.msg,Settings.LANGUAGE);
       statusDiv.style.color = "red";
       usernameInput.style.borderColor = "red";
     }
   } catch (error) {
     console.log(error);
-    statusDiv.textContent = "Błąd połączenia z serwerem.";
+    statusDiv.dataset.i18n = "server.error";
+    statusDiv.textContent = + t("server.error",Settings.LANGUAGE);
     statusDiv.style.color = "red";
   }
 }

@@ -733,13 +733,17 @@ export const upgradeBlueprints = [
   {
     name: "Money Maker",
     descriptionfn(game) {
-      if (this.bought) return `Co kaskadę daje ${Style.Score('+3X pkt')} ${Style.Highlight('za posiadane')} ${Style.Money('$')}. (obecnie ${Style.Score(`+${game.money * 3} pkt`)} co kaskadę, ${Style.Score(`+${this.props.score} pkt`)})`;
-      return `Co kaskadę daje ${Style.Score('+3X pkt')} ${Style.Highlight('za posiadane')} ${Style.Money('$')}. (obecnie ${Style.Score(`+${game.money * 3} pkt`)} co kaskadę)`;
+      if (this.bought) return `Co kaskadę daje ${Style.Score('+3X pkt')} ${Style.Highlight('za posiadane')} ${Style.Money('$')}. (obecnie ${Style.Score(`+${this.props.calcScore()} pkt`)} co kaskadę, ${Style.Score(`+${this.props.score} pkt`)})`;
+      return `Co kaskadę daje ${Style.Score('+3X pkt')} ${Style.Highlight('za posiadane')} ${Style.Money('$')}. (obecnie ${Style.Score(`+${this.props.calcScore()} pkt`)} co kaskadę)`;
     },
     props: () => ({
       score: 0,
+      calcScore(){
+        if(game.money<0) return 0;
+        return game.money * 3;
+      },
       onMatch(matches) {
-        this.props.score += game.money * 3;
+        this.props.score += this.props.calcScore();
         return UPGRADE_STATES.Active;
       },
       onScore() {
@@ -1258,7 +1262,7 @@ export const upgradeBlueprints = [
         if (!consumable) {
           return UPGRADE_STATES.Failed;
         }
-        if (consumableUpgradeBlueprints.some(b => b.name === consumable._name)) {
+        if (consumableUpgradeBlueprints.some(b => b.name === consumable._name)||consumable._name=="Głupiec") {
           return { state: UPGRADE_STATES.Tried, message: `popups.cantuse`, style: SCORE_ACTIONS.Failed, translation: true }
         }
         consumable.negative = false;
