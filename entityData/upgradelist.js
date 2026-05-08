@@ -1267,7 +1267,7 @@ export const upgradeBlueprints = [
         }
         consumable.negative = false;
         consumable.apply(game);
-        return { state: UPGRADE_STATES.Active, message: `used`, style: SCORE_ACTIONS.Info, translation: true }
+        return { state: UPGRADE_STATES.Active, message: `popups.used`, style: SCORE_ACTIONS.Info, translation: true }
       },
     }),
     price: 10,
