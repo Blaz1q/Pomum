@@ -19,7 +19,7 @@ import { upgradesList } from "../entityData/upgradelist.js";
 import { Consumable } from "../entities/Consumable.js";
 import { Voucher } from "../entities/Voucher.js";
 import { ConsumablePack } from "../entities/ConsumablePack.js";
-import { animateWave, initBalatroEffect, scaleText } from "../utils/animate_text.js";
+import { animateWave, firstplace, initBalatroEffect, scaleText, secondplace, thirdplace } from "../utils/animate_text.js";
 import { translations,changeLanguage, t } from "../entityData/translations.js";
 import { getLeaderboard } from "../utils/leaderboard.js";
 export class RenderUI {
@@ -988,10 +988,10 @@ async function displayLeaderboard() {
     // 1. Dodajemy nagłówki (Header)
     const headerTr = document.createElement("tr");
     headerTr.innerHTML = `
-      <th>Poz.</th>
-      <th>Gracz</th>
-      <th>Wynik</th>
-      <th>Runda</th>
+      <th data-i18n="ui.position">${t("ui.position",Settings.LANGUAGE)}</th>
+      <th data-i18n="ui.player">${t("ui.player",Settings.LANGUAGE)}</th>
+      <th data-i18n="ui.score">${t("ui.score",Settings.LANGUAGE)}</th>
+      <th data-i18n="ui.round">${t("ui.round",Settings.LANGUAGE)}</th>
     `;
     listContainer.appendChild(headerTr);
 
@@ -999,7 +999,7 @@ async function displayLeaderboard() {
     let i=0;
     if (top10.length === 0) {
         const emptyTr = document.createElement("tr");
-        emptyTr.innerHTML = "<td colspan='4' style='text-align:center;'>Brak wyników</td>";
+        emptyTr.innerHTML = `<td colspan='4' style='text-align:center;'>${t("ui.noscores",Settings.LANGUAGE)}</td>`;
         listContainer.appendChild(emptyTr);
     } else {
         top10.forEach((element, index) => {
@@ -1013,7 +1013,11 @@ async function displayLeaderboard() {
           const td4 = document.createElement("td");
           td4.textContent = `${element.round}`;
           if(i==0){
-            animateWave(td2);
+            firstplace(td2);
+          }else if(i==1){
+            secondplace(td2);
+          }else if(i==2){
+            thirdplace(td2);
           }
           tr.appendChild(td1);
           tr.appendChild(td2);
@@ -1026,7 +1030,7 @@ async function displayLeaderboard() {
 
   } catch (error) {
     console.error(error);
-    listContainer.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Błąd połączenia</td></tr>";
+    listContainer.innerHTML = `<tr><td colspan='4' style='text-align:center;'>${t("server.error",Settings.LANGUAGE)}}</td></tr>`;
   }
 }
 // Pomocnicza funkcja do bezpiecznego wyświetlania nicków (ochrona przed XSS)

@@ -7,6 +7,59 @@ export function fadeInAndBalatro(element){
         initBalatroEffect(element)
     });
 }
+export function firstplace(element) {
+    if (!element) return;
+    animateWave(element);
+    // SplitText przygotowuje litery jako osobne spany
+    const { chars } = splitText(element, { chars: true });
+
+    return animate(chars, {
+        // Pełna paleta kolorów tęczy
+        color: [
+            '#FFFF00', // Żółty
+            '#2cff2c', // Niebieski
+            '#001eff',  // Powrót do czerwonego dla płynnej pętli // Czerwony
+            '#FFFF00' // Pomarańczowy
+        ],
+        easing: 'linear',
+        loop: true,
+        delay: stagger(150), // Opóźnienie między literami tworzy efekt fali
+    });
+}
+export function secondplace(element) {
+    if (!element) return;
+    // SplitText przygotowuje litery jako osobne spany
+    const { chars } = splitText(element, { chars: true });
+
+    return animate(chars, {
+        // Pełna paleta kolorów tęczy
+        color: [
+            '#c3c3c3',
+            '#ffffff',
+            '#c3c3c3',
+        ],
+        easing: 'linear',
+        loop: true,
+        delay: stagger(150), // Opóźnienie między literami tworzy efekt fali
+    });
+}
+export function thirdplace(element) {
+    if (!element) return;
+    // SplitText przygotowuje litery jako osobne spany
+    const { chars } = splitText(element, { chars: true });
+
+    return animate(chars, {
+        // Pełna paleta kolorów tęczy
+        color: [
+            '#bc7a00',
+            '#ffa600',
+            '#bc7a00',
+        ],
+        easing: 'linear',
+        loop: true,
+        delay: stagger(150), // Opóźnienie między literami tworzy efekt fali
+    });
+}
 export function scaleText(element){
     if (!element) return;
     const { chars } = splitText(element, {chars: true,});

@@ -50,7 +50,9 @@ export const translations = {
       yourusername: "Podaj swój nick aby zapisać swój wynik!",
       nicktooshort: "Nick jest za krótki...",
       checking: "Sprawdzanie...",
-      leaderboard: "Tablica wyników"
+      leaderboard: "Tablica wyników",
+      position: "Poz.",
+      player: "Gracz"
     },
     server : {
       allowed: "Dozwolone!",
@@ -768,7 +770,9 @@ export const translations = {
       yourusername: "Enter your name to submit your score!",
       nicktooshort: "Nick is too short...",
       checking: "Checking...",
-      leaderboard: "Leaderboard"
+      leaderboard: "Leaderboard",
+      position: "Pos.",
+      player: "Player"
     },
     server : {
       allowed: "Allowed!",
