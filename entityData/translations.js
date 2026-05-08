@@ -49,7 +49,8 @@ export const translations = {
       chooseyourcards: (data) => `Wybierz swoje karty. Pozostało: ${data.game.BuysFromBoosterLeft}`,
       yourusername: "Podaj swój nick aby zapisać swój wynik!",
       nicktooshort: "Nick jest za krótki...",
-      checking: "Sprawdzanie..."
+      checking: "Sprawdzanie...",
+      leaderboard: "Tablica wyników"
     },
     server : {
       allowed: "Dozwolone!",
@@ -766,7 +767,8 @@ export const translations = {
       tilepoints: "Points",
       yourusername: "Enter your name to submit your score!",
       nicktooshort: "Nick is too short...",
-      checking: "Checking..."
+      checking: "Checking...",
+      leaderboard: "Leaderboard"
     },
     server : {
       allowed: "Allowed!",

@@ -21,6 +21,7 @@ import { Voucher } from "../entities/Voucher.js";
 import { ConsumablePack } from "../entities/ConsumablePack.js";
 import { animateWave, initBalatroEffect, scaleText } from "../utils/animate_text.js";
 import { translations,changeLanguage, t } from "../entityData/translations.js";
+import { getLeaderboard } from "../utils/leaderboard.js";
 export class RenderUI {
   constructor(game) {
     this.game = game;
@@ -950,6 +951,95 @@ function changeLang(){
     game.GameRenderer.displayRound();
     changeLanguage({game: game});
 }
+function showLeaderBoard(){
+  displayLeaderboard();
+}
+async function displayLeaderboard() {
+  const container = document.getElementById("leaderboard");
+  const listContainer = document.getElementById("leaderboard-data");
+  
+  container.classList.remove("hidden");
+  // Loader pasujący do szerokości tabeli (4 kolumny)
+  listContainer.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Ładowanie...</td></tr>";
+
+  try {
+    const result = await getLeaderboard();
+
+    if (!result || !Array.isArray(result)) {
+      listContainer.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Błąd danych</td></tr>";
+      return;
+    }
+
+    const filteredData = Object.values(result.reduce((acc, current) => {
+      const nick = current.nickname;
+      if (!acc[nick] || current.score > acc[nick].score) {
+        acc[nick] = { ...current };
+      }
+      return acc;
+    }, {}));
+
+    const top10 = filteredData
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10);
+
+    // --- GENEROWANIE TABELI ---
+    listContainer.innerHTML = ""; // Czyścimy loader
+
+    // 1. Dodajemy nagłówki (Header)
+    const headerTr = document.createElement("tr");
+    headerTr.innerHTML = `
+      <th>Poz.</th>
+      <th>Gracz</th>
+      <th>Wynik</th>
+      <th>Runda</th>
+    `;
+    listContainer.appendChild(headerTr);
+
+    // 2. Dodajemy wiersze z danymi
+    let i=0;
+    if (top10.length === 0) {
+        const emptyTr = document.createElement("tr");
+        emptyTr.innerHTML = "<td colspan='4' style='text-align:center;'>Brak wyników</td>";
+        listContainer.appendChild(emptyTr);
+    } else {
+        top10.forEach((element, index) => {
+          const tr = document.createElement("tr");
+          const td1 = document.createElement("td");
+          td1.textContent = `${index + 1}`;
+          const td2 = document.createElement("td");
+          td2.innerHTML = `<strong>${escapeHTML(element.nickname)}</strong>`;
+          const td3 = document.createElement("td");
+          td3.textContent = `${element.score.toLocaleString()}`;
+          const td4 = document.createElement("td");
+          td4.textContent = `${element.round}`;
+          if(i==0){
+            animateWave(td2);
+          }
+          tr.appendChild(td1);
+          tr.appendChild(td2);
+          tr.appendChild(td3);
+          tr.appendChild(td4);
+          i++;
+          listContainer.appendChild(tr);
+        });
+    }
+
+  } catch (error) {
+    console.error(error);
+    listContainer.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Błąd połączenia</td></tr>";
+  }
+}
+// Pomocnicza funkcja do bezpiecznego wyświetlania nicków (ochrona przed XSS)
+function escapeHTML(str) {
+  const p = document.createElement('p');
+  p.textContent = str;
+  return p.innerHTML;
+}
+function hideLeaderBoard(){
+  document.getElementById("leaderboard").classList.add("hidden");
+}
+window.showLeaderBoard = showLeaderBoard;
+window.hideLeaderBoard = hideLeaderBoard;
 window.changelang = changeLang;
 window.toggleOldFruits = toggleOldFruits;
 window.showSettings = showSettings;

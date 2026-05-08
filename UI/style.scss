@@ -413,7 +413,98 @@ canvas#glcanvas {
     margin-bottom: 2rem;
     text-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
   }
+  #leaderboard {
+  // Wykorzystujemy te same zmienne co w .left-panel
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "Jersey 25", sans-serif;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: light-dark(rgba(255, 255, 255, 0.95), rgba(32, 32, 32, 0.95));
+  color: light-dark(#333, #fff);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  
+  // Pozycjonowanie (możesz dostosować, np. jako modal)
+  max-width: 500px;
+  margin: 20px auto;
 
+  &.hidden {
+    display: none;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    color: $mult; // Używamy koloru akcentu z Twoich zmiennych
+    text-shadow: light-dark(1px 1px rgba(0,0,0,0.1), 2px 2px rgba(0,0,0,0.3));
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px; // Odstępy między wierszami dla efektu "pixel/box"
+    
+    th {
+      text-transform: uppercase;
+      font-size: 1rem;
+      opacity: 0.7;
+      padding: 0.5rem;
+      text-align: left;
+      border-bottom: 2px solid light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.1));
+      
+      &:first-child { text-align: center; } // Kolumna "Poz."
+      &:last-child { text-align: right; }   // Kolumna "Runda"
+    }
+
+    tr {
+      // Stylizacja wierszy jako osobnych boksów (podobnych do .pixel)
+      background: light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.2));
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.05));
+      }
+
+      td {
+        padding: 12px 8px;
+        font-size: 1.2rem;
+
+        &:first-child {
+          border-radius: 8px 0 0 8px;
+          text-align: center;
+          font-weight: bold;
+          color: $chance; // Kolor dla pozycji
+        }
+
+        &:last-child {
+          border-radius: 0 8px 8px 0;
+          text-align: right;
+        }
+
+        strong {
+          color: light-dark(#000, #fff);
+          font-weight: 400;
+        }
+
+        // Stylizacja wyniku (Score)
+        &:nth-child(3) {
+          color: $money;
+          font-weight: bold;
+        }
+      }
+      
+      // Podświetlenie TOP 1 (Złoty akcent)
+      &:nth-child(2) { // 2, bo 1 to nagłówki th
+        background: light-dark(rgba($money, 0.1), rgba($money, 0.15));
+        td:first-child { color: $money; }
+      }
+    }
+  }
+}
   #collection {
     position: absolute;
     width: 70%;

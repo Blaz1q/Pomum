@@ -66,9 +66,16 @@
       <button data-i18n="ui.startGame" id="startBtn" onclick="startGame()">Rozpocznij</button>
       <button data-i18n="ui.collection" onclick="showCollection()">Kolekcja</button>
       <button data-i18n="ui.settings" onclick="showSettings()">Ustawienia</button>
+      <button data-i18n="ui.leaderboard" onclick="showLeaderBoard()">Tablica wyników</button>
       <button onclick="changelang()"><img src="./images/icons/translate.png" width=32 height=32 style="filter: invert(1);"></button>
     </div>
-    
+    <div id="leaderboard" class="hidden">
+      <button data-i18n="ui.close" onclick="hideLeaderBoard()">Zamknij</button>
+      <h1>Top 10</h1>
+      <table id="leaderboard-data">
+
+      </table>
+    </div>
     <div id="collection" class="hidden">
       <button data-i18n="ui.close" onclick="hideCollection()">Zamknij</button>
       <div class="scroll"></div>

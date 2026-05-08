@@ -32,7 +32,7 @@ export async function getLeaderboard() {
   try {
     const response = await fetch(API_URL);
     const scores = await response.json();
-    console.log(scores);
+    return scores;
   } catch (error) {
     console.error("Nie udało się pobrać wyników:", error);
   }
