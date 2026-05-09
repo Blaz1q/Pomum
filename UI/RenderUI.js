@@ -306,8 +306,8 @@ displayTempScore() {
 
     allWrappers.forEach((wrapper) => {
       // Resetujemy transformację do pozycji początkowej
-      wrapper.style.transform = "translateY(0)";
       wrapper.classList.remove("SelectedUpgrade");
+      wrapper.style.setProperty('--select-y', '0px');
       // Opcjonalnie: resetujemy też przyciski consumable, jeśli je wcześniej pokazałeś
       const buttons = wrapper.querySelector(".consumable-buttons");
       if (buttons) {
@@ -398,67 +398,77 @@ displayTempScore() {
 
     this.displayConsumablesCounter();
   }
-  animateReorder(oldPositions, duration = 280) {
-    // FLIP: oldPositions is array [{ el, top, left }]
-    return new Promise((resolve) => {
-      if (!oldPositions || oldPositions.length === 0) return resolve();
+animateReorder(oldPositions, duration = 300, excludedEl = null) {
+  return new Promise((resolve) => {
+    if (!oldPositions || oldPositions.length === 0) return resolve();
 
-      const animated = [];
-      oldPositions.forEach(({ el, top, left }) => {
-        if (!el || !document.body.contains(el)) return; // removed from DOM
-        const newRect = el.getBoundingClientRect();
-        const dx = left - newRect.left;
-        const dy = top - newRect.top;
+    const animated = [];
+    
+    oldPositions.forEach(({ el, top, left }) => {
+      if (!el || !document.body.contains(el) || el === excludedEl) return;
 
-        if (dx === 0 && dy === 0) return;
+      const newRect = el.getBoundingClientRect();
+      const dx = left - newRect.left;
+      const dy = top - newRect.top;
 
-        // prepare invert
-        el.style.transition = "none";
-        el.style.transform = `translate(${dx}px, ${dy}px)`;
-        // force layout
-        // eslint-disable-next-line no-unused-expressions
-        el.offsetHeight;
+      if (dx === 0 && dy === 0) return;
 
-        // schedule play
-        requestAnimationFrame(() => {
-          el.style.transition = `transform ${duration}ms cubic-bezier(.2,.9,.25,1)`;
-          el.style.transform = "";
-        });
+      // --- KLUCZOWA POPRAWKA ---
+      // Musimy upewnić się, że karta nie ma żadnych śmieciowych zmiennych drag
+      // które mogłyby wpłynąć na obliczenia pozycji startowej.
+      el.style.setProperty('--drag-x', '0px');
+      el.style.setProperty('--drag-y', '0px');
+      el.style.setProperty('--drag-tilt', '0deg');
 
-        animated.push(el);
+      el.style.transition = "none";
+      // Ustawiamy sztywny transform na start (Invert)
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      
+      el.offsetHeight; // Force reflow
+
+      requestAnimationFrame(() => {
+        el.style.transition = `transform ${duration}ms cubic-bezier(0.175, 0.885, 0.32, 1.275)`;
+        // Wracamy do zera (Play)
+        el.style.transform = "translate(0, 0)";
       });
 
-      if (animated.length === 0) return resolve();
-
-      // wait for all transitions to end (or timeout)
-      let remaining = animated.length;
-      const cleanup = () => {
-        animated.forEach((a) => {
-          a.style.transition = "";
-          a.style.transform = "";
-        });
-        resolve();
-      };
-
-      const onEnd = (ev) => {
-        const target = ev.currentTarget;
-        target.removeEventListener("transitionend", onEnd);
-        remaining--;
-        if (remaining <= 0) cleanup();
-      };
-
-      animated.forEach((a) => {
-        a.addEventListener("transitionend", onEnd);
-      });
-
-      // safety timeout
-      setTimeout(() => {
-        // remove listeners and clear transforms
-        animated.forEach((a) => a.removeEventListener("transitionend", onEnd));
-        cleanup();
-      }, duration + 120);
+      animated.push(el);
     });
-  }
+
+    if (animated.length === 0) return resolve();
+
+    let remaining = animated.length;
+    const onEnd = (ev) => {
+      if (ev.propertyName !== 'transform') return;
+      
+      const target = ev.currentTarget;
+      target.removeEventListener("transitionend", onEnd);
+      
+      // --- SPRZĄTANIE ---
+      // Po zakończeniu animacji usuwamy styl inline transform, 
+      // aby karta znów słuchała zmiennych CSS (var(--drag-x) itd.)
+      target.style.transition = "";
+      target.style.transform = ""; 
+      
+      remaining--;
+      if (remaining <= 0) resolve();
+    };
+
+    animated.forEach((a) => {
+      a.addEventListener("transitionend", onEnd);
+    });
+
+    setTimeout(() => {
+      animated.forEach((a) => {
+        if (a.style.transform !== "") {
+           a.style.transition = "";
+           a.style.transform = "";
+        }
+      });
+      resolve();
+    }, duration + 50);
+  });
+}
   displayStatistics() {
     const statsContainers = document.querySelectorAll(".stats");
     statsContainers.forEach(container => {

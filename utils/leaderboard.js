@@ -2,7 +2,6 @@ import { Settings } from "../dictionary.js";
 import { t } from "../entityData/translations.js";
 
 const API_URL = "https://pomumdb.7m.pl/index.php";
-
 export async function saveScore(nick, game) {
   const data = new FormData();
   data.append("nickname", nick);
@@ -36,6 +35,61 @@ export async function getLeaderboard() {
   } catch (error) {
     console.error("Nie udało się pobrać wyników:", error);
   }
+}
+export async function getPlayerStats() {
+    // 1. Pobieramy surowe dane z Twojej istniejącej funkcji
+    const scores = await getLeaderboard();
+    
+    if (!scores || !Array.isArray(scores)) return [];
+
+    // 2. Przekształcamy tablicę wyników w obiekt statystyk (mapę)
+    const statsMap = scores.reduce((acc, current) => {
+        const nick = current.nickname;
+
+        // Inicjalizacja gracza, jeśli widzimy go pierwszy raz
+        if (!acc[nick]) {
+            acc[nick] = {
+                nickname: nick,
+                totalPoints: 0,
+                totalPlays: 0,
+                totalRounds: 0,
+                highestScore: 0,
+                wins: 0,
+            };
+        }
+
+        // Agregacja danych
+        acc[nick].totalPlays += 1;
+        acc[nick].totalPoints += current.score;
+        acc[nick].totalRounds += current.round;
+        
+        // Sprawdzanie rekordu punktowego
+        if (current.score > acc[nick].highestScore) {
+            acc[nick].highestScore = current.score;
+        }
+
+        if (current.round >= 20) {
+            acc[nick].wins += 1;
+        }
+
+        return acc;
+    }, {});
+
+    // 3. Zamieniamy obiekt na tablicę i obliczamy współczynniki (np. winrate)
+    const playerList = Object.values(statsMap).map(player => {
+        return {
+            nickname: player.nickname,
+            totalPoints: player.totalPoints,
+            totalPlays: player.totalPlays,
+            avgPoints: Math.round(player.totalPoints / player.totalPlays),
+            highestScore: player.highestScore,
+            // Obliczanie winrate (procent wygranych gier)
+            winRate: ((player.wins / player.totalPlays) * 100).toFixed(1) + "%"
+        };
+    });
+
+    // 4. Sortujemy np. po łącznej liczbie punktów
+    return playerList.sort((a, b) => b.totalPoints - a.totalPoints);
 }
 export async function checkNickname() {
   const usernameInput = document.getElementById("username");

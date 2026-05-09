@@ -1,28 +1,16 @@
 import { MODIFIERS, UPGRADE_RARITY, Style, GAME_TRIGGERS, UPGRADE_STATES, Settings } from "../dictionary.js";
 import { t } from "../entityData/translations.js";
 import { fadeInAndBalatro, initBalatroEffect } from "../utils/animate_text.js";
+import { DragAndDropHandler } from "./DragAndDropHandler.js";
 
 export class BossRenderer {
   constructor(boss, gameRenderer) {
     this.upgrade = boss; // Trzymamy pod nazwą 'upgrade', żeby metody D&D były kompatybilne
     this.gameRenderer = gameRenderer;
-    this.isDragging = false;
-    this.dragStarted = false;
-    this.startX = 0;
-    this.startY = 0;
-    this.lastMouseX = 0;
-    this.dragThreshold = 5;
-    this._mouseMoveHandler = (e) => this.onMouseMove(e);
-    this._mouseUpHandler = (e) => this.onMouseUp(e);
   }
 
   render() {
-    this.isDragging = false;
-    this.dragStarted = false;
-    this.startX = 0;
-    this.startY = 0;
-    this.lastMouseX = 0;
-    
+
     const boss = this.upgrade;
     boss.wrapper = document.createElement("div");
     const wrapper = boss.wrapper;
@@ -85,15 +73,7 @@ export class BossRenderer {
     });
 
     // 5. Drag & Drop Listener
-    wrapper.addEventListener("mousedown", (e) => {
-      this.isDragging = true;
-      this.dragStarted = false;
-      this.startX = e.clientX;
-      this.startY = e.clientY;
-      this.lastMouseX = e.clientX;
-      window.addEventListener("mousemove", this._mouseMoveHandler);
-      window.addEventListener("mouseup", this._mouseUpHandler);
-    });
+    this.dragHandler = new DragAndDropHandler(this.upgrade, this.gameRenderer);
 
     wrapper.appendChild(card);
     wrapper.appendChild(desc);

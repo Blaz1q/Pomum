@@ -481,7 +481,7 @@ export class Game {
         else if (upgrade.type == "ConsumablePack") {
             this.emit(GAME_TRIGGERS.onBoosterBuy, upgrade);
             this.GameRenderer.OpenBoosterPack(upgrade);
-            this.Audio.playSound('pop.mp3');
+            this.Audio.playSound('xmult.mp3');
         } else if (upgrade.type == "Voucher") {
             this.coupons.push(upgrade);
             upgrade.apply(this);

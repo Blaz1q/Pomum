@@ -1,25 +1,14 @@
 import { MODIFIERS, UPGRADE_RARITY, Style, GAME_TRIGGERS, UPGRADE_STATES, Settings } from "../dictionary.js";
 import { t } from "../entityData/translations.js";
 import { fadeInAndBalatro, initBalatroEffect } from "../utils/animate_text.js";
+import { DragAndDropHandler } from "./DragAndDropHandler.js";
 export class UpgradeRenderer {
   constructor(upgrade, gameRenderer) {
     this.upgrade = upgrade;
     this.gameRenderer = gameRenderer;
-    this.isDragging = false;
-    this.dragStarted = false;
-    this.startX = 0;
-    this.startY = 0;
-    this.lastMouseX = 0;
-    this.dragThreshold = 5;
-    this._mouseMoveHandler = (e) => this.onMouseMove(e);
-    this._mouseUpHandler = (e) => this.onMouseUp(e);
+    this.dragHandler = null;
   }
   render(params) {
-    this.isDragging = false;
-    this.dragStarted = false;
-    this.startX = 0;
-    this.startY = 0;
-    this.lastMouseX = 0;
     const upgrade = this.upgrade;
     this.bought = params.bought ?? false;
     let displayPrice = params.displayPrice ?? true;
@@ -30,15 +19,11 @@ export class UpgradeRenderer {
     this.originalZ = wrapper.style.zIndex || 0;
 
     wrapper.addEventListener("mouseenter", () => (wrapper.style.zIndex = 500));
-    wrapper.addEventListener("mouseleave", () => (wrapper.style.zIndex = this.originalZ));
+    wrapper.addEventListener("mouseleave", () => {
+        // Jeśli nie przeciągamy, przywracamy z-index
+        if (!this.dragHandler?.isDragging) wrapper.style.zIndex = this.originalZ;
+    });
 
-    if (displayButtons) {
-      wrapper.addEventListener("click", (e) => {
-        // Jeśli karta była przesunięta o więcej niż 5px, nie otwieraj menu
-        if (this.dragStarted) return;
-        this.displayButtons();
-      });
-    }
 
     wrapper.className = "upgrade-wrapper";
     wrapper.dataset.type = upgrade.type;
@@ -159,18 +144,20 @@ export class UpgradeRenderer {
     wrapper.appendChild(desc);
     if (displayButtons) wrapper.appendChild(this.createButtons(params));
 
+    if (this.dragHandler) {
+        this.dragHandler.stopUpdateLoop();
+    }
     
-    const onMouseDown = (e) => {
-      this.isDragging = true;
-      this.dragStarted = false;
-      this.startX = e.clientX;
-      this.startY = e.clientY;
-      this.lastMouseX = e.clientX;
+    this.dragHandler = new DragAndDropHandler(this.upgrade, this.gameRenderer);
 
-      window.addEventListener("mousemove", this._mouseMoveHandler);
-      window.addEventListener("mouseup", this._mouseUpHandler);
-    };
-    wrapper.addEventListener("mousedown", onMouseDown);
+    // 3. Obsługa kliknięcia (Twoja logika Balatro-style menu)
+    if (displayButtons) {
+      wrapper.addEventListener("click", (e) => {
+        // Blokujemy menu, jeśli właśnie skończyliśmy przeciągać
+        if (this.dragHandler.dragStarted) return;
+        this.displayButtons();
+      });
+    }
 
     return wrapper;
   }
@@ -252,135 +239,38 @@ export class UpgradeRenderer {
 
     return container; // Zwracamy obiekt DOM, a nie string!
   }
-  onMouseMove(e) {
-    if (!this.isDragging) return;
-    this.gameRenderer.resetAllUpgrades();
-    const wrapper = this.upgrade.wrapper;
-    const deltaX = e.clientX - this.startX;
-    const deltaY = e.clientY - this.startY;
-
-    if (!this.dragStarted && (Math.abs(deltaX) > this.dragThreshold || Math.abs(deltaY) > this.dragThreshold)) {
-      wrapper.style.transition = "none";
-      this.dragStarted = true;
-      wrapper.classList.add("dragging");
-      wrapper.classList.remove("returning");
-      wrapper.style.zIndex = 1000;
-    }
-
-    if (this.dragStarted) {
-      const mouseVelocity = e.clientX - this.lastMouseX;
-      this.lastMouseX = e.clientX;
-      this.currentRotation = Math.max(Math.min(mouseVelocity * 0.5, 20), -20);
-      wrapper.style.transform = `translate(${deltaX}px, ${deltaY}px) rotateZ(${this.currentRotation}deg)`;
-
-      // Podświetlanie celu
-      const target = this.getCardUnderCursor(e.clientX, e.clientY);
-      document.querySelectorAll('.upgrade-wrapper').forEach(el => el.classList.remove('drag-over'));
-      if (target && target !== wrapper) target.classList.add('drag-over');
-    }
-  };
-  onMouseUp(e) {
-
-    if (!this.isDragging) return;
-    console.log(this);
-    const wrapper = this.upgrade.wrapper
-    const wasActuallyDragged = this.dragStarted;
-    this.isDragging = false;
-    this.dragStarted = false;
-    if (wasActuallyDragged) {
-      e.stopPropagation();
-      wrapper.classList.remove("dragging");
-
-      const container = wrapper.parentElement;
-      // Szukamy karty, która ma klasę drag-over
-      const targetWrapper = container?.querySelector('.drag-over');
-
-      if (targetWrapper && targetWrapper !== wrapper) {
-        // Usuwamy klasę podświetlenia
-        targetWrapper.classList.remove('drag-over');
-
-        const children = [...container.children];
-        const draggedIndex = children.indexOf(wrapper);
-        const targetIndex = children.indexOf(targetWrapper);
-
-        // 1. Snapshot dla animacji FLIP
-        const oldPositions = this.gameRenderer.getPositions(container);
-
-        // 2. Zamiana miejsc w DOM
-        if (draggedIndex < targetIndex) {
-          container.insertBefore(wrapper, targetWrapper.nextSibling);
-        } else {
-          container.insertBefore(wrapper, targetWrapper);
-        }
-
-        // 3. Reset stylów i odpalenie animacji reorder
-        wrapper.style.transform = "";
-        this.currentRotation = 0;
-        this.gameRenderer.animateReorder(oldPositions);
-
-        // 4. Aktualizacja logiki gry
-        if (this.upgrade.bought&&this.upgrade.type == "Upgrade") {
-          const movedUpgrade = this.gameRenderer.game.upgrades.splice(draggedIndex, 1)[0];
-          this.gameRenderer.game.upgrades.splice(targetIndex, 0, movedUpgrade);
-          this.gameRenderer.game.emit(GAME_TRIGGERS.onUpgradesChanged);
-          this.gameRenderer.displayUpgradesCounter();
-        }
-      } else {
-        // Brak celu -> Powrót z bouncem
-        const style = window.getComputedStyle(wrapper);
-        const matrix = new WebKitCSSMatrix(style.transform);
-        wrapper.style.setProperty('--drag-x', `${matrix.m41}px`);
-        wrapper.style.setProperty('--drag-y', `${matrix.m42}px`);
-        wrapper.style.setProperty('--last-tilt', `${this.currentRotation}deg`);
-
-        wrapper.classList.add("returning");
-        setTimeout(() => {
-          if (!this.isDragging) {
-            wrapper.classList.remove("returning");
-            wrapper.style.transform = "";
-            wrapper.style.zIndex = this.originalZ;
-          }
-        }, 400);
-      }
-      window.removeEventListener("mousemove", this._mouseMoveHandler);
-      window.removeEventListener("mouseup", this._mouseUpHandler);
-    }
-  };
   displayButtons() {
-    if(this.isDragging) return;
-    console.log("clicked");
-    // 1. Sprawdzamy, czy ten konkretny wrapper jest już "podniesiony"
-    // Sprawdzamy styl inline lub (lepiej) konkretną wartość transformacji
+    if(this.dragHandler?.isDragging) return;
+    
     const wrapper = this.upgrade.wrapper;
-    const isAlreadyActive = wrapper.style.transform === "translateY(-20px)";
+    // Sprawdzamy obecność klasy zamiast czytania stringa transform
+    const isAlreadyActive = wrapper.classList.contains("SelectedUpgrade");
 
-    // 2. Najpierw resetujemy absolutnie wszystkie wrappery
     this.gameRenderer.resetAllUpgrades();
 
-    // 3. Jeśli wrapper NIE był aktywny, to go podnosimy.
-    // Jeśli BYŁ aktywny, to po prostu zostaje zresetowany (efekt zamknięcia).
     let game = this.gameRenderer.game;
     if (!isAlreadyActive) {
       requestAnimationFrame(() => {
+        // Zamiast stylu inline transform, ustawiamy zmienną
         wrapper.style.transition = "transform 0.05s ease-out";
-        wrapper.style.transform = "translateY(-20px)";
+        wrapper.style.setProperty('--select-y', '-20px');
         wrapper.classList.add("SelectedUpgrade");
 
-        game.Audio.playSound("select.mp3")
+        game.Audio.playSound("select.mp3");
+        
         const buttonsContainer = wrapper.querySelector(".consumable-buttons");
-
         if (buttonsContainer) {
           buttonsContainer.style.display = "flex";
-          buttonsContainer.style.transition = "opacity 0.2s ease";
           buttonsContainer.style.opacity = "1";
         }
         this.refreshAllButtons();
-        // Pobieramy wszystkie przyciski wewnątrz kontenera do tablicy
       });
     } else {
-      game.Audio.playSound("deselect.mp3")
+      game.Audio.playSound("deselect.mp3");
+      // Reset zmiennej przy odkliknięciu
+      wrapper.style.setProperty('--select-y', '0px');
     }
-  }
+}
   createBuyButton(params) {
     const upgrade = this.upgrade;
     const wrapper = upgrade.wrapper;
@@ -674,29 +564,8 @@ export class UpgradeRenderer {
         break;
     }
   }
-  getCardUnderCursor(clientX, clientY) {
-    const container = this.upgrade.wrapper.parentElement;
-    if (!container) return null;
-
-    const cards = [...container.querySelectorAll('.upgrade-wrapper:not(.dragging)')];
-    let closestCard = null;
-    let minDistance = Infinity;
-
-    cards.forEach(card => {
-      const rect = card.getBoundingClientRect();
-      const cardCenterX = rect.left + rect.width / 2;
-      const cardCenterY = rect.top + rect.height / 2;
-      const distance = Math.hypot(clientX - cardCenterX, clientY - cardCenterY);
-
-      if (distance < minDistance && distance < 180) {
-        minDistance = distance;
-        closestCard = card;
-      }
-    });
-    return closestCard;
-  }
   update(params = { bought: true, origin: null }) {
-
+    if (this.dragHandler?.isDragging) return;
     const upgrade = this.upgrade;
     if (!upgrade) return;
 

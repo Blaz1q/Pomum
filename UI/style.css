@@ -10,6 +10,16 @@
   inherits: true;
   initial-value: 50;
 }
+@property --trigger-scale {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+@property --trigger-tilt {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
 :root {
   color-scheme: light dark;
 }
@@ -774,25 +784,43 @@ canvas#glcanvas {
   z-index: 0;
   max-width: none;
   transition: transform 0.2s ease;
+  --drag-x: 0px;
+  --drag-y: 0px;
+  --drag-tilt: 0deg;
+  --trigger-scale: 1;
+  --trigger-tilt: 0deg;
+  --select-y: 0px;
+  /* Łączymy wszystko w jeden transform */
+  transform: translate(var(--drag-x), calc(var(--drag-y) + var(--select-y))) rotateZ(calc(var(--drag-tilt) + var(--trigger-tilt))) scale(var(--trigger-scale));
+  /* Ważne dla płynności */
+  will-change: transform;
 }
 .upgrade-wrapper.SelectedUpgrade,
 .boss-wrapper.SelectedUpgrade {
   z-index: 9 !important;
 }
+.upgrade-wrapper.triggered,
+.boss-wrapper.triggered {
+  /* Upewnij się, że animacja ma priorytet */
+  animation: triggeredCard 0.3s ease-in-out !important;
+  z-index: 10001; /* Wyżej niż dragging, jeśli trzeba */
+}
 .upgrade-wrapper.dragging,
 .boss-wrapper.dragging {
-  transition: transform 0.05s linear;
+  /* Zmieniamy transition tak, aby nie blokowało animacji 'triggeredCard' */
+  /* Zamiast transition: transform 0s, wyłączamy tylko transition dla konkretnych ruchów lerpa */
+  transition: none !important;
+  transform-origin: center 20%;
   pointer-events: none;
-  cursor: grabbing;
-  z-index: 3000 !important;
-}
-.upgrade-wrapper.dragging .upgrade-desc,
-.boss-wrapper.dragging .upgrade-desc {
-  opacity: 0;
+  cursor: grabbing !important;
+  z-index: 10000 !important;
+  /* Jeśli animacja triggered nie działa podczas dragging, 
+     upewnij się, że dragging nie wymusza skali 1 */
 }
 .upgrade-wrapper.returning,
 .boss-wrapper.returning {
-  animation: spring-back 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation: spring-back 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+  z-index: 1000;
 }
 .upgrade-wrapper:active,
 .boss-wrapper:active {
@@ -801,11 +829,6 @@ canvas#glcanvas {
 .upgrade-wrapper.drag-over,
 .boss-wrapper.drag-over {
   outline: 2px dashed #00f;
-}
-.upgrade-wrapper.triggered,
-.boss-wrapper.triggered {
-  animation: triggeredCard ease-in-out;
-  animation-duration: 0.3s;
 }
 .upgrade-wrapper.ready .upgrade-inner,
 .boss-wrapper.ready .upgrade-inner {
@@ -1641,14 +1664,16 @@ canvas#glcanvas {
 }
 @keyframes triggeredCard {
   0%, 20%, 50%, 80%, 100% {
-    transform: scale(100%);
-    opacity: 1;
+    --trigger-scale: 1;
+    --trigger-tilt: 0deg;
   }
   40% {
-    transform: scale(120%);
+    --trigger-scale: 1.2;
+    --trigger-tilt: -1deg;
   }
   60% {
-    transform: scale(110%);
+    --trigger-scale: 1.1;
+    --trigger-tilt: 0.5deg;
   }
 }
 @keyframes animateNegative {
@@ -1848,16 +1873,14 @@ canvas#glcanvas {
 }
 @keyframes spring-back {
   0% {
-    transform: translate(var(--drag-x), var(--drag-y)) rotateZ(var(--last-tilt));
+    /* Używamy --last-x/y ustawionych w JS w momencie puszczenia */
+    transform: translate(var(--last-x), var(--last-y)) rotateZ(var(--last-tilt));
   }
   25% {
-    transform: translate(calc(var(--drag-x) * -0.2), calc(var(--drag-y) * -0.2)) rotateZ(calc(var(--last-tilt) * -0.3));
+    transform: translate(calc(var(--last-x) * -0.2), calc(var(--last-y) * -0.2)) rotateZ(calc(var(--last-tilt) * -0.3));
   }
   50% {
-    transform: translate(calc(var(--drag-x) * 0.1), calc(var(--drag-y) * 0.1)) rotateZ(calc(var(--last-tilt) * 0.15));
-  }
-  75% {
-    transform: translate(calc(var(--drag-x) * -0.05), calc(var(--drag-y) * -0.05)) rotateZ(0deg);
+    transform: translate(calc(var(--last-x) * 0.1), calc(var(--last-y) * 0.1)) rotateZ(calc(var(--last-tilt) * 0.15));
   }
   100% {
     transform: translate(0, 0) rotateZ(0deg);
