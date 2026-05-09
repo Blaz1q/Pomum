@@ -7,6 +7,7 @@ export class UpgradeRenderer {
     this.upgrade = upgrade;
     this.gameRenderer = gameRenderer;
     this.dragHandler = null;
+    this.selectedTimer = null;
   }
   render(params) {
     const upgrade = this.upgrade;
@@ -245,12 +246,20 @@ export class UpgradeRenderer {
     const wrapper = this.upgrade.wrapper;
     // Sprawdzamy obecność klasy zamiast czytania stringa transform
     const isAlreadyActive = wrapper.classList.contains("SelectedUpgrade");
-
+    if (this.selectedTimer) {
+        clearTimeout(this.selectedTimer);
+        this.selectedTimer = null;
+    }
     this.gameRenderer.resetAllUpgrades();
 
     let game = this.gameRenderer.game;
     if (!isAlreadyActive) {
       requestAnimationFrame(() => {
+        this.selectedTimer = setTimeout(() => {
+          if(this.upgrade.wrapper.classList.contains("SelectedUpgrade")){
+            this.displayButtons();
+          }
+        }, 10000);
         // Zamiast stylu inline transform, ustawiamy zmienną
         wrapper.style.transition = "transform 0.05s ease-out";
         wrapper.style.setProperty('--select-y', '-20px');
@@ -266,6 +275,7 @@ export class UpgradeRenderer {
         this.refreshAllButtons();
       });
     } else {
+      this.selectedTimer = null;
       game.Audio.playSound("deselect.mp3");
       // Reset zmiennej przy odkliknięciu
       wrapper.style.setProperty('--select-y', '0px');

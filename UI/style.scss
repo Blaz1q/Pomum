@@ -1015,6 +1015,7 @@ canvas#glcanvas {
   /* Ważne dla płynności */
   will-change: transform;
   &.SelectedUpgrade {
+    animation: .3s select-animation;
     z-index: 9 !important; // !important upewni się, że przebije hover i z-index: 500 bossa
   }
 
@@ -1754,7 +1755,26 @@ canvas#glcanvas {
     filter: invert(1);
   }
 }
-
+@keyframes select-animation {
+  0%{
+    --trigger-tilt: -1.2deg
+  }
+  20%{
+    --trigger-tilt: 1.2deg
+  }
+  40%{
+    --trigger-tilt: -0.3deg
+  }
+  60%{
+    --trigger-tilt: 0.3deg
+  }
+  80%{
+    --trigger-tilt: 0deg
+  }
+  100%{
+    --trigger-tilt: 0deg
+  }
+}
 @keyframes shake {
   0% {
     transform: translateX(0);
@@ -1927,30 +1947,30 @@ canvas#glcanvas {
 
 @keyframes bounce-hover {
   0% {
-    transform: scale(1);
+    transform: scale(1) rotate(-1.5deg);
     animation-timing-function: ease-out;
   }
 
   20% {
-    transform: scale(1.065);
+    transform: scale(1.065) rotate(1.5deg);
     /* Lekki wznios i powiększenie */
     animation-timing-function: ease-in;
   }
 
   40% {
-    transform: scale(1.01);
+    transform: scale(1.01) rotate(-0.5deg);
     /* Opadanie i lekkie spłaszczenie */
     animation-timing-function: ease-out;
   }
 
   60% {
-    transform: scale(1.05);
+    transform: scale(1.05) rotate(0.5deg);
     /* Mniejsze odbicie w górę */
     animation-timing-function: ease-in;
   }
 
   80% {
-    transform: scale(1.01);
+    transform: scale(1.01) rotate(0deg); 
     /* Prawie powrót, lekkie uniesienie */
     animation-timing-function: ease-out;
   }
