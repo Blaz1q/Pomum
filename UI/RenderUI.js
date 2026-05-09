@@ -21,7 +21,7 @@ import { Voucher } from "../entities/Voucher.js";
 import { ConsumablePack } from "../entities/ConsumablePack.js";
 import { animateWave, firstplace, initBalatroEffect, scaleText, secondplace, thirdplace } from "../utils/animate_text.js";
 import { translations,changeLanguage, t } from "../entityData/translations.js";
-import { getLeaderboard } from "../utils/leaderboard.js";
+import { compareScores, getLeaderboard } from "../utils/leaderboard.js";
 export class RenderUI {
   constructor(game) {
     this.game = game;
@@ -974,7 +974,7 @@ async function displayLeaderboard() {
 
   try {
     const result = await getLeaderboard();
-
+    console.log(result);
     if (!result || !Array.isArray(result)) {
       listContainer.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Błąd danych</td></tr>";
       return;
@@ -982,14 +982,14 @@ async function displayLeaderboard() {
 
     const filteredData = Object.values(result.reduce((acc, current) => {
       const nick = current.nickname;
-      if (!acc[nick] || current.score > acc[nick].score) {
+      if (!acc[nick] || compareScores(current.score, acc[nick].score) > 0) {
         acc[nick] = { ...current };
       }
       return acc;
     }, {}));
 
     const top10 = filteredData
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) => compareScores(b.score, a.score)) // Odwrócone a i b dla malejącego
       .slice(0, 10);
 
     // --- GENEROWANIE TABELI ---
@@ -1004,7 +1004,32 @@ async function displayLeaderboard() {
       <th data-i18n="ui.round">${t("ui.round",Settings.LANGUAGE)}</th>
     `;
     listContainer.appendChild(headerTr);
+    function formatScientific(scoreStr) {
+      const s = String(scoreStr).toLowerCase();
+      
+      // Jeśli nie ma 'e', traktujemy jak zwykłą liczbę
+      if (!s.includes('e')) {
+          const num = Number(s);
+          return num.toLocaleString();
+      }
+      
+      const [m, e] = s.split('e');
+      const exponent = parseInt(e);
+      const mantissa = parseFloat(m);
 
+      // Jeśli wykładnik jest mniejszy niż 10, pokazujemy normalną liczbę
+      if (exponent < 10) {
+          // Obliczamy realną wartość: mantysa * 10^wykładnik
+          const realValue = mantissa * Math.pow(10, exponent);
+          return Math.floor(realValue).toLocaleString();
+      }
+      
+      // Dla dużych liczb: mantysa do 4 miejsc po przecinku + potęga
+      // Używamy toFixed(4), ale parseFloat na końcu usunie zbędne zera na końcu (np. 1.2500 -> 1.25)
+      const formattedMantissa = parseFloat(mantissa.toFixed(4));
+      
+      return `${formattedMantissa}e${exponent}`;
+  }
     // 2. Dodajemy wiersze z danymi
     let i=0;
     if (top10.length === 0) {
@@ -1019,7 +1044,7 @@ async function displayLeaderboard() {
           const td2 = document.createElement("td");
           td2.innerHTML = `<strong>${escapeHTML(element.nickname)}</strong>`;
           const td3 = document.createElement("td");
-          td3.textContent = `${element.score.toLocaleString()}`;
+          td3.textContent = `${formatScientific(element.score).toLocaleString()}`;
           const td4 = document.createElement("td");
           td4.textContent = `${element.round}`;
           if(i==0){
@@ -1048,6 +1073,32 @@ function escapeHTML(str) {
   const p = document.createElement('p');
   p.textContent = str;
   return p.innerHTML;
+}
+function formatScientific(scoreStr) {
+    const s = String(scoreStr).toLowerCase();
+    
+    // Jeśli nie ma 'e', traktujemy jak zwykłą liczbę
+    if (!s.includes('e')) {
+        const num = Number(s);
+        return num.toLocaleString();
+    }
+    
+    const [m, e] = s.split('e');
+    const exponent = parseInt(e);
+    const mantissa = parseFloat(m);
+
+    // Jeśli wykładnik jest mniejszy niż 10, pokazujemy normalną liczbę
+    if (exponent < 10) {
+        // Obliczamy realną wartość: mantysa * 10^wykładnik
+        const realValue = mantissa * Math.pow(10, exponent);
+        return Math.floor(realValue).toLocaleString();
+    }
+    
+    // Dla dużych liczb: mantysa do 4 miejsc po przecinku + potęga
+    // Używamy toFixed(4), ale parseFloat na końcu usunie zbędne zera na końcu (np. 1.2500 -> 1.25)
+    const formattedMantissa = parseFloat(mantissa.toFixed(4));
+    
+    return `${formattedMantissa} × 10^${exponent}`;
 }
 function hideLeaderBoard(){
   document.getElementById("leaderboard").classList.add("hidden");

@@ -36,6 +36,23 @@ export async function getLeaderboard() {
     console.error("Nie udało się pobrać wyników:", error);
   }
 }
+export function compareScores(aStr, bStr) {
+    const parse = (s) => {
+        const parts = String(s).toLowerCase().split('e');
+        return {
+            m: parseFloat(parts[0] || 0),
+            e: parseInt(parts[1] || 0)
+        };
+    };
+
+    const a = parse(aStr);
+    const b = parse(bStr);
+
+    // 1. Najpierw porównujemy wykładniki (kto ma więcej zer)
+    if (a.e !== b.e) return a.e - b.e;
+    // 2. Jeśli wykładniki równe, porównujemy mantysy
+    return a.m - b.m;
+}
 export async function getPlayerStats() {
     // 1. Pobieramy surowe dane z Twojej istniejącej funkcji
     const scores = await getLeaderboard();

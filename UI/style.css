@@ -803,7 +803,6 @@ canvas#glcanvas {
 .boss-wrapper.triggered {
   /* Upewnij się, że animacja ma priorytet */
   animation: triggeredCard 0.3s ease-in-out !important;
-  z-index: 10001; /* Wyżej niż dragging, jeśli trzeba */
 }
 .upgrade-wrapper.dragging,
 .boss-wrapper.dragging {
