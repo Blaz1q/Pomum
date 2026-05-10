@@ -21,7 +21,7 @@ export class DragAndDropHandler {
     // LERP - wygładzanie ruchu
     this.lerpX = 0;
     this.lerpY = 0;
-    this.lerpFactor = 0.6; // 0.1 - bardzo ciężka, 0.3 - bardzo responsywna
+    this.lerpFactor = 0.3; // 0.1 - bardzo ciężka, 0.3 - bardzo responsywna
     this.lerpInitialized = false;
 
     this.currentRotation = 0;
@@ -92,12 +92,19 @@ export class DragAndDropHandler {
     }
   }
 
-  activateDrag() {
+    activateDrag() {
     if (this.dragStarted) return;
     this.gameRenderer.resetAllUpgrades();
     this.dragStarted = true;
+
+    // Zapisujemy bazę RAZ na początku
+    const rect = this.wrapper.getBoundingClientRect();
+    this.baseX = rect.left - this.lerpX;
+    this.baseY = rect.top - this.lerpY;
+
     this.wrapper.style.transition = "none";
     this.wrapper.classList.add("dragging");
+    this.wrapper.style.setProperty('--trigger-scale', `1.045`);
     this.wrapper.style.zIndex = 1000;
     this.startUpdateLoop();
   }
@@ -112,12 +119,12 @@ export class DragAndDropHandler {
     // Zamiast usuwać transform, używamy getBoundingClientRect() 
     // i odejmujemy od niego aktualne lerpX/Y, aby dowiedzieć się gdzie jest "baza" karty.
     const rect = this.wrapper.getBoundingClientRect();
-    const baseX = rect.left - this.lerpX;
-    const baseY = rect.top - this.lerpY;
+    //const baseX = rect.left - this.lerpX;
+    //const baseY = rect.top - this.lerpY;
 
     // 2. Docelowa delta względem bazy
-    const targetDeltaX = (this.currentMouseX - this.offsetX) - baseX;
-    const targetDeltaY = (this.currentMouseY - this.offsetY) - baseY;
+    const targetDeltaX = (this.currentMouseX - this.offsetX) - this.baseX;
+    const targetDeltaY = (this.currentMouseY - this.offsetY) - this.baseY;
 
     // 3. LERP (bez zmian)
     if (!this.lerpInitialized) {
@@ -133,10 +140,13 @@ export class DragAndDropHandler {
     const mouseVelocityX = this.currentMouseX - this.lastMouseX;
 
     // Zmniejszamy mnożnik z 0.8 na ok. 0.4 i clamp z 20 na 12 stopni
-    const targetRotation = Math.max(Math.min(mouseVelocityX * 0.4, 12), -12);
+    const targetRotation = Math.max(Math.min(mouseVelocityX * 0.4, 90), -90);
 
     // Zmniejszamy lerp rotacji (0.1 zamiast 0.5), aby karta nie drgała przy małych ruchach
-    this.currentRotation += (targetRotation - this.currentRotation) * 0.7;
+    this.currentRotation += (targetRotation - this.currentRotation) * 0.4;
+    if (Math.abs(mouseVelocityX) < 0.1) {
+        this.currentRotation *= 0.99; // Tłumienie (damping)
+    }
 
     // 5. Renderowanie - tylko zmienne!
     this.wrapper.style.setProperty('--drag-x', `${this.lerpX}px`);
@@ -172,6 +182,8 @@ if (now - this.lastSwapTime > this.swapCooldown) {
         this.lerpX += diffX;
         this.lerpY += diffY;
 
+        this.baseX = actualBaseAfterX;
+        this.baseY = actualBaseAfterY;
         // 5. Aktualizujemy zmienne natychmiast
         this.wrapper.style.setProperty('--drag-x', `${this.lerpX}px`);
         this.wrapper.style.setProperty('--drag-y', `${this.lerpY}px`);
@@ -200,6 +212,7 @@ if (now - this.lastSwapTime > this.swapCooldown) {
 
     if (this.dragStarted) {
       this.wrapper.classList.remove("dragging");
+      this.wrapper.style.setProperty('--trigger-scale', `1`);
       this.executeReturn(); 
     }
 
