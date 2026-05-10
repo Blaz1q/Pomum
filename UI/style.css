@@ -455,17 +455,28 @@ canvas#glcanvas {
 }
 .game .left-panel .pixel.player-score .calcscore {
   display: flex;
+  width: 100%;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 10px;
 }
 .game .left-panel .pixel.player-score .calcscore #tempscore, .game .left-panel .pixel.player-score .calcscore #mult {
-  display: block;
-  flex: 1;
-  font-size: 3rem;
-  padding: 10px;
+  flex: 1 1 0px; /* Wymuś równe dzielenie miejsca */
+  width: 0; /* Pozwól flexboxowi decydować o szerokości */
+  min-width: 0;
   height: 50px;
-  color: #fff;
+  line-height: 50px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+  padding: 10; /* Padding liczyliśmy ręcznie w JS (availableWidth) */
+}
+.game .left-panel .pixel.player-score .calcscore {
+  /* Jeśli Anime.js tworzy spany, upewnij się, że dziedziczą font-size */
+}
+.game .left-panel .pixel.player-score .calcscore #tempscore span, .game .left-panel .pixel.player-score .calcscore #mult span {
+  font-size: inherit;
 }
 .game .left-panel .pixel.player-score .calcscore #tempscore {
   background-color: #72abe0;

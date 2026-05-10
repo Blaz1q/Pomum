@@ -825,7 +825,7 @@ export const upgradeBlueprints = [
     }),
 
     price: 6,
-    ...defaultimage, ...COMMON
+    image: "tuttifrutti", ...COMMON
   },
   {
     name: "Fruit Tycoon",

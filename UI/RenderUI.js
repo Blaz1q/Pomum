@@ -187,6 +187,47 @@ displayScore() {
     animateNumber(roundScoreBox, this.lastDisplayedRound, newRoundScore, 'lastDisplayedRound');
     animateNumber(totalScoreBox, this.lastDisplayedTotal, newTotalScore, 'lastDisplayedTotal');
 }
+fitText(container) {
+    if (!container) return;
+
+    const text = container.dataset.lastValue || "0";
+    const parent = container.parentElement;
+    if (!parent) return;
+
+    const signWidth = parent.querySelector('.multiply-sign')?.offsetWidth || 40;
+    
+    // 1. Pobieramy padding z CSS (żeby nie wpisywać go na sztywno w JS)
+    // getComputedStyle pobierze realną wartość, nawet jeśli zmienisz ją w CSS
+    const computedStyle = window.getComputedStyle(container);
+    const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
+    const paddingRight = parseFloat(computedStyle.paddingRight) || 0;
+    const totalPadding = paddingLeft + paddingRight;
+
+    // 2. Obliczamy dostępną szerokość bazy (flexbox)
+    // Odejmujemy znak X i marginesy między elementami (40)
+    const baseWidth = (parent.clientWidth - signWidth - 40) / 2;
+
+    // 3. Odejmujemy padding od maxWidth, aby tekst miał mniej miejsca
+    const maxWidth = baseWidth - totalPadding;
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    
+    let fontSize = 64; 
+    
+    while (fontSize > 8) {
+        context.font = `bold ${fontSize}px "Jersey 25", sans-serif`;
+        const metrics = context.measureText(text);
+        
+        // Jeśli tekst z tym fontem mieści się w maxWidth (już bez paddingu)
+        if (metrics.width <= maxWidth) {
+            break; 
+        }
+        fontSize -= 1;
+    }
+
+    container.style.fontSize = fontSize + 'px';
+}
 displayTempScore() {
     const scoreBox = this.game.tempscoreBox;
     const multBox = this.game.multBox;
@@ -203,18 +244,21 @@ displayTempScore() {
     // scoreBox.dataset.lastValue to nasz własny "podręczny" schowek
     const scoreChanged = scoreBox.dataset.lastValue !== formattedScore;
     const multChanged = multBox.dataset.lastValue !== formattedMult;
-
+    
+    
     if (scoreChanged) {
         // Zapisujemy nową czystą wartość do schowka
         scoreBox.dataset.lastValue = formattedScore;
         // Wstawiamy czysty tekst (to usunie stare spany przed ponownym splitText)
         scoreBox.textContent = formattedScore; 
+        this.fitText(scoreBox);
         scaleText(scoreBox);
     }
 
     if (multChanged) {
         multBox.dataset.lastValue = formattedMult;
         multBox.textContent = formattedMult;
+        this.fitText(multBox);
         scaleText(multBox);
     }
 }

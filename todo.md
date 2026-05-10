@@ -5,7 +5,7 @@
 
 # UI
 - [ ] dodanie wyglądu przechodzenia z rundy do rundy
-- [ ] zmiana wyglądu lewego panelu (tam gdzie jest boss, aby pokazywał gdzie aktualnie się znajdujemy)
+- [X] zmiana wyglądu lewego panelu (tam gdzie jest boss, aby pokazywał gdzie aktualnie się znajdujemy)
 
 
 # Skip
@@ -14,3 +14,17 @@
 
 # Content
 - vouchery
+
+# Grafiki
+- [ ] fruit tycoon
+- [ ] bomby
+- [ ] dynamity
+
+# Leaderboard
+- [ ] można przewijać leaderboard (nie tylko top 10)
+- [ ] twoje miejsce w leaderboardzie
+- [ ] twój najlepszy wynik
+- [ ] leaderboard w miesiącu, roku, all time
+- [ ] twoje statystyki:
+    - [ ] win rate
+    - [ ] liczba rozgrywek

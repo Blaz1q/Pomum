@@ -679,20 +679,30 @@ canvas#glcanvas {
 
       .calcscore {
         display: flex;
+        width: 100%;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         gap: 10px;
 
         #tempscore, #mult {
-          display: block;
-          flex: 1;
-          font-size: 3rem;
-          padding: 10px;
+          flex: 1 1 0px; /* Wymuś równe dzielenie miejsca */
+          width: 0;      /* Pozwól flexboxowi decydować o szerokości */
+          min-width: 0;
           height: 50px;
-          color: #fff; // Zakładając, że $score i $mult są ciemnymi kolorami
-        }
+          line-height: 50px;
+          text-align: center;
+          white-space: nowrap;
+          overflow: hidden;
+          display: block;
+          padding: 10;    /* Padding liczyliśmy ręcznie w JS (availableWidth) */
+      }
 
-        #tempscore { background-color: $score; text-align: right; }
+      /* Jeśli Anime.js tworzy spany, upewnij się, że dziedziczą font-size */
+      #tempscore span, #mult span {
+          font-size: inherit;
+      }
+
+        #tempscore { background-color: $score; text-align: right;}
         #mult { background-color: $mult; text-align: left; }
 
         .multiply-sign {
