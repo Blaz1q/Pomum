@@ -688,6 +688,7 @@ canvas#glcanvas {
           flex: 1 1 0px; /* Wymuś równe dzielenie miejsca */
           width: 0;      /* Pozwól flexboxowi decydować o szerokości */
           min-width: 0;
+          font-size: 3rem;
           height: 50px;
           line-height: 50px;
           text-align: center;

@@ -16,7 +16,7 @@
 - vouchery
 
 # Grafiki
-- [ ] fruit tycoon
+- [X] fruit tycoon
 - [ ] bomby
 - [ ] dynamity
 
