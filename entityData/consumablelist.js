@@ -541,7 +541,7 @@ const tarotCards = [
           game.GameRenderer.displayConsumablesCounter();
         },
         price: 4,
-        image: "magician",
+        image: "hierophant",
     },
   {
     name: "Kochankowie",
