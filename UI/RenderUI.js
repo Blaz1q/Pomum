@@ -923,6 +923,18 @@ function hideCollection() {
 function toggleLowGraphics(){
     let val = document.getElementById("graphicsToggle").checked;
     Settings.LOW_GRAPHICS = val;
+    const canv = document.getElementById("glcanvas");
+    if(Settings.LOW_GRAPHICS){
+      canv.width = 1;
+      canv.height = 1;
+    }
+    else{
+      canv.width = window.innerWidth;
+      canv.height = window.innerHeight;
+    }
+}
+function togglePotatoPc(){
+  document.body.classList.contains("potatopc") ? document.body.classList.remove("potatopc") : document.body.classList.add("potatopc")
 }
 function toggleOldFruits(){
     let val = document.getElementById("oldFruits").checked;
@@ -1162,3 +1174,4 @@ window.showCollection = showCollection;
 window.hideCollection = hideCollection;
 window.setdifficulty = setdifficulty;
 window.translations = translations;
+window.togglePotatoPc = togglePotatoPc;

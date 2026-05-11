@@ -206,30 +206,37 @@
       <button onclick="hideSettings()" class="closePopup">&times</button>
       <h2 data-i18n="ui.settings">Ustawienia</h2>
       <label>
-        Rozmiar kafelków
+        <h3 data-i18n="ui.tileSize">Rozmiar kafelków</h3>
         <input disabled type="range" min="20" step="5" max="100" />
       </label>
       <label>
-        Szybkość gry<br>
-        Szybka <input id="gameSpeed" onchange="changeGameSpeed()" value="350" type="range" min="150" step="200" max="750" /> Wolna 
+        <h3 data-i18n="ui.gameSpeed">Szybkość gry</h3>
+        <br>
+        <div class="row">
+        <b data-i18n="ui.fast">Szybka</b> <input id="gameSpeed" onchange="changeGameSpeed()" value="350" type="range" min="150" step="200" max="750" /> <b data-i18n="ui.slow">Wolna</b>
+          </div>
       </label>
       <label>
-        Głośność
+        <h3 data-i18n="ui.volume">Głośność</h3>
         <input type="range" min="100" step="250" max="1100" disabled/>
       </label>
       <label>
         <input onclick="toggleDarkMode()" type="checkbox" id="darkToggle">
-        Tryb ciemny
+        <b data-i18n="ui.darkMode">Tryb ciemny</b>
       </label>
       <label>
-        <input onclick="toggleLowGraphics()" type="checkbox" id="graphicsToggle">
-        Wyłącz tło (dla słabszych komputerów)
+        <input  onclick="toggleLowGraphics()" type="checkbox" id="graphicsToggle">
+        <b data-i18n="ui.disableBg">Wyłącz tło</b>
       </label>
       <label>
         <input onclick="toggleOldFruits()" type="checkbox" id="oldFruits">
-        Stare owoce
+        <b data-i18n="ui.oldIcons">Stare owoce</b>
       </label>
-      <button onclick="changelang()"><img src="./images/icons/translate.png" width=32 height=32></button>
+      <label>
+        <input onclick="togglePotatoPc()" type="checkbox" id="potatopc">
+        <b>🥔</b>
+      </label>
+      <button onclick="changelang()"><img src="./images/icons/translate.png" style="filter: invert(1);" width=32 height=32></button>
     </div>
     </div>
   <canvas id="glcanvas"></canvas>

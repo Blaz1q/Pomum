@@ -52,7 +52,15 @@ export const translations = {
       checking: "Sprawdzanie...",
       leaderboard: "Tablica wyników",
       position: "Poz.",
-      player: "Gracz"
+      player: "Gracz",
+      tileSize: "Rozmiar kafelków",
+      gameSpeed: "Prędkość gry",
+      fast: "Szybka",
+      slow: "Wolna",
+      volume: "Głośność",
+      darkMode: "Tryb ciemny",
+      disableBg: "Wyłącz tło",
+      oldIcons: "Stare ikony owoców"
     },
     server : {
       allowed: "Dozwolone!",
@@ -772,7 +780,15 @@ export const translations = {
       checking: "Checking...",
       leaderboard: "Leaderboard",
       position: "Pos.",
-      player: "Player"
+      player: "Player",
+      tileSize: "Tile size",
+      gameSpeed: "Game speed",
+      fast: "Fast",
+      slow: "Slow",
+      volume: "Volume",
+      darkMode: "Dark mode",
+      disableBg: "Disable background",
+      oldIcons: "Old fruit icons"
     },
     server : {
       allowed: "Allowed!",

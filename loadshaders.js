@@ -235,8 +235,14 @@ initShaders().then(program => {
 
 
     function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        if(Settings.LOW_GRAPHICS){
+            canvas.width = 1;
+            canvas.height = 1;
+        }
+        else{
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     }
     window.addEventListener('resize', resize);
@@ -287,6 +293,7 @@ initShaders().then(program => {
                 if (avgDelta > 33) {
                     console.warn("Wykryto niską wydajność. Przełączanie na tryb uproszczony.");
                     Settings.LOW_GRAPHICS = true;
+                    resize();
                 }
                 autoPerformanceCheckDone = true; 
             }

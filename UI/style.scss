@@ -273,31 +273,107 @@ canvas#glcanvas {
   }
 }
 
-#settingsPanel-content {
-  z-index: 2000;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  margin-top: 1.5rem;
-  background: light-dark($bg-color, $bg-color-dark);
-  color: light-dark($text-color-light, $text-color-dark);
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  text-align: left;
+#settingsPanel {
+  // Overlay tła (opcjonalnie, jeśli chcesz przyciemnić grę pod spodem)
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1999;
 
   &.hidden {
     display: none;
   }
+}
+
+#settingsPanel-content {
+  // Spójne z #leaderboard
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+  
+  width: 90%;
+  max-width: 450px;
+  padding: 2rem;
+  border-radius: 12px;
+  font-family: "Jersey 25", sans-serif;
+  
+  // Kolory i tło
+  background: light-dark(rgba(255, 255, 255, 0.95), rgba(32, 32, 32, 0.95));
+  color: light-dark(#333, #fff);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 
   h2 {
-    margin-bottom: 1rem;
+    font-size: 2.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    color: $mult; // Ten sam akcent co w leaderboard
+    text-shadow: light-dark(1px 1px rgba(0,0,0,0.1), 2px 2px rgba(0,0,0,0.3));
   }
 
   label {
     display: block;
-    margin: 0.5rem 0;
+    margin-bottom: 1.2rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    
+    // Stylizacja tekstu wewnątrz label
+    color: light-dark(#444, #ddd);
+
+    // Stylizacja suwaków (range)
+    input[type="range"] {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      accent-color: $money; // Zielony/pieniężny akcent
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+
+    // Stylizacja checkboxów
+    input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.3);
+      accent-color: $chance; // Akcent koloru pozycji z tabeli
+    }
+  }
+  .row{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  // Przycisk zamykania (X)
+  .closePopup {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: $chance;
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+      color: $mult;
+    }
+  }
+
+  // Przycisk zmiany języka
+  button:not(.closePopup) {
+    @include cool-button;
   }
 }
 
