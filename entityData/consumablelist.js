@@ -466,7 +466,7 @@ const tarotCards = [
           game.GameRenderer.displayConsumablesCounter();
         },
       price: 4,
-      image: 'tarot_default',
+      image: 'fool',
     },
   {
     name: "Mag",
