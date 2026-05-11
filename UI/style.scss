@@ -1000,6 +1000,9 @@ canvas#glcanvas {
   }
 }
 
+/* Styl dla graczy z prodiżem zamiast komputera */
+
+
 .upgrade-wrapper,
 .boss-wrapper {
   font-family: "Jersey 25", sans-serif;
@@ -2018,5 +2021,57 @@ canvas#glcanvas {
   }
   100% {
     transform: translate(0, 0) rotateZ(0deg);
+  }
+}
+
+body.potatopc {
+  // Wyłączamy morderców wydajności
+  .card-background::after,
+  .card-background::before,
+  .shine::after,
+  .metalic-shine::after,
+  .chip-foil::after,
+  .booster-foil::after,
+  .booster-foil::before {
+    display: none !important;
+  }
+
+  // Reset filtrów i trybów mieszania
+  .upgrade-inner, 
+  .card-background {
+    filter: none !important;
+    mix-blend-mode: normal !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    
+  }
+  .card-background.negative {
+      filter: invert(1) !important;
+
+      &.inactive {
+        filter: invert(1) grayscale(0.8) !important;
+      }
+    }
+
+  // Zatrzymujemy animacje IDLE (skewCard, readyCard itp.)
+  .upgrade-card, 
+  .upgrade-inner {
+    animation: none !important;
+    // Ważne: ustawiamy transform na sztywno, żeby nadpisać rotację 3D
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) !important;
+    
+  }
+
+  // Upraszczamy wrapper
+  .upgrade-wrapper {
+    
+    will-change: auto !important;
+    
+    // Nadpisujemy transformację, jeśli chcesz żeby karty stały idealnie prosto
+    // Ale zostawiamy zmienne --drag, żeby drag-and-drop działał
+    &:hover .upgrade-inner {
+      animation: none !important;
+      transform: scale(1.05) !important; // Tylko proste powiększenie
+    }
   }
 }

@@ -785,6 +785,7 @@ canvas#glcanvas {
   z-index: -1;
 }
 
+/* Styl dla graczy z prodiżem zamiast komputera */
 .upgrade-wrapper,
 .boss-wrapper {
   font-family: "Jersey 25", sans-serif;
@@ -1917,4 +1918,38 @@ canvas#glcanvas {
   100% {
     transform: translate(0, 0) rotateZ(0deg);
   }
+}
+body.potatopc .card-background::after,
+body.potatopc .card-background::before,
+body.potatopc .shine::after,
+body.potatopc .metalic-shine::after,
+body.potatopc .chip-foil::after,
+body.potatopc .booster-foil::after,
+body.potatopc .booster-foil::before {
+  display: none !important;
+}
+body.potatopc .upgrade-inner,
+body.potatopc .card-background {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+body.potatopc .card-background.negative {
+  filter: invert(1) !important;
+}
+body.potatopc .card-background.negative.inactive {
+  filter: invert(1) grayscale(0.8) !important;
+}
+body.potatopc .upgrade-card,
+body.potatopc .upgrade-inner {
+  animation: none !important;
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg) !important;
+}
+body.potatopc .upgrade-wrapper {
+  will-change: auto !important;
+}
+body.potatopc .upgrade-wrapper:hover .upgrade-inner {
+  animation: none !important;
+  transform: scale(1.05) !important;
 }/*# sourceMappingURL=style.css.map */
