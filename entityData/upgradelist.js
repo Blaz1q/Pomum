@@ -345,17 +345,14 @@ export const upgradeBlueprints = [
   {
     name: "Coconut Bank",
     descriptionfn(game) {
-      if (!this.props.previousPercent || this.props.previousPercent == -1)
+      if (!this.props.previousPercent || this.props.previousPercent == null)
         return `${Style.Chance("+50%")} aby ${game.fruits[4].icon} był złoty, ${Style.Chance("-10%")} ${game.fruits[4].icon}, ${Style.Chance("+2.5%")} dla reszty`;
       return `${Style.Chance("+50%")} aby ${game.fruits[4].icon} był złoty, ${Style.Chance(`-${this.props.previousPercent}%`)} ${game.fruits[4].icon}, ${Style.Chance(`+${this.props.previousPercent / (game.fruits.length - 1)}`)} dla reszty`;
     },
-    reset(game) {
-      game.fruits[4].percent += this.props.previousPercent;
-      game.fruits[4].props.upgrade.goldchance -= 50;
-      game.addChancesExcept(game.fruits[4], -this.props.previousPercent / (game.fruits.length - 1));
-    },
+    
     props: () => ({
-      previousPercent: -1,
+      
+      previousPercent: null,
       applied: false,
       onRoundStart() {
         game.fruits[4].props.upgrade.goldchance += 50;
@@ -369,15 +366,21 @@ export const upgradeBlueprints = [
         this.props.applied = true;
         return UPGRADE_STATES.Active;
       },
+      reset() {
+        console.log(this);
+        game.fruits[4].percent += this.previousPercent;
+        game.fruits[4].props.upgrade.goldchance -= 50;
+        game.addChancesExcept(game.fruits[4], -this.previousPercent / (game.fruits.length - 1));
+      },
       onRoundEnd() {
-        this.reset(game);
+        this.props.reset(game);
         this.props.applied = false;
         return UPGRADE_STATES.Failed;
       },
     }),
     remove(game) {
       if (this.props?.applied == true) {
-        this.reset(game);
+        this.props.reset(game);
       }
     },
     price: 10,
