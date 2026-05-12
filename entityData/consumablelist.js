@@ -1,6 +1,6 @@
 import { Upgrade } from "../entities/Upgrade.js";
 import { Consumable } from "../entities/Consumable.js";
-import { SCORE_ACTIONS, Style } from "../dictionary.js";
+import { SCORE_ACTIONS, Style, TYPES } from "../dictionary.js";
 import { upgradesList } from "./upgradelist.js";
 import {
   GAME_TRIGGERS,
@@ -11,6 +11,7 @@ import {
 import { Stats } from "../utils/Stats.js";
 import { Tarot } from "../entities/Tarot.js";
 import { transformsExecRgx } from "../libs/animejs/core/consts.js";
+import { Tile } from "../entities/Tile.js";
 export const consumableList = [];
 const pomumpackItems = [];
 function desc(fruit) {
@@ -287,7 +288,7 @@ export const consumableUpgradeBlueprints = [
       let copy = game.upgrades[index];
       const newUpgrade = Upgrade.Copy(copy);
       console.log(newUpgrade);
-      game.upgrades.forEach((upgrade) => {
+      [...game.upgrades].forEach((upgrade) => {
         if(upgrade!=copy){
           upgrade.remove(game);
           upgrade.destroy(game);
@@ -654,10 +655,52 @@ const tarotCards = [
     price: 4,
     image: "tarot_default",
   },
-  /*
-    {
-        name: "Śmierć"
+  {
+    id: "death",
+    name: "Śmierć",
+    descriptionfn(game){
+      return `Zamienia losowy owoc ${Style.Highlight("na plaszny")} w najrzadszy owoc`
     },
+    effect(game){
+      const minPercent = Math.min(...game.fruits.map(f => f.percent));
+      const lowestFruits = game.fruits.filter(f => f.percent === minPercent);
+      const choice = lowestFruits[Math.floor(Math.random() * lowestFruits.length)];
+      let boardFruits = game.matchesManager.getUniqueFruitsFromBoard().filter(f=>f.icon!=choice.icon);
+      let randomBoard = boardFruits[Math.floor(Math.random() * boardFruits.length)];
+      console.log(choice);
+      console.log(randomBoard);
+      for (let y = 0; y < game.matrixsize; y++) {
+        for (let x = 0; x < game.matrixsize; x++) {
+          if(game.board[y][x].icon==randomBoard.icon){
+            game.board[y][x]; 
+            //console.log(tile);
+            game.board[y][x] = new Tile({
+                        icon: choice.icon, type: TYPES.Fruit,
+                        x: x,
+                        y: y,
+                        image: choice.imagename,
+                        modifier: MODIFIERS.None,
+                        debuffed: choice.props.debuffed,
+                        upgrade: { ...choice.props.upgrade }
+                    });
+            game.board[y][x].triggerAnimation(game);
+          }
+        }
+      }
+      let matches = game.matchesManager.findMatches();
+      if(matches.length>0){
+        game.matchesManager.processMatches(matches);
+      }
+      this.message = { text: `${randomBoard.icon}🔁${choice.icon}`, style: SCORE_ACTIONS.Money };
+    },
+    canUse(game) {
+      return game.stage != STAGES.Shop && game.locked == false;
+    },
+    price: 4,
+    image: "tarot_default"
+  },
+  /*
+    
     {
         name: "Umiarkowanie"
     },

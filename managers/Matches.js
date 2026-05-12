@@ -1,6 +1,6 @@
-import { TYPES, GAME_TRIGGERS, Settings, MODIFIERS } from "./dictionary.js";
-import { Tile } from "./entities/Tile.js";
-import { Queue } from "./utils/Queue.js"
+import { TYPES, GAME_TRIGGERS, Settings, MODIFIERS } from "../dictionary.js";
+import { Tile } from "../entities/Tile.js";
+import { Queue } from "../utils/Queue.js"
 let FADE_MS = Settings.FADE_MS;
 let MIN_FALL_MS = Settings.MIN_FALL_MS;
 export class Matches {
@@ -486,5 +486,22 @@ getNeighborsForSpecial(tile) {
         }
 
         return false;
+    }
+    getUniqueFruitsFromBoard() {
+        const uniqueTiles = [];
+        const foundTypes = new Set();
+
+        for (let y = 0; y < this.matrixsize; y++) {
+            for (let x = 0; x < this.matrixsize; x++) {
+                const tile = this.game.board[y][x];
+                
+                // Sprawdzamy czy to owoc i czy już taki mamy (po imagename lub icon)
+                if (tile.type === TYPES.Fruit && !foundTypes.has(tile.icon)) {
+                    foundTypes.add(tile.icon);
+                    uniqueTiles.push(tile);
+                }
+            }
+        }
+        return uniqueTiles;
     }
 }

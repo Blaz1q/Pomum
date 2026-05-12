@@ -230,6 +230,10 @@ export const translations = {
           return `Daje ostatnią użytą kartę tarota. (Ostatnia: ${last})`;
         },
       },
+      death:{
+        name: "Śmierć",
+        description: `Zamienia losowy typ owocu ${Style.Highlight("na plaszny")} w najrzadszy owoc`
+      },
       the_magician: {
         name: "Mag",
         description: (data) => "Zamienia szanse 2 losowych owoców miejscami.",
@@ -994,6 +998,10 @@ export const translations = {
           const last = data.game.stats.lastUsedTarot?.name || "None";
           return `Gives the last used tarot card. (Last: ${last})`;
         },
+      },
+      death:{
+        name: "Death",
+        description: `Swaps a random type of fruit ${Style.Highlight("on the board")} with the rarest one`
       },
       the_magician: {
         name: "The Magician",

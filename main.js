@@ -13,7 +13,7 @@ import { RenderUI } from "./UI/RenderUI.js";
 import { Animator, animate } from "./loadshaders.js";
 import { cyrb128, getRandomString, sfc32 } from "./random.js";
 import { Roll } from "./roll.js";
-import { Matches } from "./Matches.js";
+import { Matches } from "./managers/Matches.js";
 import { Stats } from "./utils/Stats.js";
 import { Queue } from "./utils/Queue.js"
 
@@ -1028,6 +1028,7 @@ function startGame(seed = "") {
     game.GameRenderer.hideMenu();
     game.GameRenderer.showGameContainer();
     game.GameRenderer.displayPlayerUpgrades();
+    game.GameRenderer.displayPlayerConsumables();
     console.log(game.fruits);
     startRound();
     Audio.playSound('pop.mp3');

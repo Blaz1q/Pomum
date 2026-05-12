@@ -240,6 +240,10 @@ export class UpgradeRenderer {
 
     return container; // Zwracamy obiekt DOM, a nie string!
   }
+  clearTimer(){
+    clearTimeout(this.selectedTimer);
+    this.selectedTimer = null;
+  }
   displayButtons() {
     if(this.dragHandler?.isDragging) return;
     
@@ -247,8 +251,7 @@ export class UpgradeRenderer {
     // Sprawdzamy obecność klasy zamiast czytania stringa transform
     const isAlreadyActive = wrapper.classList.contains("SelectedUpgrade");
     if (this.selectedTimer) {
-        clearTimeout(this.selectedTimer);
-        this.selectedTimer = null;
+        this.clearTimer();
     }
     this.gameRenderer.resetAllUpgrades();
 
@@ -275,7 +278,7 @@ export class UpgradeRenderer {
         this.refreshAllButtons();
       });
     } else {
-      this.selectedTimer = null;
+      this.clearTimer();
       game.Audio.playSound("deselect.mp3");
       // Reset zmiennej przy odkliknięciu
       wrapper.style.setProperty('--select-y', '0px');
@@ -315,6 +318,7 @@ export class UpgradeRenderer {
         return;
       }
       if (success) {
+        this.clearTimer();
         if (upgrade.type == "Voucher") {
           this.removeButtons();
           game.GameRenderer.dissolveAndRemove(wrapper, 1000);
@@ -369,6 +373,7 @@ export class UpgradeRenderer {
         //return;
       }
       if (success) {
+        this.clearTimer();
         this.removeButtons();
         this.gameRenderer.dissolveAndRemove(wrapper, 1000);
         //wrapper.remove();
