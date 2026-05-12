@@ -1063,8 +1063,12 @@ export const upgradeBlueprints = [
 
         // 1. Sprzątanie: wywołujemy remove() kopii, jeśli istniała
         if (this.mirroredUpgradeCopy) {
-          if (typeof this.mirroredUpgradeCopy.props.remove === "function") {
-            this.mirroredUpgradeCopy.props?.remove(game);
+          const copy = this.mirroredUpgradeCopy;
+          // Próbujemy wywołać remove na kopii lub jej propsach, 
+          // upewniając się, że bindujemy poprawny kontekst
+          const removeFn = copy.remove || copy.props?.remove;
+          if (typeof removeFn === "function") {
+            removeFn.call(copy, game); // .call(copy) zapewnia, że 'this' w remove będzie poprawne
           }
           this.mirroredUpgradeCopy = null;
         }
@@ -1270,6 +1274,9 @@ export const upgradeBlueprints = [
         }
         consumable.negative = false;
         consumable.apply(game);
+        if(consumable.message);{
+          return {state: UPGRADE_STATES.Active, message: consumable.message.text, style: consumable.message.style, translation: consumable.message?.translation ?? false}
+        }
         return { state: UPGRADE_STATES.Active, message: `popups.used`, style: SCORE_ACTIONS.Info, translation: true }
       },
     }),
@@ -1687,7 +1694,73 @@ export const upgradeBlueprints = [
   image: 'hallucination',
   price: 4,
   ...COMMON
-}
+},
+{
+  name: "Hourglass",
+  descriptionfn(game){
+    return `Ulepszenie daje ${Style.Mult("X4 Mult")}, który spada o ${Style.Mult("-X0.5")} z każdym wykonanym ruchem.`
+  },
+  props: ()=>({
+    mult: 4,
+    onRoundStart(){
+      this.props.mult = 4;
+      return UPGRADE_STATES.Failed;
+    },
+    onMove(){
+      if(this.mult>1){
+        this.props.mult -= 0.5;
+      }
+      return {state: UPGRADE_STATES.Active, message: `-X0.5 Mult`, style: SCORE_ACTIONS.Info}
+    },
+    onScore(){
+      if(this.props.mult==1) return UPGRADE_STATES.Failed;
+      let messagemult = this.props.mult;
+      game.mult *= this.props.mult;
+      game.GameRenderer.displayTempScore();
+      return { state: UPGRADE_STATES.Score, message: `X${messagemult} Mult`, style: SCORE_ACTIONS.Mult };
+    },
+    onRoundEnd(){
+      this.props.mult = 4;
+      return UPGRADE_STATES.Failed;
+    }
+  }),
+  image: "hourglass",
+  price: 6,
+  ...UNCOMMON
+},
+// {
+//   name: "polaroid",
+//   descriptionfn(game){
+//     return `Gdy sprzeda się to ulepszenie po 4 rundach, otrzymuje się kopię losowego kupionego ulepszenia (runda ${this.props.counter}, z 4)`;
+//   },
+//   props: ()=>({
+//     counter: 0,
+//     onRoundEnd(){
+//       this.props.counter++;
+//       if(this.props.counter>=4){
+//         return UPGRADE_STATES.Ready;
+//       }
+//       return UPGRADE_STATES.Active;
+//     },
+//     remove(game){
+//       if(this.props.counter>=4){
+//         let avilable = game.upgrades.filter(up => up._name != this.name);
+//         let index = Math.floor(Math.random() * avilable.length);
+//         if(avilable.length==0) return {state: UPGRADE_STATES.Tried, message: "XD", style: SCORE_ACTIONS.Info}
+//         const copy = avilable[index];
+//         const newUpgrade = Upgrade.Copy(copy);
+//         newUpgrade.negative = false;
+//         game.upgrades.push(newUpgrade);
+//         newUpgrade.apply(game);
+//         //game.GameRenderer.displayPlayerUpgrades();
+//       }
+//     }
+//   }),
+  
+//     ...RARE,
+//     image: "polaroid",
+//     price: 8,
+// }
 ];
 
 

@@ -735,6 +735,12 @@ export const translations = {
         name: "Żyletka",
         description: "Losowy rząd zostaje zniszczony przy pierwszym ruchu.",
       },
+      hourglass: {
+        name: "Klepsydra",
+        description: (data) => {
+          return `Ulepszenie daje ${Style.Mult("X4 Mult")}, który spada o ${Style.Mult("-X0.5")} z każdym wykonanym ruchem. (Obecnie ${Style.Mult("X"+data.upgrade.props.mult+" Mult")})`;
+        },
+      },
     },
     popups: {
       used: "Użyto!",
@@ -1464,6 +1470,12 @@ export const translations = {
         name: "Razor",
         description: "A random row is destroyed on the first move.",
       },
+      hourglass: {
+        name: "Hourglass",
+        description: (data) => {
+          return `This upgrade gives ${Style.Mult("X4 Mult")}, which decreases by ${Style.Mult("-X0.5")} with every move. (Currently ${Style.Mult("X"+data.upgrade.props.mult+" Mult")})`;
+        },
+      }
     },
     popups: {
       used: "Used!",

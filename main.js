@@ -497,11 +497,11 @@ export class Game {
         //if(this.stage!==STAGES.Shop) return false; // not in shop -> can't sell
         this.Audio.playSound('sell.mp3');
         if (upgrade.type == "Upgrade") {
-            const index = this.upgrades.indexOf(upgrade) ?? -1;
+            let index = this.upgrades.indexOf(upgrade) ?? -1;
             if (index == -1) return;
             console.log("SELLINNN");
             this.upgrades[index].sell(this);
-            // this.upgrades.splice(index, 1);
+            //this.upgrades.splice(index, 1);
             this.GameRenderer.displayUpgradesCounter();
             this.emit(GAME_TRIGGERS.onUpgradesChanged);
         }

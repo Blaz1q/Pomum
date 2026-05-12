@@ -399,7 +399,9 @@ export class UpgradeRenderer {
       }
       if (this.gameRenderer.game.sell(upgrade)) {
         //this.refreshBuyButtons();
+        this.clearTimer();
         game.GameRenderer.fadeOutAndRemove(wrapper);
+          
         //wrapper.remove();
       }
     });
