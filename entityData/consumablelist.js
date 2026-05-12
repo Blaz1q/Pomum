@@ -558,7 +558,7 @@ const tarotCards = [
       return game.stage != STAGES.Shop && game.locked == false;
     },
     price: 4,
-    image: "tarot_default",
+    image: "lovers",
   },/*
     {
         name: "Powóz"
@@ -653,7 +653,7 @@ const tarotCards = [
       return game.stage != STAGES.Shop && game.locked == false;
     },
     price: 4,
-    image: "tarot_default",
+    image: "hanged_man",
   },
   {
     id: "death",
@@ -697,7 +697,7 @@ const tarotCards = [
       return game.stage != STAGES.Shop && game.locked == false;
     },
     price: 4,
-    image: "tarot_default"
+    image: "death"
   },
   /*
     

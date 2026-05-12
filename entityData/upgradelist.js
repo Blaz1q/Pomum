@@ -1024,7 +1024,7 @@ export const upgradeBlueprints = [
 
       // 2. Wyświetlanie opisu skopiowanego ulepszenia
       if (this.mirroredUpgradeCopy) {
-        return this.mirroredUpgrade.description(game);
+        return this.mirroredUpgradeCopy.description(game);
       }
 
       // 3. Stan domyślny (brak sąsiada)
