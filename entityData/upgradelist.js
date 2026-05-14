@@ -1113,8 +1113,8 @@ export const upgradeBlueprints = [
 
     remove(game) {
       // Przy usuwaniu lustra musimy cofnąć efekty jego kopii
-      if (this.mirroredUpgradeCopy && typeof this.mirroredUpgradeCopy.remove === "function") {
-        this.mirroredUpgradeCopy.remove(game);
+      if (this.mirroredUpgradeCopy && typeof this.mirroredUpgradeCopy.props?.remove === "function") {
+        this.mirroredUpgradeCopy.props.remove(game);
       }
       this.mirroredUpgradeCopy = null;
       this.mirroredUpgrade = null;
