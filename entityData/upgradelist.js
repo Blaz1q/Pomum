@@ -1744,7 +1744,7 @@ export const upgradeBlueprints = [
       return UPGRADE_STATES.Active;
     },
     remove(game){
-      if(this.props.counter>=4){
+      if(this.props.counter>=this.props.rounds){
         let avilable = game.upgrades.filter(up => up._name != this.name);
         let index = Math.floor(Math.random() * avilable.length);
         if(avilable.length==0) return {state: UPGRADE_STATES.Tried, message: "XD", style: SCORE_ACTIONS.Info}
