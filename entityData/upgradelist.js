@@ -1775,7 +1775,7 @@ export const upgradeBlueprints = [
         if(up.type=="Consumable"){
           up.price = 0;
           up.sellPrice = 0;
-          up.UpgradeRenderer.update({bought: true, origin: null,tick: false});
+          up.UpgradeRenderer.update({bought: false, origin: null,tick: false});
         }
       });
       return UPGRADE_STATES.Failed;
@@ -1797,7 +1797,7 @@ export const upgradeBlueprints = [
         if(up.type=="Tarot"){
           up.price = 0;
           up.sellPrice = 0;
-          up.UpgradeRenderer.update({bought: true, origin: null,tick: false});
+          up.UpgradeRenderer.update({bought: false, origin: null,tick: false});
           found = true;
         }
       });
