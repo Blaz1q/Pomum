@@ -1275,9 +1275,9 @@ export const upgradeBlueprints = [
         }
         consumable.negative = false;
         consumable.apply(game);
-        if(consumable.message);{
-          return {state: UPGRADE_STATES.Active, message: consumable.message.text, style: consumable.message.style, translation: consumable.message?.translation ?? false}
-        }
+        // if(consumable.message);{
+        //   return {state: UPGRADE_STATES.Active, message: consumable.message?.text, style: consumable.message.style, translation: consumable.message?.translation ?? false}
+        // }
         return { state: UPGRADE_STATES.Active, message: `popups.used`, style: SCORE_ACTIONS.Info, translation: true }
       },
     }),
