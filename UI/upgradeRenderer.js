@@ -8,12 +8,32 @@ export class UpgradeRenderer {
     this.gameRenderer = gameRenderer;
     this.dragHandler = null;
     this.selectedTimer = null;
+    this.lastParams = null;
+  }
+  areParamsEqual(newParams, oldParams) {
+  if (!oldParams) return false;
+
+    // Porównujemy tylko proste typy, które sterują UI
+    return (
+      newParams.bought === oldParams.bought &&
+      newParams.displayPrice === oldParams.displayPrice &&
+      newParams.displayButtons === oldParams.displayButtons &&
+      newParams.free === oldParams.free &&
+      // Jeśli origin istnieje, porównaj jego ID lub typ zamiast całego obiektu
+      newParams.origin?.type === oldParams.origin?.type &&
+      newParams.origin?.id === oldParams.origin?.id
+    );
   }
   render(params) {
     const upgrade = this.upgrade;
     this.bought = params.bought ?? false;
     let displayPrice = params.displayPrice ?? true;
     let displayButtons = params.displayButtons ?? true;
+    if(this.areParamsEqual(params,this.lastParams)){
+      return upgrade.wrapper;
+    }
+    this.lastParams = params;
+    console.log("rendering upgrade: "+this.upgrade._name);
     upgrade.wrapper = null;
     upgrade.wrapper = document.createElement("div");
     const wrapper = upgrade.wrapper;
@@ -162,6 +182,62 @@ export class UpgradeRenderer {
 
     return wrapper;
   }
+  updateWrapper(params) {
+  const upgrade = this.upgrade;
+  const wrapper = upgrade.wrapper;
+
+  if (!wrapper) return this.render(params); // Jeśli nie ma wrappera, zrób pełny render
+
+  console.log("Updating upgrade UI: " + upgrade._name);
+
+  // 1. Aktualizacja ceny
+  const priceEl = wrapper.querySelector(".upgrade-price");
+  if (priceEl) {
+    priceEl.textContent = `$${params.bought ? upgrade.sellPrice : upgrade.price}`;
+  }
+
+  // 2. Aktualizacja opisu (desc)
+  const descEl = wrapper.querySelector(".upgrade-desc");
+  if (descEl) {
+    descEl.innerHTML = "";
+    descEl.appendChild(this.createDescription());
+  }
+
+  // 3. Aktualizacja klas (bought, ready)
+  wrapper.classList.toggle("bought", params.bought ?? false);
+  wrapper.classList.toggle("ready", upgrade.isReady ?? false);
+
+  // 4. Aktualizacja tła (modyfikatory: Foil, Holo itp.)
+  const cardBackground = wrapper.querySelector(".card-background");
+  if (cardBackground) {
+    // Lista klas modyfikatorów do odświeżenia
+    const modClasses = ["chip-foil", "holo", "shine", "negative", "inactive"];
+    cardBackground.classList.remove(...modClasses);
+
+    if (upgrade.negative) cardBackground.classList.add("negative");
+    if (upgrade.modifier === MODIFIERS.Chip) cardBackground.classList.add("chip-foil");
+    else if (upgrade.modifier === MODIFIERS.Mult) {
+      cardBackground.classList.add("holo");
+      cardBackground.classList.add("shine");
+    }
+    if (upgrade.active === false) cardBackground.classList.add("inactive");
+  }
+
+  // 5. Aktualizacja przycisków (jeśli stan "bought" się zmienił)
+  if (this.lastParams?.bought !== params.bought) {
+    const oldButtons = wrapper.querySelector(".consumable-buttons");
+    if (oldButtons) oldButtons.remove();
+    if (params.displayButtons !== false) {
+      wrapper.appendChild(this.createButtons(params));
+    }
+  } else {
+    // Jeśli tylko odświeżamy istniejące przyciski (np. czy są disabled)
+    this.refreshAllButtons();
+  }
+
+  this.lastParams = { ...params };
+  return wrapper;
+}
   createDescription() {
     const upgrade = this.upgrade;
 
@@ -586,13 +662,10 @@ export class UpgradeRenderer {
     const upgrade = this.upgrade;
     if (!upgrade) return;
 
-    const oldWrapper = upgrade.wrapper;
-    if (!oldWrapper) return;
-
-    const newWrapper = this.render(params);
-    this.applyDragEvents();
-
-    oldWrapper.replaceWith(newWrapper);
+    // Zamiast render() i replaceWith(), używamy updateWrapper()
+    this.updateWrapper(params);
+    
+    // Opcjonalnie: wyzwalasz efekt wizualny przy aktualizacji
     this.trigger(300);
     this.gameRenderer.game.Audio.playSound("tick.mp3");
   }

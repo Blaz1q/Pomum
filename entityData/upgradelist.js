@@ -1728,39 +1728,40 @@ export const upgradeBlueprints = [
   price: 6,
   ...UNCOMMON
 },
-// {
-//   name: "polaroid",
-//   descriptionfn(game){
-//     return `Gdy sprzeda się to ulepszenie po 4 rundach, otrzymuje się kopię losowego kupionego ulepszenia (runda ${this.props.counter}, z 4)`;
-//   },
-//   props: ()=>({
-//     counter: 0,
-//     onRoundEnd(){
-//       this.props.counter++;
-//       if(this.props.counter>=4){
-//         return UPGRADE_STATES.Ready;
-//       }
-//       return UPGRADE_STATES.Active;
-//     },
-//     remove(game){
-//       if(this.props.counter>=4){
-//         let avilable = game.upgrades.filter(up => up._name != this.name);
-//         let index = Math.floor(Math.random() * avilable.length);
-//         if(avilable.length==0) return {state: UPGRADE_STATES.Tried, message: "XD", style: SCORE_ACTIONS.Info}
-//         const copy = avilable[index];
-//         const newUpgrade = Upgrade.Copy(copy);
-//         newUpgrade.negative = false;
-//         game.upgrades.push(newUpgrade);
-//         newUpgrade.apply(game);
-//         //game.GameRenderer.displayPlayerUpgrades();
-//       }
-//     }
-//   }),
+{
+  name: "polaroid",
+  descriptionfn(game){
+    return `Gdy sprzeda się to ulepszenie po ${this.props.rounds} rundach, otrzymuje się kopię losowego kupionego ulepszenia (Runda ${this.props.counter} z ${this.props.rounds})`;
+  },
+  props: ()=>({
+    counter: 0,
+    rounds: 2,
+    onRoundEnd(){
+      this.props.counter++;
+      if(this.props.counter>=this.props.rounds){
+        return UPGRADE_STATES.Ready;
+      }
+      return UPGRADE_STATES.Active;
+    },
+    remove(game){
+      if(this.props.counter>=4){
+        let avilable = game.upgrades.filter(up => up._name != this.name);
+        let index = Math.floor(Math.random() * avilable.length);
+        if(avilable.length==0) return {state: UPGRADE_STATES.Tried, message: "XD", style: SCORE_ACTIONS.Info}
+        const copy = avilable[index];
+        const newUpgrade = Upgrade.Copy(copy);
+        newUpgrade.negative = false;
+        game.upgrades.push(newUpgrade);
+        newUpgrade.apply(game);
+        game.GameRenderer.displayPlayerUpgrades();
+      }
+    }
+  }),
   
-//     ...RARE,
-//     image: "polaroid",
-//     price: 8,
-// }
+    ...RARE,
+    image: "polaroid",
+    price: 8,
+}
 ];
 
 

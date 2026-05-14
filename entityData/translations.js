@@ -741,6 +741,12 @@ export const translations = {
           return `Ulepszenie daje ${Style.Mult("X4 Mult")}, który spada o ${Style.Mult("-X0.5")} z każdym wykonanym ruchem. (Obecnie ${Style.Mult("X"+data.upgrade.props.mult+" Mult")})`;
         },
       },
+      polariod: {
+        name: "Polaroid",
+        description: (data) => {
+          return `Gdy sprzeda się to ulepszenie po ${data.upgrade.props.rounds} rundach, daje kopię losowego posiadanego ulepszenia (Runda ${data.upgrade.props.counter} z ${data.upgrade.props.rounds})`;
+        }
+      }
     },
     popups: {
       used: "Użyto!",
@@ -1475,6 +1481,12 @@ export const translations = {
         description: (data) => {
           return `This upgrade gives ${Style.Mult("X4 Mult")}, which decreases by ${Style.Mult("-X0.5")} with every move. (Currently ${Style.Mult("X"+data.upgrade.props.mult+" Mult")})`;
         },
+      },
+      polariod: {
+        name: "Polaroid",
+        description: (data) => {
+          return `When selling this upgrade after ${data.upgrade.props.rounds} rounds, grants a copy of a random owned upgrade (Round ${data.upgrade.props.counter} of ${data.upgrade.props.rounds})`;
+        }
       }
     },
     popups: {
