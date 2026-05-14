@@ -1067,7 +1067,7 @@ export const upgradeBlueprints = [
           const copy = this.mirroredUpgradeCopy;
           // Próbujemy wywołać remove na kopii lub jej propsach, 
           // upewniając się, że bindujemy poprawny kontekst
-          const removeFn = copy.remove || copy.props?.remove;
+          const removeFn = copy.props?.remove;
           if (typeof removeFn === "function") {
             removeFn.call(copy, game); // .call(copy) zapewnia, że 'this' w remove będzie poprawne
           }
@@ -1115,7 +1115,7 @@ export const upgradeBlueprints = [
       // Przy usuwaniu lustra musimy cofnąć efekty jego kopii
       if (this.mirroredUpgradeCopy && typeof this.mirroredUpgradeCopy.props?.remove === "function") {
         this.mirroredUpgradeCopy.props.remove(game);
-      }
+      }``
       this.mirroredUpgradeCopy = null;
       this.mirroredUpgrade = null;
     },
