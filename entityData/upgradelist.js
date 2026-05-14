@@ -1270,7 +1270,7 @@ export const upgradeBlueprints = [
         if (!consumable) {
           return UPGRADE_STATES.Failed;
         }
-        if (consumableUpgradeBlueprints.some(b => b.name === consumable._name)||consumable._name=="Głupiec") {
+        if (consumable.type=="Pact"||consumable._name=="Głupiec") {
           return { state: UPGRADE_STATES.Tried, message: `popups.cantuse`, style: SCORE_ACTIONS.Failed, translation: true }
         }
         consumable.negative = false;
