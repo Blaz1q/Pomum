@@ -746,6 +746,18 @@ export const translations = {
         description: (data) => {
           return `Gdy sprzeda się to ulepszenie po ${data.upgrade.props.rounds} rundach, daje kopię losowego posiadanego ulepszenia (Runda ${data.upgrade.props.counter} z ${data.upgrade.props.rounds})`;
         }
+      },
+      consumable: {
+        name: "Konsumpcjonizm",
+        description: `Wszystkie ${Style.Highlight("Ulepszenia kafelków")} w sklepie są ${Style.Highlight("darmowe")}.`
+      },
+      tarot: {
+        name: "Ezoteryka",
+        description: `Wszystkie ${Style.Highlight("Karty tarota")} w sklepie są ${Style.Highlight("darmowe")}.`
+      },
+      giftcard: {
+        name: "Karta Podarunkowa",
+        description: `${Style.Highlight("Na końcu rundy")}, wszystkie posiadane karty zyskują ${Style.Money("$1")} do ceny sprzedaży.`
       }
     },
     popups: {
@@ -1487,6 +1499,18 @@ export const translations = {
         description: (data) => {
           return `When selling this upgrade after ${data.upgrade.props.rounds} rounds, grants a copy of a random owned upgrade (Round ${data.upgrade.props.counter} of ${data.upgrade.props.rounds})`;
         }
+      },
+      consumable: {
+        name: "Consumerism",
+        description: `All ${Style.Highlight("Tile Upgrades")} in the shop are ${Style.Highlight("free")}.`
+      },
+      tarot: {
+        name: "Esoterica",
+        description: `All ${Style.Highlight("Tarot Cards")} in the shop are ${Style.Highlight("free")}.`
+      },
+      giftcard: {
+        name: "Gift Card",
+        description: `${Style.Highlight("At the end of the round")}, all owned cards gain ${Style.Money("$1")} to their sell price.`
       }
     },
     popups: {

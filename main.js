@@ -65,6 +65,7 @@ export class Game {
         this.tempscoreBox = document.getElementById("tempscore");
         this.multBox = document.getElementById("mult");
         this.shoproll = 4;
+        this.shopitems = [];
         this.fruits = [
             new Tile({ icon: "🍎", type: TYPES.Fruit, image: 'apple.png' }),
             new Tile({ icon: "🍐", type: TYPES.Fruit, image: 'pear.png' }),

@@ -955,7 +955,7 @@ consumableSilverBlueprints.forEach((consumable) => {
   consumable.rarity = UPGRADE_RARITY.ConsumableCommon;
 });
 consumableUpgradeBlueprints.forEach((consumable) => {
-  consumable.type = "Consumable";
+  consumable.type = "Pact";
   consumable.rarity = UPGRADE_RARITY.ConsumableRare;
 });
 tarotCards.forEach((card) => {

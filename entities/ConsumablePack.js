@@ -49,7 +49,7 @@ export class ConsumablePack extends UpgradeBase {
 
     // Pick first 'count' items and create new instances
     const picked = pool.slice(0, count).map((c) => {
-      if (c.type == "Consumable") {
+      if (c.type == "Consumable" || c.type=="Pact") {
         return new Consumable(c);
       } else if (c.type == "Upgrade") {
         let upgrade = new Upgrade(c);

@@ -4,7 +4,7 @@ import { LANGUAGE, SCORE_ACTIONS, Settings } from "../dictionary.js";
 export class Consumable extends UpgradeBase {
   constructor(props = {}) {
     super(props);
-    this.type = "Consumable";
+    this.type = props.type ? props.type : "Consumable";
     this.url = "./images/consumables/";
     this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
     this.negative = false;

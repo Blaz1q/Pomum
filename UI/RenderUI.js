@@ -627,9 +627,11 @@ animateReorder(oldPositions, duration = 300, excludedEl = null) {
   displayUpgradesInShop() {
     const shopEl = document.getElementById("upgrades-container");
     shopEl.innerHTML = "";
+    this.game.shopitems = this.game.rollUpgrades();
     shopEl.appendChild(
-      this.displayUpgrades(this.game.rollUpgrades(), { bought: false }),
+      this.displayUpgrades(this.game.shopitems, { bought: false }),
     );
+    this.game.emit(GAME_TRIGGERS.onShopSpawn, this.game.shopitems);
   }
   displayBossInGame() {
     const bossContainer = document.getElementById("boss-container");

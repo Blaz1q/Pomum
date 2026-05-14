@@ -657,7 +657,7 @@ export class UpgradeRenderer {
         break;
     }
   }
-  update(params = { bought: true, origin: null }) {
+  update(params = { bought: true, origin: null,tick: true }) {
     if (this.dragHandler?.isDragging) return;
     const upgrade = this.upgrade;
     if (!upgrade) return;
@@ -666,8 +666,10 @@ export class UpgradeRenderer {
     this.updateWrapper(params);
     
     // Opcjonalnie: wyzwalasz efekt wizualny przy aktualizacji
-    this.trigger(300);
-    this.gameRenderer.game.Audio.playSound("tick.mp3");
+    if(params?.tick==true){
+      this.trigger(300);
+      this.gameRenderer.game.Audio.playSound("tick.mp3");
+    }
   }
   removeButtons() {
     const wrapper = this.upgrade.wrapper;

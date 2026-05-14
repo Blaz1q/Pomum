@@ -6,6 +6,7 @@ import { Style } from "../dictionary.js";
 import { consumableList, consumableUpgradeBlueprints } from "./consumablelist.js";
 import { Tarot } from "../entities/Tarot.js";
 import { t } from "./translations.js";
+import { game } from "../main.js";
 
 
 export const upgradesList = [];
@@ -726,7 +727,7 @@ export const upgradeBlueprints = [
       },
       onRoundEnd() {
         this.props.found = false;
-        return UPGRADE_STATES.Active;
+        return UPGRADE_STATES.Failed;
       },
     }),
     found: false,
@@ -1729,7 +1730,7 @@ export const upgradeBlueprints = [
   ...UNCOMMON
 },
 {
-  name: "polaroid",
+  name: "Polaroid",
   descriptionfn(game){
     return `Gdy sprzeda się to ulepszenie po ${this.props.rounds} rundach, otrzymuje się kopię losowego kupionego ulepszenia (Runda ${this.props.counter} z ${this.props.rounds})`;
   },
@@ -1761,6 +1762,70 @@ export const upgradeBlueprints = [
     ...RARE,
     image: "polaroid",
     price: 8,
+},
+{
+  name: "Consumable",
+  descriptionfn(game){
+    return `Wszystkie ${Style.Highlight("ulepszenia kafelków")} w sklepie są ${Style.Highlight("darmowe")}.`
+  },
+  props: ()=>({
+    onShopSpawn(upgrades){
+      let found = false;
+      upgrades.forEach(up => {
+        if(up.type=="Consumable"){
+          up.price = 0;
+          up.sellPrice = 0;
+          up.UpgradeRenderer.update({bought: true, origin: null,tick: false});
+        }
+      });
+      return UPGRADE_STATES.Failed;
+    }
+  }),
+  price: 6,
+  image: "consumable",
+  ...COMMON
+},
+{
+  name: "Tarot",
+  descriptionfn(game){
+    return `Wszystkie ${Style.Highlight("karty tarota")} w sklepie są ${Style.Highlight("darmowe")}.`
+  },
+  props: ()=>({
+    onShopSpawn(upgrades){
+      let found = false;
+      upgrades.forEach(up => {
+        if(up.type=="Tarot"){
+          up.price = 0;
+          up.sellPrice = 0;
+          up.UpgradeRenderer.update({bought: true, origin: null,tick: false});
+          found = true;
+        }
+      });
+      return UPGRADE_STATES.Failed;
+    }
+  }),
+  price: 6,
+  image: "tarot",
+  ...COMMON
+},
+{
+  name: "Gift card",
+  descriptionfn(game){
+    return `${Style.Highlight("Na końcu rundy")} wszystkie kupione karty zyskują ${Style.Money("$1")} do ceny sprzedarzy`
+  },
+  props:()=>({
+    onRoundEnd(){
+      let pool = [...game.upgrades,...game.consumables];
+      pool.forEach(up => {
+        up.sellPrice+=1;
+        up.UpgradeRenderer.update({bought: true, origin: null,tick: false});
+      });
+      return UPGRADE_STATES.Active;
+    }
+  }),
+  price: 6,
+  image: "giftcard",
+  ...COMMON
 }
 ];
 

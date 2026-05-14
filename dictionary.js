@@ -10,7 +10,8 @@ export const GAME_TRIGGERS = {
     onConsumableUse: "ConsumableUse",
     onRetrigger: 'Retrigger',
     onReset: 'Reset',
-    onBoosterBuy: 'BoosterBuy'
+    onBoosterBuy: 'BoosterBuy',
+    onShopSpawn: 'ShopSpawn'
 };
 export const TYPES = {
     Fruit: "fruit",
