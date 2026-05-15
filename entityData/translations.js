@@ -758,6 +758,11 @@ export const translations = {
       giftcard: {
         name: "Karta Podarunkowa",
         description: `${Style.Highlight("Na końcu rundy")}, wszystkie posiadane karty zyskują ${Style.Money("$1")} do ceny sprzedaży.`
+      },
+      paytowin: {
+        name: "Pay to Win",
+        description: (data) =>
+          `${Style.Mult("+1 Mult")} za każde wydane ${Style.Money("$10")}. (Obecnie ${Style.Mult(`+${data.upgrade.props.calcMult()} Mult`)})`
       }
     },
     popups: {
@@ -1511,6 +1516,11 @@ export const translations = {
       giftcard: {
         name: "Gift Card",
         description: `${Style.Highlight("At the end of the round")}, all owned cards gain ${Style.Money("$1")} to their sell price.`
+      },
+      paytowin: {
+        name: "Pay to Win",
+        description: (data) =>
+          `${Style.Mult("+1 Mult")} for every ${Style.Money("$10")} spent. (Currently ${Style.Mult(`+${data.upgrade.props.calcMult()} Mult`)})`
       }
     },
     popups: {

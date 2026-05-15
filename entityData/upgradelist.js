@@ -649,7 +649,7 @@ export const upgradeBlueprints = [
       }
     }),
 
-    price: 10,
+    price: 5,
     ...UNCOMMON
   },
   {
@@ -681,7 +681,7 @@ export const upgradeBlueprints = [
       }
     }),
 
-    price: 8,
+    price: 6,
     image: 'clock', ...UNCOMMON
   },
   {
@@ -1677,7 +1677,8 @@ export const upgradeBlueprints = [
     return `${Style.Chance("1 na 2")} że po otwarciu ${Style.Highlight('Boostera')} dostanie się ${Style.Highlight('Kartę tarota')} (Jeśli jest miejsce)`;
   },
   props: () => ({
-    onBoosterBuy(payload){
+    onBuy(payload){
+      if(payload.type!="ConsumablePack") return UPGRADE_STATES.Failed;
       if(game.consumables.length>=game.maxConsumables) return UPGRADE_STATES.Failed;
       if(Math.random()<0.5){
         return UPGRADE_STATES.Failed;  
@@ -1826,6 +1827,26 @@ export const upgradeBlueprints = [
   price: 6,
   image: "giftcard",
   ...COMMON
+},
+{
+  name: "Pay to win",
+  descriptionfn(game){
+    return `${Style.Mult('+1 Mult')} za każde wydane ${Style.Money('$10')} (Obecnie ${Style.Mult(`+${this.props.calcMult()} Mult`)})`
+  },
+  props:()=>({
+    calcMult(){
+      return Math.floor(game.stats.moneySpent/10);
+    },
+    onScore(){
+      const gained = this.props.calcMult();
+      game.mult += gained;
+      game.GameRenderer.displayTempScore();
+      return { state: UPGRADE_STATES.Score, message: `+${gained} Mult`, style: SCORE_ACTIONS.Mult };
+    }
+  }),
+  price: 4,
+  ...COMMON,
+  ...defaultimage
 }
 ];
 

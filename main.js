@@ -480,7 +480,7 @@ export class Game {
             this.GameRenderer.displayPlayerConsumables();
         }
         else if (upgrade.type == "ConsumablePack") {
-            this.emit(GAME_TRIGGERS.onBoosterBuy, upgrade);
+            //this.emit(GAME_TRIGGERS.onBoosterBuy, upgrade);
             this.GameRenderer.OpenBoosterPack(upgrade);
             this.Audio.playSound('xmult.mp3');
         } else if (upgrade.type == "Voucher") {
@@ -489,6 +489,7 @@ export class Game {
         }
         this.money -= upgrade.price;
         this.GameRenderer.updateMoney(-upgrade.price);
+        this.emit(GAME_TRIGGERS.onBuy,upgrade);
         //this.GameRenderer.displayMoney();
         this.GameRenderer.updateRerollButton();
         this.emitTimingMs = Settings.EMIT_TIMING_MS;

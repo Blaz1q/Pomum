@@ -11,7 +11,8 @@ export const GAME_TRIGGERS = {
     onRetrigger: 'Retrigger',
     onReset: 'Reset',
     onBoosterBuy: 'BoosterBuy',
-    onShopSpawn: 'ShopSpawn'
+    onShopSpawn: 'ShopSpawn',
+    onBuy: 'Buy'
 };
 export const TYPES = {
     Fruit: "fruit",
