@@ -673,8 +673,7 @@ export const translations = {
       empty: {
         name: "Pustka",
         description: (data) => {
-          const mult = data.upgrade.props?.mult ?? 1;
-          return `${Style.Mult(`+X1 Mult`)} za każde nieużyte miejsce ulepszeń. (Obecnie ${Style.Mult(`X${mult} Mult`)})`;
+          return `${Style.Mult(`+X1 Mult`)} za każde nieużyte miejsce ulepszeń. (Obecnie ${Style.Mult(`X${data.upgrade.props.calcMult()} Mult`)})`;
         },
       },
       snowman: {
@@ -767,6 +766,11 @@ export const translations = {
         name: "Pay to Win",
         description: (data) =>
           `${Style.Mult("+1 Mult")} za każde wydane ${Style.Money("$10")}. (Obecnie ${Style.Mult(`+${data.upgrade.props.calcMult()} Mult`)})`
+      },
+      aristocrat: {
+        name: "Arystokrata",
+        description: (data) => 
+          `Daje ${Style.Mult('X1.5 mult')} za wszystkie posiadane ulepszenia ${Style.Highlight('Uncommon')}. (Obecnie ${Style.Mult(`X${data.upgrade.props.calcMult()} Mult`)})`
       }
     },
     popups: {
@@ -1435,8 +1439,7 @@ export const translations = {
       empty: {
         name: "Empty",
         description: (data) => {
-          const mult = data.upgrade.props?.mult ?? 1;
-          return `${Style.Mult(`+X1 Mult`)} for each empty upgrade slot. (Currently ${Style.Mult(`X${mult} Mult`)})`;
+          return `${Style.Mult(`+X1 Mult`)} for each empty upgrade slot. (Currently ${Style.Mult(`X${data.upgrade.props.calcMult()} Mult`)})`;
         },
       },
       snowman: {
@@ -1529,6 +1532,11 @@ export const translations = {
         name: "Pay to Win",
         description: (data) =>
           `${Style.Mult("+1 Mult")} for every ${Style.Money("$10")} spent. (Currently ${Style.Mult(`+${data.upgrade.props.calcMult()} Mult`)})`
+      },
+      aristocrat: {
+        name: "Aristocrat",
+        description: (data) => 
+          `Gives ${Style.Mult('X1.5 mult')} for every owned ${Style.Highlight('Uncommon')} upgrade. (Currently ${Style.Mult(`X${data.upgrade.props.calcMult()} Mult`)})`
       }
     },
     popups: {

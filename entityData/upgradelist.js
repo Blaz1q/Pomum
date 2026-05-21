@@ -1289,22 +1289,17 @@ export const upgradeBlueprints = [
     name: "Empty",
     descriptionfn(game) {
       const mult = this.props?.mult ?? 1;
-      return `${Style.Mult(`+X1 Mult`)} za każde nieużyte miejsce ulepszeń (Obecnie ${Style.Mult(`X${mult} Mult`)})`;
+      return `${Style.Mult(`+X1 Mult`)} za każde nieużyte miejsce ulepszeń (Obecnie ${Style.Mult(`X${this.props.calcMult} Mult`)})`;
     },
     props: () => ({
-      mult: 1,
-      onUpgradesChanged() {
-        const oldmult = this.props.mult;
-        this.props.mult = game.maxUpgrades - game.upgrades.length + 1;
-        if (this.props.mult != oldmult) {
-          return UPGRADE_STATES.Active;
-        }
-        return UPGRADE_STATES.Failed;
+      calcMult(){
+        return game.maxUpgrades - game.upgrades.length + 1
       },
       onScore() {
+        let mult = this.props.calcMult();
         if (mult <= 1) return UPGRADE_STATES.Failed;
-        const gained = this.props.mult;
-        game.mult *= this.props.mult;
+        const gained = mult
+        game.mult *= gained;
         game.mult = Math.round(game.mult * 100) / 100;
         game.GameRenderer.displayTempScore();
         return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };
@@ -1498,7 +1493,7 @@ export const upgradeBlueprints = [
         return { state: UPGRADE_STATES.Active, message: `-20 `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
       onScore(){
-        game.score += this.props.score;
+        game.tempscore += this.props.score;
         game.GameRenderer.displayTempScore();
         return { state: UPGRADE_STATES.Score, message: `+${this.props.score} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       }
@@ -1709,7 +1704,7 @@ export const upgradeBlueprints = [
       return UPGRADE_STATES.Failed;
     },
     onMove(){
-      if(this.mult>1){
+      if(this.props.mult>1){
         this.props.mult -= 0.5;
       }
       return {state: UPGRADE_STATES.Active, message: `-X0.5 Mult`, style: SCORE_ACTIONS.Info}
@@ -1846,6 +1841,27 @@ export const upgradeBlueprints = [
   }),
   price: 4,
   ...COMMON,
+  ...defaultimage
+},
+{
+  name: "Aristocrat",
+  descriptionfn(game){
+    return `Daje ${Style.Mult('X1.5 mult')} za wszystkie posiadane ulepszenia ${Style.Highlight('Uncommon')}. (Obecnie ${Style.Mult(`X${this.props.calcMult()} Mult`)})`
+  },
+  props:()=>({
+    calcMult(){
+      let upgrades = game.upgrades.filter(up => up.rarity.display=='Uncommon');
+      return Math.pow(1.5,upgrades.length)
+    },
+    onScore(){
+      let gained = this.props.calcMult();
+      game.mult *= gained;
+      game.GameRenderer.displayTempScore();
+      return { state: UPGRADE_STATES.Score, message: `X${gained} Mult`, style: SCORE_ACTIONS.Mult };
+    }
+  }),
+  price: 6,
+  ...RARE,
   ...defaultimage
 }
 ];

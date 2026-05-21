@@ -1,6 +1,6 @@
 console.log("Upgrade");
 import { UpgradeBase } from "./upgradeBase.js";
-import { MODIFIERS,SCORE_ACTIONS,Settings,UPGRADE_STATES, } from "../dictionary.js";
+import { MODIFIERS,SCORE_ACTIONS,Settings,UPGRADE_RARITY,UPGRADE_STATES, } from "../dictionary.js";
 import { Consumable } from "./Consumable.js";
 import { Voucher } from "./Voucher.js";
 import { ConsumablePack } from "./ConsumablePack.js";
@@ -19,7 +19,7 @@ export class Upgrade extends UpgradeBase {
     this.isReady = false;
     this.type = "Upgrade";
     this.url = "./images/cards/";
-    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
+    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.Common;
     this.specialFunc;
     this.repeats = props.repeats ?? {};
   }

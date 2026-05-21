@@ -19,6 +19,7 @@ export class TriggerManager {
 
     async emit(event, payload) {
         // Czyścimy flagi z poprzedniego pełnego wywołania
+        
         this.game.upgrades.forEach(u => u.isExhausted = false);
         this.visualChain = Promise.resolve(); // Resetujemy łańcuch na start nowej akcji gracza
         const queue = this.handleQueues(event);
@@ -82,11 +83,9 @@ getHandlers(upgrade,event){
         const queue = this.handleQueues(event);
         console.log(queue);
         if (!handlers || handlers.length === 0) return;
-
         // 1. Zarządzanie iteracjami na poziomie KARTY + EVENTU
         const iterKey = `${upgrade.name}_${event}`;
         let currentIter = this.iterators.get(iterKey) || 1; // Zaczynamy od 1
-        
         // Pobieramy bonusowe powtórzenia z ulepszenia (Twoja nowa tablica/obiekt)
         let extraRepeats = upgrade.repeats?.[event] ?? 0;
         let totalRepeat = 1 + extraRepeats; // 1 (bazowe) + bonus
@@ -145,7 +144,9 @@ getHandlers(upgrade,event){
                 upgrade.isExhausted = true;
             }
         }
-
+        if(event!=GAME_TRIGGERS.onUpgradeTriggered){
+            this.emit(GAME_TRIGGERS.onUpgradeTriggered,{upgrade: upgrade,event: event});
+        }
         // 3. PLANOWANIE KOLEJNEJ ITERACJI (Cała karta wraca do kolejki)
         if (currentIter < totalRepeat) {
             this.iterators.set(iterKey, currentIter + 1);
@@ -162,8 +163,7 @@ getHandlers(upgrade,event){
     addToQueue(upgrades, event, payload) {
         const queue = this.handleQueues(event);
         
-        for (const upgrade of upgrades) {
-            
+        for (const upgrade of upgrades) { 
             const handlers = this.getHandlers(upgrade, event); 
             console.log(handlers);
             if (handlers&&handlers.length > 0) {

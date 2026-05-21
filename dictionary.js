@@ -4,7 +4,7 @@ export const GAME_TRIGGERS = {
     onRoundEnd: "roundEnd",
     onRoundStart: "roundStart",
     onMove: "move",
-    onUpgradeTriggered: "upgradeTrigger",
+    onUpgradeTriggered: "upgradeTriggered",
     onScore: "score",
     onUpgradesChanged: "UpgradesChanged",
     onConsumableUse: "ConsumableUse",
