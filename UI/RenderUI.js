@@ -627,6 +627,13 @@ animateReorder(oldPositions, duration = 300, excludedEl = null) {
   displayUpgradesInShop() {
     const shopEl = document.getElementById("upgrades-container");
     shopEl.innerHTML = "";
+    if (this.game.shopitems) {
+        this.game.shopitems.forEach(upgrade => {
+            if (upgrade.UpgradeRenderer) {
+                upgrade.UpgradeRenderer.cleanup();
+            }
+        });
+    }
     this.game.shopitems = this.game.rollUpgrades();
     shopEl.appendChild(
       this.displayUpgrades(this.game.shopitems, { bought: false }),

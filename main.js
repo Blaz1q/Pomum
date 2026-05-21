@@ -441,6 +441,7 @@ export class Game {
             if (idx !== -1) {
                 this.consumables.splice(idx, 1); // removes the element in-place
             }
+            upgrade.UpgradeRenderer.cleanup();
             this.Audio.playSound('pop.mp3');
             game.GameRenderer.dissolveAndRemove(upgrade.wrapper, 1000);
             //this.GameRenderer.displayPlayerConsumables();
@@ -502,7 +503,7 @@ export class Game {
             let index = this.upgrades.indexOf(upgrade) ?? -1;
             if (index == -1) return;
             console.log("SELLINNN");
-            this.upgrades[index].sell(this);
+            this.upgrades[index].sell(this);    
             //this.upgrades.splice(index, 1);
             this.GameRenderer.displayUpgradesCounter();
             this.emit(GAME_TRIGGERS.onUpgradesChanged);
@@ -515,6 +516,7 @@ export class Game {
             this.consumables.splice(index, 1);
             this.GameRenderer.displayConsumablesCounter();
         }
+        
         this.GameRenderer.updateMoney(upgrade.sellPrice);
         this.GameRenderer.updateRerollButton();
         this.emitTimingMs = Settings.EMIT_TIMING_MS;

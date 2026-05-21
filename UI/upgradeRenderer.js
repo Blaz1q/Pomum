@@ -621,12 +621,7 @@ export class UpgradeRenderer {
     if (index < 0) return;
     let upgradecard = upgrade.wrapper;
     //let upgradecard = this.getPlayerUpgrades(index);
-    const descElement = upgradecard.querySelector(".upgrade-desc");
-    descElement.innerHTML="";
-    descElement.appendChild(this.createDescription());
-
-    const upgradePrice = upgradecard.querySelector(".upgrade-price");
-    upgradePrice.innerHTML = "$" + upgrade.sellPrice;
+    this.updateWrapper({bought: true, origin: null,tick: false});
     switch (action) {
       case UPGRADE_STATES.Active:
       case UPGRADE_STATES.Score:
@@ -671,6 +666,24 @@ export class UpgradeRenderer {
       this.gameRenderer.game.Audio.playSound("tick.mp3");
     }
   }
+  cleanup() {
+    if (this.wrapper) {
+        // 1. Zastąpienie elementu jego klonem usuwa WSZYSTKIE event listenery przypisane przez addEventListener
+        const clone = this.wrapper.cloneNode(true);
+        if (this.wrapper.parentNode) {
+            this.wrapper.parentNode.replaceChild(clone, this.wrapper);
+        }
+    }
+
+    // 3. Czyszczenie referencji obiektowych
+    this.wrapper = null;
+    this.dragHandler = null;
+    if (this.selectedTimer) {
+        clearTimeout(this.selectedTimer);
+        this.selectedTimer = null;
+    }
+    this.lastParams = null;
+}
   removeButtons() {
     const wrapper = this.upgrade.wrapper;
     const buttonsContainer = wrapper.querySelector(".consumable-buttons");
