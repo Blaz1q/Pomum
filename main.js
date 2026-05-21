@@ -456,6 +456,7 @@ export class Game {
         this.money -= upgrade.price;
         this.GameRenderer.updateMoney(-upgrade.price);
         upgrade.apply(this);
+        upgrade.UpgradeRenderer.cleanup();
         this.stats.updateTarot(upgrade);
         this.GameRenderer.resetAllUpgrades();
         this.emit(GAME_TRIGGERS.onConsumableUse, upgrade);
@@ -516,7 +517,7 @@ export class Game {
             this.consumables.splice(index, 1);
             this.GameRenderer.displayConsumablesCounter();
         }
-        
+        upgrade.UpgradeRenderer.cleanup();
         this.GameRenderer.updateMoney(upgrade.sellPrice);
         this.GameRenderer.updateRerollButton();
         this.emitTimingMs = Settings.EMIT_TIMING_MS;

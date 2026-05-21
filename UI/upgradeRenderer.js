@@ -673,6 +673,7 @@ export class UpgradeRenderer {
     }
   }
   cleanup() {
+    console.log("calling cleanup on:"+this.upgrade._name);
     if (this.wrapper) {
         // 1. Zastąpienie elementu jego klonem usuwa WSZYSTKIE event listenery przypisane przez addEventListener
         const clone = this.wrapper.cloneNode(true);
