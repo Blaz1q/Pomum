@@ -38,7 +38,7 @@ export class UpgradeRenderer {
     upgrade.wrapper = document.createElement("div");
     const wrapper = upgrade.wrapper;
     this.originalZ = wrapper.style.zIndex || 0;
-
+    this.dragHandler = new DragAndDropHandler(this.upgrade, this.gameRenderer);
     wrapper.addEventListener("mouseenter", () => (wrapper.style.zIndex = 500));
     wrapper.addEventListener("mouseleave", () => {
         // Jeśli nie przeciągamy, przywracamy z-index
@@ -172,13 +172,13 @@ export class UpgradeRenderer {
         this.dragHandler.stopUpdateLoop();
     }
     
-    this.dragHandler = new DragAndDropHandler(this.upgrade, this.gameRenderer);
+    
 
     // 3. Obsługa kliknięcia (Twoja logika Balatro-style menu)
     if (displayButtons) {
       wrapper.addEventListener("click", (e) => {
         // Blokujemy menu, jeśli właśnie skończyliśmy przeciągać
-        if (this.dragHandler.dragStarted) return;
+        if (this.dragHandler?.dragStarted) return;
         this.displayButtons();
       });
     }
