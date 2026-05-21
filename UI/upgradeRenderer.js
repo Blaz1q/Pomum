@@ -75,9 +75,12 @@ export class UpgradeRenderer {
     if (upgrade.modifier == MODIFIERS.Chip) {
       classes.push("chip-foil");
     }
-    else if (upgrade.modifier == MODIFIERS.Mult) {
+    else if (upgrade.modifier == MODIFIERS.Polychrome) {
       classes.push("holo");
       classes.push("shine");
+    }
+    else if(upgrade.modifier === MODIFIERS.Mult){
+      classes.push("mult");
     }
     if (upgrade?.active === false) classes.push("inactive");
 
@@ -211,14 +214,17 @@ export class UpgradeRenderer {
   const cardBackground = wrapper.querySelector(".card-background");
   if (cardBackground) {
     // Lista klas modyfikatorów do odświeżenia
-    const modClasses = ["chip-foil", "holo", "shine", "negative", "inactive"];
+    const modClasses = ["chip-foil", "holo", "shine", "negative", "inactive","mult"];
     cardBackground.classList.remove(...modClasses);
-
+    console.log("mod:"+upgrade.modifier);
     if (upgrade.negative) cardBackground.classList.add("negative");
     if (upgrade.modifier === MODIFIERS.Chip) cardBackground.classList.add("chip-foil");
-    else if (upgrade.modifier === MODIFIERS.Mult) {
+    else if (upgrade.modifier === MODIFIERS.Polychrome) {
       cardBackground.classList.add("holo");
       cardBackground.classList.add("shine");
+    }
+    else if(upgrade.modifier === MODIFIERS.Mult){
+      cardBackground.classList.add("mult");
     }
     if (upgrade.active === false) cardBackground.classList.add("inactive");
   }

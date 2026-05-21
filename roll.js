@@ -28,9 +28,12 @@ export class Roll {
             up.changeNegative(game, true);
         }
         if (game.shopRand() < (0.05 + modifierBonus)) {
-            if (game.shopRand() < 0.5) {
+            const r = game.shopRand();
+            if (r < 0.3) {
                 up.changeModifier(game, MODIFIERS.Chip);
-            } else {
+            } else if(r>0.3&&r<0.6){
+                up.changeModifier(game, MODIFIERS.Polychrome);
+            } else{
                 up.changeModifier(game, MODIFIERS.Mult);
             }
         }

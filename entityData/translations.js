@@ -78,9 +78,13 @@ export const translations = {
         name: "Negatyw",
         description: `Nie zajmuje miejsca.`
       },
-      [MODIFIERS.Mult]: {
+      [MODIFIERS.Polychrome]: {
         name: "Polychrome",
         description: `Daje ${Style.Mult('X1.5 Mult')} przy zliczaniu.`
+      },
+      [MODIFIERS.Mult]: {
+        name: "Mult",
+        description: `Daje ${Style.Mult('+10 Mult')} przy zliczaniu.`
       }
     },
     consumables: {
@@ -217,7 +221,7 @@ export const translations = {
       },
       foiled: {
         name: "Foliowanie",
-        description: (data) => `Losowe ulepszenie otrzymuje bonusowe ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Chip].name)} lub ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Mult].name)}.`,
+        description: (data) => `Losowe ulepszenie otrzymuje bonusowe ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Chip].name)}, ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Mult].name)} lub ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Polychrome].name)}.`,
       },
       fire: {
         name: "Ogień",
@@ -252,7 +256,7 @@ export const translations = {
       },
       wheel_of_fortune: {
         name: "Koło Fortuny",
-        description: (data) => `${Style.Chance("1 na 4")} szansy, że ulepszenie otrzyma bonusowe ${Style.Chance(MODIFIERS.Chip)} lub ${Style.Chance(MODIFIERS.Mult)}.`,
+        description: (data) => `${Style.Chance("1 na 4")} szansy, że ulepszenie otrzyma bonusowe ${Style.Chance(MODIFIERS.Chip)} lub ${Style.Chance(MODIFIERS.Polychrome)}.`,
       },
       the_hanged_man: {
         name: "Wisielec",
@@ -839,9 +843,13 @@ export const translations = {
         name: "Negative",
         description: `Doesn't take up space.`
       },
-      [MODIFIERS.Mult]: {
+      [MODIFIERS.Polychrome]: {
         name: "Polychrome",
         description: `Gives ${Style.Mult('X1.5 Mult')} when scoring.`
+      },
+      [MODIFIERS.Mult]: {
+        name: "Mult",
+        description: `Gives ${Style.Mult('+10 Mult')} when scoring.`
       }
     },
     bosses: {
@@ -1015,7 +1023,7 @@ export const translations = {
       },
       foiled: {
         name: "Foiled",
-        description: (data) => `Random upgrade gets a bonus ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Chip].name)} or ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Mult].name)}.`,
+        description: (data) => `Random upgrade gets a bonus ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Chip].name)}, ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Mult].name)} or ${Style.Chance(translations[LANGUAGE.EN].modifiers[MODIFIERS.Polychrome].name)}.`,
       },
       fire: {
         name: "Fire",
@@ -1050,7 +1058,7 @@ export const translations = {
       },
       wheel_of_fortune: {
         name: "Wheel of Fortune",
-        description: (data) => `${Style.Chance("1 in 4")} chance for an upgrade to get bonus ${Style.Chance(MODIFIERS.Chip)} or ${Style.Chance(MODIFIERS.Mult)}.`,
+        description: (data) => `${Style.Chance("1 in 4")} chance for an upgrade to get bonus ${Style.Chance(MODIFIERS.Chip)} or ${Style.Chance(MODIFIERS.Polychrome)}.`,
       },
       the_hanged_man: {
         name: "The Hanged Man",

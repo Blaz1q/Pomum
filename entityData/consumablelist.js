@@ -331,14 +331,20 @@ export const consumableUpgradeBlueprints = [
   {
     name: "Foiled",
     descriptionfn(game) {
-      return `Losowe ulepszenie dostaje bonusowe ${Style.Chance(MODIFIERS.Chip)}, lub ${Style.Chance(MODIFIERS.Mult)}`;
+      return `Losowe ulepszenie dostaje bonusowe ${Style.Chance(MODIFIERS.Chip)}, ${Style.Chance(MODIFIERS.Polychrome)} lub ${Style.Chance(MODIFIERS.Mult)}`;
     },
     effect(game) {
       if (game.upgrades.length == 0) return;
       let index = Math.floor(Math.random() * game.upgrades.length);
       let upgrade = game.upgrades[index];
-      if (Math.random() < 0.5) upgrade.modifier = MODIFIERS.Chip;
-      else upgrade.modifier = MODIFIERS.Mult;
+      const r = Math.random();
+            if (r < 0.3) {
+                upgrade.modifier = MODIFIERS.Chip;
+            } else if(r>0.3&&r<0.6){
+                upgrade.modifier = MODIFIERS.Polychrome;
+            } else{
+                upgrade.modifier = MODIFIERS.Mult;
+            }
       upgrade.addSpecial(game);
       upgrade.UpgradeRenderer.update();
       //game.GameRenderer.updateUpgrade(index);

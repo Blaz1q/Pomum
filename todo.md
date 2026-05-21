@@ -28,3 +28,6 @@
 - [ ] twoje statystyki:
     - [ ] win rate
     - [ ] liczba rozgrywek
+
+# Optymalizacja
+- [ ] rework render

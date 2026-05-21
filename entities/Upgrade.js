@@ -25,11 +25,14 @@ export class Upgrade extends UpgradeBase {
   }
   changeModifier(game, modifier) {
     this.modifier = modifier;
-    if (this.modifier == MODIFIERS.Mult) {
+    if (this.modifier == MODIFIERS.Polychrome) {
       this.price += 2;
     }
     if (this.modifier == MODIFIERS.Chip) {
       this.price += 1;
+    }
+    if(this.modifier==MODIFIERS.Mult){
+      this.price+=1;
     }
     //playsound;
   }
@@ -49,7 +52,16 @@ export class Upgrade extends UpgradeBase {
       style: SCORE_ACTIONS.Score,
     };
   }
-  addMult(game) {
+  addMult(game){
+    game.mult += 10;
+    game.GameRenderer.displayTempScore();
+    return {
+      state: UPGRADE_STATES.Score,
+      message: `+10 Mult`,
+      style: SCORE_ACTIONS.Mult,
+    };
+  }
+  addPolychrome(game) {
     game.mult *= 1.5;
     game.mult = Math.round(game.mult * 100) / 100;
     game.GameRenderer.displayTempScore();
@@ -84,7 +96,9 @@ export class Upgrade extends UpgradeBase {
   addSpecial(game) {
     if (this.modifier == MODIFIERS.Chip) {
       this.specialFunc = () => this.addChip(game);
-    } else if (this.modifier == MODIFIERS.Mult) {
+    } else if (this.modifier == MODIFIERS.Polychrome) {
+      this.specialFunc = () => this.addPolychrome(game);
+    } else if(this.modifier == MODIFIERS.Mult){
       this.specialFunc = () => this.addMult(game);
     }
     //if(typeof this.specialFunc==="function")

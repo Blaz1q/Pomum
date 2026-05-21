@@ -1,12 +1,12 @@
 console.log("Consumable");
 import { UpgradeBase } from "./upgradeBase.js";
-import { LANGUAGE, SCORE_ACTIONS, Settings } from "../dictionary.js";
+import { LANGUAGE, SCORE_ACTIONS, Settings, UPGRADE_RARITY } from "../dictionary.js";
 export class Consumable extends UpgradeBase {
   constructor(props = {}) {
     super(props);
     this.type = props.type ? props.type : "Consumable";
     this.url = "./images/consumables/";
-    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY_NAME.None;
+    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.ConsumableCommon;
     this.negative = false;
     this.bought = false;
   }

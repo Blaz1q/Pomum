@@ -17,7 +17,11 @@ export const GAME_TRIGGERS = {
 export const TYPES = {
     Fruit: "fruit",
     Bomb: "bomb",
-    Dynamite: "dynamite"
+    Dynamite: "dynamite",
+    Upgrade: "Upgrade",
+    Consumable: "Consumable",
+    Booster: "ConsumablePack",
+    Voucher: "Voucher"
 };
 export const PRIORITY = {
     REPEAT: 0,
@@ -31,7 +35,8 @@ export const MODIFIERS = {
     Silver: "silver",
     Chip: "chip",
     Negative: "negative",
-    Mult: "polychrome"
+    Polychrome: "polychrome",
+    Mult: "mult"
 };
 export const STAGES = {
     Game: "game",
