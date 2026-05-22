@@ -37,3 +37,6 @@
  - [ ] skiny do owoców
  - [ ] obramówki do boarda
  - [ ] punkty się dostaje za
+
+# Issues
+ - [ ] kupowanie tarotów nie daje przycisków

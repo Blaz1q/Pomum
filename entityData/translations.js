@@ -379,6 +379,10 @@ export const translations = {
         name: "Doładowanie",
         description: (data) => `Zwiększa miejsce na Booster Packi w sklepie o 1. (Obecnie ${Style.Chance(data.game.maxBoosters)} -> ${Style.Chance(data.game.maxBoosters + 1)})`,
       },
+      discount:{
+        name: "Promocja",
+        description: (data) => `Daje zniżkę ${Style.Chance('25%')} do wszystkich ulepszeń ${Style.Chance('w sklepie')}`
+      } 
     },
     upgrades: {
       hallucination: {
@@ -894,6 +898,10 @@ export const translations = {
         name: "The Ruler",
         description: (data) => `Reduces ${Style.Mult("mult")} and ${Style.Score("score")} by ${Style.Highlight('10%')}.`,
       },
+      rust: {
+        name: "Rust",
+        description: `The most expensive owned upgrade is debuffed.`
+      }
     },
     consumables: {
       apple: {
@@ -1149,6 +1157,11 @@ export const translations = {
         name: "Booster",
         description: (data) => `Increases shop Booster Pack slots by 1. (Currently ${Style.Chance(data.game.maxBoosters)} -> ${Style.Chance(data.game.maxBoosters + 1)})`,
       },
+      discount:{
+        name: "Discount",
+        description: (data) => `Gives ${Style.Chance('25%')} discount to all upgrades ${Style.Chance('in shop')}`
+      } 
+
     },
     upgrades: {
       hallucination: {

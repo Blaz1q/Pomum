@@ -937,6 +937,17 @@ export const coupons = [
   },
   price: 10,
   image: "default_coupon",
+},
+{
+  name: "Discount",
+  descriptionfn(game) {
+    return `Daje zniżkę ${Style.Chance('25%')} do wszystkich ulepszeń ${Style.Chance('w sklepie')}`;
+  },
+  effect(game){
+    game.discount += 0.25;
+  },
+  price: 10,
+  image: "default_coupon"
 }
 ];
 consumableBlueprints.push(...consumableLvlUp, ...consumbaleEvil);

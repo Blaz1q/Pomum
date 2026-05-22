@@ -1040,6 +1040,22 @@ canvas#glcanvas {
   opacity: 1;
   transition: opacity 0.3s ease;
 }
+.upgrade-wrapper .upgrade-card .upgrade-inner .card-background.inactive::after,
+.boss-wrapper .upgrade-card .upgrade-inner .card-background.inactive::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background-image: url("../images/icons/debuffed.png");
+  background-size: 100% 100%;
+  mix-blend-mode: normal;
+  -webkit-mask-image: var(--card-img);
+  mask-image: var(--card-img);
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
 .upgrade-wrapper .upgrade-card .upgrade-inner .card-background.mult::after,
 .boss-wrapper .upgrade-card .upgrade-inner .card-background.mult::after {
   content: "";

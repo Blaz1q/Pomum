@@ -32,7 +32,7 @@ export class DragAndDropHandler {
 
     this._mouseMoveHandler = (e) => this.onMouseMove(e);
     this._mouseUpHandler = (e) => this.onMouseUp(e);
-
+    this.isAutoMoving = false;
     this.init();
   }
 
@@ -123,10 +123,36 @@ export class DragAndDropHandler {
     //const baseY = rect.top - this.lerpY;
 
     // 2. Docelowa delta względem bazy
+    if (this.isAutoMoving) {
+    const elapsed = performance.now() - this.autoMoveStartTime;
+    // Postęp animacji od 0.0 do 1.0
+    let progress = Math.min(elapsed / this.autoMoveDuration, 1);
+
+    // Funkcja Easingowa: Ease-Out Quad (ruch zwalnia pod koniec)
+    // Jeśli wolisz ruch idealnie liniowy, usuń linijkę poniżej
+    const easeOutQuad = t => t * (2 - t);
+    const easedProgress = easeOutQuad(progress);
+
+    // Dokładne wyliczenie pozycji w danym ułamku sekundy
+    this.lerpX = this.startX + (this.autoMoveTargetX - this.startX) * easedProgress;
+    this.lerpY = this.startY + (this.autoMoveTargetY - this.startY) * easedProgress;
+
+    // Aktualizujemy wirtualną pozycję myszy, żeby logika rotacji (TILT) i SWAP działały poprawnie
+    this.currentMouseX = this.baseX + this.lerpX;
+    this.currentMouseY = this.baseY + this.lerpY;
+
+    // Warunek stopu: osiągnęliśmy koniec czasu animacji
+    if (progress >= 1) {
+      // Zmień na false, jeśli po dolecieniu na miejsce karta ma zostać tam, gdzie spadła
+      const wrocNaMiejsceWDOM = true; 
+      this.stopAutoMove(wrocNaMiejsceWDOM);
+      return;
+    }
+  } else {
+    // TWOJA ORYGINALNA LOGIKA DLA MYSZKI
     const targetDeltaX = (this.currentMouseX - this.offsetX) - this.baseX;
     const targetDeltaY = (this.currentMouseY - this.offsetY) - this.baseY;
 
-    // 3. LERP (bez zmian)
     if (!this.lerpInitialized) {
         this.lerpX = targetDeltaX;
         this.lerpY = targetDeltaY;
@@ -135,7 +161,8 @@ export class DragAndDropHandler {
         this.lerpX += (targetDeltaX - this.lerpX) * this.lerpFactor;
         this.lerpY += (targetDeltaY - this.lerpY) * this.lerpFactor;
     }
-
+  }
+    
     // 4. Rotacja (bez zmian)
     const mouseVelocityX = this.currentMouseX - this.lastMouseX;
 
@@ -305,7 +332,55 @@ executeReturn() {
     });
     return closestCard;
   }
+  moveTo(targetX, targetY, duration = 500) {
+  if (this.isDragging) return;
 
+  this.isAutoMoving = true;
+  this.dragStarted = true;
+
+  // 1. Zapamiętujemy punkt startowy w układzie współrzędnych LERPa
+  this.startX = this.lerpX;
+  this.startY = this.lerpY;
+
+  // 2. Ustalamy bazę karty (jeśli nie była zainicjalizowana)
+  const rect = this.wrapper.getBoundingClientRect();
+  this.baseX = rect.left - this.lerpX;
+  this.baseY = rect.top - this.lerpY;
+
+  // 3. Obliczamy docelową deltę, do której musimy dolecieć
+  this.offsetX = 0;
+  this.offsetY = 0;
+  this.autoMoveTargetX = targetX - this.baseX;
+  this.autoMoveTargetY = targetY - this.baseY;
+
+  // 4. Konfiguracja czasu i stanu animacji
+  this.autoMoveDuration = duration;
+  this.autoMoveStartTime = performance.now();
+
+  // 5. Wizualne przygotowanie karty
+  this.wrapper.style.transition = "none";
+  this.wrapper.classList.add("dragging");
+  this.wrapper.style.zIndex = 1000;
+
+  this.startUpdateLoop();
+}
+
+stopAutoMove(shouldReturn = true) {
+  if (!this.isAutoMoving) return;
+  
+  this.isAutoMoving = false;
+  this.dragStarted = false;
+  this.stopUpdateLoop();
+  
+  this.wrapper.classList.remove("dragging");
+  
+  if (shouldReturn) {
+    this.executeReturn(); // Karta płynnie wróci na swoje miejsce w DOM po zakończeniu lotu
+  } else {
+    // Jeśli nie ma wracać, czyścimy zaporowe style
+    this.wrapper.style.zIndex = "";
+  }
+}
   startUpdateLoop() {
     if (!this.animationFrameId) this.update();
   }

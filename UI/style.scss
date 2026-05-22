@@ -1261,6 +1261,31 @@ canvas#glcanvas {
 
           }
         }
+        &.inactive{
+          &::after {
+          content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+
+            // TWOJA LOGIKA GRADIENTU
+            background-image: url('../images/icons/debuffed.png');
+            background-size: 100% 100%;
+            //background-position: var(--shine-x, 50%) var(--shine-y, 50%);
+            // Mieszanie całości z kartą pod spodem:
+            mix-blend-mode:normal;
+
+            // --- ROZWIĄZANIE PROBLEMU PRZEZROCZYSTOŚCI ---
+            // Pobieramy obrazek karty jako maskę
+            -webkit-mask-image: var(--card-img);
+            mask-image: var(--card-img);
+            -webkit-mask-size: cover;
+            mask-size: cover;
+            // --------------------------------------------
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+          }
+        }
         &.mult {
           &::after {
             content: "";

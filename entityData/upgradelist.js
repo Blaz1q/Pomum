@@ -978,6 +978,7 @@ export const upgradeBlueprints = [
         const pool = consumableList.filter(cons => cons?.getFruit?.(game)?.icon === this.props.chosenFruit.icon);
         const rc = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null;
         let consumable = new Consumable(rc);
+        consumable.bought = true;
         game.consumables.push(consumable);
         game.Audio.playSound('pop.mp3');
         game.GameRenderer.displayPlayerConsumables();

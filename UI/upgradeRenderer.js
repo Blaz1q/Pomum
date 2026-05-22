@@ -61,7 +61,7 @@ handleDblClick(e) {
     if(this.areParamsEqual(params,this.lastParams)){
       return upgrade.wrapper;
     }
-    this.bought = params.bought ?? false;
+    this.bought = upgrade.bought ?? false;
     let displayPrice = params.displayPrice ?? true;
     let displayButtons = params.displayButtons ?? true;
     this.lastParams = params;
@@ -463,7 +463,6 @@ handleDblClick(e) {
       e.stopPropagation();
       console.log("using");
       console.log(upgrade);
-      this.removeButtons();
       this.gameRenderer.game.useConsumable(upgrade);
       //this.cleanup();
       //this.fadeOutAndRemove(wrapper);
