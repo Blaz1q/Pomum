@@ -12,6 +12,7 @@ import { animateWave } from "../utils/animate_text.js";
 export const translations = {
   [LANGUAGE.PL]: {
     ui: {
+      buydoubleclick: 'Szybki zakup/użycie (Dwuklik)',
       reroll_shop: (data) => `Odświerz sklep ($${data?.game.shoproll ?? 4})`,
       buy: "Kup",
       use: "Użyj",
@@ -829,7 +830,8 @@ export const translations = {
       volume: "Volume",
       darkMode: "Dark mode",
       disableBg: "Disable background",
-      oldIcons: "Old fruit icons"
+      oldIcons: "Old fruit icons",
+      buydoubleclick: 'Fast Buy/Use (Double-click)',
     },
     server : {
       allowed: "Allowed!",

@@ -166,7 +166,8 @@ export var Settings = {
     LOW_GRAPHICS: false,
     OLD_FRUITS: false,
     LANGUAGE: LANGUAGE.PL,
-    DIFFICULTY: DIFFICULTY.NORMAL
+    DIFFICULTY: DIFFICULTY.NORMAL,
+    DOUBLECLICK: false,
 }
 export const GAMECOLORS = {
     warmOranges: {

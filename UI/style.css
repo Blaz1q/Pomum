@@ -1049,12 +1049,12 @@ canvas#glcanvas {
   background-image: url("../images/icons/mult.png");
   background-size: 100% 100%;
   filter: hue-rotate(calc((var(--shine-x) + 10) * (var(--shine-y) + 10) * 0.067deg));
-  mix-blend-mode: hue;
+  mix-blend-mode: hard-light;
   -webkit-mask-image: var(--card-img);
   mask-image: var(--card-img);
   -webkit-mask-size: cover;
   mask-size: cover;
-  opacity: 0.4;
+  opacity: 0.2;
   transition: opacity 0.3s ease;
 }
 .upgrade-wrapper .upgrade-card .upgrade-inner .card-background.metalic-shine::after,

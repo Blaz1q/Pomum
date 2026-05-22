@@ -942,6 +942,10 @@ function toggleLowGraphics(){
       canv.height = window.innerHeight;
     }
 }
+function toggledoubleclick(){
+    let val = document.getElementById("doubleclick").checked;
+    Settings.DOUBLECLICK = val;
+}
 function togglePotatoPc(){
   document.body.classList.contains("potatopc") ? document.body.classList.remove("potatopc") : document.body.classList.add("potatopc")
 }
@@ -1168,6 +1172,7 @@ function formatScientific(scoreStr) {
 function hideLeaderBoard(){
   document.getElementById("leaderboard").classList.add("hidden");
 }
+window.toggledoubleclick = toggledoubleclick;
 window.showLeaderBoard = showLeaderBoard;
 window.hideLeaderBoard = hideLeaderBoard;
 window.changelang = changeLang;

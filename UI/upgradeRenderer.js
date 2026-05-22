@@ -9,6 +9,8 @@ export class UpgradeRenderer {
     this.dragHandler = null;
     this.selectedTimer = null;
     this.lastParams = null;
+    this.boundClickHandler = this.handleClick.bind(this);
+    this.boundDblClickHandler = this.handleDblClick.bind(this);
   }
   areParamsEqual(newParams, oldParams) {
   if (!oldParams) return false;
@@ -24,6 +26,36 @@ export class UpgradeRenderer {
       newParams.origin?.id === oldParams.origin?.id
     );
   }
+  handleClick(e) {
+  if (this.selectionBlocked) return;
+  if (this.dragHandler?.dragStarted) return;
+  this.displayButtons();
+}
+
+handleDblClick(e) {
+  e.stopPropagation();
+  if (this.selectionBlocked) return;
+  
+  if (Settings.DOUBLECLICK == true) {
+    if (this.dragHandler?.dragStarted) return;
+
+    const wrapper = this.upgrade.wrapper;
+    const buttonsContainer = wrapper?.querySelector(".consumable-buttons");
+    if (!buttonsContainer) return;
+
+    if (!this.bought) {
+      const buyBtn = buttonsContainer.querySelector('button[data-i18n="ui.buy"]');
+      if (buyBtn) {
+        buyBtn.click();
+      }
+    } else {
+      const useBtn = buttonsContainer.querySelector('button[data-i18n="ui.use"]');
+      if (useBtn) {
+        useBtn.click();
+      }
+    }
+  }
+}
   render(params) {
     const upgrade = this.upgrade;
     this.bought = params.bought ?? false;
@@ -176,13 +208,10 @@ export class UpgradeRenderer {
 
     // 3. Obsługa kliknięcia (Twoja logika Balatro-style menu)
     if (displayButtons) {
-      wrapper.addEventListener("click", (e) => {
-        // Blokujemy menu, jeśli właśnie skończyliśmy przeciągać
-        if (this.dragHandler?.dragStarted) return;
-        this.displayButtons();
-      });
+      wrapper.addEventListener("click", this.boundClickHandler);
+      wrapper.addEventListener("dblclick", this.boundDblClickHandler);
     }
-
+    
     return wrapper;
   }
   updateWrapper(params) {
@@ -422,7 +451,9 @@ export class UpgradeRenderer {
       e.stopPropagation();
       console.log("using");
       console.log(upgrade);
+      this.removeButtons();
       this.gameRenderer.game.useConsumable(upgrade);
+      //this.cleanup();
       //this.fadeOutAndRemove(wrapper);
     });
     return btnUse;
@@ -674,16 +705,19 @@ export class UpgradeRenderer {
   }
   cleanup() {
     console.log("calling cleanup on:"+this.upgrade._name);
-    if (this.wrapper) {
-        // 1. Zastąpienie elementu jego klonem usuwa WSZYSTKIE event listenery przypisane przez addEventListener
-        const clone = this.wrapper.cloneNode(true);
-        if (this.wrapper.parentNode) {
-            this.wrapper.parentNode.replaceChild(clone, this.wrapper);
-        }
-    }
+    const wrapper = this.upgrade.wrapper;
+    if (wrapper) {
+    // 1. Czyścimy stan wizualny (na wypadek, gdyby karta była wysunięta)
+    this.clearTimer();
+    wrapper.style.setProperty('--select-y', '0px');
+    wrapper.classList.remove("SelectedUpgrade");
+
+    // 2. Klonujemy element – to automatycznie i permanentnie USUWA wszystkie event listenery (click, dblclick, mouseenter itd.)
+    wrapper.removeEventListener("click", this.boundClickHandler);
+    wrapper.removeEventListener("dblclick", this.boundDblClickHandler);
+  }
 
     // 3. Czyszczenie referencji obiektowych
-    this.wrapper = null;
     this.dragHandler = null;
     if (this.selectedTimer) {
         clearTimeout(this.selectedTimer);
