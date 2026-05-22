@@ -462,10 +462,10 @@ const tarotCards = [
         canUse(){
             let extra = this.bought ? 1 : 0;
             console.log(extra);
-            return game.stats.usedTarots!=0&&game.stats.lastUsedTarot?.name!=this.name&&game.consumables.length < game.maxConsumables+extra;
+            return game.stats.usedTarots!=0&&game.stats.lastUsedTarot?._name!=this.name&&game.consumables.length < game.maxConsumables+extra;
         },
         effect(){
-          const used_blueprint = tarotCards.filter((tarot) => tarot.name==game.stats?.lastUsedTarot?.name);
+          const used_blueprint = tarotCards.filter((tarot) => tarot.name==game.stats?.lastUsedTarot?._name);
           let newTarot = new Tarot(used_blueprint[0]);
           newTarot.bought = true;
           game.consumables.push(newTarot);
