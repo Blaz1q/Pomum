@@ -1007,7 +1007,7 @@ export class Game {
         this.GameRenderer.displayTempScore();
 
         this.FALL_MS = Settings.FALL_MS;
-
+        this.stats.highestScore = this.score;
         if (this.score >= this.calcRoundScore()) {
             this.endround();
         }

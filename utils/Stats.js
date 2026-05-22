@@ -5,6 +5,15 @@ export class Stats {
     this.lastUsedTarot = null;
     this.moneySpent = 0;
     this.usedTarots = 0;
+    this._highestScore = 0;
+  }
+  set highestScore(score){
+    if(score>this._highestScore){
+      this._highestScore = score;  
+    }
+  }
+  get highestScore(){
+    return this._highestScore;
   }
   updateTarot(upgrade){
     if(upgrade instanceof Tarot){

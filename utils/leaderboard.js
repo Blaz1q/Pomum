@@ -5,7 +5,7 @@ const API_URL = "https://pomumdb.7m.pl/index.php";
 export async function saveScore(nick, game) {
   const data = new FormData();
   data.append("nickname", nick);
-  data.append("score", game.score);
+  data.append("score", game.stats.highestScore);
   data.append("round", game.round);
 
   try {
