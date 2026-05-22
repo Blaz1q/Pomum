@@ -58,12 +58,12 @@ handleDblClick(e) {
 }
   render(params) {
     const upgrade = this.upgrade;
-    this.bought = params.bought ?? false;
-    let displayPrice = params.displayPrice ?? true;
-    let displayButtons = params.displayButtons ?? true;
     if(this.areParamsEqual(params,this.lastParams)){
       return upgrade.wrapper;
     }
+    this.bought = params.bought ?? false;
+    let displayPrice = params.displayPrice ?? true;
+    let displayButtons = params.displayButtons ?? true;
     this.lastParams = params;
     console.log("rendering upgrade: "+this.upgrade._name);
     upgrade.wrapper = null;
@@ -200,9 +200,9 @@ handleDblClick(e) {
     wrapper.appendChild(desc);
     if (displayButtons) wrapper.appendChild(this.createButtons(params));
 
-    if (this.dragHandler) {
-        this.dragHandler.stopUpdateLoop();
-    }
+    // if (this.dragHandler) {
+    //     this.dragHandler.stopUpdateLoop();
+    // }
     
     
 
