@@ -219,7 +219,7 @@ handleDblClick(e) {
   const wrapper = upgrade.wrapper;
 
   if (!wrapper) return this.render(params); // Jeśli nie ma wrappera, zrób pełny render
-
+  const mergedParams = { ...this.lastParams, ...params };
   console.log("Updating upgrade UI: " + upgrade._name);
 
   // 1. Aktualizacja ceny
@@ -259,18 +259,23 @@ handleDblClick(e) {
   }
 
   // 5. Aktualizacja przycisków (jeśli stan "bought" się zmienił)
-  if (this.lastParams?.bought !== params.bought) {
-    const oldButtons = wrapper.querySelector(".consumable-buttons");
-    if (oldButtons) oldButtons.remove();
-    if (params.displayButtons !== false) {
-      wrapper.appendChild(this.createButtons(params));
+  if (this.lastParams?.bought !== mergedParams.bought) {
+      const oldButtons = wrapper.querySelector(".consumable-buttons");
+      if (oldButtons) oldButtons.remove();
+      if (mergedParams.displayButtons !== false) {
+        wrapper.appendChild(this.createButtons(mergedParams)); // Przekazujemy merged
+      }
+    } else {
+      this.refreshAllButtons();
     }
-  } else {
-    // Jeśli tylko odświeżamy istniejące przyciski (np. czy są disabled)
-    this.refreshAllButtons();
-  }
 
-  this.lastParams = { ...params };
+    // Re-inicjalizacja drag Handlera, jeśli jakimś cudem został wyczyszczony (np. przez cleanup)
+    if (!this.dragHandler) {
+      this.dragHandler = new DragAndDropHandler(this.upgrade, this.gameRenderer);
+    }
+
+  // Zapisujemy zmergowany stan na przyszłość
+  this.lastParams = { ...mergedParams };
   return wrapper;
 }
   createDescription() {
@@ -429,6 +434,13 @@ handleDblClick(e) {
         return;
       }
       if (success) {
+        if (game.shopitems) {
+            const index = game.shopitems.indexOf(upgrade);
+            if (index > -1) {
+              game.shopitems.splice(index, 1);
+              console.log(`Usunięto ${upgrade._name} z shopitems po zakupie.`);
+            }
+          }
         this.clearTimer();
         if (upgrade.type == "Voucher") {
           this.removeButtons();
