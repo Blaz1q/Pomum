@@ -144,9 +144,9 @@ getHandlers(upgrade,event){
                 upgrade.isExhausted = true;
             }
         }
-        if(event!=GAME_TRIGGERS.onUpgradeTriggered){
-            this.emit(GAME_TRIGGERS.onUpgradeTriggered,{upgrade: upgrade,event: event});
-        }
+        // if(event!=GAME_TRIGGERS.onUpgradeTriggered){
+        //     this.emit(GAME_TRIGGERS.onUpgradeTriggered,{upgrade: upgrade,event: event});
+        // }
         // 3. PLANOWANIE KOLEJNEJ ITERACJI (Cała karta wraca do kolejki)
         if (currentIter < totalRepeat) {
             this.iterators.set(iterKey, currentIter + 1);
