@@ -131,7 +131,7 @@ const BossBlueprints = [
       game.GameRenderer.displayMoves();
     },
     moneyreward: 12,
-    image: "default",
+    image: "needle",
   },
   {
     name: "Ruler",
@@ -150,7 +150,7 @@ const BossBlueprints = [
         };
       },
     }),
-    image: "default",
+    image: "ruler",
   },
   {
     name: "Rust",
