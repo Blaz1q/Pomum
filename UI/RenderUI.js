@@ -19,7 +19,7 @@ import { upgradesList } from "../entityData/upgradelist.js";
 import { Consumable } from "../entities/Consumable.js";
 import { Voucher } from "../entities/Voucher.js";
 import { ConsumablePack } from "../entities/ConsumablePack.js";
-import { animateWave, firstplace, initBalatroEffect, scaleText, secondplace, thirdplace } from "../utils/animate_text.js";
+import { animateWave, clearAnimation, firstplace, initBalatroEffect, scaleText, secondplace, thirdplace } from "../utils/animate_text.js";
 import { translations,changeLanguage, t } from "../entityData/translations.js";
 import { compareScores, getLeaderboard } from "../utils/leaderboard.js";
 export class RenderUI {
@@ -117,6 +117,9 @@ export class RenderUI {
   displayRound() {
     const title = document.getElementById("round-title");
     const desc = document.getElementById("debuff-desc");
+    clearAnimation(title);
+    clearAnimation(desc);
+    clearAnimation(this.game.roundBox);
     if(this.game.stage!=STAGES.Boss){
       title.innerHTML = t("ui.round",Settings.LANGUAGE)+" "+this.game.round;
       desc.innerHTML = t("ui.defaultdesc",Settings.LANGUAGE);
@@ -245,7 +248,8 @@ displayTempScore() {
     const scoreChanged = scoreBox.dataset.lastValue !== formattedScore;
     const multChanged = multBox.dataset.lastValue !== formattedMult;
     
-    
+    clearAnimation(scoreBox);
+    clearAnimation(multBox);
     if (scoreChanged) {
         // Zapisujemy nową czystą wartość do schowka
         scoreBox.dataset.lastValue = formattedScore;
@@ -310,6 +314,7 @@ displayTempScore() {
     this.hideShop();
   }
   displayBoosterAmmount() {
+    clearAnimation(document.getElementById("booster-amount"));
     document.getElementById("booster-amount").innerHTML = t("ui.chooseyourcards",Settings.LANGUAGE,{game:this.game});
       animateWave(document.getElementById("booster-amount"));
   }
@@ -1009,6 +1014,7 @@ function setdifficulty(action) {
     Settings.DIFFICULTY = diffArray[currentIndex];
     
     // 5. Aktualizujemy UI
+    clearAnimation(document.getElementById("poziom_trudnosci"));
     const label = document.getElementById("poziom_trudnosci");
     if (label) {
         label.innerText = t(Settings.DIFFICULTY.name,Settings.LANGUAGE);

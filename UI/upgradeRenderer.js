@@ -1,6 +1,6 @@
 import { MODIFIERS, UPGRADE_RARITY, Style, GAME_TRIGGERS, UPGRADE_STATES, Settings } from "../dictionary.js";
 import { t } from "../entityData/translations.js";
-import { fadeInAndBalatro, initBalatroEffect } from "../utils/animate_text.js";
+import { fadeInAndBalatro, initBalatroEffect, clearAnimation } from "../utils/animate_text.js";
 import { DragAndDropHandler } from "./DragAndDropHandler.js";
 export class UpgradeRenderer {
   constructor(upgrade, gameRenderer) {
@@ -161,40 +161,31 @@ handleDblClick(e) {
 
 
     wrapper.addEventListener("mouseenter", () => {
-      desc.innerHTML = "";
-      desc.appendChild(this.createDescription());
-
-      // 1. Pobierz dane o położeniu karty i oknie przeglądarki
       const cardRect = wrapper.getBoundingClientRect();
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
 
-      // Zakładana szerokość/wysokość Twojego opisu (możesz też zmierzyć desc.offsetWidth)
       const descWidth = desc.offsetWidth;
       const descHeight = desc.offsetHeight;
 
-      // Resetujemy klasy pozycjonujące przed nowym obliczeniem
       desc.classList.remove('pos-right', 'pos-left', 'pos-top', 'pos-bottom');
 
-      // --- LOGIKA POZIOMA (Lewo/Prawo) ---
-      // Jeśli po lewej stronie karty jest mniej miejsca niż szerokość opisu + margines
       if (cardRect.left < descWidth + 20) {
-        desc.classList.add('pos-right'); // Pokaż po prawej stronie karty
+        desc.classList.add('pos-right');
       } else {
-        desc.classList.add('pos-left');  // Domyślnie: po lewej stronie karty
+        desc.classList.add('pos-left');
       }
 
-      // --- LOGIKA PIONOWA (Góra/Dół) ---
-      // Jeśli karta jest za blisko dolnej krawędzi ekranu
       if (screenHeight - cardRect.bottom < 50) {
-        desc.classList.add('pos-top');    // Przylep dół opisu do dołu karty
+        desc.classList.add('pos-top');
+      } else if (cardRect.top < 50) {
+        desc.classList.add('pos-bottom');
       }
-      // Jeśli karta jest za blisko górnej krawędzi
-      else if (cardRect.top < 50) {
-        desc.classList.add('pos-bottom'); // Przylep górę opisu do góry karty
+      const titleEl = desc.querySelector(".title");
+      if (titleEl) {
+        fadeInAndBalatro(titleEl);
       }
     });
-
     if (displayPrice) wrapper.appendChild(priceEl);
     wrapper.appendChild(card);
     wrapper.appendChild(desc);
@@ -229,11 +220,10 @@ handleDblClick(e) {
   }
 
   // 2. Aktualizacja opisu (desc)
-  const descEl = wrapper.querySelector(".upgrade-desc");
-  if (descEl) {
-    descEl.innerHTML = "";
-    descEl.appendChild(this.createDescription());
-  }
+  const descContentEl = wrapper.querySelector(".upgrade-desc .content p");
+    if (descContentEl) {
+      descContentEl.innerHTML = upgrade.description(this.gameRenderer.game);
+    }
 
   // 3. Aktualizacja klas (bought, ready)
   wrapper.classList.toggle("bought", params.bought ?? false);
@@ -292,7 +282,7 @@ handleDblClick(e) {
     container.appendChild(title);
 
     // Inicjujemy animację od razu (bo element już istnieje w pamięci)
-    fadeInAndBalatro(title);
+   // fadeInAndBalatro(title);
 
     // 2. Sekcja TREŚCI
     const content = document.createElement('div');
