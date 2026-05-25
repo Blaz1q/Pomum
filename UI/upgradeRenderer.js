@@ -185,6 +185,7 @@ handleDblClick(e) {
       if (titleEl) {
         fadeInAndBalatro(titleEl);
       }
+      this.updateDescription();
     });
     if (displayPrice) wrapper.appendChild(priceEl);
     wrapper.appendChild(card);
@@ -205,6 +206,105 @@ handleDblClick(e) {
     
     return wrapper;
   }
+  updateDescription() {
+    const wrapper = this.upgrade.wrapper;
+    if (!wrapper) return;
+    if (!wrapper.matches(":hover")) return; // nie renderuj gdy nie jest widoczne
+    const descContainer = wrapper.querySelector(".upgrade-desc");
+    if (!descContainer) return;
+
+    const upgrade = this.upgrade;
+
+    // 2. Aktualizacja TREŚCI (content)
+    const contentP = descContainer.querySelector(".upgrade-desc .content p");
+      if (contentP) {
+        const newHtml = upgrade.description(this.gameRenderer.game);
+        
+        // Warunek 1: Aktualizuj tylko wtedy, gdy treść się RÓŻNI
+        if (contentP.innerHTML !== newHtml) {
+          
+          // Warunek 2: Przed usunięciem starych elementów, wyczyść ich animacje!
+          if (typeof clearAnimation === "function") {
+            contentP.querySelectorAll("b, span, i, div").forEach(el => {
+              clearAnimation(el);
+            });
+          }
+          
+          contentP.innerHTML = newHtml;
+        }
+      }
+
+    // 3. Aktualizacja STOPKI (Modyfikatory i Rzadkość)
+    const footer = descContainer.querySelector(".footer");
+    if (footer) {
+      
+      // --- Obsługa Rzadkości ---
+      let rarityDiv = footer.querySelector(".rarity");
+      if (upgrade.rarity !== UPGRADE_RARITY.None) {
+        if (!rarityDiv) {
+          rarityDiv = document.createElement('div');
+          footer.insertBefore(rarityDiv, footer.firstChild); // Wrzucamy na początek stopki
+        }
+        rarityDiv.className = `rarity ${upgrade.rarity.class}`;
+        rarityDiv.textContent = upgrade.rarity.display;
+      } else if (rarityDiv) {
+        rarityDiv.remove();
+      }
+
+      // --- Obsługa Negatywności (.desc-negative) ---
+      let negSpan = footer.querySelector(".desc-negative");
+      let negDesc = footer.querySelector('[data-i18n="modifiers.negative.description"]');
+      
+      if (upgrade.negative === true) {
+        if (!negDesc) {
+          negDesc = document.createElement('p');
+          negDesc.className = "content";
+          negDesc.dataset.i18n = `modifiers.negative.description`;
+          footer.appendChild(negDesc);
+        }
+        if (!negSpan) {
+          negSpan = document.createElement('div');
+          negSpan.className = 'type desc-negative';
+          negSpan.textContent = 'Negative';
+          footer.appendChild(negSpan);
+        }
+        negDesc.innerHTML = t(`modifiers.negative.description`, Settings.LANGUAGE);
+      }
+
+      // --- Obsługa Modyfikatora (Foil, Holo, Mult itp.) ---
+      // Szukamy elementu modyfikatora, ignorując klasę .desc-negative
+      let modSpan = footer.querySelector(".type:not(.desc-negative)");
+      // Szukamy opisu modyfikatora (wykluczając opis negative)
+      let modDesc = footer.querySelector('.content:not([data-i18n="modifiers.negative.description"])');
+
+      if (upgrade.modifier !== MODIFIERS.None) {
+        if (!modSpan) {
+          modSpan = document.createElement('div');
+          footer.appendChild(modSpan);
+        }
+        modSpan.className = `type ${upgrade.modifier}`;
+        modSpan.textContent = upgrade.modifier;
+        modSpan.dataset.i18n = `modifiers.${upgrade.modifier}.name`;
+
+        if (!modDesc) {
+          modDesc = document.createElement('p');
+          modDesc.className = "content";
+          footer.appendChild(modDesc);
+        }
+        modDesc.dataset.i18n = `modifiers.${upgrade.modifier}.description`;
+        modDesc.innerHTML = t(`modifiers.${upgrade.modifier}.description`, Settings.LANGUAGE);
+      } else {
+        if (modSpan) {
+          modSpan.remove();
+        }
+        if (modDesc) {
+          modDesc.remove();
+        }
+      }
+    }
+
+    // 4. Odpalenie animacji dla tytułu (tylko jeśli zaszła potrzeba i jest hover)
+  }
   updateWrapper(params) {
   const upgrade = this.upgrade;
   const wrapper = upgrade.wrapper;
@@ -220,10 +320,7 @@ handleDblClick(e) {
   }
 
   // 2. Aktualizacja opisu (desc)
-  const descContentEl = wrapper.querySelector(".upgrade-desc .content p");
-    if (descContentEl) {
-      descContentEl.innerHTML = upgrade.description(this.gameRenderer.game);
-    }
+  this.updateDescription();
 
   // 3. Aktualizacja klas (bought, ready)
   wrapper.classList.toggle("bought", params.bought ?? false);

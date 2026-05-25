@@ -13,7 +13,7 @@ export const translations = {
   [LANGUAGE.PL]: {
     ui: {
       buydoubleclick: 'Szybki zakup/użycie (Dwuklik)',
-      reroll_shop: (data) => `Odświerz sklep ($${data?.game.shoproll ?? 4})`,
+      reroll_shop: (data) => `Odśwież sklep ($${data?.game.shoproll ?? 4})`,
       buy: "Kup",
       use: "Użyj",
       sell: "Sprzedaj",
