@@ -33,6 +33,7 @@ export class RenderUI {
     this.game.moveBox.innerHTML = this.game.moves - this.game.movescounter;
   }
   displayMoney() {
+    clearAnimation(document.getElementById("money"));
     const moneyBox = this.moneyBox;
 
     const start = this.prevMoney ?? 0;
@@ -70,6 +71,7 @@ export class RenderUI {
       };
 
       requestAnimationFrame(animate);
+
       setTimeout(() => {
         initBalatroEffect(document.getElementById("money"));
       },300);
