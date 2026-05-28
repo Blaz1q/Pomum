@@ -1863,7 +1863,7 @@ export const upgradeBlueprints = [
   }),
   price: 6,
   ...RARE,
-  ...defaultimage
+  image: 'aristocrat'
 }
 ];
 
