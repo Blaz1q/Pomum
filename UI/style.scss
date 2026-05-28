@@ -64,6 +64,11 @@ $button-hover-dark: #a18787;
   initial-value: 0deg;
   inherits: true;
 }
+@property --is-active {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
 
 @mixin cool-desc {
   @extend .pixel-corners;

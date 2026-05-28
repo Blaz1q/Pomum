@@ -25,6 +25,11 @@
   initial-value: 0deg;
   inherits: true;
 }
+@property --is-active {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
 :root {
   color-scheme: light dark;
 }
