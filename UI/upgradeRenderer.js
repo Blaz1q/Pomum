@@ -549,6 +549,7 @@ handleDblClick(e) {
     btnUse.addEventListener("click", (e) => {
       e.stopPropagation();
       console.log("using");
+      upgrade.wrapper.classList.add("used");
       console.log(upgrade);
       this.gameRenderer.game.useConsumable(upgrade);
       //this.cleanup();
@@ -584,6 +585,7 @@ handleDblClick(e) {
         //return;
       }
       if (success) {
+        upgrade.wrapper.classList.add("used");
         this.clearTimer();
         this.removeButtons();
         this.gameRenderer.dissolveAndRemove(wrapper, 1000);

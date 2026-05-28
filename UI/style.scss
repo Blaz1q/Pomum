@@ -1124,6 +1124,9 @@ canvas#glcanvas {
     /* Upewnij się, że animacja ma priorytet */
     animation: triggeredCard 0.3s ease-in-out !important;
   }
+  &.used {
+    animation: .7s used-animation;
+  }
 
   &.dragging {
     /* Zmieniamy transition tak, aby nie blokowało animacji 'triggeredCard' */
@@ -1883,6 +1886,41 @@ canvas#glcanvas {
   }
   80%{
     --trigger-tilt: 0deg
+  }
+  100%{
+    --trigger-tilt: 0deg
+  }
+}
+@keyframes used-animation {
+  0%{
+    --trigger-tilt: -20deg
+  }
+  10%{
+    --trigger-tilt: 16deg
+  }
+  20%{
+    --trigger-tilt: -12deg
+  }
+  30%{
+    --trigger-tilt: 8deg
+  }
+  40%{
+    --trigger-tilt: 4deg
+  }
+  50%{
+    --trigger-tilt: -2deg
+  }
+  60%{
+    --trigger-tilt: 1.5deg
+  }
+  70%{
+    --trigger-tilt: -1.2deg
+  }
+  80%{
+    --trigger-tilt: 0.5deg
+  }
+  90%{
+    --trigger-tilt: -0.3deg
   }
   100%{
     --trigger-tilt: 0deg
