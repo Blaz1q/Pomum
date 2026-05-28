@@ -20,6 +20,11 @@
   inherits: true;
   initial-value: 0deg;
 }
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: true;
+}
 :root {
   color-scheme: light dark;
 }
@@ -994,10 +999,42 @@ canvas#glcanvas {
   position: relative;
   cursor: pointer;
   transform-style: preserve-3d;
-  animation: skewCard 6s infinite ease-in-out;
   transition: box-shadow 0.2s ease;
-  transform: perspective(1000px) rotateX(10deg) rotateY(-15deg);
   z-index: 5;
+  animation: spinAngle 6s infinite linear;
+  --is-active: 1;
+  --mouse-x: 0deg;
+  --mouse-y: 0deg;
+  --mouse-shine-x: 50;
+  --mouse-shine-y: 0;
+  --mouse-shadow-x: 0px;
+  --mouse-shadow-y: 10px;
+  --target-y: calc(
+    (var(--mouse-y) * (1 - var(--is-active))) +
+    ((15deg * sin(var(--angle))) * var(--is-active))
+  );
+  --target-x: calc(
+    (var(--mouse-x) * (1 - var(--is-active))) +
+    (((10deg * cos(var(--angle))) + 2deg) * var(--is-active))
+  );
+  --shine-x: calc(
+    (var(--mouse-shine-x) * (1 - var(--is-active))) +
+    ((50 + 50 * sin(var(--angle))) * var(--is-active))
+  );
+  --shine-y: calc(
+    (var(--mouse-shine-y) * (1 - var(--is-active))) +
+    ((50 - 50 * cos(var(--angle))) * var(--is-active))
+  );
+  --shadow-x: calc(
+    (var(--mouse-shadow-x) * (1 - var(--is-active))) +
+    ((-4px * sin(var(--angle))) * var(--is-active))
+  );
+  --shadow-y: calc(
+    (var(--mouse-shadow-y) * (1 - var(--is-active))) +
+    ((5px + 5px * cos(var(--angle))) * var(--is-active))
+  );
+  transform: perspective(1000px) rotateX(var(--target-x)) rotateY(var(--target-y));
+  filter: drop-shadow(calc(-4px * sin(var(--angle))) calc(5px + 5px * cos(var(--angle))) 2px rgba(0, 0, 0, 0.35));
 }
 .upgrade-wrapper .upgrade-card .upgrade-inner,
 .boss-wrapper .upgrade-card .upgrade-inner {
@@ -1007,9 +1044,7 @@ canvas#glcanvas {
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
-  transition: filter 0.3s ease, transform 0.3s ease;
   transform-origin: center center;
-  /* scale from center */
   transition: filter 0.3s ease, transform 0.3s ease;
 }
 .upgrade-wrapper .upgrade-card .upgrade-inner .card-background,
@@ -1158,10 +1193,6 @@ canvas#glcanvas {
   flex-direction: column;
   gap: 0.1em;
   justify-content: space-evenly;
-}
-.upgrade-wrapper .upgrade-card:hover,
-.boss-wrapper .upgrade-card:hover {
-  animation: none;
 }
 .upgrade-wrapper .upgrade-card:hover .upgrade-inner,
 .boss-wrapper .upgrade-card:hover .upgrade-inner {
@@ -1318,19 +1349,15 @@ canvas#glcanvas {
   font-size: 0.85rem;
   font-weight: bold;
   opacity: 1;
-  /* ukryta domyślnie */
   transition: opacity 0.3s ease, transform 0.3s ease;
   pointer-events: none;
-  /* żeby nie blokowało hovera */
   transform: translateY(-20px);
-  /* lekko niżej na start */
   z-index: 15;
 }
 .upgrade-wrapper:hover .upgrade-price,
 .boss-wrapper:hover .upgrade-price {
   opacity: 1;
   transform: translateY(-30px);
-  /* płynnie do góry */
 }
 .upgrade-wrapper.bought .upgrade-price,
 .boss-wrapper.bought .upgrade-price {
@@ -1341,7 +1368,6 @@ canvas#glcanvas {
 .boss-wrapper.bought:hover .upgrade-price {
   opacity: 1;
   transform: translateY(-15px);
-  /* płynnie do góry */
 }
 
 #game-won,
@@ -1893,34 +1919,70 @@ canvas#glcanvas {
     filter: drop-shadow(3px 8px 0px rgba(0, 0, 0, 0.35));
   }
 }
+@keyframes spinAngle {
+  0% {
+    --angle: 0deg;
+  }
+  100% {
+    --angle: 360deg;
+  }
+}
 @keyframes skewCard {
+  /* 0% -> kąt 0°: sin(0)=0, cos(0)=1 (+2deg offset) */
   0%, 100% {
-    transform: perspective(1000px) rotateX(10deg) rotateY(-15deg);
-    filter: drop-shadow(4px 10px 0px rgba(0, 0, 0, 0.35));
-    /* Karta wychylona w lewo-dół -> światło w prawym górnym rogu */
-    --shine-x: 0;
+    transform: perspective(1000px) rotateX(12deg) rotateY(0deg);
+    filter: drop-shadow(0px 10px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 50;
     --shine-y: 0;
   }
+  /* 12.5% -> kąt 45°: sin(45)=0.71, cos(45)=0.71 (+2deg offset) */
+  12.5% {
+    transform: perspective(1000px) rotateX(9.1deg) rotateY(10.65deg);
+    filter: drop-shadow(-2.8px 8.5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 85;
+    --shine-y: 15;
+  }
+  /* 25% -> kąt 90°: sin(90)=1, cos(90)=0 (+2deg offset) */
   25% {
-    transform: perspective(1000px) rotateX(-10deg) rotateY(-15deg);
-    filter: drop-shadow(4px -4px 0px rgba(0, 0, 0, 0.35));
-    /* Karta wychylona w lewo-góra -> światło w prawym dolnym rogu */
-    --shine-x: 0;
-    --shine-y: 100;
+    transform: perspective(1000px) rotateX(2deg) rotateY(15deg);
+    filter: drop-shadow(-4px 5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 100;
+    --shine-y: 50;
   }
+  /* 37.5% -> kąt 135°: sin(135)=0.71, cos(135)=-0.71 (+2deg offset) */
+  37.5% {
+    transform: perspective(1000px) rotateX(-5.1deg) rotateY(10.65deg);
+    filter: drop-shadow(-2.8px 1.5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 85;
+    --shine-y: 85;
+  }
+  /* 50% -> kąt 180°: sin(180)=0, cos(180)=-1 (+2deg offset) */
   50% {
-    transform: perspective(1000px) rotateX(-10deg) rotateY(15deg);
-    filter: drop-shadow(-4px -4px 0px rgba(0, 0, 0, 0.35));
-    /* Karta wychylona w prawo-góra -> światło w lewym dolnym rogu */
-    --shine-x: 100;
+    transform: perspective(1000px) rotateX(-8deg) rotateY(0deg);
+    filter: drop-shadow(0px 0px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 50;
     --shine-y: 100;
   }
+  /* 62.5% -> kąt 225°: sin(225)=-0.71, cos(225)=-0.71 (+2deg offset) */
+  62.5% {
+    transform: perspective(1000px) rotateX(-5.1deg) rotateY(-10.65deg);
+    filter: drop-shadow(2.8px 1.5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 15;
+    --shine-y: 85;
+  }
+  /* 75% -> kąt 270°: sin(270)=-1, cos(270)=0 (+2deg offset) */
   75% {
-    transform: perspective(1000px) rotateX(10deg) rotateY(15deg);
-    filter: drop-shadow(-4px 10px 0px rgba(0, 0, 0, 0.35));
-    /* Karta wychylona w prawo-dół -> światło w lewym górnym rogu */
-    --shine-x: 100;
-    --shine-y: 0;
+    transform: perspective(1000px) rotateX(2deg) rotateY(-15deg);
+    filter: drop-shadow(4px 5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 0;
+    --shine-y: 50;
+  }
+  /* 87.5% -> kąt 315°: sin(315)=-0.71, cos(315)=0.71 (+2deg offset) */
+  87.5% {
+    transform: perspective(1000px) rotateX(9.1deg) rotateY(-10.65deg);
+    filter: drop-shadow(2.8px 8.5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 15;
+    --shine-y: 15;
   }
 }
 @keyframes holoShift {

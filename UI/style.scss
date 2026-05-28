@@ -59,6 +59,11 @@ $button-hover-dark: #a18787;
   inherits: true;
   initial-value: 0deg;
 }
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: true;
+}
 
 @mixin cool-desc {
   @extend .pixel-corners;
@@ -1104,6 +1109,7 @@ canvas#glcanvas {
   
   /* Ważne dla płynności */
   will-change: transform;
+
   &.SelectedUpgrade {
     animation: .3s select-animation;
     z-index: 9 !important; // !important upewni się, że przebije hover i z-index: 500 bossa
@@ -1125,6 +1131,7 @@ canvas#glcanvas {
     /* Jeśli animacja triggered nie działa podczas dragging, 
        upewnij się, że dragging nie wymusza skali 1 */
   }
+
   &.returning {
     animation: spring-back 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
     z-index: 1000;
@@ -1137,8 +1144,6 @@ canvas#glcanvas {
   &.drag-over {
     outline: 2px dashed #00f;
   }
-
-  
 
   &.ready .upgrade-inner {
     animation: readyCard 1s ease-in-out infinite;
@@ -1184,32 +1189,75 @@ canvas#glcanvas {
     }
   }
 
+  // --- KLASA KARTY Z MATEMATYCZNYM SINUS/COSINUS ---
   .upgrade-card {
     width: $cardWidth;
     height: $cardHeight;
 
-    @media (max-width: 1024px) {
-      width: $cardWidth-sm;
-      height: $cardHeight-sm;
-    }
-
-    @media (max-width: 800px) {
-      width: $cardWidth-sm;
-      height: $cardHeight-sm;
-    }
-
-    @media (max-width: 600px) {
-      width: $cardWidth-sm * 0.8;
-      height: $cardHeight-sm * 0.8;
-    }
+    @media (max-width: 1024px) { width: $cardWidth-sm; height: $cardHeight-sm; }
+    @media (max-width: 800px) { width: $cardWidth-sm; height: $cardHeight-sm; }
+    @media (max-width: 600px) { width: $cardWidth-sm * 0.8; height: $cardHeight-sm * 0.8; }
 
     position: relative;
     cursor: pointer;
     transform-style: preserve-3d;
-    animation: skewCard 6s infinite ease-in-out;
     transition: box-shadow 0.2s ease;
-    transform: perspective(1000px) rotateX(10deg) rotateY(-15deg);
     z-index: 5;
+
+    // 1. URUCHOMIENIE MATEMATYCZNEJ ANIMACJI LICZNIKA KĄTA
+    animation: spinAngle 6s infinite linear;
+
+    --is-active: 1; // 1 = działa animacja, 0 = działa myszka
+  --mouse-x: 0deg;
+  --mouse-y: 0deg;
+  --mouse-shine-x: 50;
+  --mouse-shine-y: 0;
+  --mouse-shadow-x: 0px;
+  --mouse-shadow-y: 10px;
+
+  // 3. MATEMATYCZNY MIKS (Interpolacja liniowa w CSS)
+  // Jeśli --is-active wynosi 0, brany jest pod uwagę tylko ruch myszy. 
+  // Jeśli rośnie do 1, karta płynnie "wskakuje" w aktualną pozycję kręcącego się w tle sinusa!
+  --target-y: calc(
+    (var(--mouse-y) * (1 - var(--is-active))) + 
+    ((15deg * sin(var(--angle))) * var(--is-active))
+  );
+
+  --target-x: calc(
+    (var(--mouse-x) * (1 - var(--is-active))) + 
+    (((10deg * cos(var(--angle))) + 2deg) * var(--is-active))
+  );
+
+  --shine-x: calc(
+    (var(--mouse-shine-x) * (1 - var(--is-active))) + 
+    ((50 + 50 * sin(var(--angle))) * var(--is-active))
+  );
+
+  --shine-y: calc(
+    (var(--mouse-shine-y) * (1 - var(--is-active))) + 
+    ((50 - 50 * cos(var(--angle))) * var(--is-active))
+  );
+
+  --shadow-x: calc(
+    (var(--mouse-shadow-x) * (1 - var(--is-active))) + 
+    ((-4px * sin(var(--angle))) * var(--is-active))
+  );
+  
+  --shadow-y: calc(
+    (var(--mouse-shadow-y) * (1 - var(--is-active))) + 
+    ((5px + 5px * cos(var(--angle))) * var(--is-active))
+  );
+
+    // Aplikacja płynnego matematycznego obrotu
+    transform: perspective(1000px) rotateX(var(--target-x)) rotateY(var(--target-y));
+
+    // Dynamiczny, płynny cień podążający za sinusem i kosinusem
+    filter: drop-shadow(
+      calc(-4px * sin(var(--angle))) 
+      calc(5px + 5px * cos(var(--angle))) 
+      2px 
+      rgba(0, 0, 0, 0.35)
+    );
 
     .upgrade-inner {
       width: 100%;
@@ -1218,10 +1266,7 @@ canvas#glcanvas {
       background-position: center;
       background-repeat: no-repeat;
       display: flex;
-      transition: filter 0.3s ease, transform 0.3s ease;
-      ;
       transform-origin: center center;
-      /* scale from center */
       transition: filter 0.3s ease, transform 0.3s ease;
 
       .card-background {
@@ -1231,7 +1276,7 @@ canvas#glcanvas {
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
-        z-index: -1; // Warstwa dolna
+        z-index: -1; 
         transition: filter 0.3s ease;
 
         &.shine {
@@ -1240,200 +1285,136 @@ canvas#glcanvas {
             position: absolute;
             inset: 0;
             z-index: 5;
-
-            // TWOJA LOGIKA GRADIENTU
             background-image: url('../images/icons/polychromev2.png');
             background-size: 150% 200%;
             filter: hue-rotate(calc((var(--shine-x) + 10) * (var(--shine-y) + 10) * 0.067deg));
-            //background-position: var(--shine-x, 50%) var(--shine-y, 50%);
-            // Mieszanie całości z kartą pod spodem:
             mix-blend-mode: hue;
-
-            // --- ROZWIĄZANIE PROBLEMU PRZEZROCZYSTOŚCI ---
-            // Pobieramy obrazek karty jako maskę
             -webkit-mask-image: var(--card-img);
             mask-image: var(--card-img);
             -webkit-mask-size: cover;
             mask-size: cover;
-            // --------------------------------------------
             opacity: 1;
             transition: opacity 0.3s ease;
-
           }
         }
-        &.inactive{
+
+        &.inactive {
           &::after {
-          content: "";
+            content: "";
             position: absolute;
             inset: 0;
             z-index: 5;
-
-            // TWOJA LOGIKA GRADIENTU
             background-image: url('../images/icons/debuffed.png');
             background-size: 100% 100%;
-            //background-position: var(--shine-x, 50%) var(--shine-y, 50%);
-            // Mieszanie całości z kartą pod spodem:
-            mix-blend-mode:normal;
-
-            // --- ROZWIĄZANIE PROBLEMU PRZEZROCZYSTOŚCI ---
-            // Pobieramy obrazek karty jako maskę
+            mix-blend-mode: normal;
             -webkit-mask-image: var(--card-img);
             mask-image: var(--card-img);
             -webkit-mask-size: cover;
             mask-size: cover;
-            // --------------------------------------------
             opacity: 0.5;
             transition: opacity 0.3s ease;
           }
         }
+
         &.mult {
           &::after {
             content: "";
             position: absolute;
             inset: 0;
             z-index: 5;
-
-            // TWOJA LOGIKA GRADIENTU
             background-image: url('../images/icons/mult.png');
             background-size: 100% 100%;
             filter: hue-rotate(calc((var(--shine-x) + 10) * (var(--shine-y) + 10) * 0.067deg));
-            //background-position: var(--shine-x, 50%) var(--shine-y, 50%);
-            // Mieszanie całości z kartą pod spodem:
-            mix-blend-mode:hard-light;
-
-            // --- ROZWIĄZANIE PROBLEMU PRZEZROCZYSTOŚCI ---
-            // Pobieramy obrazek karty jako maskę
+            mix-blend-mode: hard-light;
             -webkit-mask-image: var(--card-img);
             mask-image: var(--card-img);
             -webkit-mask-size: cover;
             mask-size: cover;
-            // --------------------------------------------
             opacity: 0.2;
             transition: opacity 0.3s ease;
-
           }
         }
+
         &.metalic-shine {
           &::after {
             content: "";
             position: absolute;
             inset: 0;
             z-index: 5;
-
-            // TWOJA LOGIKA GRADIENTU
             background: url('../images/icons/shine4.png'), url('../images/icons/polychromev2.png');
-            ;
             background-size: 300% 300%;
             background-position: calc(var(--shine-x) * 1%) calc(var(--shine-y) * 1%);
-            //background-position: var(--shine-x, 50%) var(--shine-y, 50%);
-            // Mieszanie całości z kartą pod spodem:
             mix-blend-mode: color-dodge;
-
-            // --- ROZWIĄZANIE PROBLEMU PRZEZROCZYSTOŚCI ---
-            // Pobieramy obrazek karty jako maskę
             -webkit-mask-image: var(--card-img);
             mask-image: var(--card-img);
             -webkit-mask-size: cover;
             mask-size: cover;
-            // --------------------------------------------
             opacity: 0.3;
             transition: opacity 0.3s ease;
-
           }
         }
+
         &.chip-foil {
-  overflow: hidden; // To upewnia się, że nic nie wyjdzie poza ramkę
-  
-  // NAKŁADAMY MASKĘ TUTAJ (na całą kartę)
-  // Dzięki temu wszystko, co jest wewnątrz (w tym ::after), 
-  // będzie docięte do kształtu karty.
-  -webkit-mask-image: var(--card-img);
-  mask-image: var(--card-img);
-  -webkit-mask-size: cover;
-  mask-size: cover;
+          overflow: hidden;
+          -webkit-mask-image: var(--card-img);
+          mask-image: var(--card-img);
+          -webkit-mask-size: cover;
+          mask-size: cover;
 
-  &::after {
-    content: "";
-    position: absolute;
-    
-    // Tworzymy duży kwadrat z zapasem na rotację, 
-    // aby rogi tła nie "wchodziły" w kadr
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    z-index: 5;
+          &::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            z-index: 5;
+            background-image: url('../images/icons/chip.png');
+            background-repeat: repeat;
+            background-size: 300px 300px;
+            background-position: center; 
+            transform: rotate(calc(var(--shine-x) * 0.4deg + var(--shine-y) * 0.4deg));
+            mix-blend-mode: normal;
+            opacity: 0.4;
+            pointer-events: none;
+          }
+        }
 
-    // GRAFIKA: 300x300px bez rozciągania
-    background-image: url('../images/icons/chip.png');
-    background-repeat: repeat; // Powtarza wzór 300x300 płynnie
-    background-size: 300px 300px; // Sztywne wymiary oryginału
-    
-    // POZYCJONOWANIE I ROTACJA
-    // Center sprawia, że środek obrotu jest na środku karty
-    background-position: center; 
-    transform: rotate(calc(var(--shine-x) * 0.4deg + var(--shine-y) * 0.4deg));
-    
-    mix-blend-mode:normal; // Twój wybrany tryb
-    opacity: 0.4;
-    pointer-events: none;
-  }
-}
         &.booster-foil {
-          // 1. DELIKATNY EFEKT KOLORYSTYCZNY (TŁO)
           &::before {
             content: "";
             position: absolute;
             inset: 0;
             z-index: 4;
-
             background-image: url('../images/icons/booster-holo.png');
             background-size: 100% 100%;
-
-            // Dynamika kolorów
             filter: hue-rotate(calc((var(--shine-x) + 10) * (var(--shine-y) + 10) * 0.067deg)) brightness(0.8);
-
-            // 'hue' zachowuje teksturę karty, zmieniając tylko barwy
             mix-blend-mode: hue;
-
-            // BARDZO NISKIE OPACITY dla delikatności
             opacity: 0.2;
-
             -webkit-mask-image: var(--card-img);
             mask-image: var(--card-img);
             mask-size: cover;
             pointer-events: none;
           }
 
-          // 2. MOCNY METALICZNY BŁYSK (REFLEKSY)
           &::after {
             content: "";
             position: absolute;
             inset: 0;
             z-index: 5;
-
             background: url('../images/icons/shine4.png');
             background-size: 250% 250%;
-
-            // Śledzenie myszki/gyroskopu
             background-position: calc(var(--shine-x) * 1%) calc(var(--shine-y) * 1%);
-
-            // 'color-dodge' to standard przy kartach kolekcjonerskich - daje efekt "świecenia"
             mix-blend-mode: color-dodge;
-
-            // Wyższe opacity dla refleksu
             opacity: 0.2;
-
             -webkit-mask-image: var(--card-img);
             mask-image: var(--card-img);
             mask-size: cover;
             pointer-events: none;
-
             transition: opacity 0.3s ease;
           }
         }
       }
-
 
       .sticker-container {
         margin: .7em;
@@ -1444,18 +1425,13 @@ canvas#glcanvas {
       }
     }
 
+    // Wyłączenie animacji obrotowej na hover, aby umożliwić czysty pop-up karty
     &:hover {
-      //animation-play-state: paused;
-      animation: none;
-
-      //filter: drop-shadow(0 10px 0 rgba(0, 0, 0, 0.35));
-
       .upgrade-inner {
         animation: bounce-hover .23s;
         transform: rotateX(0deg) scale(1.045) rotateY(0deg);
       }
     }
-
   }
 
   .upgrade-desc {
@@ -1463,9 +1439,6 @@ canvas#glcanvas {
     text-align: center;
   }
 
-  // Aktywacja hovera z efektem "pop"
-
-  // Wyświetlanie
   &:hover .upgrade-desc {
     opacity: 1;
     transform: translateY(-50%) scale(1);
@@ -1482,19 +1455,15 @@ canvas#glcanvas {
     font-size: 0.85rem;
     font-weight: bold;
     opacity: 1;
-    /* ukryta domyślnie */
     transition: opacity 0.3s ease, transform 0.3s ease;
     pointer-events: none;
-    /* żeby nie blokowało hovera */
     transform: translateY(-20px);
-    /* lekko niżej na start */
     z-index: 15;
   }
 
   &:hover .upgrade-price {
     opacity: 1;
     transform: translateY(-30px);
-    /* płynnie do góry */
   }
 
   &.bought {
@@ -1506,7 +1475,6 @@ canvas#glcanvas {
     &:hover .upgrade-price {
       opacity: 1;
       transform: translateY(-15px);
-      /* płynnie do góry */
     }
   }
 }
@@ -1994,40 +1962,69 @@ canvas#glcanvas {
     filter: drop-shadow(3px 8px 0px rgba(0, 0, 0, 0.35));
   }
 }
-
-@keyframes skewCard {
-
-  0%,
+@keyframes spinAngle {
+  0% {
+    --angle: 0deg;
+  }
   100% {
-    transform: perspective(1000px) rotateX(10deg) rotateY(-15deg);
-    filter: drop-shadow(4px 10px 0px rgba(0, 0, 0, 0.35));
-    /* Karta wychylona w lewo-dół -> światło w prawym górnym rogu */
-    --shine-x: 0;
-    --shine-y: 0;
+    --angle: 360deg;
+  }
+}
+@keyframes skewCard {
+  /* 0% -> kąt 0°: sin(0)=0, cos(0)=1 (+2deg offset) */
+  0%, 100% {
+    transform: perspective(1000px) rotateX(12deg) rotateY(0deg);
+    filter: drop-shadow(0px 10px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 50; --shine-y: 0;
   }
 
+  /* 12.5% -> kąt 45°: sin(45)=0.71, cos(45)=0.71 (+2deg offset) */
+  12.5% {
+    transform: perspective(1000px) rotateX(9.1deg) rotateY(10.65deg);
+    filter: drop-shadow(-2.8px 8.5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 85; --shine-y: 15;
+  }
+
+  /* 25% -> kąt 90°: sin(90)=1, cos(90)=0 (+2deg offset) */
   25% {
-    transform: perspective(1000px) rotateX(-10deg) rotateY(-15deg);
-    filter: drop-shadow(4px -4px 0px rgba(0, 0, 0, 0.35));
-    /* Karta wychylona w lewo-góra -> światło w prawym dolnym rogu */
-    --shine-x: 0;
-    --shine-y: 100;
+    transform: perspective(1000px) rotateX(2deg) rotateY(15deg);
+    filter: drop-shadow(-4px 5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 100; --shine-y: 50;
   }
 
+  /* 37.5% -> kąt 135°: sin(135)=0.71, cos(135)=-0.71 (+2deg offset) */
+  37.5% {
+    transform: perspective(1000px) rotateX(-5.1deg) rotateY(10.65deg);
+    filter: drop-shadow(-2.8px 1.5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 85; --shine-y: 85;
+  }
+
+  /* 50% -> kąt 180°: sin(180)=0, cos(180)=-1 (+2deg offset) */
   50% {
-    transform: perspective(1000px) rotateX(-10deg) rotateY(15deg);
-    filter: drop-shadow(-4px -4px 0px rgba(0, 0, 0, 0.35));
-    /* Karta wychylona w prawo-góra -> światło w lewym dolnym rogu */
-    --shine-x: 100;
-    --shine-y: 100;
+    transform: perspective(1000px) rotateX(-8deg) rotateY(0deg);
+    filter: drop-shadow(0px 0px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 50; --shine-y: 100;
   }
 
+  /* 62.5% -> kąt 225°: sin(225)=-0.71, cos(225)=-0.71 (+2deg offset) */
+  62.5% {
+    transform: perspective(1000px) rotateX(-5.1deg) rotateY(-10.65deg);
+    filter: drop-shadow(2.8px 1.5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 15; --shine-y: 85;
+  }
+
+  /* 75% -> kąt 270°: sin(270)=-1, cos(270)=0 (+2deg offset) */
   75% {
-    transform: perspective(1000px) rotateX(10deg) rotateY(15deg);
-    filter: drop-shadow(-4px 10px 0px rgba(0, 0, 0, 0.35));
-    /* Karta wychylona w prawo-dół -> światło w lewym górnym rogu */
-    --shine-x: 100;
-    --shine-y: 0;
+    transform: perspective(1000px) rotateX(2deg) rotateY(-15deg);
+    filter: drop-shadow(4px 5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 0; --shine-y: 50;
+  }
+
+  /* 87.5% -> kąt 315°: sin(315)=-0.71, cos(315)=0.71 (+2deg offset) */
+  87.5% {
+    transform: perspective(1000px) rotateX(9.1deg) rotateY(-10.65deg);
+    filter: drop-shadow(2.8px 8.5px 0px rgba(0, 0, 0, 0.35));
+    --shine-x: 15; --shine-y: 15;
   }
 }
 

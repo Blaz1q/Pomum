@@ -717,8 +717,7 @@ animateReorder(oldPositions, duration = 300, excludedEl = null) {
   }
 addParalax(card) {
   card.addEventListener("mousemove", (e) => {
-    // Force animation to stay off while moving
-    card.style.animation = "none";
+    // Wyłączamy przejścia transition, aby karta natychmiastowo kleiła się do kursora
     card.style.transition = "none";
 
     const rect = card.getBoundingClientRect();
@@ -731,53 +730,43 @@ addParalax(card) {
     const rotateY = ((x - halfWidth) / halfWidth) * 10;
     const rotateX = ((halfHeight - y) / halfHeight) * 15;
     const shineX = (x / rect.width) * 100;
-      const shineY = (y / rect.height) * 100;
-
-      card.style.setProperty('--shine-x', `${shineX}`);
-      card.style.setProperty('--shine-y', `${shineY}`);
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    const shineY = (y / rect.height) * 100;
     
     const shadowX = -((x - halfWidth) / halfWidth) * 10;
     const shadowY = -((y - halfHeight) / halfHeight) * 10;
-    card.style.filter = `drop-shadow(${shadowX}px ${shadowY}px 0px rgba(0,0,0,0.3))`;
+
+    // Przełączamy miks na 0 (100% myszka, 0% animacja w tle)
+    card.style.setProperty('--is-active', '0');
+    
+    // Podajemy aktualne współrzędne z myszki do zmiennych pomocniczych
+    card.style.setProperty('--mouse-x', `${rotateX}deg`);
+    card.style.setProperty('--mouse-y', `${rotateY}deg`);
+    card.style.setProperty('--mouse-shine-x', `${shineX}`);
+    card.style.setProperty('--mouse-shine-y', `${shineY}`);
+    card.style.setProperty('--mouse-shadow-x', `${shadowX}px`);
+    card.style.setProperty('--mouse-shadow-y', `${shadowY}px`);
   });
 
   card.addEventListener("mouseleave", () => {
-    const duration = 1000;
-    
-    // Włączamy transition dla zmiennych i transformacji
-    card.style.transition = `
-        transform ${duration}ms ease-out, 
-        filter ${duration}ms ease-out, 
-        --shine-x ${duration}ms ease-out, 
-        --shine-y ${duration}ms ease-out
-    `;
-    
-    // Ustawiamy wartości docelowe (zgodne z 0% klatką animacji CSS)
-    card.style.setProperty('--shine-x', `0`);
-    card.style.setProperty('--shine-y', `0`);
-    card.style.transform = `perspective(1000px) rotateX(10deg) rotateY(-15deg)`;
-    card.style.filter = `drop-shadow(4px 10px 0px rgba(0, 0, 0, 0.35))`;
+    const duration = 2000; // Czas powrotu do działającej w tle animacji
+
+    // Włączamy transition TYLKO dla zmiennej --is-active. 
+    // Przeglądarka sama zrobi cudowne, maślane przejście od pozycji myszy 
+    // do punktu, w którym animacja w tle OBECNIE się znajduje!
+    card.style.transition = `--is-active ${duration}ms cubic-bezier(0.25, 1, 0.5, 1)`;
+
+    // Wracamy suwakiem do wartości 1 (100% automatyczna animacja)
+    card.style.setProperty('--is-active', '1');
 
     if (card.parallaxTimeout) clearTimeout(card.parallaxTimeout);
 
+    // Po zakończeniu transition czyścimy tylko transition inline, zmienne mogą zostać
     card.parallaxTimeout = setTimeout(() => {
-        if (!card.matches(':hover')) {
-            // Zdejmujemy transition, żeby animacja @keyframes mogła płynnie przejąć kontrolę
-            card.style.transition = "none"; 
-            card.style.animation = "skewCard 6s infinite ease-in-out";
-            
-            // Zamiast usuwać właściwości natychmiast, pozwalamy animacji nadpisać je naturalnie
-            // Jeśli shine-sync używa background-position, to nadpisze ono zmienne inline
-            // ALE: Twoja animacja CSS shine-sync powinna też używać tych samych zmiennych 
-            // lub po prostu usuwamy style po krótkiej chwili:
-            setTimeout(() => {
-                card.style.removeProperty('--shine-x');
-                card.style.removeProperty('--shine-y');
-            }, 50);
-        }
+      if (!card.matches(':hover')) {
+        card.style.transition = "none";
+      }
     }, duration);
-});
+  });
 }
   fadeInAndShow(wrapper, duration = 150) {
     if (!wrapper) return;
