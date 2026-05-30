@@ -69,6 +69,11 @@ $button-hover-dark: #a18787;
   inherits: true;
   initial-value: 1;
 }
+@property --burn {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
 
 @mixin cool-desc {
   @extend .pixel-corners;
@@ -1342,7 +1347,48 @@ canvas#glcanvas {
             transition: opacity 0.3s ease;
           }
         }
+&.fade-out {
+  // Odpalamy naszą magię
+  animation: burnOutEffect 1.5s ease-in-out infinite;
 
+  // 3. Łączymy DWIE maski: Twój obrazek oraz dynamiczną warstwę koloru
+  // Używamy kolorów hsl(), bo niesamowicie łatwo animuje się ich jasność (ostatni parametr)
+  // Gdy --burn = 0 -> hsl(0, 0%, 100%) to czysta biel
+  // Gdy --burn = 50 -> hsl(0, 0%, 50%) to neutralny szary (pozwala działać oryginalnej masce)
+  // Gdy --burn = 100 -> hsl(0, 0%, 0%) to czysta czerń
+  -webkit-mask-image: 
+    url('../images/icons/fade-out.png'),
+    linear-gradient(
+      hsl(0, 0%, calc(100% - var(--burn) * 2%)), 
+      hsl(0, 0%, calc(100% - var(--burn) * 2%))
+    );
+    
+  mask-image: 
+    url('../images/icons/fade-out.png'),
+    linear-gradient(
+      hsl(0, 0%, calc(100% - var(--burn) * 2%)), 
+      hsl(0, 0%, calc(100% - var(--burn) * 2%))
+    );
+
+  // Ustalamy parametry dokładnie dla DWÓCH warstw masek
+  -webkit-mask-size: cover, 100% 100%;
+  mask-size: cover, 100% 100%;
+  
+  -webkit-mask-position: center, center;
+  mask-position: center, center;
+  
+  -webkit-mask-repeat: no-repeat, no-repeat;
+  mask-repeat: no-repeat, no-repeat;
+
+  // 4. Łączenie masek przez 'multiply' (współczesny standard to 'intersect')
+  // Sprawia to, że warstwa koloru bezpośrednio wpływa na jasność pikseli obrazka shine2.png
+  -webkit-mask-composite: source-over; 
+  mask-composite: add;
+
+  // Czytamy jasność pikseli (Biały = widoczny, Czarny = przezroczysty)
+  -webkit-mask-mode: luminance;
+  mask-mode: luminance;
+}
         &.metalic-shine {
           &::after {
             content: "";
@@ -2190,7 +2236,15 @@ canvas#glcanvas {
     transform: translate(0, 0) rotateZ(0deg);
   }
 }
-
+@keyframes burnOutEffect {
+  0% {
+    --burn: 0; // Początek: Pełna biel (karta 100% widoczna)
+  }
+  100% {
+    --burn: 100; // Koniec: Pełna czerń (karta 100% przezroczysta)
+    opacity: 0;
+  }
+}
 body.potatopc {
   // Wyłączamy morderców wydajności
   .card-background::after,

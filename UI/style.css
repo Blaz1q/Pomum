@@ -30,6 +30,11 @@
   inherits: true;
   initial-value: 1;
 }
+@property --burn {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
 :root {
   color-scheme: light dark;
 }
@@ -1117,6 +1122,22 @@ canvas#glcanvas {
   opacity: 0.2;
   transition: opacity 0.3s ease;
 }
+.upgrade-wrapper .upgrade-card .upgrade-inner .card-background.fade-out,
+.boss-wrapper .upgrade-card .upgrade-inner .card-background.fade-out {
+  animation: burnOutEffect 1.5s ease-in-out infinite;
+  -webkit-mask-image: url("../images/icons/fade-out.png"), linear-gradient(hsl(0, 0%, calc(100% - var(--burn) * 2%)), hsl(0, 0%, calc(100% - var(--burn) * 2%)));
+  mask-image: url("../images/icons/fade-out.png"), linear-gradient(hsl(0, 0%, calc(100% - var(--burn) * 2%)), hsl(0, 0%, calc(100% - var(--burn) * 2%)));
+  -webkit-mask-size: cover, 100% 100%;
+  mask-size: cover, 100% 100%;
+  -webkit-mask-position: center, center;
+  mask-position: center, center;
+  -webkit-mask-repeat: no-repeat, no-repeat;
+  mask-repeat: no-repeat, no-repeat;
+  -webkit-mask-composite: source-over;
+  mask-composite: add;
+  -webkit-mask-mode: luminance;
+  mask-mode: luminance;
+}
 .upgrade-wrapper .upgrade-card .upgrade-inner .card-background.metalic-shine::after,
 .boss-wrapper .upgrade-card .upgrade-inner .card-background.metalic-shine::after {
   content: "";
@@ -2133,6 +2154,15 @@ canvas#glcanvas {
   }
   100% {
     transform: translate(0, 0) rotateZ(0deg);
+  }
+}
+@keyframes burnOutEffect {
+  0% {
+    --burn: 0;
+  }
+  100% {
+    --burn: 100;
+    opacity: 0;
   }
 }
 body.potatopc .card-background::after,
