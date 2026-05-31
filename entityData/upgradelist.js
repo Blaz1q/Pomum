@@ -686,10 +686,14 @@ export const upgradeBlueprints = [
   },
   {
     name: "Zdrapka",
-    descriptionfn: `${Style.Chance(`1 na 20`)} że za kaskade dostanie się ${Style.Money(`$20`)}`,
+    descriptionfn(game){
+      return `${Style.Chance(`${this.props.chance + (game.bonusChance ?? 0)} na ${this.props.max}`)} że za kaskade dostanie się ${Style.Money(`$20`)}`
+    },
     props: () => ({
+      chance: 1,
+      max : 20,
       onMatch() {
-        if (Math.random() < 0.05) {
+        if (this.checkChance(game)) {
           game.money += 20;
           game.GameRenderer.updateMoney(20);
           return { state: UPGRADE_STATES.Active, message: `+$20`, style: SCORE_ACTIONS.Money };
@@ -855,10 +859,14 @@ export const upgradeBlueprints = [
   },
   {
     name: "Jackpot",
-    descriptionfn: `Szansa ${Style.Chance("1 na 100")} że po rundzie dostaniesz ${Style.Money("$100")}`,
+    descriptionfn(game) {
+    return `Szansa ${Style.Chance(`${this.props.chance + (game.bonusChance ?? 0)} na ${this.props.max}`)} że po rundzie dostaniesz ${Style.Money("$100")}`
+    },
     props: () => ({
+      chance: 1,
+      max: 100,
       onRoundEnd() {
-        if (Math.random() < 0.01) {
+        if (this.checkChance(game)) {
           game.money += 100;
           game.GameRenderer.displayMoney();
           return { state: UPGRADE_STATES.Active, message: `+$100`, style: SCORE_ACTIONS.Money };
@@ -1147,12 +1155,14 @@ export const upgradeBlueprints = [
     name: "Critical Hit",
     descriptionfn(game) {
       var mult = this.props.mult ?? 1;
-      return `${Style.Chance(`1 na 20`)} że co kaskade dostanie się ${Style.Mult(`X3 Mult`)}, (Obecnie ${Style.Mult('X' + mult + ' Mult')})`;
+      return `${Style.Chance(`${this.props.chance + (game.bonusChance ?? 0)} na ${this.props.max}`)} że co kaskade dostanie się ${Style.Mult(`X3 Mult`)}, (Obecnie ${Style.Mult('X' + mult + ' Mult')})`;
     },
     props: () => ({
       mult: 1,
+      chance: 1,
+      max: 20,
       onMatch(matches) {
-        if (Math.random() < 0.05) {
+        if (this.checkChance(game)) {
           this.props.mult *= 3;
           this.props.mult = Math.round(this.props.mult * 100) / 100;
           return { state: UPGRADE_STATES.Active, message: `X3 Mult`, style: SCORE_ACTIONS.Info };
@@ -1371,9 +1381,11 @@ export const upgradeBlueprints = [
     id: "goraczka",
     name: "Gorączka",
     descriptionfn(game) {
-      return `Daje ${Style.Mult('10-20 Mult')}. ${Style.Chance(`1 na 10`)}, że zniknie na końcu rundy.`;
+      return `Daje ${Style.Mult('10-20 Mult')}. ${Style.Chance(`${this.props.chance + (game.bonusChance ?? 0)} na ${this.props.max}`)}, że zniknie na końcu rundy.`;
     },
     props: () => ({
+      chance: 1,
+      max: 10,
       onScore() {
         const gained = Math.floor(Math.random() * 10) + 10;
         game.mult += gained;
@@ -1381,7 +1393,7 @@ export const upgradeBlueprints = [
         return { state: UPGRADE_STATES.Score, message: `+${gained} Mult`, style: SCORE_ACTIONS.Mult };
       },
       onRoundEnd() {
-        if (Math.floor(Math.random() * 10) != 0) return;
+        if (!this.checkChance(game)) return;
         const index = game.upgrades.indexOf(this) ?? -1;
         if (index == -1) return;
         game.upgrades.splice(index, 1);
@@ -1415,9 +1427,11 @@ export const upgradeBlueprints = [
   {
     name: "Saper",
     descriptionfn(game) {
-      return `${Style.Chance('1 na 5')} na każdą bombę lub dynamit, że zostanie wysadzony na początku ruchu`;
+      return `${Style.Chance(`${this.props.chance + (game.bonusChance ?? 0)} na ${this.props.max}`)} na każdą bombę lub dynamit, że zostanie wysadzony na początku ruchu`;
     },
     props: () => ({
+      chance: 1,
+      max: 5,
       onMove(payload) {
         console.log(payload);
         let game = payload.game;
@@ -1436,7 +1450,7 @@ export const upgradeBlueprints = [
         // 2. Zbieramy wszystkie nowe trafienia
 
         explosives.forEach(explosive => {
-          if (Math.random() < 0.2) {
+          if (this.checkChance(game)) {
             matches.push(explosive);
             triggered = true;
           }
@@ -1580,7 +1594,8 @@ export const upgradeBlueprints = [
   props: () => ({
     upgradeindex: null,
     prevrepeats: null,
-    chance: 0.5,
+    chance:1,
+    max: 2,
     // Funkcja resetująca - teraz wywoływana wewnętrznie przy każdej zmianie
     resetupgrade(self){
       if (self.props.upgradeindex && self.props.prevrepeats !== null) {
@@ -1615,7 +1630,7 @@ export const upgradeBlueprints = [
       // Sprawdzamy, czy ulepszenie na 1. slocie się nie zmieniło
       this.props.changeUpgrade(this);
       this.props.resetupgrade(this);
-      if (!this.props.upgradeindex||Math.random()<this.props.chance) {
+      if (!this.props.upgradeindex||!this.checkChance(game)) {
         return UPGRADE_STATES.Failed;
       }
 
@@ -1670,13 +1685,15 @@ export const upgradeBlueprints = [
 {
   name: "Hallucination",
   descriptionfn(game) {
-    return `${Style.Chance("1 na 2")} że po otwarciu ${Style.Highlight('Boostera')} dostanie się ${Style.Highlight('Kartę tarota')} (Jeśli jest miejsce)`;
+    return `${Style.Chance(`${this.props.chance + (game.bonusChance ?? 0)} na ${this.props.max}`)} że po otwarciu ${Style.Highlight('Boostera')} dostanie się ${Style.Highlight('Kartę tarota')} (Jeśli jest miejsce)`;
   },
   props: () => ({
+    chance: 1,
+    max: 2,
     onBuy(payload){
       if(payload.type!="ConsumablePack") return UPGRADE_STATES.Failed;
       if(game.consumables.length>=game.maxConsumables) return UPGRADE_STATES.Failed;
-      if(Math.random()<0.5){
+      if(!this.checkChance(game)){
         return UPGRADE_STATES.Failed;  
       }
       const tarots = consumableList.filter((up)=>up.type=="Tarot");
@@ -1864,7 +1881,21 @@ export const upgradeBlueprints = [
   price: 6,
   ...RARE,
   image: 'aristocrat'
-}
+},
+{
+    name: "Clover",
+    descriptionfn: `Podwaja wszystkie szanse. (np. ${Style.Chance('1 na 5')} -> ${Style.Chance('2 na 5')})`,
+    rarity: UPGRADE_RARITY.Common,
+    effect(game) {
+      game.bonusChance+=1;
+    },
+    remove(game) {
+      game.bonusChance-=1;
+    },
+    price: 8,
+    ...UNCOMMON,
+    image: 'clover'
+  },
 ];
 
 

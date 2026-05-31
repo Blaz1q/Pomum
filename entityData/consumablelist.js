@@ -598,7 +598,7 @@ const tarotCards = [
       return `${Style.Chance("1 na 4")} że ulepszenie dostaje bonusowe ${Style.Chance(MODIFIERS.Chip)}, lub ${Style.Chance(MODIFIERS.Mult)}`;
     },
     effect(game) {
-      if (Math.random() >= 0.25) {
+      if (!this.checkChance(game)) {
         this.message = { text: ":(", style: SCORE_ACTIONS.Info };
         //this.UpgradeRenderer.createPopup(":(",SCORE_ACTIONS.Info);
         return;
@@ -618,6 +618,10 @@ const tarotCards = [
     },
     canUse(game) {
       return game.upgrades.length>0;
+    },
+    props: {
+      chance: 1,
+      max: 4
     },
     price: 4,
     image: "fortuna",
@@ -721,7 +725,7 @@ const tarotCards = [
     },
     effect(game) {
       console.log(this);
-      if (Math.random() >= 0.2) {
+      if (!this.checkChance(game)) {
         this.message = { text: ":(", style: SCORE_ACTIONS.Info };
         return;
       }
@@ -733,6 +737,10 @@ const tarotCards = [
       });
       this.message = { text: "popups.success", style: SCORE_ACTIONS.Money, translation: true };
       //this.UpgradeRenderer.createPopup("Sukces!",SCORE_ACTIONS.Money);
+    },
+    props: {
+      chance: 1,
+      max: 5
     },
     price: 4,
     image: "tower",

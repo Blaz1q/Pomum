@@ -94,6 +94,16 @@ export class UpgradeBase {
     }
     return this.descriptionfn || "Missing description";
   }
+  checkChance(game) {
+    let chance = this.props.chance ?? 1;
+    let max = this.props.max ?? 1;
+    let bonusChance = game.bonusChance ?? 0;
+    let finalChance = chance + bonusChance;
+    if (finalChance >= max) return true;
+    const probability = finalChance / max;
+    // Losujemy i sprawdzamy, czy mieści się w prawdopodobieństwie
+    return Math.random() < probability;
+  }
   apply(game) {
     throw new Error("Method apply must be implemented.");
   }

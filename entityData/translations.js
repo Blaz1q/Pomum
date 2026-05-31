@@ -257,7 +257,7 @@ export const translations = {
       },
       wheel_of_fortune: {
         name: "Koło Fortuny",
-        description: (data) => `${Style.Chance("1 na 4")} szansy, że ulepszenie otrzyma bonusowe ${Style.Chance(MODIFIERS.Chip)} lub ${Style.Chance(MODIFIERS.Polychrome)}.`,
+        description: (data) => `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} na ${data.upgrade.props.max}`)} szansy, że ulepszenie otrzyma bonusowe ${Style.Chance(MODIFIERS.Chip)} lub ${Style.Chance(MODIFIERS.Polychrome)}.`,
       },
       the_hanged_man: {
         name: "Wisielec",
@@ -265,7 +265,7 @@ export const translations = {
       },
       the_tower: {
         name: "Wieża",
-        description: (data) => `${Style.Chance("1 na 5")} szansy na całkowite przelosowanie szans wszystkich owoców.`,
+        description: (data) => `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} na ${data.upgrade.props.max}`)} szansy na całkowite przelosowanie szans wszystkich owoców.`,
       },
       the_star: {
         name: "Gwiazda",
@@ -387,7 +387,7 @@ export const translations = {
     upgrades: {
       hallucination: {
         name: "Halucynacja",
-        description: `${Style.Chance("1 na 2")} że po otwarciu ${Style.Highlight('Boostera')} dostanie się ${Style.Highlight('Kartę tarota')} (Jeśli jest miejsce)`
+        description: (data) => `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} na ${data.upgrade.props.max}`)} że po otwarciu ${Style.Highlight('Boostera')} dostanie się ${Style.Highlight('Kartę tarota')} (Jeśli jest miejsce)`
       },
       applehater: {
         name: "AppleHater",
@@ -550,7 +550,7 @@ export const translations = {
       },
       zdrapka: {
         name: "Zdrapka",
-        description: `${Style.Chance(`1 na 20`)} że za kaskadę dostanie się ${Style.Money(`$20`)}`,
+        description: (data) => `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} na ${data.upgrade.props.max}`)} że za kaskade dostanie się ${Style.Money(`$20`)}`
       },
       "6pak": {
         name: "6pak",
@@ -588,7 +588,7 @@ export const translations = {
       },
       jackpot: {
         name: "Jackpot",
-        description: `Szansa ${Style.Chance("1 na 100")} że po rundzie dostaniesz ${Style.Money("$100")}`,
+        description: (data) => `Szansa ${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} na ${data.upgrade.props.max}`)} że po rundzie dostaniesz ${Style.Money("$100")}`,
       },
       collector: {
         name: "Kolekcjoner",
@@ -654,7 +654,7 @@ export const translations = {
         name: "Cios Krytyczny",
         description: (data) => {
           const mult = data.upgrade.props.mult ?? 1;
-          return `${Style.Chance(`1 na 20`)} że co kaskadę dostanie się ${Style.Mult(`X3 Mult`)}, (Obecnie ${Style.Mult("X" + mult + " Mult")})`;
+          return `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} na ${data.upgrade.props.max}`)} że co kaskadę dostanie się ${Style.Mult(`X3 Mult`)}, (Obecnie ${Style.Mult("X" + mult + " Mult")})`;
         },
       },
       pozeracz: {
@@ -699,7 +699,7 @@ export const translations = {
       },
       goraczka: {
         name: "Gorączka",
-        description: `Daje ${Style.Mult("10-20 Mult")}. ${Style.Chance(`1 na 10`)}, że zniknie na końcu rundy.`,
+        description: (data) => `Daje ${Style.Mult("+10-20 Mult")}. ${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} na ${data.upgrade.props.max}`)}, że zniknie na końcu rundy.`,
       },
       dolar: {
         name: "Dolar",
@@ -707,7 +707,7 @@ export const translations = {
       },
       saper: {
         name: "Saper",
-        description: `${Style.Chance("1 na 5")} na każdą bombę lub dynamit, że zostanie wysadzony na początku ruchu.`,
+        description: (data) => `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} in ${data.upgrade.props.max}`)} na każdą bombę lub dynamit, że zostanie wysadzony na początku ruchu.`,
       },
       kartakredytowa: {
         name: "Karta Kredytowa",
@@ -776,6 +776,10 @@ export const translations = {
         name: "Arystokrata",
         description: (data) => 
           `Daje ${Style.Mult('X1.5 mult')} za wszystkie posiadane ulepszenia ${Style.Highlight('Uncommon')}. (Obecnie ${Style.Mult(`X${data.upgrade.props.calcMult()} Mult`)})`
+      },
+      clover: {
+        name: "Koniczyna",
+        description: `Podwaja wszystkie szanse. (np. ${Style.Chance('1 na 5')} -> ${Style.Chance('2 na 5')})`
       }
     },
     popups: {
@@ -1072,7 +1076,7 @@ export const translations = {
       },
       wheel_of_fortune: {
         name: "Wheel of Fortune",
-        description: (data) => `${Style.Chance("1 in 4")} chance for an upgrade to get bonus ${Style.Chance(MODIFIERS.Chip)} or ${Style.Chance(MODIFIERS.Polychrome)}.`,
+        description: (data) => `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} in ${data.upgrade.props.max}`)} chance for an upgrade to get bonus ${Style.Chance(MODIFIERS.Chip)} or ${Style.Chance(MODIFIERS.Polychrome)}.`,
       },
       the_hanged_man: {
         name: "The Hanged Man",
@@ -1080,7 +1084,7 @@ export const translations = {
       },
       the_tower: {
         name: "The Tower",
-        description: (data) => `${Style.Chance("1 in 5")} chance to reroll chances for all fruits.`,
+        description: (data) => `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} in ${data.upgrade.props.max}`)} chance to reroll chances for all fruits.`,
       },
       the_star: {
         name: "The Star",
@@ -1166,7 +1170,7 @@ export const translations = {
     upgrades: {
       hallucination: {
         name: "Hallucination",
-        description: `${Style.Chance("1 in 2")} chance when opening ${Style.Highlight('Booster packs')} for creating ${Style.Highlight('Tarot card')} (Must have room)`
+        description: (data) => `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} in ${data.upgrade.props.max}`)} chance when opening ${Style.Highlight('Booster packs')} for creating ${Style.Highlight('Tarot card')} (Must have room)`
       },
       applehater: {
         name: "AppleHater",
@@ -1328,7 +1332,7 @@ export const translations = {
       },
       zdrapka: {
         name: "Scratch Card",
-        description: `${Style.Chance(`1 in 20`)} chance to get ${Style.Money(`$20`)} for a cascade`,
+        description: (data)=> `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} in ${data.upgrade.props.max}`)} chance to get ${Style.Money(`$20`)} for a cascade`,
       },
       "6pak": {
         name: "6-Pack",
@@ -1366,7 +1370,7 @@ export const translations = {
       },
       jackpot: {
         name: "Jackpot",
-        description: `${Style.Chance("1 in 100")} chance to get ${Style.Money("$100")} after the round.`,
+        description: (data) => `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} in ${data.upgrade.props.max}`)} chance to get ${Style.Money("$100")} after the round.`,
       },
       collector: {
         name: "Collector",
@@ -1430,7 +1434,7 @@ export const translations = {
         name: "Critical Hit",
         description: (data) => {
           const mult = data.upgrade.props.mult ?? 1;
-          return `${Style.Chance(`1 in 20`)} chance to get ${Style.Mult(`X3 Mult`)} per cascade, (Currently ${Style.Mult("X" + mult + " Mult")})`;
+          return `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} in ${data.upgrade.props.max}`)} chance to get ${Style.Mult(`X3 Mult`)} per cascade, (Currently ${Style.Mult("X" + mult + " Mult")})`;
         },
       },
       pozeracz: {
@@ -1475,7 +1479,7 @@ export const translations = {
       },
       goraczka: {
         name: "Fever",
-        description: `Grants ${Style.Mult("10-20 Mult")}. ${Style.Chance(`1 in 10`)} chance to disappear at round end.`,
+        description: (data) => `Grants ${Style.Mult("+10-20 Mult")}. ${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} in ${data.upgrade.props.max}`)} chance to disappear at round end.`,
       },
       dolar: {
         name: "Dollar",
@@ -1483,7 +1487,7 @@ export const translations = {
       },
       saper: {
         name: "Sapper",
-        description: `${Style.Chance("1 in 5")} chance for each bomb or dynamite to detonate at the start of a move.`,
+        description: (data) => `${Style.Chance(`${data.upgrade.props.chance + (data.game.bonusChance ?? 0)} in ${data.upgrade.props.max}`)} chance for each bomb or dynamite to detonate at the start of a move.`,
       },
       kartakredytowa: {
         name: "Credit Card",
@@ -1552,6 +1556,10 @@ export const translations = {
         name: "Aristocrat",
         description: (data) => 
           `Gives ${Style.Mult('X1.5 mult')} for every owned ${Style.Highlight('Uncommon')} upgrade. (Currently ${Style.Mult(`X${data.upgrade.props.calcMult()} Mult`)})`
+      },
+      clover: {
+        name: "Clover",
+        description: `Doubles every chance. (eg. ${Style.Chance('1 in 5')} -> ${Style.Chance('2 in 5')})`
       }
     },
     popups: {

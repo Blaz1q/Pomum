@@ -103,6 +103,7 @@ export class Game {
             modifier: 0,
         }
         this.discount = 0;
+        this.bonusChance = 0;
         this.matchesManager = new Matches(this);
         this.triggerManager = new TriggerManager(this);
         //random
