@@ -13,7 +13,7 @@
 
 # Content
 - [ ] vouchery
-- [ ] stworzenie nowych bossów
+- [X] stworzenie nowych bossów
 
 # Grafiki
 - [X] fruit tycoon
@@ -30,7 +30,7 @@
     - [ ] liczba rozgrywek
 
 # Optymalizacja
-- [ ] rework render
+- [X] rework render
 
 
 # Sklep z przedmiotami
@@ -39,4 +39,13 @@
  - [ ] punkty się dostaje za
 
 # Issues
- - [ ] kupowanie tarotów nie daje przycisków
+ - [X] kupowanie tarotów nie daje przycisków
+ - [ ] circular dependencies:
+1) entities/ConsumablePack.js > entities/Upgrade.js
+2) entityData/consumablelist.js > entityData/upgradelist.js
+3) UI/RenderUI.js > entityData/consumablelist.js > entityData/upgradelist.js > main.js
+4) entityData/consumablelist.js > entityData/upgradelist.js > main.js
+5) entityData/upgradelist.js > main.js
+6) main.js > loadshaders.js
+7) entityData/consumablelist.js > entityData/upgradelist.js > main.js > roll.js
+8) entityData/upgradelist.js > main.js > roll.js

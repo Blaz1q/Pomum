@@ -228,6 +228,10 @@ export const translations = {
         name: "Ogień",
         description: (data) => `Daje gotówkę równą cenie sprzedaży wszystkich posiadanych ulepszeń (Max ${Style.Money("$40")}).`,
       },
+      joker: {
+        name: "Joker",
+        description: `Tworzy losowe ${Style.Mult('Rare')} ulepszenie i ${Style.Highlight('zeruje pieniądze')} (Musi mieć miejsce)`
+      },
       the_fool: {
         name: "Głupiec",
         description: (data) => {
@@ -250,6 +254,10 @@ export const translations = {
       the_lovers: {
         name: "Kochankowie",
         description: (data) => `${Style.Moves("+2 ruchy")}`,
+      },
+      hermit: {
+        name: "Pustelnik",
+        description: `Podwaja pieniądze (Max ${Style.Money('$20')})`
       },
       strength: {
         name: "Siła",
@@ -532,7 +540,7 @@ export const translations = {
       circus: {
         name: "Cyrk",
         description:
-          "Pozwala na pojawianie się w sklepie tych samych ulepszeń.",
+          `Pozwala na pojawianie się w sklepie tych samych ${Style.Highlight("Ulepszeń")}, ${Style.Highlight("Kart tarota")}, ${Style.Highlight("Ulepszeń kafelków")} i ${Style.Highlight("Kart Paktu")}`,
       },
       fossil: {
         name: "Skamielina",
@@ -1047,6 +1055,10 @@ export const translations = {
         name: "Fire",
         description: (data) => `Gives the sell price of all owned upgrades (Max ${Style.Money("$40")}).`,
       },
+      joker: {
+        name: "Joker",
+        description: `Creates random ${Style.Mult('Rare')} upgrade and ${Style.Highlight('sets money to zero.')} (Must have room)`
+      },
       the_fool: {
         name: "The Fool",
         description: (data) => {
@@ -1069,6 +1081,10 @@ export const translations = {
       the_lovers: {
         name: "The Lovers",
         description: (data) => `${Style.Moves("+2 moves")}`,
+      },
+      hermit: {
+        name: "The Hermit",
+        description: `Doubles money (Max ${Style.Money('$20')})`
       },
       strength: {
         name: "Strength",
@@ -1314,7 +1330,7 @@ export const translations = {
       },
       circus: {
         name: "Circus",
-        description: "Allows the same upgrades to appear in the shop.",
+        description: `Allows the same ${Style.Highlight("Upgrades")}, ${Style.Highlight("Tarot")}, ${Style.Highlight("Consumables")} and ${Style.Highlight("Pact cards")} to appear in the shop.`,
       },
       fossil: {
         name: "Fossil",

@@ -592,7 +592,7 @@ export const upgradeBlueprints = [
 
   {
     name: "circus",
-    descriptionfn: "Pozwala na pojawianie się w sklepie tych samych upgradeów.",
+    descriptionfn: `Pozwala na pojawianie się w sklepie tych samych ${Style.Highlight("Ulepszeń")}, ${Style.Highlight("Kart tarota")}, ${Style.Highlight("Ulepszeń kafelków")} i ${Style.Highlight("Kart Paktu")}.`,
     effect(game) {
       game.upgradeDedupe = false;
     },
@@ -605,7 +605,7 @@ export const upgradeBlueprints = [
       if (counter > 1) game.upgradeDedupe = false;
     },
     price: 8,
-    ...RARE
+    ...UNCOMMON
   },
 
   {

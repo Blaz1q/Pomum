@@ -12,6 +12,7 @@ import { Stats } from "../utils/Stats.js";
 import { Tarot } from "../entities/Tarot.js";
 import { transformsExecRgx } from "../libs/animejs/core/consts.js";
 import { Tile } from "../entities/Tile.js";
+import { Roll } from "../roll.js";
 export const consumableList = [];
 const pomumpackItems = [];
 function desc(fruit) {
@@ -370,6 +371,27 @@ export const consumableUpgradeBlueprints = [
     price: 8,
     image: "fire",
   },
+  {
+    name: "Joker",
+    descriptionfn(game){
+      return `Tworzy losowe ${Style.Mult('Rare')} ulepszenie i ${Style.Highlight('zeruje pieniądze')} (Musi mieć miejsce)`;
+    },
+    effect(game){
+      if(game.upgrades.length>=game.maxUpgrades) return;
+      const pool = upgradesList.filter(up=>up.rarity==UPGRADE_RARITY.Rare);
+      let picked = pool[Math.floor(Math.random() * pool.length)];
+      let roll = new Roll(game);
+      let up = new Upgrade(picked);
+      roll.Modifier(up);
+      game.upgrades.push(up);
+      game.GameRenderer.displayPlayerUpgrades();
+      let moneyLost = game.money;
+      game.money=0;
+      game.GameRenderer.updateMoney(-moneyLost);
+    },
+    price: 8,
+    image: "fire",
+  }
 ];
 const consumableGoldBlueprints = [
   {
@@ -584,13 +606,27 @@ const tarotCards = [
     },
     price: 4,
     image: "strength",
-  } /*
+  },
     {
         name: "Pustelnik",
+        id: "hermit",
         descriptionfn(game){
-            return `Daje tyle $, ile złotych kafelków na planszy. (max. $20)`;
-        }
-    },*/,
+          return `Podwaja pieniądze (Max ${Style.Money('$20')})`;
+        },
+        effect(game){
+          let gained = 0;
+          if(money<=0) return;
+          if(game.money*2>20){
+            gained=20;
+          }else{
+            gained = game.money*=2;
+          }
+          game.money+=gained;
+          game.GameRenderer.updateMoney(gained);
+        },
+        price: 4,
+        image: 'tarot_default'
+    },
   {
     name: "Fortuna",
     id: "wheel_of_fortune",
