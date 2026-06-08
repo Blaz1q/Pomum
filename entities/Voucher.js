@@ -6,7 +6,7 @@ export class Voucher extends UpgradeBase {
     super(props);
     this.type = "Voucher";
     this.url = "./images/vouchers/";
-    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.None;
+    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.Voucher;
   }
   translation(){
       const lang = Settings.LANGUAGE || LANGUAGE.PL;

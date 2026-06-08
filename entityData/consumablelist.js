@@ -997,31 +997,31 @@ export const coupons = [
 consumableBlueprints.push(...consumableLvlUp, ...consumbaleEvil);
 consumbaleEvil.forEach((consumable) => {
   consumable.type = "Consumable";
-  consumable.rarity = UPGRADE_RARITY.ConsumableCommon;
+  consumable.rarity = UPGRADE_RARITY.Consumable;
 });
 consumableLvlUp.forEach((consumable) => {
   consumable.type = "Consumable";
-  consumable.rarity = UPGRADE_RARITY.ConsumableCommon;
+  consumable.rarity = UPGRADE_RARITY.Consumable;
 });
 consumableBlueprints.forEach((consumable) => {
   consumable.type = "Consumable";
-  consumable.rarity = UPGRADE_RARITY.ConsumableCommon;
+  consumable.rarity = UPGRADE_RARITY.Consumable;
 });
 consumableGoldBlueprints.forEach((consumable) => {
   consumable.type = "Consumable";
-  consumable.rarity = UPGRADE_RARITY.ConsumableCommon;
+  consumable.rarity = UPGRADE_RARITY.Consumable;
 });
 consumableSilverBlueprints.forEach((consumable) => {
   consumable.type = "Consumable";
-  consumable.rarity = UPGRADE_RARITY.ConsumableCommon;
+  consumable.rarity = UPGRADE_RARITY.Consumable;
 });
 consumableUpgradeBlueprints.forEach((consumable) => {
   consumable.type = "Pact";
-  consumable.rarity = UPGRADE_RARITY.ConsumableRare;
+  consumable.rarity = UPGRADE_RARITY.Pact;
 });
 tarotCards.forEach((card) => {
   card.type = "Tarot";
-  card.rarity = UPGRADE_RARITY.ConsumableCommon;
+  card.rarity = UPGRADE_RARITY.Tarot;
 });
 pomumpackItems.push(...consumableBlueprints);
 consumableList.push(

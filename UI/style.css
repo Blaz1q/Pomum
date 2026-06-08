@@ -1313,6 +1313,34 @@ canvas#glcanvas {
   color: white;
   background-color: #fe4d40;
 }
+.upgrade-wrapper .upgrade-desc .type.consumable,
+.upgrade-wrapper .upgrade-desc .rarity.consumable,
+.boss-wrapper .upgrade-desc .type.consumable,
+.boss-wrapper .upgrade-desc .rarity.consumable {
+  color: white;
+  background-color: #0db619;
+}
+.upgrade-wrapper .upgrade-desc .type.pact,
+.upgrade-wrapper .upgrade-desc .rarity.pact,
+.boss-wrapper .upgrade-desc .type.pact,
+.boss-wrapper .upgrade-desc .rarity.pact {
+  color: white;
+  background-color: #0d4bb6;
+}
+.upgrade-wrapper .upgrade-desc .type.Tarot,
+.upgrade-wrapper .upgrade-desc .rarity.Tarot,
+.boss-wrapper .upgrade-desc .type.Tarot,
+.boss-wrapper .upgrade-desc .rarity.Tarot {
+  color: black;
+  background-color: #eec90f;
+}
+.upgrade-wrapper .upgrade-desc .type.voucher,
+.upgrade-wrapper .upgrade-desc .rarity.voucher,
+.boss-wrapper .upgrade-desc .type.voucher,
+.boss-wrapper .upgrade-desc .rarity.voucher {
+  color: white;
+  background-color: #ee340f;
+}
 .upgrade-wrapper .upgrade-desc .type.desc-negative,
 .upgrade-wrapper .upgrade-desc .rarity.desc-negative,
 .boss-wrapper .upgrade-desc .type.desc-negative,
@@ -1739,6 +1767,26 @@ canvas#glcanvas {
 .tile .upgrade-desc .rarity.rare {
   color: white;
   background-color: #fe4d40;
+}
+.tile .upgrade-desc .type.consumable,
+.tile .upgrade-desc .rarity.consumable {
+  color: white;
+  background-color: #0db619;
+}
+.tile .upgrade-desc .type.pact,
+.tile .upgrade-desc .rarity.pact {
+  color: white;
+  background-color: #0d4bb6;
+}
+.tile .upgrade-desc .type.Tarot,
+.tile .upgrade-desc .rarity.Tarot {
+  color: black;
+  background-color: #eec90f;
+}
+.tile .upgrade-desc .type.voucher,
+.tile .upgrade-desc .rarity.voucher {
+  color: white;
+  background-color: #ee340f;
 }
 .tile .upgrade-desc .type.desc-negative,
 .tile .upgrade-desc .rarity.desc-negative {

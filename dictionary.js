@@ -90,15 +90,25 @@ export const UPGRADE_RARITY = {
         weight: 6, 
         class: 'rare' 
     },
-    ConsumableCommon: { 
-        display: 'Common', 
-        weight: 1, 
-        class: 'common' 
+    Consumable:{
+        display: 'Consumable',
+        weight: 1,
+        class: 'consumable'
     },
-    ConsumableRare: { 
-        display: 'Rare', 
-        weight: 0.7, 
-        class: 'rare' 
+    Tarot: {
+        display: 'Tarot',
+        weight: 1,
+        class: 'Tarot'
+    },
+    Pact: {
+        display: 'Pact',
+        weight: 1,
+        class: 'pact'
+    },
+    Voucher: {
+        display: 'Voucher',
+        weight: 1,
+        class: 'voucher'
     },
     PomumPackCommon: { 
         display: 'Common', 

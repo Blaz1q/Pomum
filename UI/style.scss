@@ -158,6 +158,22 @@ $button-hover-dark: #a18787;
       color: white;
       background-color: $rarity-rare;
     }
+    &.consumable {
+      color: white;
+      background-color: #0db619;
+    }
+    &.pact {
+      color: white;
+      background-color: #0d4bb6;
+    }
+    &.Tarot{
+      color: black;
+      background-color: #eec90f;
+    }
+    &.voucher{
+      color: white;
+      background-color: #ee340f;
+    }
     &.desc-negative {
       color: black;
       background-color: #00d0ff

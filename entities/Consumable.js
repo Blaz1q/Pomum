@@ -6,7 +6,7 @@ export class Consumable extends UpgradeBase {
     super(props);
     this.type = props.type ? props.type : "Consumable";
     this.url = "./images/consumables/";
-    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.ConsumableCommon;
+    this.rarity = props.rarity ? props.rarity : UPGRADE_RARITY.Consumable;
     this.negative = false;
     this.bought = false;
   }
