@@ -476,6 +476,7 @@ export class Game {
             this.upgrades.push(upgrade);
             upgrade.apply(this);
             this.GameRenderer.displayPlayerUpgrades();
+            //upgrade.dragHandler.buyTransition(document.getElementById("player-upgrades-container"));
             this.emit(GAME_TRIGGERS.onUpgradesChanged);
         } else if (upgrade instanceof Consumable) {
             if (upgrade.negative) this.maxConsumables += 1;

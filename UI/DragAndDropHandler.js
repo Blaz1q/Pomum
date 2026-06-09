@@ -232,7 +232,61 @@ if (now - this.lastSwapTime > this.swapCooldown) {
     this.lastMouseX = this.currentMouseX;
     this.animationFrameId = requestAnimationFrame(() => this.update());
   }
+  buyTransition(newContainer) {
+  // 1. Zabezpieczenie pętli
+  this.stopUpdateLoop();
 
+  // 2. Pobieramy AKTUALNĄ, absolutną pozycję karty na ekranie, zanim cokolwiek zmienimy
+  const rectBefore = this.wrapper.getBoundingClientRect();
+
+  // 3. Przepinamy kartę w DOM do kontenera gracza (Flexbox natychmiast wylicza nowe miejsce)
+  newContainer.appendChild(this.wrapper);
+
+  // 4. Pobieramy nową pozycję bazy (czyli tam, gdzie Flexbox chce, żeby karta była)
+  const rectAfter = this.wrapper.getBoundingClientRect();
+
+  // 5. OBLIČZENIE KOREKTY LERPA
+  // Chcemy, żeby karta fizycznie została w starym miejscu, więc jej startowy LERP 
+  // w nowym układzie musi wynosić dokładnie tyle, ile brakowało staremu miejscu do nowego.
+  this.lerpX = rectBefore.left - rectAfter.left;
+  this.lerpY = rectBefore.top - rectAfter.top;
+  this.lerpInitialized = true;
+
+  // Ustawiamy nową bazę dla logiki myszki (na wypadek, gdyby gracz złapał kartę w locie)
+  this.baseX = rectAfter.left;
+  this.baseY = rectAfter.top;
+
+  // 6. Wstrzykujemy skorygowane zmienne do CSS, żeby uniknąć mignięcia (flicker)
+  this.wrapper.style.setProperty('--drag-x', `${this.lerpX}px`);
+  this.wrapper.style.setProperty('--drag-y', `${this.lerpY}px`);
+  this.wrapper.style.setProperty('--drag-tilt', `0deg`);
+
+  // Przygotowanie stylów do lotu
+  this.wrapper.style.transition = "none";
+  this.wrapper.classList.add("dragging"); // dodajemy klasę, żeby zachować z-index itp.
+  this.wrapper.style.zIndex = 1000;
+
+  // 7. RUCH DO DOCELOWEGO MIEJSCA FLEXBOXA
+  // Ponieważ docelowe miejsce w nowym kontenerze to po prostu transform: translate(0, 0),
+  // możemy użyć Twojej metody moveTo(), kierując ją na punkt (0, 0) w przestrzeni LERPa.
+  
+  // Mały hack: Twoje moveTo potrzebuje globalnych X i Y, więc podajemy jej globalną pozycję nowej bazy
+  this.isAutoMoving = true;
+  this.dragStarted = true;
+
+  this.startX = this.lerpX;
+  this.startY = this.lerpY;
+
+  // Celujemy w 0, bo transform(0,0) to idealne ułożenie we Flexboxie gracza
+  this.autoMoveTargetX = 0; 
+  this.autoMoveTargetY = 0;
+
+  this.autoMoveDuration = 400; // Czas dolotu karty do ekwipunku gracza w ms
+  this.autoMoveStartTime = performance.now();
+
+  // Odpalamy pętlę - Twoje update() zajmie się resztą (wygładzaniem i rotacją)!
+  this.startUpdateLoop();
+}
   onMouseUp(e) {
     this.stopUpdateLoop();
     if (!this.isDragging) return;
