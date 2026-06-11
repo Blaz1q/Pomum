@@ -1,4 +1,4 @@
-import { MODIFIERS, UPGRADE_RARITY, Style, GAME_TRIGGERS, UPGRADE_STATES, Settings } from "../dictionary.js";
+import { MODIFIERS, UPGRADE_RARITY, Style, GAME_TRIGGERS, UPGRADE_STATES, Settings, TYPES } from "../dictionary.js";
 import { t } from "../entityData/translations.js";
 import { fadeInAndBalatro, initBalatroEffect, clearAnimation } from "../utils/animate_text.js";
 import { DragAndDropHandler } from "./DragAndDropHandler.js";
@@ -529,10 +529,10 @@ handleDblClick(e) {
             }
           }
         this.clearTimer();
-        if (upgrade.type == "Voucher") {
+        if (upgrade.type == TYPES.Voucher) {
           this.removeButtons();
           game.GameRenderer.dissolveAndRemove(wrapper, 1000);
-        } else {
+        } else if(upgrade.type==TYPES.Booster){
           game.GameRenderer.fadeOutAndRemove(wrapper);
         }
         //shopWrapper.remove();

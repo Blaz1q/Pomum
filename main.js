@@ -475,14 +475,19 @@ export class Game {
         if (upgrade.type == "Upgrade") {
             this.upgrades.push(upgrade);
             upgrade.apply(this);
-            this.GameRenderer.displayPlayerUpgrades();
-            //upgrade.dragHandler.buyTransition(document.getElementById("player-upgrades-container"));
+            //this.GameRenderer.displayPlayerUpgrades();
+            upgrade.UpgradeRenderer.update();
+            upgrade.UpgradeRenderer.dragHandler.buyTransition(document.getElementById("player-upgrades-container"));
+            this.GameRenderer.displayUpgradesCounter();
             this.emit(GAME_TRIGGERS.onUpgradesChanged);
         } else if (upgrade instanceof Consumable) {
             if (upgrade.negative) this.maxConsumables += 1;
             upgrade.bought = true;
             this.consumables.push(upgrade);
-            this.GameRenderer.displayPlayerConsumables();
+            upgrade.UpgradeRenderer.update();
+            upgrade.UpgradeRenderer.dragHandler.buyTransition(document.getElementById("player-consumables-container"));
+            this.GameRenderer.displayConsumablesCounter();
+            //this.GameRenderer.displayPlayerConsumables();
         }
         else if (upgrade.type == "ConsumablePack") {
             //this.emit(GAME_TRIGGERS.onBoosterBuy, upgrade);

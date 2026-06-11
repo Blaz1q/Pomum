@@ -260,7 +260,8 @@ if (now - this.lastSwapTime > this.swapCooldown) {
   this.wrapper.style.setProperty('--drag-x', `${this.lerpX}px`);
   this.wrapper.style.setProperty('--drag-y', `${this.lerpY}px`);
   this.wrapper.style.setProperty('--drag-tilt', `0deg`);
-
+  this.wrapper.classList.remove("SelectedUpgrade");
+  this.wrapper.style.setProperty('--select-y', '0px');
   // Przygotowanie stylów do lotu
   this.wrapper.style.transition = "none";
   this.wrapper.classList.add("dragging"); // dodajemy klasę, żeby zachować z-index itp.
@@ -281,7 +282,7 @@ if (now - this.lastSwapTime > this.swapCooldown) {
   this.autoMoveTargetX = 0; 
   this.autoMoveTargetY = 0;
 
-  this.autoMoveDuration = 400; // Czas dolotu karty do ekwipunku gracza w ms
+  this.autoMoveDuration = 150; // Czas dolotu karty do ekwipunku gracza w ms
   this.autoMoveStartTime = performance.now();
 
   // Odpalamy pętlę - Twoje update() zajmie się resztą (wygładzaniem i rotacją)!
