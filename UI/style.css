@@ -722,40 +722,79 @@ canvas#glcanvas {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: light-dark(#ffffff, #2e2e2e);
+  background-image: url("../images/tiles/default.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 50px 50px;
   cursor: grab;
-  border-radius: 10px;
-  transition: transform 200ms ease, opacity 300ms ease, background 200ms ease;
+  position: relative;
+  transition: transform 200ms ease, opacity 300ms ease, box-shadow 200ms ease;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+.game .right-panel #body div::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  opacity: 0;
+  transition: background-color 200ms ease, opacity 200ms ease;
+  -webkit-mask-image: url("../images/tiles/default.png");
+          mask-image: url("../images/tiles/default.png");
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  mix-blend-mode: normal;
+  z-index: 1;
+}
+.game .right-panel #body div > * {
+  z-index: 2;
+  position: relative;
 }
 .game .right-panel #body div.gold {
-  background-color: gold;
+  background-image: url("../images/tiles/gold.png");
 }
 .game .right-panel #body div.silver {
-  background-color: silver;
+  background-image: url("../images/tiles/silver.png");
 }
-.game .right-panel #body div.debuffed {
-  background-color: rgba(255, 0, 0, 0.403);
+.game .right-panel #body div.wild {
+  background-image: url("../images/tiles/wild.png");
 }
-.game .right-panel #body div.debuffed.gold {
-  background-color: rgba(255, 187, 0, 0.403);
+.game .right-panel #body div.glass {
+  background-image: url("../images/tiles/glass.png");
 }
-.game .right-panel #body div.debuffed.silver {
-  background-color: rgba(255, 153, 153, 0.403);
+.game .right-panel #body div.mult {
+  background-image: url("../images/tiles/mult.png");
+}
+.game .right-panel #body div.chip {
+  background-image: url("../images/tiles/chip.png");
+}
+.game .right-panel #body div.debuffed::after {
+  background-color: rgba(255, 73, 73, 0.5137254902);
+  opacity: 1;
 }
 .game .right-panel #body div.fade {
   opacity: 0;
 }
 .game .right-panel #body div.selected {
-  background: #b1ff09;
   color: white;
   font-weight: bold;
 }
-.game .right-panel #body div.selected:hover {
-  background-color: #ffa749;
+.game .right-panel #body div.selected::after {
+  background-color: rgba(255, 167, 73, 0.5137254902);
+  opacity: 1;
+}
+.game .right-panel #body div.selected:hover::after {
+  background-color: rgba(255, 154, 47, 0.6039215686);
 }
 .game .right-panel #body div:hover {
-  background: #ffe6a7;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+.game .right-panel #body div:hover::after {
+  background-color: rgba(255, 167, 73, 0.5529411765);
+  opacity: 1;
 }
 .game .right-panel #body div.triggered {
   animation: triggeredCard ease-in-out;

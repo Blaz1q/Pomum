@@ -55,13 +55,33 @@ export class Matches {
     
     // 3. Dodaj normalne dopasowania (owoce), które mogły nie zostać trafione przez bomby
     const boardMatches = this.findMatches() || [];
+    const boardMatchesKeys = new Set(boardMatches.map(m => getKey(m)));
     boardMatches.forEach(m => {
         if (!visited.has(getKey(m))) {
             results.push(m);
             visited.add(getKey(m));
         }
     });
+    for (let y = 0; y < this.matrixsize; y++) {
+        for (let x = 0; x < this.matrixsize; x++) {
+            const tile = this.game.board[y][x];
+            if (tile && tile.props.modifier === MODIFIERS.Glass) {
+                const tileKey = getKey(tile);
 
+                if (boardMatchesKeys.has(tileKey)) {
+                    // Sytuacja A: Glass brał udział w naturalnym matchu owoców
+                    tile.props.isNaturalGlassMatch = true;
+                } else {
+                    // Sytuacja B: Glass był na planszy podczas kaskady -> niszczy się automatycznie
+                    tile.props.isCascadeGlass = true;
+                    if (!visited.has(tileKey)) {
+                        results.push(tile);
+                        visited.add(tileKey);
+                    }
+                }
+            }
+        }
+    }
     return results;
 }
 
@@ -192,11 +212,21 @@ getNeighborsForSpecial(tile) {
                 // Skip, jeśli to bomba która ma jeszcze detonacje
                 let isStillActive = this.game.activeExplosions.some(e => e.x === m.x && e.y === m.y);
                 if (isStillActive) continue;
+                if (tile.props.isCascadeGlass) {
+                    // Glass zniszczony kaskadą -> usuwamy z planszy i natychmiast skipujemy (brak punktów/multów)
+                    this.game.board[m.y][m.x] = null;
+                    continue;
+                }
 
+                if (tile.props.isNaturalGlassMatch) {
+                    // Glass zmatchowany naturalnie -> mnożnik * 2
+                    this.game.mult *= 2;
+                }
                 // Logika złota/srebra/punktów
                 if (tile.props.modifier == MODIFIERS.Gold) addmoney++;
                 if (tile.props.modifier == MODIFIERS.Silver) this.game.mult *= 1.5;
-
+                if (tile.props.modifier == MODIFIERS.Chip) this.game.tempscore+=50;
+                if (tile.props.modifier == MODIFIERS.Mult) this.game.mult+=10;
                 let type = tile.icon;
                 if (!groups[type]) groups[type] = { mult: 0, added: false };
                 
@@ -314,79 +344,131 @@ getNeighborsForSpecial(tile) {
         }
     }
     findMatches() {
-        const board = this.game.board;
-        const size = board.length;
-        const matchedTiles = new Set();
+    const board = this.game.board;
+    const size = board.length;
+    const matchedTiles = new Set();
 
-        // Pomocnicza funkcja sprawdzająca dopasowania w linii
-        const checkLine = (line) => {
-            let count = 1;
-            for (let i = 1; i <= line.length; i++) {
-                const curr = line[i];
-                const prev = line[i - 1];
+    // Pomocnicza funkcja sprawdzająca dopasowania w linii
+    const checkLine = (line) => {
+        let count = 1;
+        
+        // Zmienna trzymająca "wiodącą" ikonę dla aktualnego zestawu (combo)
+        let matchIcon = null; 
+        
+        // Inicjalizacja pierwszej ikony w linii, jeśli to owoc
+        if (line[0] && line[0].type === TYPES.Fruit) {
+            matchIcon = line[0].props.modifier === MODIFIERS.Wild ? null : line[0].icon;
+        }
 
-                if (curr && prev &&
-                    curr.type === TYPES.Fruit &&
-                    prev.type === TYPES.Fruit &&
-                    curr.icon === prev.icon) {
-                    count++;
+        for (let i = 1; i <= line.length; i++) {
+            const curr = line[i];
+            const prev = line[i - 1];
+
+            // Funkcja pomocnicza sprawdzająca, czy dwa kafelki pasują do siebie (biorąc pod uwagę Wild)
+            const isMatch = () => {
+                if (!curr || !prev) return false;
+                if (curr.type !== TYPES.Fruit || prev.type !== TYPES.Fruit) return false;
+
+                const currIsWild = curr.props.modifier === MODIFIERS.Wild;
+                const prevIsWild = prev.props.modifier === MODIFIERS.Wild;
+
+                // Jeśli oba są wildami, to pasują
+                if (currIsWild && prevIsWild) return true;
+
+                // Jeśli obecny to Wild, dopasowuje się do dotychczasowej ikony serii lub ikony poprzednika
+                if (currIsWild) {
+                    return true;
+                }
+                
+                // Jeśli poprzedni był Wild, sprawdzamy z zapisaną ikoną serii 
+                // (lub jeśli serii jeszcze nie zdefiniowano, to znaczy że zaczęliśmy od Wilda i teraz ustalamy ikonę)
+                if (prevIsWild) {
+                    if (matchIcon === null) {
+                        matchIcon = curr.icon; // Dziki kafelek przyjmuje ikonę obecnego owocu
+                    }
+                    return curr.icon === matchIcon;
+                }
+
+                // Standardowe porównanie zwykłych kafelków
+                return curr.icon === prev.icon;
+            };
+
+            if (isMatch()) {
+                count++;
+                // Aktualizujemy matchIcon, jeśli spotkaliśmy normalny owoc, a wcześniej mieliśmy tylko Wildy
+                if (matchIcon === null && curr && curr.props.modifier !== MODIFIERS.Wild) {
+                    matchIcon = curr.icon;
+                }
+            } else {
+                if (count >= 3) {
+                    for (let k = 1; k <= count; k++) {
+                        matchedTiles.add(line[i - k]);
+                    }
+                }
+                count = 1;
+                // Resetujemy ikonę dla nowej serii
+                if (curr && curr.type === TYPES.Fruit) {
+                    matchIcon = curr.props.modifier === MODIFIERS.Wild ? null : curr.icon;
                 } else {
-                    if (count >= 3) {
-                        for (let k = 1; k <= count; k++) {
-                            matchedTiles.add(line[i - k]);
-                        }
-                    }
-                    count = 1;
-                }
-            }
-        };
-
-        // Sprawdzanie poziomów (Horizontal)
-        for (let y = 0; y < size; y++) {
-            checkLine(board[y]);
-        }
-
-        // Sprawdzanie pionów (Vertical)
-        for (let x = 0; x < size; x++) {
-            const column = [];
-            for (let y = 0; y < size; y++) {
-                column.push(board[y][x]);
-            }
-            checkLine(column);
-        }
-        for (let y = 0; y < size - 1; y++) {
-            for (let x = 0; x < size - 1; x++) {
-                const topLeft = board[y][x];
-                const topRight = board[y][x + 1];
-                const bottomLeft = board[y + 1][x];
-                const bottomRight = board[y + 1][x + 1];
-
-                // Sprawdzamy, czy wszystkie 4 istnieją i są owocami
-                if (topLeft && topRight && bottomLeft && bottomRight &&
-                    topLeft.type === TYPES.Fruit &&
-                    topRight.type === TYPES.Fruit &&
-                    bottomLeft.type === TYPES.Fruit &&
-                    bottomRight.type === TYPES.Fruit) {
-
-                    // Sprawdzamy, czy wszystkie mają tę samą ikonę
-                    const icon = topLeft.icon;
-                    if (topRight.icon === icon && 
-                        bottomLeft.icon === icon && 
-                        bottomRight.icon === icon) {
-                        
-                        matchedTiles.add(topLeft);
-                        matchedTiles.add(topRight);
-                        matchedTiles.add(bottomLeft);
-                        matchedTiles.add(bottomRight);
-                    }
+                    matchIcon = null;
                 }
             }
         }
+    };
 
-        // Set automatycznie dba o unikalność referencji obiektów, 
-        // więc nie potrzebujemy ręcznej deduplikacji po kluczu `${x},${y}`.
-        return Array.from(matchedTiles);
+    // Sprawdzanie poziomów (Horizontal)
+    for (let y = 0; y < size; y++) {
+        checkLine(board[y]);
     }
+
+    // Sprawdzanie pionów (Vertical)
+    for (let x = 0; x < size; x++) {
+        const column = [];
+        for (let y = 0; y < size; y++) {
+            column.push(board[y][x]);
+        }
+        checkLine(column);
+    }
+
+    // Sprawdzanie kwadratów 2x2
+    for (let y = 0; y < size - 1; y++) {
+        for (let x = 0; x < size - 1; x++) {
+            const tiles = [
+                board[y][x],     // topLeft
+                board[y][x + 1], // topRight
+                board[y + 1][x], // bottomLeft
+                board[y + 1][x + 1] // bottomRight
+            ];
+
+            // Sprawdzamy, czy wszystkie 4 istnieją i są owocami
+            const allFruits = tiles.every(tile => tile && tile.type === TYPES.Fruit);
+
+            if (allFruits) {
+                // Szukamy pierwszej ikony, która NIE jest Wildem, żeby mieć punkt odniesienia
+                const nonWildTile = tiles.find(tile => tile.props.modifier !== MODIFIERS.Wild);
+                
+                let isQuadMatch = false;
+
+                if (!nonWildTile) {
+                    // Wszystkie 4 kafelki to Wildy! To automatyczny match.
+                    isQuadMatch = true;
+                } else {
+                    const targetIcon = nonWildTile.icon;
+                    // Każdy kafelek musi być albo Wildem, albo mieć taką samą ikonę jak targetIcon
+                    isQuadMatch = tiles.every(tile => 
+                        tile.props.modifier === MODIFIERS.Wild || tile.icon === targetIcon
+                    );
+                }
+
+                if (isQuadMatch) {
+                    tiles.forEach(tile => matchedTiles.add(tile));
+                }
+            }
+        }
+    }
+
+    return Array.from(matchedTiles);
+}
     isThreeLine(matches) {
         if (matches.length != 3) return false;
         // group by row and column

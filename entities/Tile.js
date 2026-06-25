@@ -111,6 +111,10 @@ export class Tile {
         // 3. Apply Modifier Classes (Mirroring render)
         if (this.props.modifier === MODIFIERS.Gold) g.classList.add("gold");
         if (this.props.modifier === MODIFIERS.Silver) g.classList.add("silver");
+        if(this.props.modifier === MODIFIERS.Wild) g.classList.add("wild");
+        if(this.props.modifier === MODIFIERS.Mult) g.classList.add("mult");
+        if(this.props.modifier === MODIFIERS.Chip) g.classList.add("chip");
+        if(this.props.modifier === MODIFIERS.Glass) g.classList.add("glass");
         if (this.props.debuffed) g.classList.add("debuffed");
 
         return g;
@@ -174,14 +178,30 @@ export class Tile {
         });
         const isGold = this.props.modifier == MODIFIERS.Gold;
         const isSilver = this.props.modifier == MODIFIERS.Silver;
+        const isWild = this.props.modifier == MODIFIERS.Wild;
+        const isChip = this.props.modifier == MODIFIERS.Chip;
+        const isMult = this.props.modifier == MODIFIERS.Mult;
+        const isGlass = this.props.modifier == MODIFIERS.Glass;
         const isDebuffed = this.props.debuffed;
         element.style.transform = "translate(0,0)";
         element.style.transition = "";
         if (isGold) {
             element.classList.add("gold");
         }
+        if(isWild) {
+            element.classList.add("wild");
+        }
         if (isSilver) {
             element.classList.add("silver");
+        }
+        if(isMult){
+            element.classList.add("mult");
+        }
+        if(isChip){
+            element.classList.add("chip");
+        }
+        if(isGlass){
+            element.classList.add("glass");
         }
         if (isDebuffed) {
             element.classList.add("debuffed")

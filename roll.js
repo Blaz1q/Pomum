@@ -133,9 +133,13 @@ export class Roll {
 
     const isSilver = game.rand() * 100 < silverChance;
     const isGold = game.rand() * 100 < goldChance;
-
+    //const isGlass = game.rand() < 0.2;
+    //const wild = game.rand() < 0.1;
+    
     if (isSilver) modifier = MODIFIERS.Silver;
     if (isGold) modifier = MODIFIERS.Gold; // gold nadpisuje silver jeśli oba trafione
+    //if (isGlass) modifier = MODIFIERS.Glass;
+    //if (wild) modifier = MODIFIERS.tile.Wild;
     return modifier;
   }
   Stickers(up) {

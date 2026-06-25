@@ -36,7 +36,10 @@ export const MODIFIERS = {
     Chip: "chip",
     Negative: "negative",
     Polychrome: "polychrome",
-    Mult: "mult"
+    Mult: "mult",
+    Wild: "Wild",
+    Stone: "Stone",
+    Lucky: "Lucky"
 };
 export const STAGES = {
     Game: "game",

@@ -946,62 +946,126 @@ canvas#glcanvas {
       box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
 
       div {
-        font-size: calc($gap / 2);
-        height: $cellsize;
-        width: $cellsize;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: light-dark($tile-bg, $tile-bg-dark);
-        cursor: grab;
-        border-radius: 10px;
-        transition: transform 200ms ease, opacity 300ms ease, background 200ms ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  // --- BASE TILE STYLES (Keep existing) ---
+  font-size: calc($gap / 2);
+  height: $cellsize;
+  width: $cellsize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  // Set the base background color and the DEFAULT image
+  //background-color: light-dark($tile-bg, $tile-bg-dark);
+  background-image: url('../images/tiles/default.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: $cellsize $cellsize;
+  
+  cursor: grab;
+  position: relative; // REQUIRED: For the absolute pseudo-element to align
+  
+  transition: transform 200ms ease, opacity 300ms ease, box-shadow 200ms ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden; // Keeps the overlay contained
 
-        &.gold {
-          background-color: gold;
-        }
+  // --- THE TINTING OVERLAY (The Magic) ---
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent; // Start transparent
+    opacity: 0; // Completely hidden
+    transition: background-color 200ms ease, opacity 200ms ease;
+    
+    // Choose the blend mode that looks best with your graphics.
+    // 'overlay' tints midtones and preserves shadows/highlights.
+    // 'screen' makes things brighter and adds color.
+    // 'color' only changes hue/saturation, preserving luminosity.
+    mask-image: url('../images/tiles/default.png');
+    -webkit-mask-size: cover;
+            mask-size: cover;
+    mix-blend-mode:normal; 
+    z-index: 1; // Put overlay on top of the background image
+  }
 
-        &.silver {
-          background-color: silver;
-        }
+  // Ensure content (if any, like text) stays above the overlay
+  > * {
+    z-index: 2;
+    position: relative;
+  }
 
-        &.debuffed {
-          background-color: rgba(255, 0, 0, 0.403);
+  // --- OVERRIDE IMAGES FOR MODIFIERS (Keep existing) ---
+  &.gold {
+    background-image: url('../images/tiles/gold.png');
+  }
 
-          &.gold {
-            background-color: rgba(255, 187, 0, 0.403);
-          }
+  &.silver {
+    background-image: url('../images/tiles/silver.png');
+  }
+  &.wild{
+    background-image: url('../images/tiles/wild.png');
+  }
+  &.glass{
+    background-image: url('../images/tiles/glass.png');
+  }
+  &.mult{
+    background-image: url('../images/tiles/mult.png');
+  }
+  &.chip{
+    background-image: url('../images/tiles/chip.png');
+  }
 
-          &.silver {
-            background-color: rgba(255, 153, 153, 0.403);
-          }
-        }
+  // --- DEBUFFED STATE (Modified) ---
+  &.debuffed {
+    &::after {
+      background-color: #ff494983;
+      opacity: 1;
+    }
+  }
 
-        &.fade {
-          opacity: 0;
-        }
+  // --- FADE STATE (Keep existing) ---
+  &.fade {
+    opacity: 0;
+  }
 
-        &.selected {
-          background: #b1ff09;
-          color: white;
-          font-weight: bold;
+  // --- SELECTED STATE (Tints the image) ---
+  &.selected {
+    color: white; // Keep text color change
+    font-weight: bold;
 
-          &:hover {
-            background-color: #ffa749;
-          }
-        }
+    // Activate and set the color of the overlay
+    &::after {
+      background-color: #ffa74983;
+      opacity: 1;
+    }
 
-        &:hover {
-          //transform: scale(1.15);
-          background: $tile-hover;
-        }
+    // Handle hover while selected
+    &:hover::after {
+      background-color: #ff9a2f9a; // Slightly different tint on hover while selected
+    }
+  }
 
-        &.triggered {
-          animation: triggeredCard ease-in-out;
-          animation-duration: 0.3s;
-        }
-      }
+  // --- HOVER STATE (Tints the image) ---
+  &:hover {
+    // transform: scale(1.05); // Consider adding a subtle scale
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    
+    // Activate the overlay tint on hover
+    &::after {
+      background-color: #ffa7498d;
+      opacity: 1;
+    }
+  }
+
+  // --- TRIGGERED STATE (Keep existing) ---
+  &.triggered {
+    animation: triggeredCard ease-in-out;
+    animation-duration: 0.3s;
+  }
+}
     }
 
     #shop {

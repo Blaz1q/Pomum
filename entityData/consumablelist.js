@@ -662,9 +662,37 @@ const tarotCards = [
     price: 4,
     image: "fortuna",
   },
-  /*{
-        name: "Sprawiedliwość"
-    },*/
+  {
+    name: "Sprawiedliwość",
+    descriptionfn(game){
+      return `Zmienia 10 losowych kafelków na ${Style.Highlight("Wild")}`;
+    },
+        effect(game){
+          let usedCoords = new Set(); // Przechowujemy klucze tekstowe (np. "2,5")
+          let results = []; // Tablica wynikowa ze współrzędnymi
+          let randomnum = Math.floor(Math.random() * 20) + 1;
+          while (results.length < randomnum) {
+            let x = Math.floor(Math.random() * game.matrixsize);
+            let y = Math.floor(Math.random() * game.matrixsize);
+            let key = `${x},${y}`;
+
+            if (!usedCoords.has(key)) {
+              usedCoords.add(key);
+              results.push({ x, y });
+            }
+          }
+          results.forEach(coords => {
+            const tile = game.board[coords.x][coords.y];
+            tile.props.modifier = MODIFIERS.Wild;
+            tile.triggerAnimation(game);
+          });
+        },
+        canUse(game) {
+        return game.stage != STAGES.Shop && game.locked == false;
+      },
+      price: 4,
+      image: 'tarot_default'
+  },
   {
     name: "Szubieniczyk",
     id: "the_hanged_man",
@@ -868,15 +896,44 @@ const tarotCards = [
       },
       price: 4,
       image: "sun",
-    }
+    },
     /*
     {
         name: "Sędzia"
-    },
+    },*/
     {
-        name: "Świat"
+        name: "Świat",
+        id:"the_world",
+        descriptionfn(){
+          return `Ulepsza od ${Style.Chance(`10 do 30`)} kafelków na ${Style.Highlight("losowy ulepszony kafelek")}`;
+        },
+        effect(game){
+          let usedCoords = new Set(); // Przechowujemy klucze tekstowe (np. "2,5")
+          let results = []; // Tablica wynikowa ze współrzędnymi
+          let randomnum = Math.floor(Math.random() * 20) + 10;
+          let modifierList = [MODIFIERS.Chip,MODIFIERS.Gold,MODIFIERS.Mult,MODIFIERS.Silver,MODIFIERS.Wild,MODIFIERS.Glass];
+          while (results.length < randomnum) {
+            let x = Math.floor(Math.random() * game.matrixsize);
+            let y = Math.floor(Math.random() * game.matrixsize);
+            let key = `${x},${y}`;
+
+            if (!usedCoords.has(key)) {
+              usedCoords.add(key);
+              results.push({ x, y });
+            }
+          }
+          results.forEach(coords => {
+            const tile = game.board[coords.x][coords.y];
+            tile.props.modifier = modifierList[Math.floor(Math.random()*modifierList.length)];
+            tile.triggerAnimation(game);
+          });
+        },
+        canUse(game) {
+        return game.stage != STAGES.Shop && game.locked == false;
+      },
+      price: 4,
+      image: "tarot_default",
     }
-        */,
 ];
 function silverDesc(fruit) {
   return `${Style.Chance(`+1.5%`)} szansa na Silver dla ${fruit.icon}`;
