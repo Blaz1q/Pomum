@@ -329,7 +329,7 @@ displayTempScore() {
     document.getElementById("menu").style.display = "none";
   }
   hideGame() {
-    document.getElementById("body").style.display = "none";
+    document.getElementById("game-board").style.display = "none";
   }
   showGameContainer() {
     document.getElementsByClassName("game")[0].style.display = "flex";
@@ -339,7 +339,7 @@ displayTempScore() {
   }
   showGame() {
     //this.refreshUseButtons();
-    document.getElementById("body").style.display = "grid";
+    document.getElementById("game-board").style.display = "flex";
     if (this.game.stage != STAGES.Boss) {
       const palettes = Object.values(GAMECOLORS);
       const randomPalette =

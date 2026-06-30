@@ -86,6 +86,9 @@ export const translations = {
       [MODIFIERS.Mult]: {
         name: "Mult",
         description: `Daje ${Style.Mult('+10 Mult')} przy zliczaniu.`
+      },
+      debuffed: {
+        description: `Nie daje punktów.`
       }
     },
     consumables: {
@@ -872,6 +875,9 @@ export const translations = {
       [MODIFIERS.Mult]: {
         name: "Mult",
         description: `Gives ${Style.Mult('+10 Mult')} when scoring.`
+      },
+      debuffed: {
+        description: `Nie daje punktów.`
       }
     },
     bosses: {

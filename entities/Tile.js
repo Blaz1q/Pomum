@@ -1,12 +1,13 @@
 console.log("Tile");
-import { GAME_TRIGGERS, MODIFIERS, Settings, TYPES } from "../dictionary.js";
+import { GAME_TRIGGERS, MODIFIERS, Settings, Style, TYPES } from "../dictionary.js";
+import { t } from "../entityData/translations.js";
 export class Tile {
     constructor(props = {}) {
+        this.url = `./images/tiles/`;
         if (props instanceof Tile) {
             this.constructorTILE(props);
             return;
-        }
-        this.url = `./images/tiles/`;
+        }        
         this.imagename = props.image ?? "Unknown";
         this.icon = props.icon ?? "X";
         this.type = props.type ?? "Unknown"; // "fruit", "dynamite", "bomb"
@@ -32,8 +33,7 @@ export class Tile {
         this.type = Tile.type;
         this.x = Tile.x;
         this.y = Tile.y;
-        this.imagename = Tile.imagename;
-        console.log(Tile);
+        this.imagename = Tile.imagename ?? "Unknown";
         this.props = {
             debuffed: Tile.props.debuffed,
             detonations: Tile.props.detonations,
@@ -131,6 +131,90 @@ export class Tile {
               rendered.classList.remove("triggered");
             }, time);
     }
+    createDescription() {
+        // Pobieramy dane bezpośrednio z właściwości kafra (Tile)
+        const modifier = this.props.modifier;
+        const upgrade = this.props.upgrade;
+        const isDebuffed = this.props.debuffed;
+
+        // Główny kontener opisu
+        const container = document.createElement('div');
+        container.className = 'description-wrapper';
+
+        // 1. Sekcja TYTUŁU (Nazwa typu kafla, np. Fruit, Bomb, Dynamite)
+        const title = document.createElement('div');
+        title.className = 'title';
+        // Zabezpieczenie na wypadek braku typu i formatowanie (np. pierwsza litera duża)
+        const typeName = this.type ? this.type.charAt(0).toUpperCase() + this.type.slice(1) : "Unknown Tile";
+        title.textContent = `${this.icon} (Lvl ${upgrade.level})`;
+        container.appendChild(title);
+
+        // 2. Sekcja TREŚCI (Statystyki podstawowe kafla)
+        const content = document.createElement('div');
+        content.className = 'content';
+
+        const descP = document.createElement('p');
+        let baseStats = `Po zniszczeniu daje<hr>${Style.Score("+"+upgrade.score+" "+t("ui.pts",Settings.LANGUAGE))}`;
+        if (upgrade.mult > 0) {
+            baseStats += `<hr>${Style.Mult(" +"+upgrade.mult+" Mult")}`;
+        }
+        baseStats +=`<hr>Szansa: ${Style.Chance(Math.round(this.props.percent*100/100) +"%")}`;
+        descP.innerHTML = baseStats;
+        content.appendChild(descP);
+        container.appendChild(content);
+
+        // 3. Sekcja STOPKI (Modyfikatory i Debuffy)
+        const footer = document.createElement('div');
+        footer.className = 'footer';
+
+        // Obsługa Debuffa
+        if (isDebuffed) {
+            const debuffSpan = document.createElement('div');
+            debuffSpan.className = 'type desc-debuffed';
+            debuffSpan.textContent = 'Debuffed';
+            
+            const descDebuff = document.createElement('p');
+            descDebuff.className = "content text-debuffed";
+            // Funkcja t() zakładam, że jest globalna z Twojego systemu tłumaczeń
+            descDebuff.innerHTML = t(`modifiers.debuffed.description`, Settings.LANGUAGE);
+            footer.appendChild(debuffSpan);
+            footer.appendChild(descDebuff);
+            
+        }
+
+        // Obsługa Modyfikatora (Gold, Silver, Glass itp.)
+        if (modifier && modifier !== MODIFIERS.None) {
+            const modSpan = document.createElement('div');
+            modSpan.className = `type ${modifier.toLowerCase()}`;
+            modSpan.textContent = modifier;
+
+            const descModifier = document.createElement('p');
+            descModifier.className = "content";
+            
+
+            //footer.appendChild(descModifier);
+            footer.appendChild(modSpan);
+        }
+
+        // Dodajemy stopkę tylko, jeśli ma jakąś zawartość
+        if (footer.children.length > 0) {
+            container.appendChild(footer);
+        }
+
+        return container; // Zwraca obiekt DOM
+    }
+
+    hover() {
+        const container = document.getElementById("tile-hover-desc");
+        if (!container) return;
+        
+        // Czyścimy poprzednią zawartość
+        container.innerHTML = "";
+        
+        // Generujemy nowy opis jako element DOM i go dołączamy
+        const descriptionNode = this.createDescription();
+        container.appendChild(descriptionNode);
+    }
     render(game){
         const Tile = this;
         const x = Tile.x;
@@ -152,7 +236,7 @@ export class Tile {
 
         // kliknięcie
         element.addEventListener("click", () => game.handleClick(x, y, element));
-
+        element.addEventListener("mouseover", ()=> this.hover());
         // przeciąganie
         element.draggable = true;
         element.addEventListener("dragstart", (e) => {

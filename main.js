@@ -556,15 +556,10 @@ export class Game {
             total = this.fruits.length;
             const r = Math.floor(this.rand() * total);
             const base = this.fruits[r];
-            return new Tile({
-                icon: base.icon, type: TYPES.Fruit,
-                x: x,
-                y: y,
-                image: base.imagename,
-                modifier: this.roll.tileModifier(base),
-                debuffed: base.props.debuffed,
-                upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
-            });
+            let tile = new Tile(base);
+            tile.x = x;
+            tile.y = y; 
+            return tile;
         }
 
         let r = this.rand() * total;
@@ -572,29 +567,19 @@ export class Game {
             r -= weights[i];
             if (r < 0) {
                 const base = this.fruits[i];
-                return new Tile({
-                    icon: base.icon, type: TYPES.Fruit,
-                    x: x,
-                    y: y,
-                    image: base.imagename,
-                    modifier: this.roll.tileModifier(base),
-                    debuffed: base.props.debuffed,
-                    upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
-                });
+                let tile = new Tile(base);
+                tile.x = x;
+                tile.y = y; 
+                return tile;
             }
         }
 
         // default – pierwszy owoc
         const base = this.fruits[0];
-        return new Tile({
-            icon: base.icon, type: TYPES.Fruit,
-            x: x,
-            y: y,
-            image: base.imagename,
-            modifier: this.roll.tileModifier(base),
-            debuffed: base.props.debuffed,
-            upgrade: { ...base.props.upgrade }  // <- kopiujemy upgrade
-        });
+        let tile = new Tile(base);
+            tile.x = x;
+            tile.y = y; 
+            return tile;
     }
     updateCell(x, y) {
         const idx = y * this.matrixsize + x;

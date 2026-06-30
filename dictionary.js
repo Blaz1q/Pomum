@@ -39,7 +39,8 @@ export const MODIFIERS = {
     Mult: "mult",
     Wild: "Wild",
     Stone: "Stone",
-    Lucky: "Lucky"
+    Lucky: "Lucky",
+    Glass: "Glass"
 };
 export const STAGES = {
     Game: "game",
