@@ -586,4 +586,22 @@ getNeighborsForSpecial(tile) {
         }
         return uniqueTiles;
     }
+    hasWild(payload){
+        let has = false;
+        payload.forEach(tile=>{
+            if(tile.props.modifier==MODIFIERS.Wild){
+                return true;
+            }
+        });
+        return false;
+    }
+    hasIcon(payload,icon){
+        let has = false;
+        payload.forEach(tile=>{
+            if(tile.isFruit(icon)){
+                return true;
+            }
+        });
+        return false;
+    }
 }

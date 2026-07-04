@@ -48,6 +48,9 @@ export class Tile {
             }
         };
     }
+    isFruit(icon){
+        return this.icon==icon||this.props.modifier==MODIFIERS.Wild;
+    }
     get image(){
         return this.url+this.imagename;
     }

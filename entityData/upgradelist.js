@@ -24,9 +24,9 @@ export const upgradeBlueprints = [
     props: () => ({
       score: 0,
       onMatch(payload) {
-        const uniqueFruits = new Set(payload.map(m => m.icon));
-        const hasFruit = uniqueFruits.has(game.fruits[0].icon);
-        if (hasFruit) return UPGRADE_STATES.Failed;
+        const hasWild = game.matchesManager.hasWild(payload);
+        const hasFruit = game.matchesManager.hasIcon(payload,game.fruits[0].icon);
+        if (hasFruit||hasWild) return UPGRADE_STATES.Failed;
         this.props.score += 60;
         return UPGRADE_STATES.Active;
       },
@@ -165,8 +165,8 @@ export const upgradeBlueprints = [
       mult: 0,
       onMatch(matches) {
         let gained = 0;
-        matches.forEach(fruit => {
-            if(fruit.icon == game.fruits[0].icon){
+        matches.forEach(tile => {
+            if(tile.isFruit(game.fruits[0].icon)){
               gained++;
             }
         });
@@ -202,8 +202,8 @@ export const upgradeBlueprints = [
       mult: 0,
       onMatch(matches) {
         let gained = 0;
-        matches.forEach(fruit => {
-            if(fruit.icon == game.fruits[1].icon){
+        matches.forEach(tile => {
+            if(tile.isFruit(game.fruits[1].icon)){
               gained++;
             }
         });
@@ -243,8 +243,8 @@ export const upgradeBlueprints = [
       mult: 0,
       onMatch(matches) {
         let gained = 0;
-        matches.forEach(fruit => {
-            if(fruit.icon == game.fruits[2].icon){
+        matches.forEach(tile => {
+            if(tile.isFruit(game.fruits[2].icon)){
               gained++;
             }
         });
@@ -279,8 +279,8 @@ export const upgradeBlueprints = [
       mult: 0,
       onMatch(matches) {
         let gained = 0;
-        matches.forEach(fruit => {
-            if(fruit.icon == game.fruits[3].icon){
+        matches.forEach(tile => {
+            if(tile.isFruit(game.fruits[3].icon)){
               gained++;
             }
         });
@@ -317,8 +317,8 @@ export const upgradeBlueprints = [
       mult: 0,
       onMatch(matches) {
         let gained = 0;
-        matches.forEach(fruit => {
-            if(fruit.icon == game.fruits[4].icon){
+        matches.forEach(tile => {
+            if(tile.isFruit(game.fruits[4].icon)){
               gained++;
             }
         });
@@ -439,7 +439,7 @@ export const upgradeBlueprints = [
       onMatch(matches) {
         let found = false;
         matches.forEach(m => {
-          if (m.icon === game.fruits[3].icon) {
+          if (m.isFruit(game.fruits[3].icon)) {
             this.props.score += this.props.value;
             found = true;
           }
@@ -628,7 +628,7 @@ export const upgradeBlueprints = [
       },
       onMatch(payload) {
         const uniqueFruits = new Set(payload.map(m => m.icon));
-        if (uniqueFruits.has(this.props.chosenFruit.icon)) {
+        if (game.matchesManager.hasIcon(payload,this.props.chosenFruit.icon)) {
           this.props.mult *= 1.5;
           return UPGRADE_STATES.Active;
         }
@@ -808,7 +808,7 @@ export const upgradeBlueprints = [
         if (this.props.chosenFruit == null) return UPGRADE_STATES.Failed;
         var found = false
         matches.forEach(m => {
-          if (m.icon === this.props.chosenFruit.icon) {
+          if (m.isFruit(this.props.chosenFruit.icon)) {
             this.props.score += 20;
             found = true;
           }
@@ -903,7 +903,7 @@ export const upgradeBlueprints = [
           if (m.type == TYPES.Fruit) this.props.collected.add(m.icon)
         });
 
-        if (this.props.collected.size === game.fruits.length) {
+        if (this.props.collected.size === game.fruits.length||game.matchesManager.hasWild(matches)) {
           this.props.score += 200;
           return UPGRADE_STATES.Active;
         }
@@ -918,7 +918,7 @@ export const upgradeBlueprints = [
         return { state: UPGRADE_STATES.Score, message: `+${gained} `+t("ui.pts",Settings.LANGUAGE), style: SCORE_ACTIONS.Score };
       },
       reset(){
-                this.props.score = 0;
+        this.props.score = 0;
       },
       onRoundEnd() {
         this.props.collected.clear();
