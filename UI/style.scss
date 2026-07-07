@@ -1791,7 +1791,7 @@ canvas#glcanvas {
 
 .negative {
   filter: invert(1);
-
+  
   &.inactive {
     filter: invert(1) grayscale(0.8);
   }

@@ -103,7 +103,10 @@ handleDblClick(e) {
 
     // Logika klas wizualnych
     let classes = [];
-    if (upgrade.negative) classes.push("negative");
+    if (upgrade.negative){
+      classes.push("negative");
+      classes.push("metalic-shine");
+    } 
     if (upgrade.modifier == MODIFIERS.Chip) {
       classes.push("chip-foil");
     }
@@ -333,7 +336,10 @@ handleDblClick(e) {
     const modClasses = ["chip-foil", "holo", "shine", "negative", "inactive","mult"];
     cardBackground.classList.remove(...modClasses);
     console.log("mod:"+upgrade.modifier);
-    if (upgrade.negative) cardBackground.classList.add("negative");
+    if (upgrade.negative){
+          cardBackground.classList.add("negative");
+    cardBackground.classList.add("metalic-shine");
+    } 
     if (upgrade.modifier === MODIFIERS.Chip) cardBackground.classList.add("chip-foil");
     else if (upgrade.modifier === MODIFIERS.Polychrome) {
       cardBackground.classList.add("holo");

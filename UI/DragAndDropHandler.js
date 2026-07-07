@@ -9,20 +9,21 @@ export class DragAndDropHandler {
     this.isDragging = false;
     this.dragStarted = false;
     
-    // Pozycja myszy
     this.currentMouseX = 0;
     this.currentMouseY = 0;
     this.lastMouseX = 0;
 
-    // Punkt uchwytu (gdzie na karcie kliknęliśmy)
     this.offsetX = 0;
     this.offsetY = 0;
 
     // LERP - wygładzanie ruchu
     this.lerpX = 0;
     this.lerpY = 0;
-    this.lerpFactor = 0.3; // 0.1 - bardzo ciężka, 0.3 - bardzo responsywna
+    this.lerpFactor = 0.3; // Teraz traktujemy to jako wartość bazową dla 60Hz
     this.lerpInitialized = false;
+
+    // --- NOWE: Zmienne do kontroli czasu ---
+    this.lastFrameTime = 0; 
 
     this.currentRotation = 0;
     this.animationFrameId = null;
@@ -37,40 +38,36 @@ export class DragAndDropHandler {
   }
 
   init() {
-  this.wrapper.addEventListener("mousedown", (e) => {
-    if (e.target.closest('button')) return;
+    this.wrapper.addEventListener("mousedown", (e) => {
+      if (e.target.closest('button')) return;
 
-    // --- NOWE: Przerwanie powrotu ---
-    if (this.wrapper.classList.contains("returning")) {
-      const style = window.getComputedStyle(this.wrapper);
-      const matrix = new WebKitCSSMatrix(style.transform);
-      
-      // Ustalamy lerp na obecną pozycję, żeby karta nie "skoczyła"
-      // Musimy jednak pamiętać, że rect.left w update() odniesie się do nowej bazy
-      this.lerpX = matrix.m41;
-      this.lerpY = matrix.m42;
-      this.lerpInitialized = true;
-      
-      this.wrapper.classList.remove("returning");
-      this.wrapper.style.transition = "none";
-    }
-    // --------------------------------
+      if (this.wrapper.classList.contains("returning")) {
+        const style = window.getComputedStyle(this.wrapper);
+        const matrix = new WebKitCSSMatrix(style.transform);
+        
+        this.lerpX = matrix.m41;
+        this.lerpY = matrix.m42;
+        this.lerpInitialized = true;
+        
+        this.wrapper.classList.remove("returning");
+        this.wrapper.style.transition = "none";
+      }
 
-    this.isDragging = true;
-    this.dragStarted = false;
+      this.isDragging = true;
+      this.dragStarted = false;
 
-    const rect = this.wrapper.getBoundingClientRect();
-    this.offsetX = e.clientX - rect.left;
-    this.offsetY = e.clientY - rect.top;
+      const rect = this.wrapper.getBoundingClientRect();
+      this.offsetX = e.clientX - rect.left;
+      this.offsetY = e.clientY - rect.top;
 
-    this.currentMouseX = e.clientX;
-    this.currentMouseY = e.clientY;
-    this.lastMouseX = e.clientX;
+      this.currentMouseX = e.clientX;
+      this.currentMouseY = e.clientY;
+      this.lastMouseX = e.clientX;
 
-    window.addEventListener("mousemove", this._mouseMoveHandler);
-    window.addEventListener("mouseup", this._mouseUpHandler);
-  });
-}
+      window.addEventListener("mousemove", this._mouseMoveHandler);
+      window.addEventListener("mouseup", this._mouseUpHandler);
+    });
+  }
 
   onMouseMove(e) {
     if (!this.isDragging) return;
@@ -78,26 +75,15 @@ export class DragAndDropHandler {
     this.currentMouseY = e.clientY;
 
     if (!this.dragStarted) {
-      // Próg aktywacji przeciągania mierzymy względem pierwotnego kliknięcia
-      const initialDist = Math.hypot(e.clientX - (this.currentMouseX), e.clientY - (this.currentMouseY));
-      
-      // Prosty check progu (używając zapasowych startX/Y jeśli potrzebujesz, 
-      // ale tutaj bazujemy na ruchu od mousedown)
-      if (Math.abs(e.clientX - (this.currentMouseX + this.offsetX)) > this.dragThreshold) { 
-          // Uprośćmy: jeśli mysz się ruszyła o próg
-      }
-      
-      // Dla uproszczenia logiki progu w tym modelu:
       this.activateDrag();
     }
   }
 
-    activateDrag() {
+  activateDrag() {
     if (this.dragStarted) return;
     this.gameRenderer.resetAllUpgrades();
     this.dragStarted = true;
 
-    // Zapisujemy bazę RAZ na początku
     const rect = this.wrapper.getBoundingClientRect();
     this.baseX = rect.left - this.lerpX;
     this.baseY = rect.top - this.lerpY;
@@ -106,6 +92,9 @@ export class DragAndDropHandler {
     this.wrapper.classList.add("dragging");
     this.wrapper.style.setProperty('--trigger-scale', `1.045`);
     this.wrapper.style.zIndex = 1000;
+    
+    // --- NOWE: Reset czasu przed startem pętli ---
+    this.lastFrameTime = performance.now();
     this.startUpdateLoop();
   }
 
@@ -115,179 +104,151 @@ export class DragAndDropHandler {
     const container = this.wrapper.parentElement;
     if (!container) return;
 
-    // 1. Pomiar pozycji "czystej"
-    // Zamiast usuwać transform, używamy getBoundingClientRect() 
-    // i odejmujemy od niego aktualne lerpX/Y, aby dowiedzieć się gdzie jest "baza" karty.
-    const rect = this.wrapper.getBoundingClientRect();
-    //const baseX = rect.left - this.lerpX;
-    //const baseY = rect.top - this.lerpY;
+    // --- NOWE: Obliczanie Delta Time ---
+    const now = performance.now();
+    // deltaTime to ułamek sekundy (np. ~0.016 dla 60Hz, ~0.007 dla 144Hz)
+    const dt = (now - this.lastFrameTime) / 1000;
+    this.lastFrameTime = now;
 
-    // 2. Docelowa delta względem bazy
+    // Zabezpieczenie przed zamrożeniem karty (np. zmiana karty w przeglądarce)
+    const clampedDt = Math.min(dt, 0.1); 
+
     if (this.isAutoMoving) {
-    const elapsed = performance.now() - this.autoMoveStartTime;
-    // Postęp animacji od 0.0 do 1.0
-    let progress = Math.min(elapsed / this.autoMoveDuration, 1);
+      const elapsed = now - this.autoMoveStartTime;
+      let progress = Math.min(elapsed / this.autoMoveDuration, 1);
 
-    // Funkcja Easingowa: Ease-Out Quad (ruch zwalnia pod koniec)
-    // Jeśli wolisz ruch idealnie liniowy, usuń linijkę poniżej
-    const easeOutQuad = t => t * (2 - t);
-    const easedProgress = easeOutQuad(progress);
+      const easeOutQuad = t => t * (2 - t);
+      const easedProgress = easeOutQuad(progress);
 
-    // Dokładne wyliczenie pozycji w danym ułamku sekundy
-    this.lerpX = this.startX + (this.autoMoveTargetX - this.startX) * easedProgress;
-    this.lerpY = this.startY + (this.autoMoveTargetY - this.startY) * easedProgress;
+      this.lerpX = this.startX + (this.autoMoveTargetX - this.startX) * easedProgress;
+      this.lerpY = this.startY + (this.autoMoveTargetY - this.startY) * easedProgress;
 
-    // Aktualizujemy wirtualną pozycję myszy, żeby logika rotacji (TILT) i SWAP działały poprawnie
-    this.currentMouseX = this.baseX + this.lerpX;
-    this.currentMouseY = this.baseY + this.lerpY;
+      this.currentMouseX = this.baseX + this.lerpX;
+      this.currentMouseY = this.baseY + this.lerpY;
 
-    // Warunek stopu: osiągnęliśmy koniec czasu animacji
-    if (progress >= 1) {
-      // Zmień na false, jeśli po dolecieniu na miejsce karta ma zostać tam, gdzie spadła
-      const wrocNaMiejsceWDOM = true; 
-      this.stopAutoMove(wrocNaMiejsceWDOM);
-      return;
-    }
-  } else {
-    // TWOJA ORYGINALNA LOGIKA DLA MYSZKI
-    const targetDeltaX = (this.currentMouseX - this.offsetX) - this.baseX;
-    const targetDeltaY = (this.currentMouseY - this.offsetY) - this.baseY;
-
-    if (!this.lerpInitialized) {
-        this.lerpX = targetDeltaX;
-        this.lerpY = targetDeltaY;
-        this.lerpInitialized = true;
+      if (progress >= 1) {
+        const wrocNaMiejsceWDOM = true; 
+        this.stopAutoMove(wrocNaMiejsceWDOM);
+        return;
+      }
     } else {
-        this.lerpX += (targetDeltaX - this.lerpX) * this.lerpFactor;
-        this.lerpY += (targetDeltaY - this.lerpY) * this.lerpFactor;
-    }
-  }
-    
-    // 4. Rotacja (bez zmian)
-    const mouseVelocityX = this.currentMouseX - this.lastMouseX;
+      const targetDeltaX = (this.currentMouseX - this.offsetX) - this.baseX;
+      const targetDeltaY = (this.currentMouseY - this.offsetY) - this.baseY;
 
-    // Zmniejszamy mnożnik z 0.8 na ok. 0.4 i clamp z 20 na 12 stopni
+      if (!this.lerpInitialized) {
+          this.lerpX = targetDeltaX;
+          this.lerpY = targetDeltaY;
+          this.lerpInitialized = true;
+      } else {
+          // --- KLUCZOWA POPRAWKA LERPa ---
+          // Konwertujemy tradycyjny współczynnik na niezależny od klatek za pomocą Math.exp.
+          // Liczba 25 reguluje szybkość. Możesz ją zmniejszyć/zwiększyć pod swoje widzimisię.
+          const frameIndependentLerp = 1 - Math.exp(-22 * clampedDt);
+          
+          this.lerpX += (targetDeltaX - this.lerpX) * frameIndependentLerp;
+          this.lerpY += (targetDeltaY - this.lerpY) * frameIndependentLerp;
+      }
+    }
+    
+    // 4. Rotacja i prędkość myszy uniezależniona od FPS
+    // mouseVelocityX mogło wariować przy wysokim Hz, bo dystans w pikselach na klatkę stawał się mikroskopijny.
+    // Dzielenie przez clampedDt normalizuje prędkość "na sekundę".
+    const mouseVelocityX = (this.currentMouseX - this.lastMouseX) / (clampedDt * 60 || 1);
+
     const targetRotation = Math.max(Math.min(mouseVelocityX * 0.4, 90), -90);
 
-    // Zmniejszamy lerp rotacji (0.1 zamiast 0.5), aby karta nie drgała przy małych ruchach
-    this.currentRotation += (targetRotation - this.currentRotation) * 0.4;
+    // Dynamiczny współczynnik obrotu i tłumienia oparty o dt
+    const rotationLerp = 1 - Math.exp(-25 * clampedDt);
+    this.currentRotation += (targetRotation - this.currentRotation) * rotationLerp;
+    
     if (Math.abs(mouseVelocityX) < 0.1) {
-        this.currentRotation *= 0.99; // Tłumienie (damping)
+        // Tłumienie (damping) również przeskalowane czasowo
+        this.currentRotation *= Math.pow(0.95, clampedDt * 60);
     }
 
-    // 5. Renderowanie - tylko zmienne!
+    // 5. Renderowanie
     this.wrapper.style.setProperty('--drag-x', `${this.lerpX}px`);
     this.wrapper.style.setProperty('--drag-y', `${this.lerpY}px`);
     this.wrapper.style.setProperty('--drag-tilt', `${this.currentRotation}deg`);
 
     // 6. Logika SWAP
-    const now = performance.now();
-if (now - this.lastSwapTime > this.swapCooldown) {
-    const target = this.getCardUnderCursor(this.currentMouseX, this.currentMouseY);
+    if (now - this.lastSwapTime > this.swapCooldown) {
+      const target = this.getCardUnderCursor(this.currentMouseX, this.currentMouseY);
 
-    if (target && target !== this.wrapper) {
-        const container = this.wrapper.parentElement;
-        const oldPositions = this.gameRenderer.getPositions(container);
+      if (target && target !== this.wrapper) {
+          const container = this.wrapper.parentElement;
+          const oldPositions = this.gameRenderer.getPositions(container);
 
-        // --- KLUCZOWA POPRAWKA: Korekta Lerp ---
-        const rectBefore = this.wrapper.getBoundingClientRect();
-        const actualBaseBeforeX = rectBefore.left - this.lerpX;
-        const actualBaseBeforeY = rectBefore.top - this.lerpY;
+          const rectBefore = this.wrapper.getBoundingClientRect();
+          const actualBaseBeforeX = rectBefore.left - this.lerpX;
+          const actualBaseBeforeY = rectBefore.top - this.lerpY;
 
-        this.executeReorder(container, target);
+          this.executeReorder(container, target);
 
-        // 2. Mierzymy pozycję po zamianie (nowa baza)
-        const rectAfter = this.wrapper.getBoundingClientRect();
-        const actualBaseAfterX = rectAfter.left - this.lerpX;
-        const actualBaseAfterY = rectAfter.top - this.lerpY;
+          const rectAfter = this.wrapper.getBoundingClientRect();
+          const actualBaseAfterX = rectAfter.left - this.lerpX;
+          const actualBaseAfterY = rectAfter.top - this.lerpY;
 
-        // 3. Obliczamy o ile przesunęła się BAZA karty w DOM
-        const diffX = actualBaseBeforeX - actualBaseAfterX;
-        const diffY = actualBaseBeforeY - actualBaseAfterY;
+          const diffX = actualBaseBeforeX - actualBaseAfterX;
+          const diffY = actualBaseBeforeY - actualBaseAfterY;
 
-        // 4. Korygujemy Lerp
-        this.lerpX += diffX;
-        this.lerpY += diffY;
+          this.lerpX += diffX;
+          this.lerpY += diffY;
 
-        this.baseX = actualBaseAfterX;
-        this.baseY = actualBaseAfterY;
-        // 5. Aktualizujemy zmienne natychmiast
-        this.wrapper.style.setProperty('--drag-x', `${this.lerpX}px`);
-        this.wrapper.style.setProperty('--drag-y', `${this.lerpY}px`);
+          this.baseX = actualBaseAfterX;
+          this.baseY = actualBaseAfterY;
+          
+          this.wrapper.style.setProperty('--drag-x', `${this.lerpX}px`);
+          this.wrapper.style.setProperty('--drag-y', `${this.lerpY}px`);
+          this.wrapper.style.setProperty('--drag-tilt', `${this.currentRotation}deg`);
 
-        // 6. Przywracamy natychmiast transformację z poprawionym lerpem, 
-        // żeby uniknąć mignięcia przed następną klatką
-        this.wrapper.style.setProperty('--drag-x', `${this.lerpX}px`);
-        this.wrapper.style.setProperty('--drag-y', `${this.lerpY}px`);
-        this.wrapper.style.setProperty('--drag-tilt', `${this.currentRotation}deg`);
-        // ---------------------------------------
-
-        // Animuj sąsiadów
-        this.gameRenderer.animateReorder(oldPositions, 280, this.wrapper);
-        
-        this.lastSwapTime = now;
+          this.gameRenderer.animateReorder(oldPositions, 280, this.wrapper);
+          this.lastSwapTime = now;
+      }
     }
-}
 
     this.lastMouseX = this.currentMouseX;
     this.animationFrameId = requestAnimationFrame(() => this.update());
   }
+
   buyTransition(newContainer) {
-  // 1. Zabezpieczenie pętli
-  this.stopUpdateLoop();
+    this.stopUpdateLoop();
+    const rectBefore = this.wrapper.getBoundingClientRect();
+    newContainer.appendChild(this.wrapper);
+    const rectAfter = this.wrapper.getBoundingClientRect();
 
-  // 2. Pobieramy AKTUALNĄ, absolutną pozycję karty na ekranie, zanim cokolwiek zmienimy
-  const rectBefore = this.wrapper.getBoundingClientRect();
+    this.lerpX = rectBefore.left - rectAfter.left;
+    this.lerpY = rectBefore.top - rectAfter.top;
+    this.lerpInitialized = true;
 
-  // 3. Przepinamy kartę w DOM do kontenera gracza (Flexbox natychmiast wylicza nowe miejsce)
-  newContainer.appendChild(this.wrapper);
+    this.baseX = rectAfter.left;
+    this.baseY = rectAfter.top;
 
-  // 4. Pobieramy nową pozycję bazy (czyli tam, gdzie Flexbox chce, żeby karta była)
-  const rectAfter = this.wrapper.getBoundingClientRect();
+    this.wrapper.style.setProperty('--drag-x', `${this.lerpX}px`);
+    this.wrapper.style.setProperty('--drag-y', `${this.lerpY}px`);
+    this.wrapper.style.setProperty('--drag-tilt', `0deg`);
+    this.wrapper.classList.remove("SelectedUpgrade");
+    this.wrapper.style.setProperty('--select-y', '0px');
+    this.wrapper.style.transition = "none";
+    this.wrapper.classList.add("dragging"); 
+    this.wrapper.style.zIndex = 1000;
 
-  // 5. OBLIČZENIE KOREKTY LERPA
-  // Chcemy, żeby karta fizycznie została w starym miejscu, więc jej startowy LERP 
-  // w nowym układzie musi wynosić dokładnie tyle, ile brakowało staremu miejscu do nowego.
-  this.lerpX = rectBefore.left - rectAfter.left;
-  this.lerpY = rectBefore.top - rectAfter.top;
-  this.lerpInitialized = true;
+    this.isAutoMoving = true;
+    this.dragStarted = true;
 
-  // Ustawiamy nową bazę dla logiki myszki (na wypadek, gdyby gracz złapał kartę w locie)
-  this.baseX = rectAfter.left;
-  this.baseY = rectAfter.top;
+    this.startX = this.lerpX;
+    this.startY = this.lerpY;
 
-  // 6. Wstrzykujemy skorygowane zmienne do CSS, żeby uniknąć mignięcia (flicker)
-  this.wrapper.style.setProperty('--drag-x', `${this.lerpX}px`);
-  this.wrapper.style.setProperty('--drag-y', `${this.lerpY}px`);
-  this.wrapper.style.setProperty('--drag-tilt', `0deg`);
-  this.wrapper.classList.remove("SelectedUpgrade");
-  this.wrapper.style.setProperty('--select-y', '0px');
-  // Przygotowanie stylów do lotu
-  this.wrapper.style.transition = "none";
-  this.wrapper.classList.add("dragging"); // dodajemy klasę, żeby zachować z-index itp.
-  this.wrapper.style.zIndex = 1000;
+    this.autoMoveTargetX = 0; 
+    this.autoMoveTargetY = 0;
 
-  // 7. RUCH DO DOCELOWEGO MIEJSCA FLEXBOXA
-  // Ponieważ docelowe miejsce w nowym kontenerze to po prostu transform: translate(0, 0),
-  // możemy użyć Twojej metody moveTo(), kierując ją na punkt (0, 0) w przestrzeni LERPa.
-  
-  // Mały hack: Twoje moveTo potrzebuje globalnych X i Y, więc podajemy jej globalną pozycję nowej bazy
-  this.isAutoMoving = true;
-  this.dragStarted = true;
+    this.autoMoveDuration = 150; 
+    this.autoMoveStartTime = performance.now();
 
-  this.startX = this.lerpX;
-  this.startY = this.lerpY;
+    this.lastFrameTime = performance.now(); // Reset przed pętlą
+    this.startUpdateLoop();
+  }
 
-  // Celujemy w 0, bo transform(0,0) to idealne ułożenie we Flexboxie gracza
-  this.autoMoveTargetX = 0; 
-  this.autoMoveTargetY = 0;
-
-  this.autoMoveDuration = 150; // Czas dolotu karty do ekwipunku gracza w ms
-  this.autoMoveStartTime = performance.now();
-
-  // Odpalamy pętlę - Twoje update() zajmie się resztą (wygładzaniem i rotacją)!
-  this.startUpdateLoop();
-}
   onMouseUp(e) {
     this.stopUpdateLoop();
     if (!this.isDragging) return;
@@ -310,14 +271,12 @@ if (now - this.lastSwapTime > this.swapCooldown) {
     const draggedIndex = children.indexOf(this.wrapper);
     const targetIndex = children.indexOf(targetWrapper);
 
-    // Zamiana w DOM
     if (draggedIndex < targetIndex) {
       container.insertBefore(this.wrapper, targetWrapper.nextSibling);
     } else {
       container.insertBefore(this.wrapper, targetWrapper);
     }
 
-    // Synchronizacja z tablicą w pamięci gry
     const upgrade = this.upgrade;
     if (upgrade.bought && upgrade.type === "Upgrade") {
       const movedUpgrade = this.gameRenderer.game.upgrades.splice(draggedIndex, 1)[0];
@@ -327,43 +286,37 @@ if (now - this.lastSwapTime > this.swapCooldown) {
     }
   }
 
+  executeReturn() {
+    this.wrapper.style.setProperty('--last-x', `${this.lerpX}px`);
+    this.wrapper.style.setProperty('--last-y', `${this.lerpY}px`);
+    this.wrapper.style.setProperty('--last-tilt', `${this.currentRotation}deg`);
 
-executeReturn() {
-  // 1. Zapisujemy pozycję startową dla animacji
-  this.wrapper.style.setProperty('--last-x', `${this.lerpX}px`);
-  this.wrapper.style.setProperty('--last-y', `${this.lerpY}px`);
-  this.wrapper.style.setProperty('--last-tilt', `${this.currentRotation}deg`);
+    this.wrapper.style.setProperty('--drag-x', `0px`);
+    this.wrapper.style.setProperty('--drag-y', `0px`);
+    this.wrapper.style.setProperty('--drag-tilt', `0deg`);
 
-  // 2. Zerujemy zmienne drag, żeby nie przeszkadzały po zakończeniu animacji
-  this.wrapper.style.setProperty('--drag-x', `0px`);
-  this.wrapper.style.setProperty('--drag-y', `0px`);
-  this.wrapper.style.setProperty('--drag-tilt', `0deg`);
+    this.wrapper.style.transform = "none";
+    void this.wrapper.offsetWidth; 
 
-  // 3. KLUCZOWE: Najpierw zdejmujemy transform i wymuszamy przeliczenie stylów
-  this.wrapper.style.transform = "none";
-  void this.wrapper.offsetWidth; // To sprawia, że przeglądarka "widzi" reset
+    this.wrapper.classList.add("returning");
+    this.wrapper.style.transform = "";
 
-  // 4. Teraz dodajemy klasę z animacją
-  this.wrapper.classList.add("returning");
-  // Usuwamy transform inline zupełnie, by animacja z CSS (keyframes) mogła działać
-  this.wrapper.style.transform = "";
+    setTimeout(() => {
+      if (!this.isDragging && this.wrapper.classList.contains("returning")) {
+        this.wrapper.classList.remove("returning");
+        this.wrapper.style.zIndex = "";
+        
+        this.currentRotation = 0;
+        this.lerpX = 0;
+        this.lerpY = 0;
+        this.lerpInitialized = false;
 
-  setTimeout(() => {
-    if (!this.isDragging && this.wrapper.classList.contains("returning")) {
-      this.wrapper.classList.remove("returning");
-      this.wrapper.style.zIndex = "";
-      
-      this.currentRotation = 0;
-      this.lerpX = 0;
-      this.lerpY = 0;
-      this.lerpInitialized = false;
-
-      this.wrapper.style.removeProperty('--last-x');
-      this.wrapper.style.removeProperty('--last-y');
-      this.wrapper.style.removeProperty('--last-tilt');
-    }
-  }, 500); 
-}
+        this.wrapper.style.removeProperty('--last-x');
+        this.wrapper.style.removeProperty('--last-y');
+        this.wrapper.style.removeProperty('--last-tilt');
+      }
+    }, 500); 
+  }
 
   getCardUnderCursor(x, y) {
     const container = this.wrapper.parentElement;
@@ -379,7 +332,6 @@ executeReturn() {
       const cardCenterY = rect.top + rect.height / 2;
       const distance = Math.hypot(x - cardCenterX, y - cardCenterY);
 
-      // Zmniejszamy dystans aktywacji (np. 100), aby karta nie "wariowała" zbyt wcześnie
       if (distance < minDistance && distance < 80) {
         minDistance = distance;
         closestCard = card;
@@ -387,57 +339,57 @@ executeReturn() {
     });
     return closestCard;
   }
+
   moveTo(targetX, targetY, duration = 500) {
-  if (this.isDragging) return;
+    if (this.isDragging) return;
 
-  this.isAutoMoving = true;
-  this.dragStarted = true;
+    this.isAutoMoving = true;
+    this.dragStarted = true;
 
-  // 1. Zapamiętujemy punkt startowy w układzie współrzędnych LERPa
-  this.startX = this.lerpX;
-  this.startY = this.lerpY;
+    this.startX = this.lerpX;
+    this.startY = this.lerpY;
 
-  // 2. Ustalamy bazę karty (jeśli nie była zainicjalizowana)
-  const rect = this.wrapper.getBoundingClientRect();
-  this.baseX = rect.left - this.lerpX;
-  this.baseY = rect.top - this.lerpY;
+    const rect = this.wrapper.getBoundingClientRect();
+    this.baseX = rect.left - this.lerpX;
+    this.baseY = rect.top - this.lerpY;
 
-  // 3. Obliczamy docelową deltę, do której musimy dolecieć
-  this.offsetX = 0;
-  this.offsetY = 0;
-  this.autoMoveTargetX = targetX - this.baseX;
-  this.autoMoveTargetY = targetY - this.baseY;
+    this.offsetX = 0;
+    this.offsetY = 0;
+    this.autoMoveTargetX = targetX - this.baseX;
+    this.autoMoveTargetY = targetY - this.baseY;
 
-  // 4. Konfiguracja czasu i stanu animacji
-  this.autoMoveDuration = duration;
-  this.autoMoveStartTime = performance.now();
+    this.autoMoveDuration = duration;
+    this.autoMoveStartTime = performance.now();
 
-  // 5. Wizualne przygotowanie karty
-  this.wrapper.style.transition = "none";
-  this.wrapper.classList.add("dragging");
-  this.wrapper.style.zIndex = 1000;
+    this.wrapper.style.transition = "none";
+    this.wrapper.classList.add("dragging");
+    this.wrapper.style.zIndex = 1000;
 
-  this.startUpdateLoop();
-}
-
-stopAutoMove(shouldReturn = true) {
-  if (!this.isAutoMoving) return;
-  
-  this.isAutoMoving = false;
-  this.dragStarted = false;
-  this.stopUpdateLoop();
-  
-  this.wrapper.classList.remove("dragging");
-  
-  if (shouldReturn) {
-    this.executeReturn(); // Karta płynnie wróci na swoje miejsce w DOM po zakończeniu lotu
-  } else {
-    // Jeśli nie ma wracać, czyścimy zaporowe style
-    this.wrapper.style.zIndex = "";
+    this.lastFrameTime = performance.now(); // Reset przed pętlą
+    this.startUpdateLoop();
   }
-}
+
+  stopAutoMove(shouldReturn = true) {
+    if (!this.isAutoMoving) return;
+    
+    this.isAutoMoving = false;
+    this.dragStarted = false;
+    this.stopUpdateLoop();
+    
+    this.wrapper.classList.remove("dragging");
+    
+    if (shouldReturn) {
+      this.executeReturn(); 
+    } else {
+      this.wrapper.style.zIndex = "";
+    }
+  }
+
   startUpdateLoop() {
-    if (!this.animationFrameId) this.update();
+    if (!this.animationFrameId) {
+      this.lastFrameTime = performance.now(); // Pilnujemy czystego startu czasu
+      this.update();
+    }
   }
 
   stopUpdateLoop() {
