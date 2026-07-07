@@ -559,6 +559,7 @@ export class Game {
             let tile = new Tile(base);
             tile.x = x;
             tile.y = y; 
+            tile.props.modifier = this.roll.tileModifier(tile);
             return tile;
         }
 
@@ -570,6 +571,7 @@ export class Game {
                 let tile = new Tile(base);
                 tile.x = x;
                 tile.y = y; 
+                tile.props.modifier = this.roll.tileModifier(tile);
                 return tile;
             }
         }
@@ -579,6 +581,7 @@ export class Game {
         let tile = new Tile(base);
             tile.x = x;
             tile.y = y; 
+            tile.props.modifier = this.roll.tileModifier(tile);
             return tile;
     }
     updateCell(x, y) {
