@@ -1051,7 +1051,19 @@ canvas#glcanvas {
       background-color: #ff9a2f9a; // Slightly different tint on hover while selected
     }
   }
-
+  &.highlight-possible-match{
+    &::after {
+      background-color: var(--match-highlight-color, rgba(149, 73, 255, 0.35));
+      opacity: 1;
+    }
+    &.debuffed::after{
+      background-color: color-mix(
+      in srgb, 
+      rgba(255, 73, 73, 0.5) 50%, 
+      var(--match-highlight-color, rgba(149, 73, 255, 0.35))
+    );
+    }
+  }
   // --- HOVER STATE (Tints the image) ---
   &:hover {
     // transform: scale(1.05); // Consider adding a subtle scale

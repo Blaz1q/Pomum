@@ -218,6 +218,139 @@ export class Tile {
         const descriptionNode = this.createDescription();
         container.appendChild(descriptionNode);
     }
+highlightMatchingNeighbours(game) {
+    if (!game || !game.board) return;
+
+    // 1. Czyszczenie poprzednich podświetleń
+    this.clearHighlights();
+
+    const board = game.board;
+    const size = board.length;
+    const originX = this.x;
+    const originY = this.y;
+
+    const getKey = (t) => `${t.x},${t.y}`;
+    const visitedKeys = new Set();
+    const queue = [];
+    const tilesToHighlight = new Set();
+
+    // Funkcja pomocnicza do bezpiecznego dodawania do kolejki BFS
+    const enqueue = (tile) => {
+        if (!tile) return;
+        const key = getKey(tile);
+        if (!visitedKeys.has(key)) {
+            visitedKeys.add(key);
+            queue.push(tile);
+        }
+    };
+
+    // A. Jeśli sam kliknięty kafelek jest specjałem (Bomba / Dynamit)
+    if (this.type === TYPES.Dynamite || this.type === TYPES.Bomb) {
+        enqueue(this);
+    } else {
+        // B. Jeśli to zwykły owoc – symulujemy swap w 4 kierunkach
+        const directions = [
+            { x: 1, y: 0 },  // Prawo
+            { x: -1, y: 0 }, // Lewo
+            { x: 0, y: 1 },  // Dół
+            { x: 0, y: -1 }  // Góra
+        ];
+
+        const runFindMatchesOnBoard = (tempBoard) => {
+            const fakeGameContext = { game: { board: tempBoard } };
+            return game.matchesManager.findMatches.call(fakeGameContext);
+        };
+
+        for (const dir of directions) {
+            const targetX = originX + dir.x;
+            const targetY = originY + dir.y;
+
+            if (targetX < 0 || targetX >= size || targetY < 0 || targetY >= size) continue;
+
+            // Kopia płytka wierszy
+            const tempBoard = board.map(row => [...row]);
+
+            const currentTile = tempBoard[originY][originX];
+            const targetTile = tempBoard[targetY][targetX];
+
+            if (!currentTile || !targetTile) continue;
+
+            // Podmieniamy pozycje
+            tempBoard[originY][originX] = targetTile;
+            tempBoard[targetY][targetX] = currentTile;
+
+            const simulatedMatches = runFindMatchesOnBoard(tempBoard);
+
+            // Sprawdzamy, czy przesuwany kafelek bierze udział w matchu
+            const involvesCurrentTile = simulatedMatches.some(
+                tile => (tile.x === originX && tile.y === originY) || (tile.x === targetX && tile.y === targetY)
+            );
+
+            if (involvesCurrentTile) {
+                simulatedMatches.forEach(tile => enqueue(tile));
+            }
+        }
+    }
+
+    // 2. BFS: Chainowanie wybuchów dla bomb i dynamitów
+    let head = 0;
+    while (head < queue.length) {
+        const tile = queue[head++];
+        tilesToHighlight.add(tile);
+
+        // Jeśli trafiło na Bombę lub Dynamit -> odpalamy jej obszar wybuchu i dołączamy sąsiadów
+        if (tile.type === TYPES.Bomb || tile.type === TYPES.Dynamite) {
+            // Pobieramy obszar wybuchu dla tej konkretnej pozycji i typu
+            const explosionArea = this.getExplosionArea(board, size, tile.x, tile.y, tile.type);
+            
+            explosionArea.forEach(impactedTile => {
+                if (impactedTile) {
+                    enqueue(impactedTile); // Jeśli trafi na kolejną bombę/dynamit, pętla while też go przetworzy!
+                }
+            });
+        }
+    }
+
+    // 3. Podświetlamy wszystkie zebrane kafelki w DOM
+    tilesToHighlight.forEach(tile => {
+        const domTile = document.querySelector(`[data-x="${tile.x}"][data-y="${tile.y}"]`);
+        if (domTile) {
+            domTile.classList.add("highlight-possible-match");
+        }
+    });
+}
+getExplosionArea(board, size, centerX, centerY, type) {
+    const area = [];
+
+    if (type === TYPES.Dynamite) {
+        
+        
+        if (centerX > 0) area.push(board[centerY][centerX - 1]);             // Lewo
+        if (centerX < size - 1) area.push(board[centerY][centerX + 1]);         // Prawo
+        if (centerY > 0) area.push(board[centerY - 1][centerX]);             // Góra
+        if (centerY < size - 1) area.push(board[centerY + 1][centerX]);         // Dół
+        
+    } else if (type === TYPES.Bomb) {
+        // Obszar 3x3 wokół kafelka
+        for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+                const nx = centerX + dx;
+                const ny = centerY + dy;
+                if (nx >= 0 && nx < size && ny >= 0 && ny < size) {
+                    area.push(board[ny][nx]);
+                }
+            }
+        }
+    }
+
+    return area;
+}
+// Czyszczenie klas podświetlenia
+clearHighlights() {
+    document.querySelectorAll(".highlight-possible-match").forEach(el => {
+        el.classList.remove("highlight-possible-match");
+    });
+}
     render(game){
         const Tile = this;
         const x = Tile.x;
@@ -239,7 +372,13 @@ export class Tile {
 
         // kliknięcie
         element.addEventListener("click", () => game.handleClick(x, y, element));
-        element.addEventListener("mouseover", ()=> this.hover());
+        element.addEventListener("mouseover", ()=> {
+            this.hover()
+            this.highlightMatchingNeighbours(game); // Symuluje ruchy i podświetla potencjalne matche
+        });
+        element.addEventListener("mouseleave", () => {
+            this.clearHighlights(); // Czyści podświetlenia po zjechaniu kafelka
+        });
         // przeciąganie
         element.draggable = true;
         element.addEventListener("dragstart", (e) => {

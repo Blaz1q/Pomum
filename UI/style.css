@@ -794,6 +794,13 @@ canvas#glcanvas {
 .game .right-panel #body div.selected:hover::after {
   background-color: rgba(255, 154, 47, 0.6039215686);
 }
+.game .right-panel #body div.highlight-possible-match::after {
+  background-color: var(--match-highlight-color, rgba(149, 73, 255, 0.35));
+  opacity: 1;
+}
+.game .right-panel #body div.highlight-possible-match.debuffed::after {
+  background-color: color-mix(in srgb, rgba(255, 73, 73, 0.5) 50%, var(--match-highlight-color, rgba(149, 73, 255, 0.35)));
+}
 .game .right-panel #body div:hover {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }

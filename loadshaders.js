@@ -178,6 +178,28 @@ export class Animator {
         this.targetColors = color.map(c =>
             Array.isArray(c) ? [...c] : Animator.hexToVec3(c)
         );
+        const primaryBgColor = color[0]; 
+    let rgbString = "";
+
+    if (Array.isArray(primaryBgColor)) {
+        // Jeśli jest tablicą RGB [r, g, b] (np. 0-255 lub 0-1)
+        const [r, g, b] = primaryBgColor.map(v => v <= 1 ? Math.round(v * 255) : v);
+        rgbString = `${r}, ${g}, ${b}`;
+    } else if (typeof primaryBgColor === 'string') {
+        // Jeśli jest HEXem (#RRGGBB)
+        const vec = Animator.hexToVec3(primaryBgColor);
+        const [r, g, b] = vec.map(v => v <= 1 ? Math.round(v * 255) : v);
+        rgbString = `${r}, ${g}, ${b}`;
+    }
+
+    if (rgbString) {
+        // Ustawiamy zmienną CSS na kontenerze gry (lub document.documentElement)
+        // 0.35 to przezroczystość (odpowiednik Twojego '59' w hex)
+        document.documentElement.style.setProperty(
+            '--match-highlight-color', 
+            `rgba(${rgbString}, 0.35)`
+        );
+    }
         this.colorAnimProgress = 0;
         this.colorAnimDuration = durationFrames;
         this.colorAnimating = true;
